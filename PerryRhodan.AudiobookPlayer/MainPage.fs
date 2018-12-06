@@ -90,7 +90,7 @@ open Common
         | PermissionDenied ->
             model, Cmd.none, Some GotoPermissionDeniedPage
         | LoadLocalAudiobooks -> 
-            model, Cmd.batch [ loadLocalAudioBooks (); Cmd.ofMsg (ChangeBusyState true)], None
+            model, Cmd.batch [ Cmd.ofMsg (ChangeBusyState true); loadLocalAudioBooks ()], None
         | LocalAudioBooksLoaded ab ->
             let mapedAb = ab |> Array.map (fun i -> AudioBookItem.initModel i)
             { model with Audiobooks = mapedAb }, Cmd.ofMsg (ChangeBusyState false), None
