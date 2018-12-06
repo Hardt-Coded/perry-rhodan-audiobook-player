@@ -1,0 +1,45 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="browse_icon.png" />
+    <Content Include="home_icon.png" />
+    <Content Include="AudioBookPlaceholder_Dark.png" />
+    <EmbeddedResource Include="AudioBookPlaceholder.png" />
+    <None Include="repl_stuff.fsx" />
+    <Content Include="einsamediaDownloadPage.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Compile Include="SampleData.fs" />
+    <Compile Include="Common.fs" />
+    <Compile Include="Domain.fs" />
+    <Compile Include="Services.fs" />
+    <Compile Include="Controls.fs" />
+    <Compile Include="LoginPage.fs" />
+    <Compile Include="AudioBookItem.fs" />
+    <Compile Include="DownloadQueue.fs" />
+    <Compile Include="BrowserPage.fs" />
+    <Compile Include="AudioPlayerPage.fs" />
+    <Compile Include="MainPage.fs" />
+    <Compile Include="App.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="FSharp.Data" Version="3.0.0" />
+    <PackageReference Include="Plugin.Permissions" Version="3.0.0.12" />
+    <PackageReference Include="SharpZipLib" Version="1.0.0" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="1.0.0-beta0005" />
+    <PackageReference Include="System.IO.Compression.ZipFile" Version="4.3.0" />
+    <PackageReference Include="Xamarin.FFImageLoading" Version="2.4.4.859" />
+    <PackageReference Include="Xamarin.Forms" Version="3.4.0.1008975" />
+    <PackageReference Include="Xamarin.Essentials" Version="0.6.0-preview" />
+    <PackageReference Include="Fabulous.Core" Version="0.27.1" />
+    <PackageReference Include="Fabulous.LiveUpdate" Version="0.27.1" />
+    <PackageReference Include="FSharp.Core" Version="4.5.2" />
+    <PackageReference Update="FSharp.Core" Version="4.5.4" /> <!-- workaround for VSMac bug https://github.com/mono/monodevelop/pull/5137 --> 
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
+  </ItemGroup>
+</Project>
