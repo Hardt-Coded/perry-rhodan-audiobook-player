@@ -155,10 +155,10 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Fabulous.Core">
-      <HintPath>..\packages\Fabulous.Core.0.27.1\lib\netstandard2.0\Fabulous.Core.dll</HintPath>
+      <HintPath>..\packages\Fabulous.Core.0.28.0\lib\netstandard2.0\Fabulous.Core.dll</HintPath>
     </Reference>
     <Reference Include="Fabulous.CustomControls">
-      <HintPath>..\packages\Fabulous.CustomControls.0.27.1\lib\netstandard2.0\Fabulous.CustomControls.dll</HintPath>
+      <HintPath>..\packages\Fabulous.CustomControls.0.28.0\lib\netstandard2.0\Fabulous.CustomControls.dll</HintPath>
     </Reference>
     <Reference Include="Fabulous.LiveUpdate">
       <HintPath>..\packages\Fabulous.LiveUpdate.0.27.1\lib\netstandard2.0\Fabulous.LiveUpdate.dll</HintPath>
@@ -206,6 +206,9 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
     <Reference Include="System.Numerics.Vectors" />
+    <Reference Include="taglib-sharp">
+      <HintPath>..\packages\taglib-sharp-netstandard2.0.2.1.0\lib\netstandard2.0\taglib-sharp.dll</HintPath>
+    </Reference>
     <Reference Include="WebP.Touch">
       <HintPath>..\packages\WebP.Touch.1.0.8\lib\Xamarin.iOS10\WebP.Touch.dll</HintPath>
     </Reference>

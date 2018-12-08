@@ -45,6 +45,9 @@ type AudioPlayer() =
         member this.CurrentPosition 
             with get () = mediaPlayer.CurrentPosition
         
+        member this.CurrentDuration 
+            with get () = mediaPlayer.Duration
+
         member this.LastPositionBeforeStop with get () = lastPositionBeforeStop
 
         member this.OnCompletion 
@@ -86,9 +89,31 @@ type AudioPlayer() =
 
         member this.GotToPosition ms =
             mediaPlayer.SeekTo(ms)
+
+        //member this.GetMp3Duration files =
+        //    async {
+        //        let metaRetriever = new MediaMetadataRetriever()
+                
+                
+        //        let! res =
+        //            Common.asyncFunc (fun () ->
+        //                let res = 
+        //                    files
+        //                    |> List.map (
+        //                        fun file -> 
+        //                            metaRetriever.SetDataSource(file)
+        //                            let duration =  
+        //                                metaRetriever.ExtractMetadata(Android.Media.MetadataKey.Duration)
+        //                            let (ok,duration) = Int32.TryParse(duration)
+        //                            (file, if ok then duration else 0)
+        //                    )
+        //                res
+        //            )       
+        //        metaRetriever.Dispose()
+        //        return res                
+        //    }
         
-        //[<CLIEvent>]
-        //member this.OnGotoPositionComplete = onGotoPositionCompleteEvent.Publish
+        
             
 
 

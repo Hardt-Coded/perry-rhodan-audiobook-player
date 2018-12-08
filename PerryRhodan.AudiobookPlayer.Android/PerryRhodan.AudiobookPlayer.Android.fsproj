@@ -27,8 +27,8 @@
     <RestorePackages>true</RestorePackages>
     <OtherFlags>/warnon:1182</OtherFlags>
     <WarningLevel>4</WarningLevel>
-    <SelectedDevice>Android_Accelerated_x86_Nougat</SelectedDevice>
-    <DefaultDevice>Android_Accelerated_x86_Nougat</DefaultDevice>
+    <SelectedDevice>Android_Accelerated_x86</SelectedDevice>
+    <DefaultDevice>Android_Accelerated_x86</DefaultDevice>
     <AndroidDesignerPreferredTheme>Theme.DeviceDefault.NoActionBar.Fullscreen</AndroidDesignerPreferredTheme>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -132,10 +132,10 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Fabulous.Core">
-      <HintPath>..\packages\Fabulous.Core.0.27.1\lib\netstandard2.0\Fabulous.Core.dll</HintPath>
+      <HintPath>..\packages\Fabulous.Core.0.28.0\lib\netstandard2.0\Fabulous.Core.dll</HintPath>
     </Reference>
     <Reference Include="Fabulous.CustomControls">
-      <HintPath>..\packages\Fabulous.CustomControls.0.27.1\lib\netstandard2.0\Fabulous.CustomControls.dll</HintPath>
+      <HintPath>..\packages\Fabulous.CustomControls.0.28.0\lib\netstandard2.0\Fabulous.CustomControls.dll</HintPath>
     </Reference>
     <Reference Include="Fabulous.LiveUpdate">
       <HintPath>..\packages\Fabulous.LiveUpdate.0.27.1\lib\netstandard2.0\Fabulous.LiveUpdate.dll</HintPath>
@@ -193,6 +193,9 @@
     </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Xml" />
+    <Reference Include="taglib-sharp">
+      <HintPath>..\packages\taglib-sharp-netstandard2.0.2.1.0\lib\netstandard2.0\taglib-sharp.dll</HintPath>
+    </Reference>
     <Reference Include="Xamarin.Android.Arch.Core.Common">
       <HintPath>..\packages\Xamarin.Android.Arch.Core.Common.1.0.0.1\lib\MonoAndroid80\Xamarin.Android.Arch.Core.Common.dll</HintPath>
     </Reference>

@@ -8,7 +8,7 @@ open System.Threading.Tasks
 
 type AudioBookPosition = 
     { Filename: string
-      Psoition: TimeSpan }
+      Position: TimeSpan }
 
 type AudioBookState = 
     { Completed:bool

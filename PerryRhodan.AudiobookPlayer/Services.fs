@@ -26,6 +26,7 @@ type IAndroidDownloadFolder =
 type IAudioPlayer = 
 
     abstract member CurrentPosition: int with get
+    abstract member CurrentDuration: int with get
     abstract member LastPositionBeforeStop: int option with get
 
     abstract member OnCompletion: (unit -> unit) option with get,set
@@ -34,6 +35,7 @@ type IAudioPlayer =
     abstract member ContinuePlayFile:string -> int -> Async<unit>
     abstract member Stop:unit -> unit
     abstract member GotToPosition: int -> unit
+    //abstract member GetMp3Duration:string list -> Async<(string*int) list>
     
     
 
@@ -272,7 +274,7 @@ let downloadAudiobook cookies updateProgress audiobook =
                                 Directory.CreateDirectory(unzipTargetFolder) |> ignore
 
                             let! imageFileNames = 
-                                asyncMethod (fun () ->   
+                                asyncFunc (fun () ->   
                                     use archiveFile = File.OpenRead(targetFileName)
                                     use archive = new ICSharpCode.SharpZipLib.Zip.ZipFile(archiveFile)
                                     //use archive = ZipFile.OpenRead(targetFileName)    

@@ -38,11 +38,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Fabulous.Core, Version=0.27.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Fabulous.Core.0.27.1\lib\netstandard2.0\Fabulous.Core.dll</HintPath>
+    <Reference Include="Fabulous.Core, Version=0.28.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Fabulous.Core.0.28.0\lib\netstandard2.0\Fabulous.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Fabulous.CustomControls, Version=0.27.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Fabulous.CustomControls.0.27.1\lib\netstandard2.0\Fabulous.CustomControls.dll</HintPath>
+    <Reference Include="Fabulous.CustomControls, Version=0.28.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Fabulous.CustomControls.0.28.0\lib\netstandard2.0\Fabulous.CustomControls.dll</HintPath>
     </Reference>
     <Reference Include="FFImageLoading, Version=2.4.4.859, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Xamarin.FFImageLoading.2.4.4.859\lib\netstandard1.0\FFImageLoading.dll</HintPath>
@@ -226,6 +226,9 @@
       <HintPath>..\packages\System.Xml.ReaderWriter.4.3.1\lib\net46\System.Xml.ReaderWriter.dll</HintPath>
       <Private>True</Private>
       <Private>True</Private>
+    </Reference>
+    <Reference Include="taglib-sharp, Version=2.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\taglib-sharp-netstandard2.0.2.1.0\lib\netstandard2.0\taglib-sharp.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />

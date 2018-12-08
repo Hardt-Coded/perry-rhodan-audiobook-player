@@ -12,6 +12,8 @@ open System.IO
 open System.Threading
 
 
+    
+
     type PlayerState =
         | Stopped        
         | Playing
@@ -20,11 +22,16 @@ open System.Threading
       { AudioBook:AudioBook 
         CurrentAudioFile: string option
         CurrentAudioFileIndex: int
-        CurrentPosition: TimeSpan option 
+        CurrentPosition: TimeSpan option  
+        CurrentPositionMs: int option 
+        CurrentDuration: TimeSpan option  
+        CurrentDurationMs: int option
         CurrentState : PlayerState
-        AudioFileList: string list 
+        AudioFileList: (string * int) list 
         IsLoading: bool 
-        CurrentPlayingStateUpdateTimer:Timer option}
+        CurrentPlayingStateUpdateTimer:Timer option 
+        TrackPositionProcess: float
+        ProgressbarValue: float }
 
     type Msg = 
         | Play 
@@ -35,9 +42,13 @@ open System.Threading
         | PreviousAudioFile
         | JumpForward
         | JumpBackwards
-        | FileListLoaded of string list
+        | FileListLoaded of (string * int) list
 
-        | UpdatePostion of int
+        | UpdatePostion of position:int * duration:int
+
+        | ProgressBarChanged of float
+
+        | SaveCurrentPosition of AudioBook
 
         | ChangeBusyState of bool
         | DoNothing
@@ -46,6 +57,8 @@ open System.Threading
         | GotoMainPage
         | GotoBrowserPage
 
+
+    let audioPlayer = DependencyService.Get<Services.IAudioPlayer>()
 
     let toTimeSpan (ms:int) =
         TimeSpan.FromMilliseconds(ms |> float)
@@ -67,21 +80,32 @@ open System.Threading
             | None -> return None
             | Some folder ->
                 let! files = 
-                    asyncMethod( 
+                    asyncFunc( 
                         fun () -> folder |> Directory.EnumerateFiles
                     )
-                return Some (FileListLoaded (files |> Seq.toList))
+                
+                let! res =
+                    asyncFunc (fun () ->
+                        files 
+                        |> Seq.toList 
+                        |> List.map (
+                            fun i ->
+                                use tfile = TagLib.File.Create(i)
+                                (i,tfile.Properties.Duration |> fromTimeSpan)
+                        )
+                    )
+                return Some (FileListLoaded (res |> List.sortBy (fun (f,_) -> f)))
         } |> Cmd.ofAsyncMsgOption
 
 
     let playAudio model =
         (fun (dispatch:Dispatch<Msg>) -> 
             async {
-                let audioPlayer = DependencyService.Get<Services.IAudioPlayer>()
+                //let audioPlayer = DependencyService.Get<Services.IAudioPlayer>()
                 if model.AudioFileList.Length = 0 then
                     return DoNothing
                 else
-                    let file = model.AudioFileList.[model.CurrentAudioFileIndex]
+                    let (file,_) = model.AudioFileList.[model.CurrentAudioFileIndex]
                     let currentPosition =model.CurrentPosition |> fromTimeSpanOpt
 
                     audioPlayer.OnCompletion <- Some (fun ()-> dispatch NextAudioFile)
@@ -89,14 +113,14 @@ open System.Threading
                     do! audioPlayer.PlayFile file currentPosition
                     let timer =
                         new Timer(
-                            fun _ -> dispatch (UpdatePostion audioPlayer.CurrentPosition)
+                            fun _ -> dispatch (UpdatePostion (audioPlayer.CurrentPosition, audioPlayer.CurrentDuration))
                         , null, 0, 1000)
                     return (PlayStarted timer)
             }
         ) |> Cmd.ofAsyncWithInternalDispatch
 
     let stopAudio model =
-        let audioPlayer = DependencyService.Get<Services.IAudioPlayer>()
+        //let audioPlayer = DependencyService.Get<Services.IAudioPlayer>()
         audioPlayer.Stop () |> ignore
         audioPlayer.OnCompletion <- None
         match model.CurrentPlayingStateUpdateTimer with
@@ -105,17 +129,42 @@ open System.Threading
             timer.Dispose()
             audioPlayer.LastPositionBeforeStop
 
-    let setAudioPosition value model =
+    let setAudioPositionRelative value model =
         match model.CurrentPosition with
         | None -> ()            
         |  Some pos ->
             let msPos = pos |> fromTimeSpan
             let newPos = if msPos + value < 0 then 0 else msPos + value
-            let audioPlayer = DependencyService.Get<Services.IAudioPlayer>()
             audioPlayer.GotToPosition (newPos) |> ignore
+ 
+ 
+    let setAudioPositionAbsolute value =
+        audioPlayer.GotToPosition (value) |> ignore
 
-            
-        
+    
+    let saveCurrentPosition model =
+        async {
+            do! Async.Sleep 5000
+
+            match model.CurrentPosition, model.CurrentAudioFile with
+            | Some cp, Some file ->
+                let newPos = { Position = cp; Filename = file } 
+                let newState = { model.AudioBook.State with CurrentPosition = Some newPos }
+                let newAudioBook = { model.AudioBook with State = newState }
+
+                let! res =  newAudioBook |> Services.updateAudioBookInStateFile
+                match res with
+                | Error e ->
+                    do! Common.Helpers.displayAlert("Error save Position",e,"Ok")
+                    return (Some Stop)
+                | Ok _ ->
+                    if (model.CurrentState = Stopped) then
+                        return None
+                    else
+                        return Some (SaveCurrentPosition newAudioBook)
+            | _,_ ->
+                return Some (SaveCurrentPosition model.AudioBook)
+        } |> Cmd.ofAsyncMsgOption
         
 
     let unsetBusyCmd = Cmd.ofMsg (ChangeBusyState false)
@@ -123,81 +172,199 @@ open System.Threading
 
     let setBusyCmd = Cmd.ofMsg (ChangeBusyState true)
 
+
     let initModel audioBook = 
         { AudioBook = audioBook; 
-          CurrentAudioFile = None; 
+          CurrentAudioFile = None
           CurrentAudioFileIndex = 0
-          CurrentPosition= None; 
-          CurrentState = Stopped; 
-          AudioFileList = []; 
-          IsLoading=false; 
-          CurrentPlayingStateUpdateTimer=None }
+          CurrentPosition= None    
+          CurrentPositionMs = None
+          CurrentDuration= None    
+          CurrentDurationMs = None
+          CurrentState = Stopped
+          AudioFileList = []
+          IsLoading=false
+          CurrentPlayingStateUpdateTimer=None
+          TrackPositionProcess=0.0
+          ProgressbarValue = 0.0 }
 
     let init audioBook = 
         let model = audioBook |> initModel
+
         model, Cmd.batch [(audioBook |> loadFilesCommand); setBusyCmd]
 
-    
 
-    let update msg model =
+    let rec update msg model =
         match msg with
-        | Play ->
-            let playAudioCmd = model |> playAudio
-            {model with CurrentState = Playing}, Cmd.batch [ playAudioCmd ], None
-        | PlayStarted timer ->
-            {model with CurrentPlayingStateUpdateTimer = Some timer}, Cmd.none, None
-        | Stop -> 
-            let lastPosition = 
-                model 
-                |> stopAudio
-                |> Option.map (toTimeSpan)
-
-            {model with CurrentState = Stopped; CurrentPlayingStateUpdateTimer = None; CurrentPosition = lastPosition}, Cmd.none, None
+        | Play -> 
+            model |> onPlayMsg
+        | PlayStarted timer -> 
+            model |> onPlayStartedMsg timer            
+        | Stop ->
+            model |> onStopMsg
         | NextAudioFile -> 
-            let newIndex = 
-                let max = model.AudioFileList.Length - 1
-                let n = model.CurrentAudioFileIndex + 1
-                if n > max then max else n
-
-            let newModel = {model with CurrentAudioFileIndex = newIndex; CurrentPosition = None}
-            
-            if newModel.CurrentState = Playing then
-                newModel |> stopAudio |> ignore
-                let playAudioCmd = newModel |> playAudio
-                newModel, playAudioCmd, None
-            else
-                newModel, Cmd.none, None
-                
-            
+            model |> onNextAudioFileMsg
         | PreviousAudioFile -> 
-            let newIndex =                 
-                let n = model.CurrentAudioFileIndex - 1
-                if n < 0 then 0 else n
-            let newModel = {model with CurrentAudioFileIndex = newIndex; CurrentPosition = None}
-
-            if newModel.CurrentState = Playing then
-                newModel |> stopAudio |> ignore
-                let playAudioCmd = newModel |> playAudio
-                newModel, playAudioCmd, None
-            else
-                newModel, Cmd.none, None
-
+            model |> onPreviousAudioFileMsg
         | JumpForward -> 
-            model |> setAudioPosition 30000
-            model, Cmd.none, None
+            model |> onJumpForwardMsg            
         | JumpBackwards -> 
-            model |> setAudioPosition -30000
-            model, Cmd.none, None
-        | FileListLoaded fileList ->
-            {model with AudioFileList = fileList}, unsetBusyCmd, None
-
-        | UpdatePostion ms ->
-            {model with CurrentPosition = Some (ms |> toTimeSpan)}, Cmd.none, None
-
+            model |> onJumpBackwardsMsg
+        | FileListLoaded fileList -> 
+            model |> onFileListLoadedMsg fileList
+        | UpdatePostion (position, duration) -> 
+            model |> onUpdatePositionMsg (position, duration)
+        | ProgressBarChanged e -> 
+            model |> onProgressBarChangedMsg e
+        | SaveCurrentPosition ab ->
+            {model with AudioBook = ab}, model |> saveCurrentPosition, None
         | ChangeBusyState state -> 
             {model with IsLoading = state}, Cmd.none, None
         | PlayStopped | DoNothing -> 
             model, Cmd.none, None
+
+    and onPlayMsg model = 
+        let playAudioCmd = model |> playAudio
+        let newModel = {model with CurrentState = Playing}
+        newModel, Cmd.batch [ playAudioCmd; Cmd.ofMsg (newModel.AudioBook |> SaveCurrentPosition) ], None
+
+
+    and onPlayStartedMsg timer model =
+        {model with CurrentPlayingStateUpdateTimer = Some timer}, Cmd.none, None
+
+
+    and onStopMsg model =
+        let lastPosition = 
+            model 
+            |> stopAudio
+            |> Option.map (toTimeSpan)
+        let newModel = { model with CurrentState = Stopped; CurrentPlayingStateUpdateTimer = None; CurrentPosition = lastPosition}
+        newModel, newModel |> saveCurrentPosition , None
+
+    
+    and onNextAudioFileMsg model =
+        let newIndex = 
+            let max = model.AudioFileList.Length - 1
+            let n = model.CurrentAudioFileIndex + 1
+            if n > max then max else n
+        let (fn,duration) = model.AudioFileList.[newIndex]
+        let currentDuration = duration |> toTimeSpan
+        let currentDurationMs = duration
+
+        let newModel = 
+            { model with 
+                CurrentAudioFileIndex = newIndex
+                CurrentDuration = Some currentDuration
+                CurrentDurationMs = Some currentDurationMs
+                CurrentAudioFile = Some fn
+                CurrentPosition = None }
+            
+        if newModel.CurrentState = Playing then
+            newModel |> stopAudio |> ignore
+            let playAudioCmd = newModel |> playAudio
+            newModel, playAudioCmd, None
+        else
+            newModel, Cmd.none, None
+
+
+    and onPreviousAudioFileMsg model =
+        let newIndex =                 
+            let n = model.CurrentAudioFileIndex - 1
+            if n < 0 then 0 else n
+        let (fn,duration) = model.AudioFileList.[newIndex]
+        let currentDuration = duration |> toTimeSpan
+        let currentDurationMs = duration
+        let newModel = 
+            { model with 
+                CurrentAudioFileIndex = newIndex
+                CurrentDuration = Some currentDuration
+                CurrentDurationMs = Some currentDurationMs
+                CurrentAudioFile = Some fn
+                CurrentPosition = None }
+
+        if newModel.CurrentState = Playing then
+            newModel |> stopAudio |> ignore
+            let playAudioCmd = newModel |> playAudio
+            newModel, playAudioCmd, None
+        else
+            newModel, Cmd.none, None
+
+
+    and onJumpForwardMsg model =
+        model |> setAudioPositionRelative 30000
+        model, Cmd.none, None
+
+
+    and onJumpBackwardsMsg model =
+        model |> setAudioPositionRelative -30000
+        model, Cmd.none, None
+
+
+    and onFileListLoadedMsg fileList model =
+        match model.AudioBook.State.CurrentPosition with
+        | None ->
+            let (fn,duration) = fileList.[0]
+            let currentDuration = duration |> toTimeSpan
+            let currentDurationMs = duration
+            {model with 
+                AudioFileList = fileList
+                CurrentDuration = Some currentDuration
+                CurrentDurationMs = Some currentDurationMs
+                CurrentAudioFile = Some fn
+                CurrentAudioFileIndex = 0
+            }, unsetBusyCmd, None
+        | Some cp ->
+            let lastListenFile = 
+                fileList
+                |> List.indexed
+                |> List.tryFind (fun (_,(fn,_)) -> fn = cp.Filename)
+            match lastListenFile with
+            | None -> 
+                {model with AudioFileList = fileList}, unsetBusyCmd, None
+            | Some (idx, (fn, duration)) ->
+                let currentPosition = cp.Position
+                let currentPositionMs = cp.Position |> fromTimeSpan
+                let currentDuration = duration |> toTimeSpan
+                let currentDurationMs = duration
+                {model with 
+                    AudioFileList = fileList
+                    CurrentPosition = Some currentPosition
+                    CurrentPositionMs = Some currentPositionMs
+                    CurrentDuration = Some currentDuration
+                    CurrentDurationMs = Some currentDurationMs
+                    CurrentAudioFile = Some fn
+                    CurrentAudioFileIndex = idx
+                }, unsetBusyCmd, None
+
+
+    and onUpdatePositionMsg (position, duration) model =
+        let trackProcess = 
+            if (duration = 0) then 0.0
+            else
+                (position |> float) / (duration |> float)
+
+        {model with 
+            CurrentPosition = Some (position |> toTimeSpan)
+            CurrentPositionMs = Some position
+            CurrentDuration = Some (duration |> toTimeSpan)
+            CurrentDurationMs = Some duration
+            TrackPositionProcess = trackProcess
+        }, Cmd.none, None
+
+
+    and onProgressBarChangedMsg e model =
+        let min = model.TrackPositionProcess - 0.03
+        let max = model.TrackPositionProcess + 0.03
+        if (e < min || e > max ) then
+            if model.CurrentDurationMs.IsSome then
+                let newPos = ((model.CurrentDurationMs.Value |> float) * e) |> int
+                setAudioPositionAbsolute  newPos
+
+        {model with ProgressbarValue = e}, Cmd.none, None
+
+
+
+
 
     let view (model: Model) dispatch =
         View.ContentPage(
@@ -207,19 +374,20 @@ open System.Threading
             View.Grid(padding = 20.0,
                 horizontalOptions = LayoutOptions.Fill,
                 verticalOptions = LayoutOptions.Fill,                
-                rowdefs = [ box "*"; box "*"; box "*" ],
+                rowdefs = [ box "*"; box "*"; box "*"; box "auto" ],
                 
                 children = [
 
                     // Todo: Data Stuff
                     let currentPos = (model.CurrentPosition |> Option.defaultValue TimeSpan.Zero).ToString("hh\:mm\:ss")
+                    let currentDuration = (model.CurrentDuration |> Option.defaultValue TimeSpan.Zero).ToString("hh\:mm\:ss")
                     yield View.StackLayout(orientation = StackOrientation.Vertical,
                         verticalOptions=LayoutOptions.Fill,
                         horizontalOptions=LayoutOptions.Center,                        
                         children = [
                             yield (Controls.primaryTextColorLabel 25.0 (model.AudioBook.FullName ))
                             yield (Controls.primaryTextColorLabel 40.0 (sprintf "Track: %i von %i" (model.CurrentAudioFileIndex + 1) model.AudioFileList.Length ))
-                            yield (Controls.primaryTextColorLabel 40.0 (sprintf "%s" currentPos))
+                            yield (Controls.primaryTextColorLabel 30.0 (sprintf "%s von %s" currentPos currentDuration))
                         ]
                     ).GridRow(0)
                     
@@ -252,8 +420,17 @@ open System.Threading
                             yield (Controls.primaryColorSymbolLabelWithTapCommand (fun () -> dispatch JumpForward) 45.0 true "\uf04e").GridColumn(3).GridRow(0)
                             yield (Controls.primaryColorSymbolLabelWithTapCommand (fun () -> dispatch NextAudioFile) 45.0 true "\uf051").GridColumn(4).GridRow(0)
                             
+                            yield (View.Slider(
+                                    value=model.TrackPositionProcess,
+                                    minimum = 0.0, maximum = 1.0, 
+                                    horizontalOptions = LayoutOptions.Fill,
+                                    valueChanged= (fun e -> dispatch (ProgressBarChanged e.NewValue))
+                                  )).GridColumnSpan(5).GridRow(1)
+
                         ]).GridRow(2)
 
+                    //yield (Controls.primaryTextColorLabel 40.0 (sprintf "%f" model.ProgressbarValue)).GridRow(3)
+                    
                     if model.IsLoading then 
                         yield Common.createBusyLayer().GridRowSpan(3)
                 ]

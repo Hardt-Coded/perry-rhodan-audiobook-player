@@ -43,7 +43,7 @@
             ]
         )
 
-    let asyncMethod f = 
+    let asyncFunc f = 
         async {  
             let original = System.Threading.SynchronizationContext.Current
             do! Async.SwitchToNewThread() 
