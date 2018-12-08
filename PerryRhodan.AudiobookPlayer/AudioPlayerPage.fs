@@ -10,6 +10,7 @@ open System
 open System.Threading.Tasks
 open System.IO
 open System.Threading
+open System.Threading
 
 
     
@@ -31,7 +32,8 @@ open System.Threading
         IsLoading: bool 
         CurrentPlayingStateUpdateTimer:Timer option 
         TrackPositionProcess: float
-        ProgressbarValue: float }
+        ProgressbarValue: float         
+        TimeUntilSleeps: TimeSpan option}
 
     type Msg = 
         | Play 
@@ -43,13 +45,11 @@ open System.Threading
         | JumpForward
         | JumpBackwards
         | FileListLoaded of (string * int) list
-
         | UpdatePostion of position:int * duration:int
-
         | ProgressBarChanged of float
-
         | SaveCurrentPosition of AudioBook
-
+        | StartSleepTimer of TimeSpan
+        | UpdateSleepTimer of TimeSpan
         | ChangeBusyState of bool
         | DoNothing
 
@@ -165,7 +165,19 @@ open System.Threading
             | _,_ ->
                 return Some (SaveCurrentPosition model.AudioBook)
         } |> Cmd.ofAsyncMsgOption
-        
+    
+    
+    let sleepTimerUpdateCmd model =
+        async {
+            match model.TimeUntilSleeps with
+            | None -> 
+                return None
+            | Some t ->
+                do! Async.Sleep 1000       
+                let newT = t.Subtract(TimeSpan.FromSeconds(1.0))
+                return Some (UpdateSleepTimer newT)
+        } |> Cmd.ofAsyncMsgOption
+
 
     let unsetBusyCmd = Cmd.ofMsg (ChangeBusyState false)
 
@@ -186,7 +198,8 @@ open System.Threading
           IsLoading=false
           CurrentPlayingStateUpdateTimer=None
           TrackPositionProcess=0.0
-          ProgressbarValue = 0.0 }
+          ProgressbarValue = 0.0 
+          TimeUntilSleeps = None}
 
     let init audioBook = 
         let model = audioBook |> initModel
@@ -218,6 +231,12 @@ open System.Threading
             model |> onProgressBarChangedMsg e
         | SaveCurrentPosition ab ->
             {model with AudioBook = ab}, model |> saveCurrentPosition, None
+        | StartSleepTimer sleepTime ->
+            let newModel = {model with TimeUntilSleeps = Some sleepTime}
+            newModel, newModel |> sleepTimerUpdateCmd, None
+        | UpdateSleepTimer sleepTime ->
+            model |> onUpdateSleepTimerMsg sleepTime
+            
         | ChangeBusyState state -> 
             {model with IsLoading = state}, Cmd.none, None
         | PlayStopped | DoNothing -> 
@@ -363,6 +382,14 @@ open System.Threading
         {model with ProgressbarValue = e}, Cmd.none, None
 
 
+    and onUpdateSleepTimerMsg sleepTime model =
+        if sleepTime <= TimeSpan.Zero then
+            {model with TimeUntilSleeps = None},Cmd.ofMsg Stop, None
+        else
+            let newModel = {model with TimeUntilSleeps = Some sleepTime}
+            newModel, newModel |> sleepTimerUpdateCmd, None
+
+
 
 
 
@@ -428,8 +455,15 @@ open System.Threading
                                   )).GridColumnSpan(5).GridRow(1)
 
                         ]).GridRow(2)
-
-                    //yield (Controls.primaryTextColorLabel 40.0 (sprintf "%f" model.ProgressbarValue)).GridRow(3)
+                    
+                    yield View.StackLayout(orientation=StackOrientation.Horizontal,
+                            children=[
+                                yield (Controls.primaryColorSymbolLabelWithTapCommand (fun () -> dispatch (TimeSpan(0,30,0) |> StartSleepTimer)) 45.0 true "\uf017")
+                                if model.TimeUntilSleeps.IsSome then
+                                    let currentSleepTime = (model.TimeUntilSleeps |> Option.defaultValue TimeSpan.Zero).ToString("mm\:ss")
+                                    yield (Controls.primaryTextColorLabel 30.0 (sprintf "%s" currentSleepTime))
+                            ]
+                        ).GridRow(3)
                     
                     if model.IsLoading then 
                         yield Common.createBusyLayer().GridRowSpan(3)
