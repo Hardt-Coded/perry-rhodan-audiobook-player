@@ -48,8 +48,10 @@ open System.Threading
         | UpdatePostion of position:int * duration:int
         | ProgressBarChanged of float
         | SaveCurrentPosition of AudioBook
+        | OpenSleepTimerActionMenu
         | StartSleepTimer of TimeSpan
         | UpdateSleepTimer of TimeSpan
+        
         | ChangeBusyState of bool
         | DoNothing
 
@@ -231,6 +233,8 @@ open System.Threading
             model |> onProgressBarChangedMsg e
         | SaveCurrentPosition ab ->
             model |> onSaveCurrentPosition ab        
+        | OpenSleepTimerActionMenu ->
+            model |> onOpenSleepTimerActionMenu        
         | StartSleepTimer sleepTime ->
             model |> onStartSleepTimer sleepTime            
         | UpdateSleepTimer sleepTime ->
@@ -241,6 +245,29 @@ open System.Threading
         | PlayStopped | DoNothing -> 
             model, Cmd.none, None
 
+    
+    and onOpenSleepTimerActionMenu model =
+        
+        let openSleepTimerActionMenu () =            
+            async {
+                let buttons = [|
+                        
+                    yield ("30 sek",(fun () -> StartSleepTimer (TimeSpan.FromSeconds(30.0))) ())
+                    yield ("5 min",(fun () -> StartSleepTimer (TimeSpan.FromMinutes(5.0))) ())
+                    yield ("15 min",(fun () -> StartSleepTimer (TimeSpan.FromMinutes(15.0))) ())
+                    yield ("30 min",(fun () -> StartSleepTimer (TimeSpan.FromMinutes(30.0))) ())
+                    yield ("45 min",(fun () -> StartSleepTimer (TimeSpan.FromMinutes(45.0))) ())
+                    yield ("60 min",(fun () -> StartSleepTimer (TimeSpan.FromMinutes(60.0))) ())
+                    yield ("75 min",(fun () -> StartSleepTimer (TimeSpan.FromMinutes(75.0))) ())
+                    yield ("90 min",(fun () -> StartSleepTimer (TimeSpan.FromMinutes(90.0))) ())
+                        
+                |]
+                return! Helpers.displayActionSheet (Some "Select Sleep Time ...") (Some "Cancel") buttons
+            } |> Cmd.ofAsyncMsgOption
+
+        model, (openSleepTimerActionMenu ()), None
+    
+    
     and onPlayMsg model = 
         let playAudioCmd = model |> playAudio
         let newModel = {model with CurrentState = Playing}
