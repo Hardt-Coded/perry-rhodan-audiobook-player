@@ -76,7 +76,6 @@ open Controls
             model, Cmd.batch [(login model);Cmd.ofMsg (ChangeBusyState true)], None
         | LoginSucceeded cc ->
             let cmd = if model.RememberLogin then (storeCredentials model) else Cmd.none
-
             model, Cmd.batch [cmd;Cmd.ofMsg (ChangeBusyState false)], Some (GotoForwardToBrowsing cc)
         | LoginFailed ->
             {model with LoginFailed = true}, Cmd.ofMsg (ChangeBusyState false), None
@@ -92,8 +91,12 @@ open Controls
             {model with IsLoading = state}, Cmd.none, None
         | DoNothing -> model,  Cmd.none, None
 
-    // textChanged = (fun t  -> dispatch (ChangeUsername t.NewTextValue))
-    //
+    
+    
+    
+    
+    
+    
     let view (model: Model) dispatch =
         View.ContentPage(
           title="Login",useSafeArea=true,

@@ -68,81 +68,117 @@
     let init audiobook = audiobook |> initModel, Cmd.none, None
 
 
-    let update msg model =
+    let rec update msg model =
         match msg with
         | OpenAudioBookActionMenu ->
-            let openActionMenuCmd =
-                Controls.audioBookEntryActionSheet 
-                    (fun a -> Msg.AddToDownloadQueue)
-                    (fun a -> Msg.RemoveFromDownloadQueue)
-                    (fun a -> DeleteAudiobook)
-                    (fun a -> MarkAudioBookAsListend)
-                    (fun a -> UnmarkAudioBookAsListend)
-                    (fun a -> DoNothing)
-                    model.QueuedToDownload
-                    model.AudioBook
-                |> Cmd.ofAsyncMsgOption
-                    
-            model, openActionMenuCmd, None
+            model |> onOpenAudioBookActionMenuMsg
         | Msg.AddToDownloadQueue ->
-            
-            let newModel = { model with QueuedToDownload = true}
-            newModel, Cmd.none, Some (ExternalMsg.AddToDownloadQueue model)
+            model |> onAddToDownloadQueueMsg
         | Msg.RemoveFromDownloadQueue ->
-            
-            let newModel = { model with QueuedToDownload = false}
-            newModel, Cmd.none, Some (ExternalMsg.RemoveFromDownloadQueue model)
-
+            model |> onRemoveFromDownloadQueueMsg
         | AudiobookDownloaded (ab,mp3Path,imageFullName,thumbnail) ->
-            let newState = {model.AudioBook.State with Downloaded = true; DownloadedFolder = Some mp3Path}
-            let newAudioBook = {ab with State = newState; Picture = imageFullName; Thumbnail = thumbnail}                            
-            let newModel = {model with AudioBook = newAudioBook }
-            let updateStateCmd = newModel |> updateAudiobookInStateFile
-            newModel, Cmd.batch [Helpers.unsetBusyCmd;Helpers.setGlobalBusyCmd; updateStateCmd], Some (UpdateAudioBook newAudioBook)
-
+            model |> onAudioBookDownloadedMsg ab mp3Path imageFullName thumbnail
         | DeleteAudiobook ->
-            // removeAudiobook
-            let newState = {model.AudioBook.State with Downloaded = false; DownloadedFolder = None}
-            let newAudioBook = {model.AudioBook with State = newState; }
-            match Services.removeAudiobook model.AudioBook with
-            | Error e ->
-                Common.Helpers.displayAlert("Error Remove Audiobook",e,"OK") |> ignore
-                model,Cmd.none,None
-            | Ok _ ->
-                let newModel = {model with AudioBook = newAudioBook }
-                let updateStateCmd = newModel |> updateAudiobookInStateFile
-                newModel, Cmd.batch [Helpers.setGlobalBusyCmd;updateStateCmd ], Some (UpdateAudioBook newAudioBook)
-
+            model |> onDeleteAudioBookMsg
         | MarkAudioBookAsListend ->
-            
-            let newState = {model.AudioBook.State with Completed = true}
-            let newAudioBook = {model.AudioBook with State = newState; }                
-            let newModel = {model with AudioBook = newAudioBook }
-            let updateStateCmd = newModel |> updateAudiobookInStateFile
-            newModel, Cmd.batch [Helpers.setGlobalBusyCmd; updateStateCmd ], Some (UpdateAudioBook newAudioBook)
-
+            model |> onMarkAudioBookListendMsg
         | UnmarkAudioBookAsListend ->
-           
-            let newState = {model.AudioBook.State with Completed = false}
-            let newAudioBook = {model.AudioBook with State = newState; }
+            model |> onMarkAudioBookUnlistendMsg
+        | UpdateDownloadProgress progress ->            
+            model |> onUpdateDownloadProgressMsg progress
+        | ChangeBusyState state -> 
+            model |> onChangeBusyStateMsg state
+        | ChangeGlobalBusyState state -> 
+            model |> onChangeGlobalBusyStateMsg state
+        | Msg.OpenAudioBookPlayer  ->
+            model |> onOpenAudioBookPlayerMsg
+        | DoNothing ->
+            model |> onDoNothingMsg
+
+    
+    and onOpenAudioBookActionMenuMsg model =
+        
+        let openActionMenuCmd =
+            Controls.audioBookEntryActionSheet 
+                (fun a -> Msg.AddToDownloadQueue)
+                (fun a -> Msg.RemoveFromDownloadQueue)
+                (fun a -> DeleteAudiobook)
+                (fun a -> MarkAudioBookAsListend)
+                (fun a -> UnmarkAudioBookAsListend)
+                (fun a -> DoNothing)
+                model.QueuedToDownload
+                model.AudioBook
+            |> Cmd.ofAsyncMsgOption
+            
+        model, openActionMenuCmd, None
+
+    
+    and onAddToDownloadQueueMsg model =
+        let newModel = { model with QueuedToDownload = true}
+        newModel, Cmd.none, Some (ExternalMsg.AddToDownloadQueue model)
+
+    
+    and onRemoveFromDownloadQueueMsg model =
+        let newModel = { model with QueuedToDownload = false}
+        newModel, Cmd.none, Some (ExternalMsg.RemoveFromDownloadQueue model)
+
+
+    and onAudioBookDownloadedMsg ab mp3Path imageFullName thumbnail model =
+        let newState = {model.AudioBook.State with Downloaded = true; DownloadedFolder = Some mp3Path}
+        let newAudioBook = {ab with State = newState; Picture = imageFullName; Thumbnail = thumbnail}                            
+        let newModel = {model with AudioBook = newAudioBook }
+        let updateStateCmd = newModel |> updateAudiobookInStateFile
+        newModel, Cmd.batch [Helpers.unsetBusyCmd;Helpers.setGlobalBusyCmd; updateStateCmd], Some (UpdateAudioBook newAudioBook)
+    
+    
+    and onDeleteAudioBookMsg model =
+        let newState = {model.AudioBook.State with Downloaded = false; DownloadedFolder = None}
+        let newAudioBook = {model.AudioBook with State = newState; }
+        match Services.removeAudiobook model.AudioBook with
+        | Error e ->
+            Common.Helpers.displayAlert("Error Remove Audiobook",e,"OK") |> ignore
+            model,Cmd.none,None
+        | Ok _ ->
             let newModel = {model with AudioBook = newAudioBook }
             let updateStateCmd = newModel |> updateAudiobookInStateFile
-            newModel, Cmd.batch [Helpers.setGlobalBusyCmd; updateStateCmd ], Some (UpdateAudioBook newAudioBook)
+            newModel, Cmd.batch [Helpers.setGlobalBusyCmd;updateStateCmd ], Some (UpdateAudioBook newAudioBook)
 
-        | UpdateDownloadProgress progress ->            
-            {model with CurrentDownloadProgress = progress}, Cmd.none, None
+    
+    and onMarkAudioBookListendMsg model =
+        let newState = {model.AudioBook.State with Completed = true}
+        let newAudioBook = {model.AudioBook with State = newState; }                
+        let newModel = {model with AudioBook = newAudioBook }
+        let updateStateCmd = newModel |> updateAudiobookInStateFile
+        newModel, Cmd.batch [Helpers.setGlobalBusyCmd; updateStateCmd ], Some (UpdateAudioBook newAudioBook)
+    
+    and onMarkAudioBookUnlistendMsg model =
+        let newState = {model.AudioBook.State with Completed = false}
+        let newAudioBook = {model.AudioBook with State = newState; }
+        let newModel = {model with AudioBook = newAudioBook }
+        let updateStateCmd = newModel |> updateAudiobookInStateFile
+        newModel, Cmd.batch [Helpers.setGlobalBusyCmd; updateStateCmd ], Some (UpdateAudioBook newAudioBook)
+    
+    
+    and onUpdateDownloadProgressMsg progress model =
+        { model with CurrentDownloadProgress = progress }, Cmd.none, None
+    
+    
+    and onChangeBusyStateMsg state model =
+        {model with IsLoading = state}, Cmd.none, None
 
-        | ChangeBusyState state -> 
-            {model with IsLoading = state}, Cmd.none, None
+    
+    and onChangeGlobalBusyStateMsg state model =
+        model, Cmd.none, Some (PageChangeBusyState state)
+    
+    
+    and onOpenAudioBookPlayerMsg model =
+        model, Cmd.none, Some (ExternalMsg.OpenAudioBookPlayer model.AudioBook)
 
-        | ChangeGlobalBusyState state -> 
-            model, Cmd.none, Some (PageChangeBusyState state)
+    
+    and onDoNothingMsg model =
+        model, Cmd.ofMsg (ChangeBusyState false), None
 
-        | Msg.OpenAudioBookPlayer  ->
-            model, Cmd.none, Some (ExternalMsg.OpenAudioBookPlayer model.AudioBook)
 
-        | DoNothing ->
-            model, Cmd.ofMsg (ChangeBusyState false), None
 
 
     let view (model: Model) dispatch =

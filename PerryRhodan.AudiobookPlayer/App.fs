@@ -44,7 +44,6 @@ module App =
         | GotoLoginPage
         | GotoPermissionDeniedPage
         | NavigationPopped of Pages
-        | ChangeNavVisibility of bool
         
 
     let initModel = { IsNav = false
@@ -57,7 +56,125 @@ module App =
                       PageStack = [ MainPage] }
 
 
-    let addPageToPageStack page model =
+
+
+    let init () = 
+        let mainPageModel, mainPageMsg = MainPage.init ()
+
+        {initModel with MainPageModel = mainPageModel}, Cmd.batch [ (Cmd.map MainPageMsg mainPageMsg)]
+
+
+    let rec update msg model =
+        match msg with
+        | MainPageMsg msg ->
+            model |> onProcessMainPageMsg msg
+        | LoginPageMsg msg ->
+            model |> onProcessLoginPageMsg msg
+        | BrowserPageMsg msg ->
+            model |> onProcessBrowserPageMsg msg
+        | AudioPlayerPageMsg msg ->
+            model |> onProcessAudioPlayerMsg msg
+        | GotoMainPage ->
+            model |> onGotoMainPageMsg
+        | GotoLoginPage ->
+            model |> onGotoLoginPageMsg
+        | GotoBrowserPage ->
+            model |> onGotoBrowserPageMsg
+        | GotoAudioPlayerPage audioBook ->
+            model |> onGotoAudioPageMsg audioBook
+        | GotoPermissionDeniedPage ->
+            model |> onGotoPermissionDeniedMsg
+        | NavigationPopped page ->
+            model |> onNavigationPoppedMsg page
+        | SetBrowserPageCookieContainerAfterSucceededLogin cc ->
+            model |> onSetBrowserPageCookieContainerAfterSucceedLogin cc
+            
+    
+    and onProcessMainPageMsg msg model =
+
+        let mainPageExternalMsgToCommand externalMsg =
+            match externalMsg with
+            | None -> Cmd.none
+            | Some excmd -> 
+                match excmd with
+                | MainPage.ExternalMsg.GotoPermissionDeniedPage ->
+                    Cmd.ofMsg GotoPermissionDeniedPage
+                | MainPage.ExternalMsg.OpenAudioBookPlayer ab ->
+                    Cmd.ofMsg (GotoAudioPlayerPage ab)
+
+        let m,cmd, externalMsg = MainPage.update msg model.MainPageModel        
+        let externalCmds =
+            externalMsg |> mainPageExternalMsgToCommand        
+        {model with MainPageModel = m}, Cmd.batch [(Cmd.map MainPageMsg cmd); externalCmds ]
+
+
+    and onProcessLoginPageMsg msg model =
+
+        let loginPageExternalMsgToCommand externalMsg =
+            match externalMsg with
+            | None -> Cmd.none
+            | Some excmd -> 
+                match excmd with
+                | LoginPage.ExternalMsg.GotoForwardToBrowsing c ->
+                    Cmd.batch ([ Cmd.ofMsg (SetBrowserPageCookieContainerAfterSucceededLogin c); Cmd.ofMsg GotoBrowserPage ])
+
+        match model.LoginPageModel with
+        | Some loginPageModel ->
+            let m,cmd, externalMsg = LoginPage.update msg loginPageModel
+
+            let externalCmds =
+                externalMsg |> loginPageExternalMsgToCommand
+       
+
+            {model with LoginPageModel = Some m}, Cmd.batch [(Cmd.map LoginPageMsg cmd); externalCmds ]
+        | None -> model, Cmd.none   
+
+
+    and browserExternalMsgToCommand externalMsg =
+        match externalMsg with
+        | None -> Cmd.none
+        | Some excmd -> 
+            match excmd with
+            | BrowserPage.ExternalMsg.OpenLoginPage ->
+                Cmd.ofMsg (GotoLoginPage)
+            | BrowserPage.ExternalMsg.OpenAudioBookPlayer ab ->
+                Cmd.ofMsg (GotoAudioPlayerPage ab)
+        
+
+    and onProcessBrowserPageMsg msg model =
+        match model.BrowserPageModel with
+        | Some browserPageModel ->
+            let m,cmd,externalMsg = BrowserPage.update msg browserPageModel
+
+            let externalCmds =
+                externalMsg |> browserExternalMsgToCommand
+
+            {model with BrowserPageModel = Some m}, Cmd.batch [(Cmd.map BrowserPageMsg cmd); externalCmds ]
+
+        | None -> model, Cmd.none
+
+
+    and onProcessAudioPlayerMsg msg model =
+
+        let audioPlayerExternalMsgToCommand externalMsg =
+            match externalMsg with
+            | None -> Cmd.none
+            | Some excmd -> 
+                Cmd.none    
+
+        match model.AudioPlayerPageModel with
+        | Some audioPlayerPageModel ->
+            let m,cmd,externalMsg = AudioPlayerPage.update msg audioPlayerPageModel
+
+            let externalCmds = 
+                externalMsg |> audioPlayerExternalMsgToCommand
+
+            {model with AudioPlayerPageModel = Some m}, Cmd.batch [(Cmd.map AudioPlayerPageMsg cmd); externalCmds]
+
+        | None -> model, Cmd.none
+
+
+    and addPageToPageStack page model =
         let hasItem = model.PageStack |> List.tryFind (fun i -> i = page)
         match hasItem with
         | None ->
@@ -68,164 +185,79 @@ module App =
                 |> List.filter (fun i -> i <> page)
             {model with PageStack = pageStackWithoutNewPage @ [page]}
 
-    let init () = 
-        let mainPageModel, mainPageMsg = MainPage.init ()
-
-        {initModel with MainPageModel = mainPageModel}, Cmd.batch [ (Cmd.map MainPageMsg mainPageMsg)]
-
     
-
-    let browserExternalMsgToCommand externalMsg =
-        match externalMsg with
-        | None -> Cmd.none
-        | Some excmd -> 
-            match excmd with
-            | BrowserPage.ExternalMsg.OpenLoginPage ->
-                Cmd.ofMsg (GotoLoginPage)
-            | BrowserPage.ExternalMsg.OpenAudioBookPlayer ab ->
-                Cmd.ofMsg (GotoAudioPlayerPage ab)
-
-    let mainPageExternalMsgToCommand externalMsg =
-        match externalMsg with
-        | None -> Cmd.none
-        | Some excmd -> 
-            match excmd with
-            | MainPage.ExternalMsg.GotoPermissionDeniedPage ->
-                Cmd.ofMsg GotoPermissionDeniedPage
-            | MainPage.ExternalMsg.OpenAudioBookPlayer ab ->
-                Cmd.ofMsg (GotoAudioPlayerPage ab)
-
-    let loginPageExternalMsgToCommand externalMsg =
-        match externalMsg with
-        | None -> Cmd.none
-        | Some excmd -> 
-            match excmd with
-            | LoginPage.ExternalMsg.GotoForwardToBrowsing c ->
-                Cmd.batch ([ Cmd.ofMsg (SetBrowserPageCookieContainerAfterSucceededLogin c); Cmd.ofMsg GotoBrowserPage ])
-
-    let audioPlayerExternalMsgToCommand externalMsg =
-        match externalMsg with
-        | None -> Cmd.none
-        | Some excmd -> 
-           Cmd.none
+    and onGotoMainPageMsg model =
+        let newModel = model |> addPageToPageStack MainPage
+        {newModel with CurrentPage = MainPage}, Cmd.batch [ (Cmd.ofMsg (MainPageMsg MainPage.Msg.LoadLocalAudiobooks)) ]
 
 
-    let update msg model =
-        match msg with
-        | MainPageMsg msg ->
-            let m,cmd, externalMsg = MainPage.update msg model.MainPageModel
-
-            let externalCmds =
-                externalMsg |> mainPageExternalMsgToCommand
-
-            {model with MainPageModel = m}, Cmd.batch [(Cmd.map MainPageMsg cmd); externalCmds ]
-
-        | LoginPageMsg msg ->
-            match model.LoginPageModel with
-            | Some loginPageModel ->
-                let m,cmd, externalMsg = LoginPage.update msg loginPageModel
-
-                let externalCmds =
-                    externalMsg |> loginPageExternalMsgToCommand
-                   
-
-                {model with LoginPageModel = Some m}, Cmd.batch [(Cmd.map LoginPageMsg cmd); externalCmds ]
-            | None -> model, Cmd.none
-
-        | BrowserPageMsg msg ->
-            match model.BrowserPageModel with
-            | Some browserPageModel ->
-                let m,cmd,externalMsg = BrowserPage.update msg browserPageModel
-
-                let externalCmds =
-                    externalMsg |> browserExternalMsgToCommand
-
-                {model with BrowserPageModel = Some m}, Cmd.batch [(Cmd.map BrowserPageMsg cmd); externalCmds ]
-
-            | None -> model, Cmd.none
-        | AudioPlayerPageMsg msg ->
-            match model.AudioPlayerPageModel with
-            | Some audioPlayerPageModel ->
-                let m,cmd,externalMsg = AudioPlayerPage.update msg audioPlayerPageModel
-
-                let externalCmds = 
-                    externalMsg |> audioPlayerExternalMsgToCommand
-
-                {model with AudioPlayerPageModel = Some m}, Cmd.batch [(Cmd.map AudioPlayerPageMsg cmd); externalCmds]
-
-            | None -> model, Cmd.none
-
-        | GotoMainPage ->
-            let newModel = model |> addPageToPageStack MainPage
-            {newModel with CurrentPage = MainPage}, Cmd.batch [ (Cmd.ofMsg (MainPageMsg MainPage.Msg.LoadLocalAudiobooks)); Cmd.ofMsg (ChangeNavVisibility false) ]
-
-        | GotoLoginPage ->
-            let newPageModel = model |> addPageToPageStack LoginPage
-            match model.LoginPageModel with
-            | None ->
-                let m,cmd = LoginPage.init ()
-                {newPageModel with CurrentPage = LoginPage; LoginPageModel = Some m},Cmd.batch [ (Cmd.map LoginPageMsg cmd); Cmd.ofMsg (ChangeNavVisibility false) ]
-            | Some lpm  -> 
-                let newModel = 
-                    if not lpm.RememberLogin then
-                        {lpm with Username = ""; Password = ""}
-                    else
-                        lpm
-                {newPageModel with CurrentPage = LoginPage; LoginPageModel = Some newModel}, Cmd.ofMsg (ChangeNavVisibility false)
-
-        | GotoBrowserPage ->
-            let newPageModel = model |> addPageToPageStack BrowserPage
-            match model.BrowserPageModel with
-            | None ->
-                let m,cmd, externalMsg = BrowserPage.init ()
-                let externalCmds =
-                    externalMsg |> browserExternalMsgToCommand
-
-                {newPageModel with CurrentPage = BrowserPage; BrowserPageModel = Some m}, Cmd.batch [(Cmd.map BrowserPageMsg cmd); externalCmds; Cmd.ofMsg (ChangeNavVisibility false); Cmd.ofMsg (ChangeNavVisibility false)  ]
-            | Some _  -> 
-                {newPageModel with CurrentPage = BrowserPage}, Cmd.ofMsg (ChangeNavVisibility false)
-            
-        | GotoAudioPlayerPage audioBook ->
-            let newPageModel = model |> addPageToPageStack AudioPlayerPage
-            let brandNewPage () = 
-                let m,cmd = AudioPlayerPage.init audioBook
-                {newPageModel with CurrentPage = AudioPlayerPage; AudioPlayerPageModel = Some m}, Cmd.batch [ (Cmd.map AudioPlayerPageMsg cmd) ]
-
-            match model.AudioPlayerPageModel with
-            | None ->
-                brandNewPage()
-
-            | Some abModel ->
-                if (abModel.AudioBook <> audioBook) then
-                    brandNewPage()
+    and onGotoLoginPageMsg model =
+        let newPageModel = model |> addPageToPageStack LoginPage
+        match model.LoginPageModel with
+        | None ->
+            let m,cmd = LoginPage.init ()
+            {newPageModel with CurrentPage = LoginPage; LoginPageModel = Some m},Cmd.batch [ (Cmd.map LoginPageMsg cmd) ]
+        | Some lpm  -> 
+            let newModel = 
+                if not lpm.RememberLogin then
+                    {lpm with Username = ""; Password = ""}
                 else
-                    newPageModel, Cmd.none
-        
-        | GotoPermissionDeniedPage ->
-            let newPageModel = model |> addPageToPageStack PermissionDeniedPage
-            {newPageModel with CurrentPage = PermissionDeniedPage}, Cmd.none
-        
-        | NavigationPopped page ->
-            if page = MainPage then
-               model, Cmd.none
+                    lpm
+            {newPageModel with CurrentPage = LoginPage; LoginPageModel = Some newModel}, Cmd.none
+
+
+    and onGotoBrowserPageMsg model =
+        let newPageModel = model |> addPageToPageStack BrowserPage
+        match model.BrowserPageModel with
+        | None ->
+            let m,cmd, externalMsg = BrowserPage.init ()
+            let externalCmds =
+                externalMsg |> browserExternalMsgToCommand
+
+            {newPageModel with CurrentPage = BrowserPage; BrowserPageModel = Some m}, Cmd.batch [(Cmd.map BrowserPageMsg cmd); externalCmds ]
+        | Some _  -> 
+            {newPageModel with CurrentPage = BrowserPage}, Cmd.none
+
+
+    and onGotoAudioPageMsg audioBook model =
+        let newPageModel = model |> addPageToPageStack AudioPlayerPage
+        let brandNewPage () = 
+            let m,cmd = AudioPlayerPage.init audioBook
+            {newPageModel with CurrentPage = AudioPlayerPage; AudioPlayerPageModel = Some m}, Cmd.batch [ (Cmd.map AudioPlayerPageMsg cmd) ]
+
+        match model.AudioPlayerPageModel with
+        | None ->
+            brandNewPage()
+
+        | Some abModel ->
+            if (abModel.AudioBook <> audioBook) then
+                brandNewPage()
             else
-               let newPageStack = model.PageStack |> List.filter ( fun i -> i <> page)
-               {model with PageStack = newPageStack}, Cmd.none
+                newPageModel, Cmd.none
 
-        | ChangeNavVisibility b ->
-            { model with NavIsVisible = b}, Cmd.none
 
-        | SetBrowserPageCookieContainerAfterSucceededLogin cc ->
-            match model.BrowserPageModel with 
-            | None -> model, Cmd.none
-            | Some bm ->
-                
-            let downloadQueueModel = {bm.DownloadQueueModel with CurrentSessionCookieContainer = Some cc}
-            let bModel = {bm with CurrentSessionCookieContainer = Some cc; DownloadQueueModel = downloadQueueModel}
-            { model with BrowserPageModel = Some bModel}, Cmd.batch [Cmd.ofMsg (BrowserPageMsg BrowserPage.Msg.LoadLocalAudiobooks) ]
-        
-        
+    and onGotoPermissionDeniedMsg model =
+        let newPageModel = model |> addPageToPageStack PermissionDeniedPage
+        {newPageModel with CurrentPage = PermissionDeniedPage}, Cmd.none
+
+
+    and onNavigationPoppedMsg page model =
+        if page = MainPage then
+            model, Cmd.none
+        else
+            let newPageStack = model.PageStack |> List.filter ( fun i -> i <> page)
+            {model with PageStack = newPageStack}, Cmd.none
+
+
+    and onSetBrowserPageCookieContainerAfterSucceedLogin cc model =
+        match model.BrowserPageModel with 
+        | None -> model, Cmd.none
+        | Some bm ->
     
+        let downloadQueueModel = {bm.DownloadQueueModel with CurrentSessionCookieContainer = Some cc}
+        let bModel = {bm with CurrentSessionCookieContainer = Some cc; DownloadQueueModel = downloadQueueModel}
+        { model with BrowserPageModel = Some bModel}, Cmd.batch [Cmd.ofMsg (BrowserPageMsg BrowserPage.Msg.LoadLocalAudiobooks) ]
+
 
     let view (model: Model) dispatch =
         // it's the same as  (MainPageMsg >> dispatch)

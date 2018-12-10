@@ -230,15 +230,14 @@ open System.Threading
         | ProgressBarChanged e -> 
             model |> onProgressBarChangedMsg e
         | SaveCurrentPosition ab ->
-            {model with AudioBook = ab}, model |> saveCurrentPosition, None
+            model |> onSaveCurrentPosition ab        
         | StartSleepTimer sleepTime ->
-            let newModel = {model with TimeUntilSleeps = Some sleepTime}
-            newModel, newModel |> sleepTimerUpdateCmd, None
+            model |> onStartSleepTimer sleepTime            
         | UpdateSleepTimer sleepTime ->
             model |> onUpdateSleepTimerMsg sleepTime
             
         | ChangeBusyState state -> 
-            {model with IsLoading = state}, Cmd.none, None
+            model |> onChangeBusyState state
         | PlayStopped | DoNothing -> 
             model, Cmd.none, None
 
@@ -389,7 +388,18 @@ open System.Threading
             let newModel = {model with TimeUntilSleeps = Some sleepTime}
             newModel, newModel |> sleepTimerUpdateCmd, None
 
+    
+    and onSaveCurrentPosition ab model =
+        {model with AudioBook = ab}, model |> saveCurrentPosition, None
 
+
+    and onStartSleepTimer sleepTime model =
+        let newModel = {model with TimeUntilSleeps = Some sleepTime}
+        newModel, newModel |> sleepTimerUpdateCmd, None
+
+
+    and onChangeBusyState state model =
+        {model with IsLoading = state}, Cmd.none, None
 
 
 

@@ -32,11 +32,12 @@ let audioBookEntryActionSheet
         let buttons = [|
             if audiobook.State.Downloaded then
                 yield ("Remove From Device",cmdDelete audiobook)
+            elif (isOnDownloadQueue && not audiobook.State.Downloaded) then
+                yield ("Remove From Download Queue",cmdRemoveFromDownloadQueue audiobook)
             else 
                 yield ("Download AudioBook",cmdDownload audiobook)
             
-            if (isOnDownloadQueue) then
-                yield ("Remove From Download Queue",cmdRemoveFromDownloadQueue audiobook)
+            
 
             if audiobook.State.Completed then
                 yield ("Unmark As Listend",cmdMarkAsUnlistend audiobook)                

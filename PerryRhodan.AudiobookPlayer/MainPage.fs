@@ -26,87 +26,111 @@ open Common
         | GotoPermissionDeniedPage
         | OpenAudioBookPlayer of AudioBook
 
+    
     let initModel = { Audiobooks = [||]; IsLoading = false }
 
-    let loadLocalAudioBooks () =
-        async {
-            let! audioBooks = Services.loadAudioBooksStateFile ()
-            match audioBooks with
-            | Error e -> 
-                do! Common.Helpers.displayAlert("Error on loading Local Audiobooks",e,"OK")
-                return Some (ChangeBusyState false)
-            | Ok ab -> 
-                match ab with
-                | None -> return Some (ChangeBusyState false)
-                | Some ab ->
-                    let ab = 
-                        ab                         
-                        |> Array.filter (fun i -> i.State.Downloaded)
-                        |> Array.sortByDescending ( fun i -> i.FullName)
-                    
-                    return Some (LocalAudioBooksLoaded ab)
-        } |> Common.Cmd.ofAsyncMsgOption
-
+    
     let init () = initModel, Cmd.ofMsg AskForAppPermission
 
-    let update msg model =
+
+    let rec update msg model =
         match msg with
         | AskForAppPermission ->
-            let ask = 
-                async { 
-                    let! res = Common.Helpers.askPermissionAsync Permission.Storage
-                    if res then return LoadLocalAudiobooks 
-                    else return PermissionDenied
-                } |> Cmd.ofAsyncMsg
-            
-            model, ask, None
-        
+            model |> onAskForAppPermissionMsg
         | AudioBooksItemMsg (abModel, msg) ->
-            let newModel, cmd, externalMsg = AudioBookItem.update msg abModel
-            let (externalCmds,mainPageMsg) =
-                match externalMsg with
-                | None -> Cmd.none, None
-                | Some excmd -> 
-                    match excmd with
-                    | AudioBookItem.ExternalMsg.UpdateAudioBook ab ->
-                        Cmd.ofMsg DoNothing, None
-                    | AudioBookItem.ExternalMsg.AddToDownloadQueue mdl ->
-                        Cmd.ofMsg DoNothing, None
-                    | AudioBookItem.ExternalMsg.RemoveFromDownloadQueue mdl ->
-                        Cmd.ofMsg DoNothing, None
-                    | AudioBookItem.ExternalMsg.OpenLoginPage ->
-                        Cmd.ofMsg DoNothing, None
-                    | AudioBookItem.ExternalMsg.PageChangeBusyState state ->
-                        Cmd.ofMsg (ChangeBusyState state), None
-                    | AudioBookItem.ExternalMsg.OpenAudioBookPlayer ab ->
-                        Cmd.none, Some (OpenAudioBookPlayer ab)
-            
-            let newDab = 
-                model.Audiobooks 
-                |> Array.map (fun i -> if i = abModel then newModel else i)
-
-            {model with Audiobooks = newDab}, Cmd.batch [(Cmd.map2 newModel AudioBooksItemMsg cmd); externalCmds ], mainPageMsg
-
+            model |> onProcessAudioBookItemMsg abModel msg
         | PermissionDenied ->
-            model, Cmd.none, Some GotoPermissionDeniedPage
+            model |> onPermissionDeniedMsg
         | LoadLocalAudiobooks -> 
-            model, Cmd.batch [ Cmd.ofMsg (ChangeBusyState true); loadLocalAudioBooks ()], None
+            model |> onLoadAudioBooksMsg
         | LocalAudioBooksLoaded ab ->
-            let mapedAb = ab |> Array.map (fun i -> AudioBookItem.initModel i)
-            { model with Audiobooks = mapedAb }, Cmd.ofMsg (ChangeBusyState false), None
+            model |> onLocalAudioBooksLoadedMsg ab
         | ChangeBusyState state -> 
-            {model with IsLoading = state}, Cmd.none, None
+            model |> onChangeBusyStateMsg state
         | DoNothing ->
-            model, Cmd.ofMsg (ChangeBusyState false), None
+            model |> onDoNothingMsg
 
+    
+    and onAskForAppPermissionMsg model =
+        let ask = 
+            async { 
+                let! res = Common.Helpers.askPermissionAsync Permission.Storage
+                if res then return LoadLocalAudiobooks 
+                else return PermissionDenied
+            } |> Cmd.ofAsyncMsg
+        
+        model, ask, None
+    
+    
+    and onProcessAudioBookItemMsg abModel msg model =
+        let newModel, cmd, externalMsg = AudioBookItem.update msg abModel
+        let (externalCmds,mainPageMsg) =
+            match externalMsg with
+            | None -> Cmd.none, None
+            | Some excmd -> 
+                match excmd with
+                | AudioBookItem.ExternalMsg.UpdateAudioBook ab ->
+                    Cmd.ofMsg DoNothing, None
+                | AudioBookItem.ExternalMsg.AddToDownloadQueue mdl ->
+                    Cmd.ofMsg DoNothing, None
+                | AudioBookItem.ExternalMsg.RemoveFromDownloadQueue mdl ->
+                    Cmd.ofMsg DoNothing, None
+                | AudioBookItem.ExternalMsg.OpenLoginPage ->
+                    Cmd.ofMsg DoNothing, None
+                | AudioBookItem.ExternalMsg.PageChangeBusyState state ->
+                    Cmd.ofMsg (ChangeBusyState state), None
+                | AudioBookItem.ExternalMsg.OpenAudioBookPlayer ab ->
+                    Cmd.none, Some (OpenAudioBookPlayer ab)
+        
+        let newDab = 
+            model.Audiobooks 
+            |> Array.map (fun i -> if i = abModel then newModel else i)
+
+        {model with Audiobooks = newDab}, Cmd.batch [(Cmd.map2 newModel AudioBooksItemMsg cmd); externalCmds ], mainPageMsg
+
+    
+    
+    and onPermissionDeniedMsg model =
+        model, Cmd.none, Some GotoPermissionDeniedPage
+    
+
+    and onLoadAudioBooksMsg model =
+        
+        let loadLocalAudioBooks () =
+            async {
+                let! audioBooks = Services.loadAudioBooksStateFile ()
+                match audioBooks with
+                | Error e -> 
+                    do! Common.Helpers.displayAlert("Error on loading Local Audiobooks",e,"OK")
+                    return Some (ChangeBusyState false)
+                | Ok ab -> 
+                    match ab with
+                    | None -> return Some (ChangeBusyState false)
+                    | Some ab ->
+                        let ab = 
+                            ab                         
+                            |> Array.filter (fun i -> i.State.Downloaded)
+                            |> Array.sortByDescending ( fun i -> i.FullName)
+                        
+                        return Some (LocalAudioBooksLoaded ab)
+            } |> Common.Cmd.ofAsyncMsgOption
+        
+        model, Cmd.batch [ Cmd.ofMsg (ChangeBusyState true); loadLocalAudioBooks ()], None
+
+    
+    and onLocalAudioBooksLoadedMsg ab model =
+        let mapedAb = ab |> Array.map (fun i -> AudioBookItem.initModel i)
+        { model with Audiobooks = mapedAb }, Cmd.ofMsg (ChangeBusyState false), None
+    
+    and onChangeBusyStateMsg state model =
+        {model with IsLoading = state}, Cmd.none, None
+
+    
+    and onDoNothingMsg model =
+        model, Cmd.ofMsg (ChangeBusyState false), None
 
 
     let view (model: Model) dispatch =
-        //View.ContentPage(
-        //  title="Home",useSafeArea=true,
-        //  backgroundColor = Consts.backgroundColor,
-        //  isBusy = model.IsLoading,
-        //  content = 
             View.Grid(
                 rowdefs= [box "auto"; box "*"],
                 verticalOptions = LayoutOptions.Fill,
@@ -149,5 +173,4 @@ open Common
                         yield Common.createBusyLayer().GridRowSpan(2)
                 ]
                 )
-            //)
     
