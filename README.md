@@ -11,6 +11,11 @@ https://perry-rhodan.net/produkte/international
 
 You can modify the parsing function and the login function to parse other pages.
 
+Here is a demo video.
+
+https://youtu.be/qgTg-DQ2ASw
+
+
 2018-12-06:
 
 The Audioplayer currently working only on Android. I haven't implemented the audio player wrapper for iOS, yet. Nor do I own any apple devices. So community, go! 
@@ -18,3 +23,7 @@ The Audioplayer currently working only on Android. I haven't implemented the aud
 The WPF Application is more or less only a way to test some basic functions without the long running compiling process for the android emulator.
 
 Also there is currently no way to set the directory were the file will be stored.
+
+2018-12-11:
+
+Demo Video added, some small stuff, bugfixing bla.
