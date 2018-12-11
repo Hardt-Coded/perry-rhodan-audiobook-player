@@ -8,6 +8,10 @@ open Xamarin.Forms
 open Plugin.Permissions.Abstractions
 open Common
 open Domain
+open Microsoft.AppCenter
+open Microsoft.AppCenter.Crashes
+open Microsoft.AppCenter.Analytics
+
 
 module App = 
     open Xamarin.Essentials
@@ -457,6 +461,8 @@ module App =
 type App () as app = 
     inherit Application ()
 
+    do AppCenter.Start("", typeof<Analytics>, typeof<Crashes>)
+    
     let runner =
         
         App.program
@@ -470,6 +476,7 @@ type App () as app =
                     (sprintf "%s / %s" s baseException.Message),
                     "OK") |> Async.RunSynchronously
         )
+        |> Common.AppCenter.withAppCenterTrace
         |> Program.runWithDynamicView app
 
 #if DEBUG

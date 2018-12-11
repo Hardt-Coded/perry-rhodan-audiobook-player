@@ -5,6 +5,7 @@
     open Xamarin.Forms
     open System.IO
     open System.Threading.Tasks
+    open Fabulous.Core
 
     type ComError =
     | SessionExpired of string
@@ -201,3 +202,21 @@
                 else
                     (false,0)
             if (fileSizeFound) then contentLength else defaultValue
+
+
+    module AppCenter =
+
+        open Microsoft.AppCenter
+        open Microsoft.AppCenter.Analytics
+        open Microsoft.AppCenter.Crashes
+
+        type AppCenterUpdateTracer<'msg, 'model> =
+            'msg -> 'model -> (string * (string * string) list) option
+
+        /// Trace all the updates to AppCenter
+        let withAppCenterTrace (program: Program<_, _, _>) =
+            let traceError (message, exn) =
+                Crashes.TrackError(exn, dict [ ("Message", message) ])
+
+            { program with                 
+                onError = traceError }
