@@ -51,7 +51,7 @@ open Services
         | SaveCurrentPosition of AudioBook
         | OpenSleepTimerActionMenu
         | StartSleepTimer of TimeSpan
-        | UpdateSleepTimer of TimeSpan
+        | DecreaseSleepTimer
         
         | ChangeBusyState of bool
         | DoNothing
@@ -176,9 +176,8 @@ open Services
             | None -> 
                 return None
             | Some t ->
-                do! Async.Sleep 1000       
-                let newT = t.Subtract(TimeSpan.FromSeconds(1.0))
-                return Some (UpdateSleepTimer newT)
+                do! Async.Sleep 1000
+                return Some DecreaseSleepTimer
         } |> Cmd.ofAsyncMsgOption
 
 
@@ -238,8 +237,8 @@ open Services
             model |> onOpenSleepTimerActionMenu        
         | StartSleepTimer sleepTime ->
             model |> onStartSleepTimer sleepTime            
-        | UpdateSleepTimer sleepTime ->
-            model |> onUpdateSleepTimerMsg sleepTime
+        | DecreaseSleepTimer ->
+            model |> onUpdateSleepTimerMsg 
             
         | ChangeBusyState state -> 
             model |> onChangeBusyState state
@@ -409,12 +408,17 @@ open Services
         {model with ProgressbarValue = e}, Cmd.none, None
 
 
-    and onUpdateSleepTimerMsg sleepTime model =
-        if sleepTime <= TimeSpan.Zero then
-            {model with TimeUntilSleeps = None},Cmd.ofMsg Stop, None
-        else
-            let newModel = {model with TimeUntilSleeps = Some sleepTime}
-            newModel, newModel |> sleepTimerUpdateCmd, None
+    and onUpdateSleepTimerMsg model =
+        match model.TimeUntilSleeps with
+        | None ->
+            model, Cmd.none, None
+        | Some t ->
+            let sleepTime = t.Subtract(TimeSpan.FromSeconds(1.0))
+            if sleepTime <= TimeSpan.Zero then
+                {model with TimeUntilSleeps = None},Cmd.ofMsg Stop, None
+            else
+                let newModel = {model with TimeUntilSleeps = Some sleepTime}
+                newModel, newModel |> sleepTimerUpdateCmd, None
 
     
     and onSaveCurrentPosition ab model =
@@ -468,27 +472,28 @@ open Services
                             | None -> "AudioBookPlaceholder_Dark.png"
                             | Some p -> p
                             ,
-                        horizontalOptions=LayoutOptions.CenterAndExpand,
-                        verticalOptions=LayoutOptions.CenterAndExpand,
-                        aspect=Aspect.AspectFill
+                        horizontalOptions=LayoutOptions.Fill,
+                        verticalOptions=LayoutOptions.Fill,
+                        aspect=Aspect.AspectFit
+                        
                         ).GridRow(1)
 
                     yield View.Grid(
                         coldefs=[box "*";box "*";box "*";box "*";box "*"],
                         rowdefs=[box "*";box "*" ],
                         children=[
-                            yield (Controls.primaryColorSymbolLabelWithTapCommand (fun () -> dispatch PreviousAudioFile) 45.0 true "\uf048").GridColumn(0).GridRow(0)
-                            yield (Controls.primaryColorSymbolLabelWithTapCommand (fun () -> dispatch JumpBackwards) 45.0 true "\uf04a").GridColumn(1).GridRow(0)
+                            yield (Controls.primaryColorSymbolLabelWithTapCommand (fun () -> dispatch PreviousAudioFile) 30.0 true "\uf048").GridColumn(0).GridRow(0)
+                            yield (Controls.primaryColorSymbolLabelWithTapCommand (fun () -> dispatch JumpBackwards) 30.0 true "\uf04a").GridColumn(1).GridRow(0)
 
                             match model.CurrentState with
                             | Stopped ->
-                                yield (Controls.primaryColorSymbolLabelWithTapCommand (fun () -> dispatch Play) 45.0 false "\uf144").GridColumn(2).GridRow(0)
+                                yield (Controls.primaryColorSymbolLabelWithTapCommand (fun () -> dispatch Play) 60.0 false "\uf144").GridColumn(2).GridRow(0)
                             | Playing ->
-                                yield (Controls.primaryColorSymbolLabelWithTapCommand (fun () -> dispatch Stop) 45.0 false "\uf28b").GridColumn(2).GridRow(0)
+                                yield (Controls.primaryColorSymbolLabelWithTapCommand (fun () -> dispatch Stop) 60.0 false "\uf28b").GridColumn(2).GridRow(0)
                                 
                             
-                            yield (Controls.primaryColorSymbolLabelWithTapCommand (fun () -> dispatch JumpForward) 45.0 true "\uf04e").GridColumn(3).GridRow(0)
-                            yield (Controls.primaryColorSymbolLabelWithTapCommand (fun () -> dispatch NextAudioFile) 45.0 true "\uf051").GridColumn(4).GridRow(0)
+                            yield (Controls.primaryColorSymbolLabelWithTapCommand (fun () -> dispatch JumpForward) 30.0 true "\uf04e").GridColumn(3).GridRow(0)
+                            yield (Controls.primaryColorSymbolLabelWithTapCommand (fun () -> dispatch NextAudioFile) 30.0 true "\uf051").GridColumn(4).GridRow(0)
                             
                             yield (View.Slider(
                                     value=model.TrackPositionProcess,

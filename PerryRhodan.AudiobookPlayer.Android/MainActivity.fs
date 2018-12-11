@@ -12,11 +12,11 @@ open Android.Widget
 open Android.Media
 open Android.OS
 open Xamarin.Forms.Platform.Android
-open Services.DependencyServices
+open Services
 
 
 type AndroidDownloadFolder() =
-    interface Services.IAndroidDownloadFolder with
+    interface DependencyServices.IAndroidDownloadFolder with
         member this.GetAndroidDownloadFolder () =
             let path = Android.OS.Environment.GetExternalStoragePublicDirectory (Android.OS.Environment.DirectoryDownloads)
             path.AbsolutePath
@@ -41,7 +41,7 @@ type AudioPlayer() =
         
         m
 
-    interface Services.IAudioPlayer with
+    interface DependencyServices.IAudioPlayer with
         
         member this.CurrentPosition 
             with get () = mediaPlayer.CurrentPosition
