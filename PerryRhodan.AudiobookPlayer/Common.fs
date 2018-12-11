@@ -171,7 +171,6 @@
             )
 
 
-    
     module Consts =        
 
         let backgroundColor = Color.FromHex("#303030")
@@ -188,3 +187,17 @@
         let secondaryTextColor = Color.FromHex("#B3FFFFFF")
 
         let disabledTextColor = Color.FromHex("#61FFFFFF")
+
+    
+    module HttpHelpers =
+        
+        let getFileSizeFromHttpHeadersOrDefaultValue defaultValue (headers:Map<string,string>) =
+            // Get FileSize from Download
+            let (hasLength,contentLengthHeader) = 
+                headers.TryGetValue("Content-Length")
+            let (fileSizeFound,contentLength) = 
+                if (hasLength) then
+                    Int32.TryParse(contentLengthHeader)
+                else
+                    (false,0)
+            if (fileSizeFound) then contentLength else defaultValue

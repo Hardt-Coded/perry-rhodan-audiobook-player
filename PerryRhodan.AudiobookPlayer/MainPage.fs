@@ -7,6 +7,7 @@ open Xamarin.Forms
 open Domain
 open Plugin.Permissions.Abstractions
 open Common
+open Services
 
     type Model = 
       { Audiobooks: AudioBookItem.Model[]
@@ -18,6 +19,7 @@ open Common
         | LoadLocalAudiobooks
         | LocalAudioBooksLoaded of AudioBook []
         | AudioBooksItemMsg of AudioBookItem.Model * AudioBookItem.Msg
+        | UpdateAudioBook of AudioBookItem.Model
 
         | ChangeBusyState of bool
         | DoNothing
@@ -25,6 +27,7 @@ open Common
     type ExternalMsg =
         | GotoPermissionDeniedPage
         | OpenAudioBookPlayer of AudioBook
+        | UpdateAudioBookGlobal  of AudioBookItem.Model * string
 
     
     let initModel = { Audiobooks = [||]; IsLoading = false }
@@ -45,11 +48,28 @@ open Common
             model |> onLoadAudioBooksMsg
         | LocalAudioBooksLoaded ab ->
             model |> onLocalAudioBooksLoadedMsg ab
+        | UpdateAudioBook ab ->
+            model |> onUpdateAudioBookMsg ab
         | ChangeBusyState state -> 
             model |> onChangeBusyStateMsg state
         | DoNothing ->
             model |> onDoNothingMsg
 
+    
+    and onUpdateAudioBookMsg ab model =
+        let newAudioBooks =
+            model.Audiobooks
+            |> Array.map (
+                fun (i:AudioBookItem.Model) ->
+                    if (i.AudioBook.FullName = ab.AudioBook.FullName) then
+                        ab
+                    else
+                        i
+            )
+            |> Array.filter (fun i -> i.AudioBook.State.Downloaded)
+
+        { model with Audiobooks = newAudioBooks }, Cmd.none, None
+    
     
     and onAskForAppPermissionMsg model =
         let ask = 
@@ -70,7 +90,7 @@ open Common
             | Some excmd -> 
                 match excmd with
                 | AudioBookItem.ExternalMsg.UpdateAudioBook ab ->
-                    Cmd.ofMsg DoNothing, None
+                    Cmd.ofMsg (UpdateAudioBook ab), Some (UpdateAudioBookGlobal (ab, "MainPage"))
                 | AudioBookItem.ExternalMsg.AddToDownloadQueue mdl ->
                     Cmd.ofMsg DoNothing, None
                 | AudioBookItem.ExternalMsg.RemoveFromDownloadQueue mdl ->
@@ -98,7 +118,7 @@ open Common
         
         let loadLocalAudioBooks () =
             async {
-                let! audioBooks = Services.loadAudioBooksStateFile ()
+                let! audioBooks = FileAccess.loadAudioBooksStateFile ()
                 match audioBooks with
                 | Error e -> 
                     do! Common.Helpers.displayAlert("Error on loading Local Audiobooks",e,"OK")
@@ -108,7 +128,7 @@ open Common
                     | None -> return Some (ChangeBusyState false)
                     | Some ab ->
                         let ab = 
-                            ab                         
+                            ab
                             |> Array.filter (fun i -> i.State.Downloaded)
                             |> Array.sortByDescending ( fun i -> i.FullName)
                         
@@ -149,7 +169,7 @@ open Common
                             yield dependsOn (model.Audiobooks) (fun _ (abItems) ->
                                 match abItems with
                                 | [||]  ->
-                                    View.Label(text="Swipe from left border to right to open the menu and browse for your audio books", fontSize=25.0, textColor=Consts.secondaryTextColor)
+                                    View.Label(text="There are currently no audiobooks on your device. Use the button on the upper right corner to browse your online audio books.", fontSize=25.0, textColor=Consts.secondaryTextColor)
                                 | _ ->
                                     View.ScrollView(horizontalOptions = LayoutOptions.Fill,
                                             verticalOptions = LayoutOptions.Fill,

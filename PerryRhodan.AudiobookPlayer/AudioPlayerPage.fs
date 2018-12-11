@@ -11,6 +11,7 @@ open System.Threading.Tasks
 open System.IO
 open System.Threading
 open System.Threading
+open Services
 
 
     
@@ -60,7 +61,7 @@ open System.Threading
         | GotoBrowserPage
 
 
-    let audioPlayer = DependencyService.Get<Services.IAudioPlayer>()
+    let audioPlayer = DependencyService.Get<DependencyServices.IAudioPlayer>()
 
     let toTimeSpan (ms:int) =
         TimeSpan.FromMilliseconds(ms |> float)
@@ -83,7 +84,7 @@ open System.Threading
             | Some folder ->
                 let! files = 
                     asyncFunc( 
-                        fun () -> folder |> Directory.EnumerateFiles
+                        fun () ->  Directory.EnumerateFiles(folder, "*.mp3")
                     )
                 
                 let! res =
@@ -154,7 +155,7 @@ open System.Threading
                 let newState = { model.AudioBook.State with CurrentPosition = Some newPos }
                 let newAudioBook = { model.AudioBook with State = newState }
 
-                let! res =  newAudioBook |> Services.updateAudioBookInStateFile
+                let! res =  newAudioBook |> FileAccess.updateAudioBookInStateFile
                 match res with
                 | Error e ->
                     do! Common.Helpers.displayAlert("Error save Position",e,"Ok")
@@ -422,7 +423,12 @@ open System.Threading
 
     and onStartSleepTimer sleepTime model =
         let newModel = {model with TimeUntilSleeps = Some sleepTime}
-        newModel, newModel |> sleepTimerUpdateCmd, None
+        match model.TimeUntilSleeps with
+        | None ->
+            
+            newModel, newModel |> sleepTimerUpdateCmd, None
+        | Some _ ->
+            newModel, Cmd.none, None
 
 
     and onChangeBusyState state model =
@@ -495,7 +501,7 @@ open System.Threading
                     
                     yield View.StackLayout(orientation=StackOrientation.Horizontal,
                             children=[
-                                yield (Controls.primaryColorSymbolLabelWithTapCommand (fun () -> dispatch (TimeSpan(0,30,0) |> StartSleepTimer)) 45.0 true "\uf017")
+                                yield (Controls.primaryColorSymbolLabelWithTapCommand (fun () -> dispatch OpenSleepTimerActionMenu) 45.0 true "\uf017")
                                 if model.TimeUntilSleeps.IsSome then
                                     let currentSleepTime = (model.TimeUntilSleeps |> Option.defaultValue TimeSpan.Zero).ToString("mm\:ss")
                                     yield (Controls.primaryTextColorLabel 30.0 (sprintf "%s" currentSleepTime))

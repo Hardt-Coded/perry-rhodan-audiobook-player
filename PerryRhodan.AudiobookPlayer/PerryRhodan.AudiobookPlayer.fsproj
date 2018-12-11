@@ -6,14 +6,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="browse_icon.png" />
-    <Content Include="home_icon.png" />
-    <Content Include="AudioBookPlaceholder_Dark.png" />
-    <EmbeddedResource Include="AudioBookPlaceholder.png" />
+    <Content Include="Images\browse_icon.png" />
+    <Content Include="Images\home_icon.png" />
+    <Content Include="Images\AudioBookPlaceholder_Dark.png" />
+    <EmbeddedResource Include="Images\AudioBookPlaceholder.png" />
     <None Include="repl_stuff.fsx" />
-    <Content Include="einsamediaDownloadPage.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Compile Include="SampleData.fs" />
     <Compile Include="Common.fs" />
     <Compile Include="Domain.fs" />

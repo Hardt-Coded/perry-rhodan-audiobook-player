@@ -9,6 +9,7 @@ open System.Net
 open Common
 open Common.Extensions
 open Controls
+open Services
 
 
     
@@ -39,7 +40,7 @@ open Controls
     let loadStoredCredentials = 
         async {
             
-            let! res = Services.loadLoginCredentials ()
+            let! res = SecureLoginStorage.loadLoginCredentials ()
             match res with
             | Error e -> 
                 System.Diagnostics.Debug.WriteLine("Error loading cred: " + e)
@@ -53,7 +54,7 @@ open Controls
 
     let login model =        
         async {
-            let! cc = Services.login model.Username model.Password
+            let! cc = WebAccess.login model.Username model.Password
             match cc with
             | None -> return LoginFailed
             | Some c -> return LoginSucceeded c
@@ -62,7 +63,7 @@ open Controls
     
     let storeCredentials model =
         async {
-            let! sRes = (Services.saveLoginCredentials model.Username model.Password model.RememberLogin)
+            let! sRes = (SecureLoginStorage.saveLoginCredentials model.Username model.Password model.RememberLogin)
             match sRes with
             | Error e -> 
                 System.Diagnostics.Debug.WriteLine("credential store failed:" + e)

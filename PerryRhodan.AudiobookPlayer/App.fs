@@ -44,6 +44,7 @@ module App =
         | GotoLoginPage
         | GotoPermissionDeniedPage
         | NavigationPopped of Pages
+        | UpdateAudioBook of AudioBookItem.Model * string
         
 
     let initModel = { IsNav = false
@@ -87,7 +88,39 @@ module App =
         | NavigationPopped page ->
             model |> onNavigationPoppedMsg page
         | SetBrowserPageCookieContainerAfterSucceededLogin cc ->
-            model |> onSetBrowserPageCookieContainerAfterSucceedLogin cc
+            model |> onSetBrowserPageCookieContainerAfterSucceedLoginMsg cc
+        | UpdateAudioBook (ab, cameFrom) ->
+            model |> onUpdateAudioBookMsg ab cameFrom
+        
+    and onUpdateAudioBookMsg ab cameFrom model =
+
+        let mainPageMsg = 
+            if cameFrom = "MainPage" then
+                MainPageMsg (MainPage.Msg.DoNothing)
+            else
+                MainPageMsg (MainPage.Msg.UpdateAudioBook ab)
+
+        let browserPageMsg = 
+            if cameFrom = "Browser" then
+                BrowserPageMsg (BrowserPage.Msg.DoNothing)
+            else
+                BrowserPageMsg (BrowserPage.Msg.UpdateAudioBookItemList ab)
+
+
+        let audioPlayerModel =
+            match model.AudioPlayerPageModel with
+            | None -> None
+            | Some amdl ->
+                if amdl.AudioBook.FullName = ab.AudioBook.FullName then
+                    if ab.AudioBook.State.Downloaded then
+                
+                        Some ({amdl with AudioBook = ab.AudioBook})
+                    else
+                        None
+                else
+                    model.AudioPlayerPageModel
+
+        {model with AudioPlayerPageModel = audioPlayerModel}, Cmd.batch [Cmd.ofMsg mainPageMsg; Cmd.ofMsg browserPageMsg ]        
             
     
     and onProcessMainPageMsg msg model =
@@ -101,6 +134,8 @@ module App =
                     Cmd.ofMsg GotoPermissionDeniedPage
                 | MainPage.ExternalMsg.OpenAudioBookPlayer ab ->
                     Cmd.ofMsg (GotoAudioPlayerPage ab)
+                | MainPage.ExternalMsg.UpdateAudioBookGlobal (ab,cameFrom) ->
+                    Cmd.ofMsg (UpdateAudioBook (ab, cameFrom))
 
         let m,cmd, externalMsg = MainPage.update msg model.MainPageModel        
         let externalCmds =
@@ -115,7 +150,7 @@ module App =
             | None -> Cmd.none
             | Some excmd -> 
                 match excmd with
-                | LoginPage.ExternalMsg.GotoForwardToBrowsing c ->
+                | LoginPage.ExternalMsg.GotoForwardToBrowsing c ->                    
                     Cmd.batch ([ Cmd.ofMsg (SetBrowserPageCookieContainerAfterSucceededLogin c); Cmd.ofMsg GotoBrowserPage ])
 
         match model.LoginPageModel with
@@ -124,8 +159,7 @@ module App =
 
             let externalCmds =
                 externalMsg |> loginPageExternalMsgToCommand
-       
-
+            
             {model with LoginPageModel = Some m}, Cmd.batch [(Cmd.map LoginPageMsg cmd); externalCmds ]
         | None -> model, Cmd.none   
 
@@ -139,6 +173,8 @@ module App =
                 Cmd.ofMsg (GotoLoginPage)
             | BrowserPage.ExternalMsg.OpenAudioBookPlayer ab ->
                 Cmd.ofMsg (GotoAudioPlayerPage ab)
+            | BrowserPage.ExternalMsg.UpdateAudioBookGlobal (ab,cameFrom) ->
+                Cmd.ofMsg (UpdateAudioBook (ab,cameFrom))
         
 
     and onProcessBrowserPageMsg msg model =
@@ -243,19 +279,29 @@ module App =
 
     and onNavigationPoppedMsg page model =
         if page = MainPage then
-            model, Cmd.none
+            {model with PageStack = [MainPage]}, (Cmd.ofMsg (MainPageMsg MainPage.Msg.LoadLocalAudiobooks))
         else
-            let newPageStack = model.PageStack |> List.filter ( fun i -> i <> page)
-            {model with PageStack = newPageStack}, Cmd.none
+            let newPageStack = model.PageStack |> List.filter ( fun i -> i <> page && i <> LoginPage)
+
+            // Reload AudioBooks when reach MainPage, it always at least one in the list
+            let lastEntry = newPageStack |> List.last
+            let cmd =
+                if lastEntry = MainPage then
+                    (Cmd.ofMsg (MainPageMsg MainPage.Msg.LoadLocalAudiobooks))
+                else
+                    Cmd.none
+
+            {model with PageStack = newPageStack}, cmd
 
 
-    and onSetBrowserPageCookieContainerAfterSucceedLogin cc model =
+    and onSetBrowserPageCookieContainerAfterSucceedLoginMsg cc model =
         match model.BrowserPageModel with 
         | None -> model, Cmd.none
         | Some bm ->
     
         let downloadQueueModel = {bm.DownloadQueueModel with CurrentSessionCookieContainer = Some cc}
         let bModel = {bm with CurrentSessionCookieContainer = Some cc; DownloadQueueModel = downloadQueueModel}
+        
         { model with BrowserPageModel = Some bModel}, Cmd.batch [Cmd.ofMsg (BrowserPageMsg BrowserPage.Msg.LoadLocalAudiobooks) ]
 
 
@@ -296,7 +342,6 @@ module App =
                         ])
                     .HasNavigationBar(true)
                     .HasBackButton(false)
-                    .WithAttribute(AttributeKey("pageType"),MainPage)
                 
             )
 
@@ -309,7 +354,6 @@ module App =
                         (LoginPage.view m (LoginPageMsg >> dispatch))
                             .HasNavigationBar(false)
                             .HasBackButton(true)
-                            .WithAttribute(AttributeKey("pageType"),LoginPage)
                 )
             )
 
@@ -326,7 +370,7 @@ module App =
                             .ToolbarItems([
                                 View.ToolbarItem(
                                     icon="home_icon.png",
-                                    command=(fun ()-> dispatch GotoMainPage))
+                                    command=(fun ()-> dispatch (NavigationPopped BrowserPage)))
                                     ])
                             .HasNavigationBar(true)
                             .HasBackButton(true)
@@ -418,7 +462,14 @@ type App () as app =
         App.program
 //#if DEBUG
 //        |> Program.withConsoleTrace
-//#endif    
+//#endif   
+        |> Program.withErrorHandler(
+            fun (s,exn)-> 
+                let baseException = exn.GetBaseException()
+                Common.Helpers.displayAlert("Error",
+                    (sprintf "%s / %s" s baseException.Message),
+                    "OK") |> Async.RunSynchronously
+        )
         |> Program.runWithDynamicView app
 
 #if DEBUG

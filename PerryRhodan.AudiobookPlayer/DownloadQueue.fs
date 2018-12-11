@@ -5,6 +5,7 @@
     open Common
     open Fabulous.DynamicViews
     open Xamarin.Forms
+    open Services
 
     type QueueState =
         | Idle
@@ -113,7 +114,7 @@
         
         let updateAudiobookInStateFile audioBook =
             async {
-                let! res = audioBook |> Services.updateAudioBookInStateFile            
+                let! res = audioBook |> FileAccess.updateAudioBookInStateFile            
                 match res with
                 | Error e ->
                     Common.Helpers.displayAlert("Error",e,"OK") |> ignore
@@ -168,7 +169,7 @@
                     | Some cc ->
                         let updateProgress (a,b) = dispatch (Msg.UpdateDownloadProgress (audiobookItemModel,(Some (a,b))))
                         
-                        let! res = audiobookItemModel.AudioBook |> Services.downloadAudiobook cc updateProgress
+                        let! res = audiobookItemModel.AudioBook |> WebAccess.downloadAudiobook cc updateProgress
                         match res with
                         | Error e ->
                             match e with
@@ -241,7 +242,7 @@
                 for (idx,item) in model.DownloadQueue |> List.indexed do
                     let cmd =
                         if (idx > 0) then
-                            (fun () -> dispatch OpenActionMenu item)
+                            (fun () -> dispatch (OpenActionMenu item))
                         else
                             (fun () -> ())
 

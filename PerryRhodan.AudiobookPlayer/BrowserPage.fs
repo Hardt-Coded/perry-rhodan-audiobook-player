@@ -10,6 +10,7 @@ open Domain
 open Common
 open System.Text.RegularExpressions
 open Fabulous.DynamicViews
+open Services
 
 
     type Model = 
@@ -46,7 +47,8 @@ open Fabulous.DynamicViews
 
     type ExternalMsg =
         | OpenLoginPage
-        | OpenAudioBookPlayer of AudioBook
+        | OpenAudioBookPlayer of AudioBook 
+        | UpdateAudioBookGlobal  of AudioBookItem.Model *  string
         
 
     let initModel = { AudioBooks = None
@@ -62,7 +64,7 @@ open Fabulous.DynamicViews
 
     let loadLocalAudioBooks () =
         async {
-            let! audioBooks = Services.loadAudioBooksStateFile ()
+            let! audioBooks = FileAccess.loadAudioBooksStateFile ()
             match audioBooks with
             | Error e -> return (ShowErrorMessage e)
             | Ok ab -> 
@@ -105,7 +107,7 @@ open Fabulous.DynamicViews
         | GoToLoginPage ->
             model |> onGotoLoginPageMsg
         | AudioBooksItemMsg (abModel, msg) ->
-            model |> onProcessAduioBookItemMsg abModel msg
+            model |> onProcessAudioBookItemMsg abModel msg
         | DownloadQueueMsg msg ->
             model |> onProcessDownloadQueueMsg msg            
         | UpdateAudioBookItemList abModel ->
@@ -124,7 +126,7 @@ open Fabulous.DynamicViews
         let loadOnlineAudioBooks model =
             async {
                 let! audioBooks = 
-                    Services.getAudiobooksOnline model.CurrentSessionCookieContainer
+                    WebAccess.getAudiobooksOnline model.CurrentSessionCookieContainer
                     
                 match audioBooks with
                 | Error e -> 
@@ -141,8 +143,8 @@ open Fabulous.DynamicViews
                     match model.AudioBooks with
                     | None -> 
                         // if your files is empty, than sync with the folders
-                        let localFileSynced = Services.syncPossibleDownloadFolder ab
-                        let! saveRes = localFileSynced |> Services.saveAudioBooksStateFile
+                        let localFileSynced = FileAccess.syncPossibleDownloadFolder ab
+                        let! saveRes = localFileSynced |> FileAccess.saveAudioBooksStateFile
                         match saveRes with
                         | Error e ->
                             return (ShowErrorMessage e)
@@ -152,8 +154,8 @@ open Fabulous.DynamicViews
                         
                     | Some la ->
                         let loadedFlatten = la |> AudioBooks.flatten
-                        let synchedAb = Services.synchronizeAudiobooks loadedFlatten ab
-                        let! saveRes = synchedAb |> Services.saveAudioBooksStateFile 
+                        let synchedAb = Domain.synchronizeAudiobooks loadedFlatten ab
+                        let! saveRes = synchedAb |> FileAccess.saveAudioBooksStateFile 
                         match saveRes with
                         | Error e ->
                             return (ShowErrorMessage e)
@@ -250,7 +252,7 @@ open Fabulous.DynamicViews
         model,Cmd.none,Some OpenLoginPage
     
 
-    and onProcessAduioBookItemMsg abModel msg model =
+    and onProcessAudioBookItemMsg abModel msg model =
         let newModel, cmd, externalMsg = AudioBookItem.update msg abModel
         let (externalCmds,mainPageMsg) =
             match externalMsg with
@@ -258,7 +260,7 @@ open Fabulous.DynamicViews
             | Some excmd -> 
                 match excmd with
                 | AudioBookItem.ExternalMsg.UpdateAudioBook ab ->
-                    Cmd.ofMsg DoNothing, None
+                    Cmd.ofMsg DoNothing, Some (UpdateAudioBookGlobal (ab, "Browser"))
                 | AudioBookItem.ExternalMsg.AddToDownloadQueue mdl ->
                     Cmd.ofMsg (DownloadQueueMsg (DownloadQueue.Msg.AddItemToQueue mdl)), None
                 | AudioBookItem.ExternalMsg.RemoveFromDownloadQueue mdl ->
@@ -287,7 +289,7 @@ open Fabulous.DynamicViews
                 | DownloadQueue.ExternalMsg.ExOpenLoginPage ->
                     Cmd.ofMsg DoNothing, Some OpenLoginPage
                 | DownloadQueue.ExternalMsg.UpdateAudioBook abModel ->
-                    Cmd.ofMsg (UpdateAudioBookItemList abModel), None
+                    Cmd.ofMsg (UpdateAudioBookItemList abModel), Some (UpdateAudioBookGlobal (abModel, "Browser"))
                 | DownloadQueue.ExternalMsg.UpdateDownloadProgress (abModel,progress) ->
                     Cmd.batch [ Cmd.ofMsg (AudioBooksItemMsg (abModel,(AudioBookItem.Msg.UpdateDownloadProgress progress))); Cmd.ofMsg (UpdateAudioBookItemList abModel) ], None
                 | DownloadQueue.ExternalMsg.PageChangeBusyState state ->
@@ -401,6 +403,7 @@ open Fabulous.DynamicViews
                                         )
                                 let downloadQueueDispatch =
                                     DownloadQueueMsg >> dispatch
+
                                 yield DownloadQueue.view model.DownloadQueueModel downloadQueueDispatch
                                             
                         if (model.SelectedGroups.Length > 0) then

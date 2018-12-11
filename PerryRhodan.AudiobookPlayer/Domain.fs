@@ -120,6 +120,14 @@ let parseDownloadData htmlData =
     )
 
 
+let synchronizeAudiobooks (local:AudioBook[]) (online:AudioBook[]) =
+    let differences =
+        online
+        |> Array.filter (fun i -> local |> Array.exists (fun l -> l.FullName = i.FullName) |> not)
+
+    Array.concat [|local; differences|] 
+
+
 
 module Filters = 
 

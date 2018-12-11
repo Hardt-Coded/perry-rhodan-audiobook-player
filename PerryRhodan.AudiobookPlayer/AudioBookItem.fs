@@ -5,6 +5,7 @@
     open Common
     open Fabulous.DynamicViews
     open Xamarin.Forms
+    open Services
 
     type Model = { AudioBook: AudioBook
                    CurrentDownloadProgress: (int * int) option
@@ -28,7 +29,7 @@
 
     type ExternalMsg =
         | OpenLoginPage
-        | UpdateAudioBook of AudioBook
+        | UpdateAudioBook of Model
         | AddToDownloadQueue of Model
         | RemoveFromDownloadQueue of Model
         | PageChangeBusyState of bool
@@ -53,7 +54,7 @@
     
     let updateAudiobookInStateFile model =
         async {
-            let! res = model.AudioBook |> Services.updateAudioBookInStateFile            
+            let! res = model.AudioBook |> FileAccess.updateAudioBookInStateFile            
             match res with
             | Error e ->
                 Common.Helpers.displayAlert("Error",e,"OK") |> ignore
@@ -128,20 +129,20 @@
         let newAudioBook = {ab with State = newState; Picture = imageFullName; Thumbnail = thumbnail}                            
         let newModel = {model with AudioBook = newAudioBook }
         let updateStateCmd = newModel |> updateAudiobookInStateFile
-        newModel, Cmd.batch [Helpers.unsetBusyCmd;Helpers.setGlobalBusyCmd; updateStateCmd], Some (UpdateAudioBook newAudioBook)
+        newModel, Cmd.batch [Helpers.unsetBusyCmd;Helpers.setGlobalBusyCmd; updateStateCmd], Some (UpdateAudioBook newModel)
     
     
     and onDeleteAudioBookMsg model =
         let newState = {model.AudioBook.State with Downloaded = false; DownloadedFolder = None}
         let newAudioBook = {model.AudioBook with State = newState; }
-        match Services.removeAudiobook model.AudioBook with
+        match FileAccess.removeAudiobook model.AudioBook with
         | Error e ->
             Common.Helpers.displayAlert("Error Remove Audiobook",e,"OK") |> ignore
             model,Cmd.none,None
         | Ok _ ->
             let newModel = {model with AudioBook = newAudioBook }
             let updateStateCmd = newModel |> updateAudiobookInStateFile
-            newModel, Cmd.batch [Helpers.setGlobalBusyCmd;updateStateCmd ], Some (UpdateAudioBook newAudioBook)
+            newModel, Cmd.batch [Helpers.setGlobalBusyCmd;updateStateCmd ], Some (UpdateAudioBook newModel)
 
     
     and onMarkAudioBookListendMsg model =
@@ -149,14 +150,14 @@
         let newAudioBook = {model.AudioBook with State = newState; }                
         let newModel = {model with AudioBook = newAudioBook }
         let updateStateCmd = newModel |> updateAudiobookInStateFile
-        newModel, Cmd.batch [Helpers.setGlobalBusyCmd; updateStateCmd ], Some (UpdateAudioBook newAudioBook)
+        newModel, Cmd.batch [Helpers.setGlobalBusyCmd; updateStateCmd ], Some (UpdateAudioBook newModel)
     
     and onMarkAudioBookUnlistendMsg model =
         let newState = {model.AudioBook.State with Completed = false}
         let newAudioBook = {model.AudioBook with State = newState; }
         let newModel = {model with AudioBook = newAudioBook }
         let updateStateCmd = newModel |> updateAudiobookInStateFile
-        newModel, Cmd.batch [Helpers.setGlobalBusyCmd; updateStateCmd ], Some (UpdateAudioBook newAudioBook)
+        newModel, Cmd.batch [Helpers.setGlobalBusyCmd; updateStateCmd ], Some (UpdateAudioBook newModel)
     
     
     and onUpdateDownloadProgressMsg progress model =
