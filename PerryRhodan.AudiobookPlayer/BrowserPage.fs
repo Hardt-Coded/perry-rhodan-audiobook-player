@@ -69,8 +69,8 @@ open Services
             | Error e -> return (ShowErrorMessage e)
             | Ok ab -> 
                 match ab with
-                | None -> return DoNothing
-                | Some ab ->     
+                | [||] -> return DoNothing
+                | _ ->     
                     let result = ab |> Domain.Filters.nameFilter
                     return (InitAudiobooks result)
         } |> Cmd.ofAsyncMsg
@@ -144,7 +144,7 @@ open Services
                     | None -> 
                         // if your files is empty, than sync with the folders
                         let localFileSynced = FileAccess.syncPossibleDownloadFolder ab
-                        let! saveRes = localFileSynced |> FileAccess.saveAudioBooksStateFile
+                        let! saveRes = localFileSynced |> FileAccess.insertNewAudioBooksInStateFile
                         match saveRes with
                         | Error e ->
                             return (ShowErrorMessage e)
@@ -154,8 +154,8 @@ open Services
                         
                     | Some la ->
                         let loadedFlatten = la |> AudioBooks.flatten
-                        let synchedAb = Domain.synchronizeAudiobooks loadedFlatten ab
-                        let! saveRes = synchedAb |> FileAccess.saveAudioBooksStateFile 
+                        let synchedAb = Domain.filterNewAudioBooks loadedFlatten ab
+                        let! saveRes = synchedAb |> FileAccess.insertNewAudioBooksInStateFile 
                         match saveRes with
                         | Error e ->
                             return (ShowErrorMessage e)

@@ -34,7 +34,8 @@ open Services
         CurrentPlayingStateUpdateTimer:Timer option 
         TrackPositionProcess: float
         ProgressbarValue: float         
-        TimeUntilSleeps: TimeSpan option}
+        TimeUntilSleeps: TimeSpan option 
+        AudioPlayerBusy:bool }
 
     type Msg = 
         | Play 
@@ -118,6 +119,8 @@ open Services
                         new Timer(
                             fun _ -> dispatch (UpdatePostion (audioPlayer.CurrentPosition, audioPlayer.CurrentDuration))
                         , null, 0, 1000)
+                    // avoid error on move forward or backward
+                    do! Async.Sleep 1000
                     return (PlayStarted timer)
             }
         ) |> Cmd.ofAsyncWithInternalDispatch
@@ -201,7 +204,8 @@ open Services
           CurrentPlayingStateUpdateTimer=None
           TrackPositionProcess=0.0
           ProgressbarValue = 0.0 
-          TimeUntilSleeps = None}
+          TimeUntilSleeps = None
+          AudioPlayerBusy = false }
 
     let init audioBook = 
         let model = audioBook |> initModel
@@ -275,7 +279,7 @@ open Services
 
 
     and onPlayStartedMsg timer model =
-        {model with CurrentPlayingStateUpdateTimer = Some timer}, Cmd.none, None
+        {model with CurrentPlayingStateUpdateTimer = Some timer; AudioPlayerBusy = false }, Cmd.none, None
 
 
     and onStopMsg model =
@@ -288,9 +292,9 @@ open Services
 
     
     and onNextAudioFileMsg model =
+        let max = model.AudioFileList.Length - 1
+        let n = model.CurrentAudioFileIndex + 1
         let newIndex = 
-            let max = model.AudioFileList.Length - 1
-            let n = model.CurrentAudioFileIndex + 1
             if n > max then max else n
         let (fn,duration) = model.AudioFileList.[newIndex]
         let currentDuration = duration |> toTimeSpan
@@ -304,10 +308,16 @@ open Services
                 CurrentAudioFile = Some fn
                 CurrentPosition = None }
             
-        if newModel.CurrentState = Playing then
+        if newModel.CurrentState = Playing then            
             newModel |> stopAudio |> ignore
-            let playAudioCmd = newModel |> playAudio
-            newModel, playAudioCmd, None
+
+            // do not play "next" file if on end of the audio book
+            if (n>max) then
+                newModel, Cmd.none, None
+            else
+                let newModel = { newModel with AudioPlayerBusy = true }
+                let playAudioCmd = newModel |> playAudio
+                newModel, playAudioCmd, None
         else
             newModel, Cmd.none, None
 
@@ -328,6 +338,7 @@ open Services
                 CurrentPosition = None }
 
         if newModel.CurrentState = Playing then
+            let newModel = { newModel with AudioPlayerBusy = true }
             newModel |> stopAudio |> ignore
             let playAudioCmd = newModel |> playAudio
             newModel, playAudioCmd, None
@@ -477,13 +488,20 @@ open Services
                         aspect=Aspect.AspectFit
                         
                         ).GridRow(1)
+                    
+                    let runIfNotBusy (cmd:(unit->unit)) =
+                        if not model.AudioPlayerBusy 
+                        then cmd
+                        else (fun () -> ())
+                        
+                           
 
                     yield View.Grid(
                         coldefs=[box "*";box "*";box "*";box "*";box "*"],
                         rowdefs=[box "*";box "*" ],
                         children=[
-                            yield (Controls.primaryColorSymbolLabelWithTapCommand (fun () -> dispatch PreviousAudioFile) 30.0 true "\uf048").GridColumn(0).GridRow(0)
-                            yield (Controls.primaryColorSymbolLabelWithTapCommand (fun () -> dispatch JumpBackwards) 30.0 true "\uf04a").GridColumn(1).GridRow(0)
+                            yield (Controls.primaryColorSymbolLabelWithTapCommand ((fun () -> dispatch PreviousAudioFile) |> runIfNotBusy) 30.0 true "\uf048").GridColumn(0).GridRow(0)
+                            yield (Controls.primaryColorSymbolLabelWithTapCommand ((fun () -> dispatch JumpBackwards) |> runIfNotBusy) 30.0 true "\uf04a").GridColumn(1).GridRow(0)
 
                             match model.CurrentState with
                             | Stopped ->
@@ -492,8 +510,8 @@ open Services
                                 yield (Controls.primaryColorSymbolLabelWithTapCommand (fun () -> dispatch Stop) 60.0 false "\uf28b").GridColumn(2).GridRow(0)
                                 
                             
-                            yield (Controls.primaryColorSymbolLabelWithTapCommand (fun () -> dispatch JumpForward) 30.0 true "\uf04e").GridColumn(3).GridRow(0)
-                            yield (Controls.primaryColorSymbolLabelWithTapCommand (fun () -> dispatch NextAudioFile) 30.0 true "\uf051").GridColumn(4).GridRow(0)
+                            yield (Controls.primaryColorSymbolLabelWithTapCommand ((fun () -> dispatch JumpForward) |> runIfNotBusy) 30.0 true "\uf04e").GridColumn(3).GridRow(0)
+                            yield (Controls.primaryColorSymbolLabelWithTapCommand ((fun () -> dispatch NextAudioFile) |> runIfNotBusy) 30.0 true "\uf051").GridColumn(4).GridRow(0)
                             
                             yield (View.Slider(
                                     value=model.TrackPositionProcess,
@@ -514,7 +532,7 @@ open Services
                         ).GridRow(3)
                     
                     if model.IsLoading then 
-                        yield Common.createBusyLayer().GridRowSpan(3)
+                        yield Common.createBusyLayer().GridRowSpan(4)
                 ]
             )
           

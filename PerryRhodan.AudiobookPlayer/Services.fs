@@ -52,7 +52,7 @@ module Consts =
             | _ -> Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
         Path.Combine(baseFolder,"PerryRhodan.AudioBookPlayer","data")
     let stateFileFolder = Path.Combine(currentLocalDataFolder,"states")
-    let audioBooksStateDataFile = Path.Combine(stateFileFolder,"audiobooks.json")
+    let audioBooksStateDataFile = Path.Combine(stateFileFolder,"audiobooks.db")
     let audioBookDownloadFolderBase = Path.Combine(currentLocalDataFolder,"audiobooks")
 
 
@@ -64,6 +64,12 @@ module Consts =
 module FileAccess =
 
     open Consts
+    open LiteDB
+    open LiteDB.FSharp
+    open LiteDB.FSharp.Extensions
+
+    let mapper = FSharpBsonMapper()    
+
 
     let initAppFolders () =
         if not (Directory.Exists(currentLocalDataFolder)) then
@@ -75,47 +81,55 @@ module FileAccess =
     let loadAudioBooksStateFile () =
         async {
             try
-                if not (File.Exists(audioBooksStateDataFile)) then
-                    return Ok (None)
-                else
-                    let! json = Common.readFileTextAsync audioBooksStateDataFile
-                    return json |> Result.map( fun j -> Some (JsonConvert.DeserializeObject<AudioBook[]>(j)))
+                
+                let! res = asyncFunc (fun () ->
+                    use db = new LiteDatabase(audioBooksStateDataFile, mapper)
+                    let audioBooks = 
+                        db.GetCollection<AudioBook>("audiobooks")
+                            .FindAll()                             
+                            |> Seq.toArray
+                            |> Array.sortBy (fun i -> i.FullName)
+
+                    audioBooks
+                )
+
+                return res |> Ok
             with
             | _ as e -> return Error e.Message
 
         }
 
-
-    let saveAudioBooksStateFile (audiobooks:AudioBook[]) =
+    let insertNewAudioBooksInStateFile (audioBooks:AudioBook[]) =
         async {
             try
-                let json = JsonConvert.SerializeObject(audiobooks)
-                do! json |> Common.writeFileTextAsync audioBooksStateDataFile
-                return Ok ()
+            
+                let! res = asyncFunc (fun () ->
+                    use db = new LiteDatabase(audioBooksStateDataFile, mapper)
+                    let audioBooksCol = 
+                        db.GetCollection<AudioBook>("audiobooks")
+                    
+                    audioBooksCol.InsertBulk(audioBooks)
+                )
+
+                return res |> Ok
             with
             | _ as e -> return Error e.Message
 
         }
 
 
-    let updateAudioBookInStateFile audioBook =
+    let updateAudioBookInStateFile (audioBook:AudioBook) =
         async {
-            let! currentAudioBooks = loadAudioBooksStateFile ()
-            match currentAudioBooks with
-            | Error e -> return Error e
-            | Ok abooks ->
-                let newAb =
-                    abooks        
-                    |> Option.map (fun items ->
-                        items
-                        |> Array.Parallel.map (fun a -> (if audioBook.FullName = a.FullName then audioBook else a)
-                        )
-                    )
-                match newAb with
-                | None -> 
-                    return Ok ()
-                | Some audiobooks ->
-                    return! audiobooks|> saveAudioBooksStateFile
+
+            let! res = asyncFunc (fun () ->
+                use db = new LiteDatabase(audioBooksStateDataFile, mapper)
+                let audioBooks = db.GetCollection<AudioBook>("audiobooks")
+                audioBooks.Update(audioBook)
+            )
+
+            if res 
+            then return (Ok ())
+            else return (Error "error storing audiobook data into database.")
             
         }
 
