@@ -26,6 +26,8 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FSharp.Data" Version="3.0.0" />
+    <PackageReference Include="LiteDB" Version="4.1.4" />
+    <PackageReference Include="LiteDB.FSharp" Version="2.6.0" />
     <PackageReference Include="Microsoft.AppCenter.Analytics" Version="1.11.0" />
     <PackageReference Include="Microsoft.AppCenter.Crashes" Version="1.11.0" />
     <PackageReference Include="Plugin.Permissions" Version="3.0.0.12" />

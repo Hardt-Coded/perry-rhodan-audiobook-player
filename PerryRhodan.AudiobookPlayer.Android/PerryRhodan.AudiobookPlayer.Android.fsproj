@@ -159,6 +159,12 @@
       <HintPath>..\packages\SharpZipLib.1.0.0\lib\netstandard2.0\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
     <Reference Include="Java.Interop" />
+    <Reference Include="LiteDB">
+      <HintPath>..\packages\LiteDB.4.1.4\lib\netstandard2.0\LiteDB.dll</HintPath>
+    </Reference>
+    <Reference Include="LiteDB.FSharp">
+      <HintPath>..\packages\LiteDB.FSharp.2.6.0\lib\netstandard2.0\LiteDB.FSharp.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.AppCenter">
       <HintPath>..\packages\Microsoft.AppCenter.1.11.0\lib\MonoAndroid403\Microsoft.AppCenter.dll</HintPath>
     </Reference>

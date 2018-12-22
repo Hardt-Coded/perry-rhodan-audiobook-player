@@ -32,6 +32,7 @@
         then Some() else None    
 
 
+
     let createBusyLayer () =
         View.Grid(
             backgroundColor = Color.FromHex "#A0000000",
@@ -202,6 +203,35 @@
                 else
                     (false,0)
             if (fileSizeFound) then contentLength else defaultValue
+
+
+    module RegExHelper =
+
+        open System.Text.RegularExpressions
+
+        let regexMatch pattern input =
+            let res = Regex.Match(input,pattern)
+            if res.Success then
+                Some res.Value
+            else
+                None
+
+        let regexMatchOpt pattern input =
+            input
+            |> Option.map (regexMatch pattern)
+            |> Option.flatten
+
+        let regexMatchGroup pattern group input =
+            let res = Regex.Match(input,pattern)
+            if res.Success && res.Groups.Count >= group then
+                Some res.Groups.[group].Value
+            else
+                None
+
+        let regexMatchGroupOpt pattern group input =
+            input
+            |> Option.map (regexMatchGroup group pattern)
+            |> Option.flatten
 
 
     module AppCenter =
