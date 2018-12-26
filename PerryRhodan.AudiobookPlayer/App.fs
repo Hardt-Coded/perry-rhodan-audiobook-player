@@ -271,6 +271,9 @@ module App =
 
         | Some abModel ->
             if (abModel.AudioBook <> audioBook) then
+                if abModel.CurrentState = AudioPlayerPage.Playing then
+                    // stop audio player
+                    AudioPlayerPage.audioPlayer.Stop()
                 brandNewPage()
             else
                 newPageModel, Cmd.none
