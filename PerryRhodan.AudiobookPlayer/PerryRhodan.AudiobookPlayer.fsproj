@@ -27,19 +27,18 @@
   <ItemGroup>
     <PackageReference Include="FSharp.Data" Version="3.0.0" />
     <PackageReference Include="LiteDB" Version="4.1.4" />
-    <PackageReference Include="LiteDB.FSharp" Version="2.6.0" />
-    <PackageReference Include="Microsoft.AppCenter.Analytics" Version="1.11.0" />
-    <PackageReference Include="Microsoft.AppCenter.Crashes" Version="1.11.0" />
+    <PackageReference Include="Microsoft.AppCenter.Analytics" Version="1.12.0" />
+    <PackageReference Include="Microsoft.AppCenter.Crashes" Version="1.12.0" />
     <PackageReference Include="Plugin.Permissions" Version="3.0.0.12" />
-    <PackageReference Include="SharpZipLib" Version="1.0.0" />
+    <PackageReference Include="SharpZipLib" Version="1.1.0" />
     <PackageReference Include="SixLabors.ImageSharp" Version="1.0.0-beta0005" />
     <PackageReference Include="System.IO.Compression.ZipFile" Version="4.3.0" />
     <PackageReference Include="taglib-sharp-netstandard2.0" Version="2.1.0" />
     <PackageReference Include="Xamarin.FFImageLoading" Version="2.4.4.859" />
     <PackageReference Include="Xamarin.Forms" Version="3.4.0.1008975" />
-    <PackageReference Include="Xamarin.Essentials" Version="0.6.0-preview" />
-    <PackageReference Include="Fabulous.Core" Version="0.28.0" />
-    <PackageReference Include="Fabulous.LiveUpdate" Version="0.27.1" />
+    <PackageReference Include="Xamarin.Essentials" Version="1.0.0" />
+    <PackageReference Include="Fabulous.Core" Version="0.29.0" />
+    <PackageReference Include="Fabulous.LiveUpdate" Version="0.29.0" />
     <PackageReference Include="FSharp.Core" Version="4.5.2" />
     <PackageReference Update="FSharp.Core" Version="4.5.4" /> <!-- workaround for VSMac bug https://github.com/mono/monodevelop/pull/5137 --> 
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />

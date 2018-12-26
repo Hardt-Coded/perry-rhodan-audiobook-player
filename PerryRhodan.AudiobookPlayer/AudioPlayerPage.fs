@@ -525,7 +525,8 @@ open Services
                             
                             yield (View.Slider(
                                     value=model.TrackPositionProcess,
-                                    minimum = 0.0, maximum = 1.0, 
+                                    minimumMaximum = (0.0,1.0),
+                                    //minimum = 0.0, maximum = 1.0, 
                                     horizontalOptions = LayoutOptions.Fill,
                                     valueChanged= (fun e -> dispatch (ProgressBarChanged e.NewValue))
                                   )).GridColumnSpan(5).GridRow(1)
