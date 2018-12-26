@@ -55,23 +55,23 @@
             return result 
         }
 
-    let readFileTextAsync filename =
-        async {
-            try
-                use file = File.OpenText(filename)
-                let! res = (file.ReadToEndAsync()) |> Async.AwaitTask
-                return Ok res
-            with
-            | _ as e -> return Error e.Message
-        }
+    //let readFileTextAsync filename =
+    //    async {
+    //        try
+    //            use file = File.OpenText(filename)
+    //            let! res = (file.ReadToEndAsync()) |> Async.AwaitTask
+    //            return Ok res
+    //        with
+    //        | _ as e -> return Error e.Message
+    //    }
 
-    let writeFileTextAsync filename text =
-        async {
-            let original = System.Threading.SynchronizationContext.Current
-            do! Async.SwitchToNewThread() 
-            File.WriteAllText(filename,text)
-            do! Async.SwitchToContext(original)            
-        }
+    //let writeFileTextAsync filename text =
+    //    async {
+    //        let original = System.Threading.SynchronizationContext.Current
+    //        do! Async.SwitchToNewThread() 
+    //        File.WriteAllText(filename,text)
+    //        do! Async.SwitchToContext(original)            
+        //}
         
 
     module Extensions =
@@ -261,4 +261,6 @@
             if (z.Name.Contains(".mp3")) then Mp3File
             elif (z.Name.Contains(".jpg")) then PicFile
             else Other
-            
+
+
+    
