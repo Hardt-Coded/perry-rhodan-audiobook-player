@@ -6,6 +6,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="LiteDbExtensions\Json.fs" />
+    <Compile Include="LiteDbExtensions\Bson.fs" />
+    <Compile Include="LiteDbExtensions\FSharpBsonMapper.fs" />
     <Content Include="Images\browse_icon.png" />
     <Content Include="Images\home_icon.png" />
     <Content Include="Images\AudioBookPlaceholder_Dark.png" />

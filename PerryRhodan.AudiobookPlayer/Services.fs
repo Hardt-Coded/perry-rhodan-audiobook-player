@@ -66,9 +66,10 @@ module FileAccess =
 
     open Consts
     open LiteDB
+    open LiteDB.FSharp
     
 
-    let mapper = BsonMapper()    
+    let mapper = FSharpBsonMapper()    
 
 
     let initAppFolders () =
