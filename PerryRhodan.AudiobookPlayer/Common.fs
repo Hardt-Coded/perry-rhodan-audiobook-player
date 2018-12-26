@@ -6,6 +6,7 @@
     open System.IO
     open System.Threading.Tasks
     open Fabulous.Core
+    
 
     type ComError =
     | SessionExpired of string
@@ -250,3 +251,14 @@
 
             { program with                 
                 onError = traceError }
+
+
+    module ZipHelpers =
+
+        open ICSharpCode.SharpZipLib.Zip
+
+        let (|Mp3File|PicFile|Other|) (z:ZipEntry) = 
+            if (z.Name.Contains(".mp3")) then Mp3File
+            elif (z.Name.Contains(".jpg")) then PicFile
+            else Other
+            

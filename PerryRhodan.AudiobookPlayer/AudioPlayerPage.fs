@@ -49,9 +49,9 @@ open Services
         | FileListLoaded of (string * int) list
         | UpdatePostion of position:int * duration:int
         | ProgressBarChanged of float
-        | SaveCurrentPosition of AudioBook
+        | SaveCurrentPosition //of AudioBook
         | OpenSleepTimerActionMenu
-        | StartSleepTimer of TimeSpan
+        | StartSleepTimer of TimeSpan option
         | DecreaseSleepTimer
         
         | ChangeBusyState of bool
@@ -113,14 +113,21 @@ open Services
                     let currentPosition =model.CurrentPosition |> fromTimeSpanOpt
 
                     audioPlayer.OnCompletion <- Some (fun ()-> dispatch NextAudioFile)
+                    audioPlayer.OnInfo <- Some (fun (p,d) -> 
+                        dispatch (UpdatePostion (p,d))
+                        let tsPos =  (p |> toTimeSpan)
+                        if tsPos.Seconds % 5 = 0 then
+                            dispatch (SaveCurrentPosition)
+                        )
 
                     do! audioPlayer.PlayFile file currentPosition
-                    let timer =
+
+                    let timer = 
                         new Timer(
-                            fun _ -> dispatch (UpdatePostion (audioPlayer.CurrentPosition, audioPlayer.CurrentDuration))
-                        , null, 0, 1000)
-                    // avoid error on move forward or backward
-                    do! Async.Sleep 1000
+                            fun _ -> audioPlayer.GetInfo() |> Async.Start
+                            ,null,0,1000)
+
+                    
                     return (PlayStarted timer)
             }
         ) |> Cmd.ofAsyncWithInternalDispatch
@@ -167,9 +174,11 @@ open Services
                     if (model.CurrentState = Stopped) then
                         return None
                     else
-                        return Some (SaveCurrentPosition newAudioBook)
+                        //return Some (SaveCurrentPosition newAudioBook)
+                        return None
             | _,_ ->
-                return Some (SaveCurrentPosition model.AudioBook)
+                //return Some (SaveCurrentPosition model.AudioBook)
+                return None
         } |> Cmd.ofAsyncMsgOption
     
     
@@ -218,7 +227,7 @@ open Services
         | Play -> 
             model |> onPlayMsg
         | PlayStarted timer -> 
-            model |> onPlayStartedMsg timer            
+            model |> onPlayStartedMsg timer          
         | Stop ->
             model |> onStopMsg
         | NextAudioFile -> 
@@ -235,8 +244,8 @@ open Services
             model |> onUpdatePositionMsg (position, duration)
         | ProgressBarChanged e -> 
             model |> onProgressBarChangedMsg e
-        | SaveCurrentPosition ab ->
-            model |> onSaveCurrentPosition ab        
+        | SaveCurrentPosition  ->
+            model |> onSaveCurrentPosition     
         | OpenSleepTimerActionMenu ->
             model |> onOpenSleepTimerActionMenu        
         | StartSleepTimer sleepTime ->
@@ -255,15 +264,16 @@ open Services
         let openSleepTimerActionMenu () =            
             async {
                 let buttons = [|
-                        
-                    yield ("30 sek",(fun () -> StartSleepTimer (TimeSpan.FromSeconds(30.0))) ())
-                    yield ("5 min",(fun () -> StartSleepTimer (TimeSpan.FromMinutes(5.0))) ())
-                    yield ("15 min",(fun () -> StartSleepTimer (TimeSpan.FromMinutes(15.0))) ())
-                    yield ("30 min",(fun () -> StartSleepTimer (TimeSpan.FromMinutes(30.0))) ())
-                    yield ("45 min",(fun () -> StartSleepTimer (TimeSpan.FromMinutes(45.0))) ())
-                    yield ("60 min",(fun () -> StartSleepTimer (TimeSpan.FromMinutes(60.0))) ())
-                    yield ("75 min",(fun () -> StartSleepTimer (TimeSpan.FromMinutes(75.0))) ())
-                    yield ("90 min",(fun () -> StartSleepTimer (TimeSpan.FromMinutes(90.0))) ())
+                    
+                    yield ("off",   (fun () -> StartSleepTimer None)())    
+                    yield ("30 sek",(fun () -> StartSleepTimer (Some (TimeSpan.FromSeconds(30.0) ))) ())
+                    yield ("5 min", (fun () -> StartSleepTimer (Some (TimeSpan.FromMinutes(5.0) ))) ())
+                    yield ("15 min",(fun () -> StartSleepTimer (Some (TimeSpan.FromMinutes(15.0) ))) ())
+                    yield ("30 min",(fun () -> StartSleepTimer (Some (TimeSpan.FromMinutes(30.0) ))) ())
+                    yield ("45 min",(fun () -> StartSleepTimer (Some (TimeSpan.FromMinutes(45.0) ))) ())
+                    yield ("60 min",(fun () -> StartSleepTimer (Some (TimeSpan.FromMinutes(60.0) ))) ())
+                    yield ("75 min",(fun () -> StartSleepTimer (Some (TimeSpan.FromMinutes(75.0) ))) ())
+                    yield ("90 min",(fun () -> StartSleepTimer (Some (TimeSpan.FromMinutes(90.0) ))) ())
                         
                 |]
                 return! Helpers.displayActionSheet (Some "Select Sleep Time ...") (Some "Cancel") buttons
@@ -275,7 +285,7 @@ open Services
     and onPlayMsg model = 
         let playAudioCmd = model |> playAudio
         let newModel = {model with CurrentState = Playing}
-        newModel, Cmd.batch [ playAudioCmd; Cmd.ofMsg (newModel.AudioBook |> SaveCurrentPosition) ], None
+        newModel, Cmd.batch [ playAudioCmd; model |> saveCurrentPosition ], None
 
 
     and onPlayStartedMsg timer model =
@@ -432,12 +442,12 @@ open Services
                 newModel, newModel |> sleepTimerUpdateCmd, None
 
     
-    and onSaveCurrentPosition ab model =
-        {model with AudioBook = ab}, model |> saveCurrentPosition, None
+    and onSaveCurrentPosition model =
+        model, model |> saveCurrentPosition, None
 
 
     and onStartSleepTimer sleepTime model =
-        let newModel = {model with TimeUntilSleeps = Some sleepTime}
+        let newModel = {model with TimeUntilSleeps = sleepTime}
         match model.TimeUntilSleeps with
         | None ->
             

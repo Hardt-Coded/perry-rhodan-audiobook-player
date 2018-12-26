@@ -28,9 +28,14 @@ type AudioPlayer() =
     let mutable lastPositionBeforeStop = None
     
     let mutable onCompletion = None
+
+    let mutable onAfterPrepare = None
+
+    let mutable onInfo = None
     
     let mediaPlayer = 
         let m = new MediaPlayer()
+        m.SetWakeMode(Application.Context, WakeLockFlags.Partial);
         
         m.Completion.Add(
             fun _ -> 
@@ -38,45 +43,41 @@ type AudioPlayer() =
                 | None -> ()
                 | Some cmd -> cmd()
         )
-        
+
+        m.Prepared.Add(
+            fun _ ->                 
+                match onAfterPrepare with
+                | None -> ()
+                | Some cmd -> cmd()
+                m.Start()
+                lastPositionBeforeStop <- None
+        )
+
+                
         m
 
     interface DependencyServices.IAudioPlayer with
         
-        member this.CurrentPosition 
-            with get () = mediaPlayer.CurrentPosition
-        
-        member this.CurrentDuration 
-            with get () = mediaPlayer.Duration
-
         member this.LastPositionBeforeStop with get () = lastPositionBeforeStop
 
         member this.OnCompletion 
             with get () = onCompletion
             and set p = onCompletion <- p
 
+        member this.OnInfo 
+            with get () = onInfo
+            and set p = onInfo <- p
+
         member this.PlayFile file position =
             async {
                 mediaPlayer.Reset()
                 do! mediaPlayer.SetDataSourceAsync(file) |> Async.AwaitTask
-                mediaPlayer.Prepare()
-                mediaPlayer.SeekTo(position)
-                mediaPlayer.Start()
-                lastPositionBeforeStop <- None
+                onAfterPrepare <- Some (fun () -> mediaPlayer.SeekTo(position))
+                mediaPlayer.PrepareAsync()
                 return ()
             }
 
-        member this.ContinuePlayFile file position =
-            async {
-                do! mediaPlayer.SetDataSourceAsync(file) |> Async.AwaitTask
-                mediaPlayer.SeekTo(position)
-                mediaPlayer.Start()
-                lastPositionBeforeStop <- None
-                return ()
-            }
-            
         
-
         member this.Stop () =
             if (mediaPlayer.IsPlaying) then
                 mediaPlayer.Pause()
@@ -90,6 +91,16 @@ type AudioPlayer() =
 
         member this.GotToPosition ms =
             mediaPlayer.SeekTo(ms)
+
+        member this.GetInfo () =
+            async {
+                do! Common.asyncFunc(
+                        fun () ->
+                            match onInfo,mediaPlayer.IsPlaying with
+                            | Some cmd, true -> cmd(mediaPlayer.CurrentPosition,mediaPlayer.Duration)
+                            | _ -> ()
+                )
+            }
 
 
 
