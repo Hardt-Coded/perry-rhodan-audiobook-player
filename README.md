@@ -24,6 +24,12 @@ The WPF Application is more or less only a way to test some basic functions with
 
 Also there is currently no way to set the directory were the file will be stored.
 
+
+2018-12-28:
+
+Using LiteDb instead of plain JSON file. More stability. Some Bugfixes. Stop playing, when remove headset or bluetooth.
+  
+
 2018-12-11:
 
 Demo Video added, some small stuff, bugfixing bla.
