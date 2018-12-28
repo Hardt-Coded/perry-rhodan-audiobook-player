@@ -20,7 +20,8 @@ type AudioBookState =
         static member Empty = {Completed = false; CurrentPosition = None; Downloaded=false; DownloadedFolder = None}
 
 type AudioBook =
-    { FullName:string 
+    { Id:int
+      FullName:string 
       EpisodeNo:int option
       EpisodenTitel: string
       Group:string
@@ -32,7 +33,8 @@ type AudioBook =
 
     with
         static member Empty = 
-            { FullName="" 
+            { Id = 0
+              FullName="" 
               EpisodeNo=None
               EpisodenTitel = ""
               Group = ""
@@ -102,8 +104,15 @@ let parseDownloadData htmlData =
                 | None -> sprintf "%s - %s" key episodeTitle
                 | Some no -> sprintf "%s %i - %s" key no episodeTitle
 
+            let (hasProdId,productId) = 
+                linkProductSite
+                |> RegExHelper.regexMatchGroupOpt 2 "(productID=)(\d*)"
+                |> Option.defaultValue "-1"
+                |> Int32.TryParse
+
                         
-            {   FullName = fullName 
+            {   Id = if hasProdId then productId else -1
+                FullName = fullName 
                 EpisodeNo = episodeNumber
                 EpisodenTitel = episodeTitle
                 Group = key
@@ -113,19 +122,26 @@ let parseDownloadData htmlData =
                 Thumbnail = None
                 State = AudioBookState.Empty }
     )
+    |> Array.filter (fun i -> i.Id <> -1)
     |> Array.sortBy (fun ab -> 
             match ab.EpisodeNo with
             | None -> -1
             | Some x -> x
     )
+    |> Array.distinct
+
+let filterNewAudioBooks (local:AudioBook[]) (online:AudioBook[]) =    
+    online
+    |> Array.filter (fun i -> local |> Array.exists (fun l -> l.Id = i.Id) |> not)
 
 
 let synchronizeAudiobooks (local:AudioBook[]) (online:AudioBook[]) =
-    let differences =
-        online
-        |> Array.filter (fun i -> local |> Array.exists (fun l -> l.FullName = i.FullName) |> not)
-
+    let differences = filterNewAudioBooks local online
     Array.concat [|local; differences|] 
+
+
+
+    
 
 
 

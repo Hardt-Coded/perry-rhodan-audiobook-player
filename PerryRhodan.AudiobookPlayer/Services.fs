@@ -28,17 +28,20 @@ module DependencyServices =
 
     type IAudioPlayer = 
 
-        abstract member CurrentPosition: int with get
-        abstract member CurrentDuration: int with get
+        //abstract member CurrentPosition: int with get
+        //abstract member CurrentDuration: int with get
         abstract member LastPositionBeforeStop: int option with get
+        abstract member CurrentFile: string option with get
 
         abstract member OnCompletion: (unit -> unit) option with get,set
+        abstract member OnNoisyHeadPhone: (unit -> unit) option with get,set
+        abstract member OnInfo: (int * int -> unit) option with get,set
 
         abstract member PlayFile:string -> int -> Async<unit>
-        abstract member ContinuePlayFile:string -> int -> Async<unit>
         abstract member Stop:unit -> unit
         abstract member GotToPosition: int -> unit
-    
+        // triggers to get async position and duration via onInfo Handler
+        abstract member GetInfo: unit -> Async<unit>
 
 module Consts =
     
@@ -52,7 +55,7 @@ module Consts =
             | _ -> Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
         Path.Combine(baseFolder,"PerryRhodan.AudioBookPlayer","data")
     let stateFileFolder = Path.Combine(currentLocalDataFolder,"states")
-    let audioBooksStateDataFile = Path.Combine(stateFileFolder,"audiobooks.json")
+    let audioBooksStateDataFile = Path.Combine(stateFileFolder,"audiobooks.db")
     let audioBookDownloadFolderBase = Path.Combine(currentLocalDataFolder,"audiobooks")
 
 
@@ -64,6 +67,12 @@ module Consts =
 module FileAccess =
 
     open Consts
+    open LiteDB
+    open LiteDB.FSharp
+    
+
+    let mapper = FSharpBsonMapper()    
+
 
     let initAppFolders () =
         if not (Directory.Exists(currentLocalDataFolder)) then
@@ -75,47 +84,55 @@ module FileAccess =
     let loadAudioBooksStateFile () =
         async {
             try
-                if not (File.Exists(audioBooksStateDataFile)) then
-                    return Ok (None)
-                else
-                    let! json = Common.readFileTextAsync audioBooksStateDataFile
-                    return json |> Result.map( fun j -> Some (JsonConvert.DeserializeObject<AudioBook[]>(j)))
+                initAppFolders ()
+                let! res = asyncFunc (fun () ->
+                    use db = new LiteDatabase(audioBooksStateDataFile, mapper)
+                    let audioBooks = 
+                        db.GetCollection<AudioBook>("audiobooks")
+                            .FindAll()                             
+                            |> Seq.toArray
+                            |> Array.sortBy (fun i -> i.FullName)
+
+                    audioBooks
+                )
+
+                return res |> Ok
             with
             | _ as e -> return Error e.Message
 
         }
 
-
-    let saveAudioBooksStateFile (audiobooks:AudioBook[]) =
+    let insertNewAudioBooksInStateFile (audioBooks:AudioBook[]) =
         async {
             try
-                let json = JsonConvert.SerializeObject(audiobooks)
-                do! json |> Common.writeFileTextAsync audioBooksStateDataFile
-                return Ok ()
+            
+                let! res = asyncFunc (fun () ->
+                    use db = new LiteDatabase(audioBooksStateDataFile, mapper)
+                    let audioBooksCol = 
+                        db.GetCollection<AudioBook>("audiobooks")
+                    
+                    audioBooksCol.InsertBulk(audioBooks)
+                )
+
+                return res |> Ok
             with
             | _ as e -> return Error e.Message
 
         }
 
 
-    let updateAudioBookInStateFile audioBook =
+    let updateAudioBookInStateFile (audioBook:AudioBook) =
         async {
-            let! currentAudioBooks = loadAudioBooksStateFile ()
-            match currentAudioBooks with
-            | Error e -> return Error e
-            | Ok abooks ->
-                let newAb =
-                    abooks        
-                    |> Option.map (fun items ->
-                        items
-                        |> Array.Parallel.map (fun a -> (if audioBook.FullName = a.FullName then audioBook else a)
-                        )
-                    )
-                match newAb with
-                | None -> 
-                    return Ok ()
-                | Some audiobooks ->
-                    return! audiobooks|> saveAudioBooksStateFile
+
+            let! res = asyncFunc (fun () ->
+                use db = new LiteDatabase(audioBooksStateDataFile, mapper)
+                let audioBooks = db.GetCollection<AudioBook>("audiobooks")
+                audioBooks.Update(audioBook)
+            )
+
+            if res 
+            then return (Ok ())
+            else return (Error "error storing audiobook data into database.")
             
         }
 
@@ -279,127 +296,121 @@ module WebAccess =
                         try
                             let! resp = Http.AsyncRequestStream(url,httpMethod=HttpMethod.Get)
 
-                            
-
                             let targetFileName = Path.Combine(audioBookFolder,audiobook.FullName.Replace(" ","_") + ".zip")
                             if (resp.StatusCode <> 200) then 
                                 return Error (Other (sprintf "download statuscode %i" resp.StatusCode))
                             else
-
-                                use fileStream = new FileStream(targetFileName,FileMode.Create)
-
-                                let buffer:byte[] = Array.zeroCreate (500*1024)
-                            
-                                let ofLength = 0
-                                let mutable read:int = 0
-                                let mutable readed:int = 0
-                                let mutable counter:int = 0
                                 
-                                let getFileSize ()= 
-                                    (resp.Headers
-                                    |> HttpHelpers.getFileSizeFromHttpHeadersOrDefaultValue readed) / (1024 * 1024)
-
-                                updateProgress (readed / (1024 * 1024) ,getFileSize ())
-
-                                let! r = resp.ResponseStream.AsyncRead(buffer,0, buffer.Length) 
-                                read <- r
-                                readed <- (readed + r)
-
-                                while (read > 0) do  
-                                    do! fileStream.AsyncWrite(buffer,0,read)
-                                    // nur jeden MB
-
-                                    counter <- counter + 1
-
-                                    let update = 
-                                        if counter = 25 then
-                                            counter <- 0
-                                            true
-                                        else
-                                            false
-                                    
-                                    
-                                    
-                                    if update then
-                                        updateProgress (readed / (1024 * 1024) , getFileSize ())
-
-                                    let! r = resp.ResponseStream.AsyncRead(buffer,0,buffer.Length) 
-                                    read <- r
-                                    readed <- readed + r
-                                
-                            
-                                updateProgress (readed / (1024 * 1024) , getFileSize ())
-                                
-                                fileStream.Close()
-                                resp.ResponseStream.Close()                        
-
                                 let unzipTargetFolder = Path.Combine(audioBookFolder,"audio")
                                 if not (Directory.Exists(unzipTargetFolder)) then
                                     Directory.CreateDirectory(unzipTargetFolder) |> ignore
+                                
+                                let fileSize = 
+                                    (resp.Headers
+                                    |> HttpHelpers.getFileSizeFromHttpHeadersOrDefaultValue 0) / (1024 * 1024)
+                                
+                                
 
-                                let! imageFileNames = 
-                                    asyncFunc (fun () ->   
-                                        use archiveFile = File.OpenRead(targetFileName)
-                                        use archive = new ICSharpCode.SharpZipLib.Zip.ZipFile(archiveFile)
-                                        //use archive = ZipFile.OpenRead(targetFileName)    
+                                
+
+
+                                //use fileStream = new FileStream(targetFileName,FileMode.Create)
+                                use zipStream = new ZipInputStream(resp.ResponseStream)
+
+                                
+
+                                let zipSeq =
+                                    seq {
+                                        let mutable entryAvailable = true
+                                        while entryAvailable do
+                                            match zipStream.GetNextEntry() with
+                                            | null ->
+                                                entryAvailable <- false
+                                            | entry -> 
+                                                yield (entry, zipStream.Length)
+                                            
+                                    }
+
+                                let buffer:byte[] = Array.zeroCreate (500*1024)
+
+                                let copyStream (src:Stream) (dst:Stream) initProgress entrySize =
                                     
-                                        let mp3Files = 
-                                            archive
-                                            |> Seq.cast<ZipEntry>
-                                            |> Seq.toList
-                                            |> List.filter (fun i -> i.Name.Contains(".mp3"))
-                                    
-                                        let numFiles = mp3Files.Length
-
-                                        mp3Files
-                                        |> Seq.iteri (fun idx i -> 
-                                            let name = Path.GetFileName(i.Name)
-                                            let extractFullPath = Path.Combine(unzipTargetFolder,name)
-                                            if (File.Exists(extractFullPath)) then
-                                                File.Delete(extractFullPath)
-                                            use zipStream = archive.GetInputStream(i)
-                                            use outFile = File.Create(extractFullPath)
-                                            zipStream.CopyTo(outFile)
-                                            updateProgress (idx+1,numFiles)
-                                        
-                                        )
-                                        let images = 
-                                            archive
-                                            |> Seq.cast<ZipEntry>
-                                            |> Seq.filter (fun i -> i.Name.Contains(".jpg"))
-                                            |> Seq.toList
-
-                                        if images.Length >0 then
-                                            let imageFullName = Path.Combine(audioBookFolder,audiobook.FullName + ".jpg")
-                                            if not (File.Exists(imageFullName)) then
-                                                use zipStream = archive.GetInputStream(images.[0])
-                                                use outFile = File.Create(imageFullName)
-                                                zipStream.CopyTo(outFile)                                            
-
-
-                                            let thumbFullName = Path.Combine(audioBookFolder,audiobook.FullName + ".thumb.jpg")
-                                        
-                                            if not (File.Exists(thumbFullName)) then
-                                                use thumb = SixLabors.ImageSharp.Image.Load(imageFullName)
-                                                thumb.Mutate(fun x -> 
-                                                    x.Resize(200,200) |> ignore
-                                                    ()
-                                                    ) |> ignore                                        
-
-                                                use fileStream = new FileStream(thumbFullName,FileMode.Create)
-                                                thumb.SaveAsJpeg(fileStream)
-                                                fileStream.Close()
-                                        
-                                        
-                                            archive.Close()
-                                            // delete old archive file
-                                            File.Delete(targetFileName)
-
-                                            Some (imageFullName,thumbFullName)
+                                    let mutable copying = true
+                                    let mutable progress = initProgress
+                                    while copying do
+                                        let bytesRead = src.Read(buffer,0,buffer.Length)
+                                        progress <- progress + bytesRead
+                                        updateProgress (progress / (1024 * 1024), entrySize / (1024 * 1024))
+                                        if bytesRead > 0 then
+                                            dst.Write(buffer, 0, bytesRead)
                                         else
-                                            None
+                                            dst.Flush()
+                                            copying <- false
+                                    progress
+
+
+                                let processMp3File initProgress entrySize (entry:ZipEntry) =
+                                    let name = Path.GetFileName(entry.Name)
+                                    let extractFullPath = Path.Combine(unzipTargetFolder,name)
+                                    if (File.Exists(extractFullPath)) then
+                                        File.Delete(extractFullPath)
+
+                                    use streamWriter = File.Create(extractFullPath)
+                                    let progress = copyStream zipStream streamWriter initProgress entrySize
+                                    streamWriter.Close()
+                                    progress                    
+
+
+                                let processPicFile initProgress entrySize =
+                                    let mutable progress = initProgress
+                                    let imageFullName = Path.Combine(audioBookFolder,audiobook.FullName + ".jpg")
+                                    if not (File.Exists(imageFullName)) then
+                                        use streamWriter = File.Create(imageFullName)
+                                        progress <- copyStream zipStream streamWriter initProgress entrySize
+                                        streamWriter.Close()                                        
+
+                                    let thumbFullName = Path.Combine(audioBookFolder,audiobook.FullName + ".thumb.jpg")
+                                                
+                                    if not (File.Exists(thumbFullName)) then
+                                        use thumb = SixLabors.ImageSharp.Image.Load(imageFullName)
+                                        thumb.Mutate(fun x -> 
+                                            x.Resize(200,200) |> ignore
+                                            ()
+                                            ) |> ignore                                        
+
+                                        use fileStream = new FileStream(thumbFullName,FileMode.Create)
+                                        thumb.SaveAsJpeg(fileStream)
+                                        fileStream.Close()
                                     
-                                    )                          
+                                    progress
+
+                                
+                                let mutable globalProgress = 0
+
+                                do! asyncFunc(fun () ->
+                                    zipSeq
+                                    |> Seq.iter (
+                                        fun (entry, entrySize) ->
+                                            match entry with
+                                            | ZipHelpers.Mp3File ->
+                                                globalProgress <- (entry |> processMp3File globalProgress (entrySize|>int))
+                                            | ZipHelpers.PicFile ->
+                                                globalProgress <- (processPicFile globalProgress (entrySize|>int))
+                                            | _ -> ()
+                                    )
+                                )
+                                
+                                zipStream.Close()
+                                resp.ResponseStream.Close()       
+                                let imageFullName = Path.Combine(audioBookFolder,audiobook.FullName + ".jpg")
+                                let thumbFullName = Path.Combine(audioBookFolder,audiobook.FullName + ".thumb.jpg")
+
+                                let imageFileNames = 
+                                    if File.Exists(imageFullName) && File.Exists(thumbFullName) then
+                                        Some (imageFullName,thumbFullName)
+                                    else None
+
+                                updateProgress (fileSize, fileSize)
                             
 
                                 return Ok (unzipTargetFolder,imageFileNames)

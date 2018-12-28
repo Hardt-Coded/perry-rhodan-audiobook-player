@@ -6,6 +6,7 @@
     open System.IO
     open System.Threading.Tasks
     open Fabulous.Core
+    
 
     type ComError =
     | SessionExpired of string
@@ -32,6 +33,7 @@
         then Some() else None    
 
 
+
     let createBusyLayer () =
         View.Grid(
             backgroundColor = Color.FromHex "#A0000000",
@@ -53,23 +55,23 @@
             return result 
         }
 
-    let readFileTextAsync filename =
-        async {
-            try
-                use file = File.OpenText(filename)
-                let! res = (file.ReadToEndAsync()) |> Async.AwaitTask
-                return Ok res
-            with
-            | _ as e -> return Error e.Message
-        }
+    //let readFileTextAsync filename =
+    //    async {
+    //        try
+    //            use file = File.OpenText(filename)
+    //            let! res = (file.ReadToEndAsync()) |> Async.AwaitTask
+    //            return Ok res
+    //        with
+    //        | _ as e -> return Error e.Message
+    //    }
 
-    let writeFileTextAsync filename text =
-        async {
-            let original = System.Threading.SynchronizationContext.Current
-            do! Async.SwitchToNewThread() 
-            File.WriteAllText(filename,text)
-            do! Async.SwitchToContext(original)            
-        }
+    //let writeFileTextAsync filename text =
+    //    async {
+    //        let original = System.Threading.SynchronizationContext.Current
+    //        do! Async.SwitchToNewThread() 
+    //        File.WriteAllText(filename,text)
+    //        do! Async.SwitchToContext(original)            
+        //}
         
 
     module Extensions =
@@ -204,6 +206,35 @@
             if (fileSizeFound) then contentLength else defaultValue
 
 
+    module RegExHelper =
+
+        open System.Text.RegularExpressions
+
+        let regexMatch pattern input =
+            let res = Regex.Match(input,pattern)
+            if res.Success then
+                Some res.Value
+            else
+                None
+
+        let regexMatchOpt pattern input =
+            input
+            |> Option.map (regexMatch pattern)
+            |> Option.flatten
+
+        let regexMatchGroup pattern group input =
+            let res = Regex.Match(input,pattern)
+            if res.Success && res.Groups.Count >= group then
+                Some res.Groups.[group].Value
+            else
+                None
+
+        let regexMatchGroupOpt pattern group input =
+            input
+            |> Option.map (regexMatchGroup group pattern)
+            |> Option.flatten
+
+
     module AppCenter =
 
         open Microsoft.AppCenter
@@ -220,3 +251,16 @@
 
             { program with                 
                 onError = traceError }
+
+
+    module ZipHelpers =
+
+        open ICSharpCode.SharpZipLib.Zip
+
+        let (|Mp3File|PicFile|Other|) (z:ZipEntry) = 
+            if (z.Name.Contains(".mp3")) then Mp3File
+            elif (z.Name.Contains(".jpg")) then PicFile
+            else Other
+
+
+    

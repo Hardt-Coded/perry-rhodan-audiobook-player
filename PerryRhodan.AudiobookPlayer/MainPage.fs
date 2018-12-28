@@ -125,8 +125,8 @@ open Services
                     return Some (ChangeBusyState false)
                 | Ok ab -> 
                     match ab with
-                    | None -> return Some (ChangeBusyState false)
-                    | Some ab ->
+                    | [||] -> return Some (ChangeBusyState false)
+                    | _ ->
                         let ab = 
                             ab
                             |> Array.filter (fun i -> i.State.Downloaded)
