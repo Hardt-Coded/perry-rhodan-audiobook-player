@@ -28,6 +28,8 @@ Also there is currently no way to set the directory were the file will be stored
 2018-12-28:
 
 Using LiteDb instead of plain JSON file. More stability. Some Bugfixes. Stop playing, when remove headset or bluetooth.
+Instead of downloading the zip file and extract the audio book from the file on the phone. I use a zip input stream to read extract
+the audio book on the fly while downloading.
   
 
 2018-12-11:
