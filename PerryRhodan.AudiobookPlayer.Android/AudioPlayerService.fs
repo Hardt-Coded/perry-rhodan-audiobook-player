@@ -138,28 +138,5 @@ module rec AudioPlayerService =
                 }
 
 
-    type MediaSessionCallback(service:MediaPlayerServiceBinder) =
-        inherit MediaSession.Callback()
-
-        override this.OnPause () =
-            match service.Service.CurrentFile, service.Service.LastPositionBeforeStop with
-            | Some f, Some p ->
-                service.Service.PlayFile f p |> Async.RunSynchronously
-                ()
-            | _ ->
-                ()
-
-            
-        override this.OnStop () =
-            service.Service.Stop ()
-
-
-
-
-    type MediaPlayerServiceBinder(service:DependencyServices.IAudioPlayer) =
-        inherit Binder()
-
-        member this.Service with get():DependencyServices.IAudioPlayer = service
-
-        
+      
         
