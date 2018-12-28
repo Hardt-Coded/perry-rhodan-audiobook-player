@@ -113,6 +113,7 @@ open Services
                     let currentPosition =model.CurrentPosition |> fromTimeSpanOpt
 
                     audioPlayer.OnCompletion <- Some (fun ()-> dispatch NextAudioFile)
+                    audioPlayer.OnNoisyHeadPhone <- Some (fun () -> dispatch Stop)
                     audioPlayer.OnInfo <- Some (fun (p,d) -> 
                         dispatch (UpdatePostion (p,d))
                         let tsPos =  (p |> toTimeSpan)
@@ -136,6 +137,7 @@ open Services
         //let audioPlayer = DependencyService.Get<Services.IAudioPlayer>()
         audioPlayer.Stop () |> ignore
         audioPlayer.OnCompletion <- None
+        audioPlayer.OnNoisyHeadPhone <- None
         match model.CurrentPlayingStateUpdateTimer with
         | None -> None
         | Some timer ->

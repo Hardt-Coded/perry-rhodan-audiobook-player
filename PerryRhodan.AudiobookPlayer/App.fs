@@ -464,7 +464,7 @@ module App =
 type App () as app = 
     inherit Application ()
 
-    do AppCenter.Start("ios=(...);android=***REMOVED***", typeof<Analytics>, typeof<Crashes>)
+    do AppCenter.Start("ios=(...);android=", typeof<Analytics>, typeof<Crashes>)
     
     let runner =
         

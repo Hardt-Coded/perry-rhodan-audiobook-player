@@ -31,8 +31,10 @@ module DependencyServices =
         //abstract member CurrentPosition: int with get
         //abstract member CurrentDuration: int with get
         abstract member LastPositionBeforeStop: int option with get
+        abstract member CurrentFile: string option with get
 
         abstract member OnCompletion: (unit -> unit) option with get,set
+        abstract member OnNoisyHeadPhone: (unit -> unit) option with get,set
         abstract member OnInfo: (int * int -> unit) option with get,set
 
         abstract member PlayFile:string -> int -> Async<unit>
@@ -315,6 +317,8 @@ module WebAccess =
                                 //use fileStream = new FileStream(targetFileName,FileMode.Create)
                                 use zipStream = new ZipInputStream(resp.ResponseStream)
 
+                                
+
                                 let zipSeq =
                                     seq {
                                         let mutable entryAvailable = true
@@ -323,19 +327,20 @@ module WebAccess =
                                             | null ->
                                                 entryAvailable <- false
                                             | entry -> 
-                                                yield entry
+                                                yield (entry, zipStream.Length)
+                                            
                                     }
 
                                 let buffer:byte[] = Array.zeroCreate (500*1024)
 
-                                let copyStream (src:Stream) (dst:Stream) initProgress =
+                                let copyStream (src:Stream) (dst:Stream) initProgress entrySize =
                                     
                                     let mutable copying = true
                                     let mutable progress = initProgress
                                     while copying do
                                         let bytesRead = src.Read(buffer,0,buffer.Length)
                                         progress <- progress + bytesRead
-                                        updateProgress (progress / (1024 * 1024), fileSize)
+                                        updateProgress (progress / (1024 * 1024), entrySize / (1024 * 1024))
                                         if bytesRead > 0 then
                                             dst.Write(buffer, 0, bytesRead)
                                         else
@@ -344,24 +349,24 @@ module WebAccess =
                                     progress
 
 
-                                let processMp3File initProgress (entry:ZipEntry) =
+                                let processMp3File initProgress entrySize (entry:ZipEntry) =
                                     let name = Path.GetFileName(entry.Name)
                                     let extractFullPath = Path.Combine(unzipTargetFolder,name)
                                     if (File.Exists(extractFullPath)) then
                                         File.Delete(extractFullPath)
 
                                     use streamWriter = File.Create(extractFullPath)
-                                    let progress = copyStream zipStream streamWriter initProgress
+                                    let progress = copyStream zipStream streamWriter initProgress entrySize
                                     streamWriter.Close()
                                     progress                    
 
 
-                                let processPicFile initProgress =
+                                let processPicFile initProgress entrySize =
                                     let mutable progress = initProgress
                                     let imageFullName = Path.Combine(audioBookFolder,audiobook.FullName + ".jpg")
                                     if not (File.Exists(imageFullName)) then
                                         use streamWriter = File.Create(imageFullName)
-                                        progress <- copyStream zipStream streamWriter initProgress
+                                        progress <- copyStream zipStream streamWriter initProgress entrySize
                                         streamWriter.Close()                                        
 
                                     let thumbFullName = Path.Combine(audioBookFolder,audiobook.FullName + ".thumb.jpg")
@@ -385,12 +390,12 @@ module WebAccess =
                                 do! asyncFunc(fun () ->
                                     zipSeq
                                     |> Seq.iter (
-                                        fun entry ->
+                                        fun (entry, entrySize) ->
                                             match entry with
                                             | ZipHelpers.Mp3File ->
-                                                globalProgress <- (entry |> processMp3File globalProgress)
+                                                globalProgress <- (entry |> processMp3File globalProgress (entrySize|>int))
                                             | ZipHelpers.PicFile ->
-                                                globalProgress <- (processPicFile globalProgress)
+                                                globalProgress <- (processPicFile globalProgress (entrySize|>int))
                                             | _ -> ()
                                     )
                                 )

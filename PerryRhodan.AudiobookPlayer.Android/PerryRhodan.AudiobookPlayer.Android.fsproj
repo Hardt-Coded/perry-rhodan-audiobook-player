@@ -112,6 +112,7 @@
     <AndroidResource Include="Resources\drawable\AudioBookPlaceholder_Dark.png" />
     <AndroidResource Include="Resources\drawable\browse_icon.png" />
     <AndroidResource Include="Resources\drawable\home_icon.png" />
+    <Compile Include="AudioPlayerService.fs" />
     <Compile Include="MainActivity.fs" />
     <Content Include="packages.config" />
   </ItemGroup>
