@@ -271,6 +271,9 @@ module App =
 
         | Some abModel ->
             if (abModel.AudioBook <> audioBook) then
+                if abModel.CurrentState = AudioPlayerPage.Playing then
+                    // stop audio player
+                    AudioPlayerPage.audioPlayer.Stop()
                 brandNewPage()
             else
                 newPageModel, Cmd.none
@@ -461,7 +464,7 @@ module App =
 type App () as app = 
     inherit Application ()
 
-    do AppCenter.Start("", typeof<Analytics>, typeof<Crashes>)
+    do AppCenter.Start("ios=(...);android=", typeof<Analytics>, typeof<Crashes>)
     
     let runner =
         

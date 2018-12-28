@@ -13,6 +13,7 @@ open Android.Media
 open Android.OS
 open Xamarin.Forms.Platform.Android
 open Services
+open AudioPlayerService
 
 
 type AndroidDownloadFolder() =
@@ -23,73 +24,7 @@ type AndroidDownloadFolder() =
 
 
 
-type AudioPlayer() =
-    
-    let mutable lastPositionBeforeStop = None
-    
-    let mutable onCompletion = None
-    
-    let mediaPlayer = 
-        let m = new MediaPlayer()
-        
-        m.Completion.Add(
-            fun _ -> 
-                match onCompletion with
-                | None -> ()
-                | Some cmd -> cmd()
-        )
-        
-        m
 
-    interface DependencyServices.IAudioPlayer with
-        
-        member this.CurrentPosition 
-            with get () = mediaPlayer.CurrentPosition
-        
-        member this.CurrentDuration 
-            with get () = mediaPlayer.Duration
-
-        member this.LastPositionBeforeStop with get () = lastPositionBeforeStop
-
-        member this.OnCompletion 
-            with get () = onCompletion
-            and set p = onCompletion <- p
-
-        member this.PlayFile file position =
-            async {
-                mediaPlayer.Reset()
-                do! mediaPlayer.SetDataSourceAsync(file) |> Async.AwaitTask
-                mediaPlayer.Prepare()
-                mediaPlayer.SeekTo(position)
-                mediaPlayer.Start()
-                lastPositionBeforeStop <- None
-                return ()
-            }
-
-        member this.ContinuePlayFile file position =
-            async {
-                do! mediaPlayer.SetDataSourceAsync(file) |> Async.AwaitTask
-                mediaPlayer.SeekTo(position)
-                mediaPlayer.Start()
-                lastPositionBeforeStop <- None
-                return ()
-            }
-            
-        
-
-        member this.Stop () =
-            if (mediaPlayer.IsPlaying) then
-                mediaPlayer.Pause()
-                lastPositionBeforeStop <- Some mediaPlayer.CurrentPosition
-                
-            else
-                lastPositionBeforeStop <- Some mediaPlayer.CurrentPosition
-
-            mediaPlayer.Stop()
-            ()
-
-        member this.GotToPosition ms =
-            mediaPlayer.SeekTo(ms)
 
 
 
@@ -106,6 +41,7 @@ type MainActivity() =
         Xamarin.Forms.Forms.Init (this, bundle)
         Xamarin.Forms.DependencyService.Register<AndroidDownloadFolder>()
         Xamarin.Forms.DependencyService.Register<AudioPlayer>()
+
         
         Plugin.CurrentActivity.CrossCurrentActivity.Current.Init(this, bundle);
 
