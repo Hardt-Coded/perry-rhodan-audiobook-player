@@ -1,6 +1,7 @@
 ﻿#r "netstandard"
 #r "System.Xml.Linq"
-#r @"C:\Users\Dieselmeister\.nuget\packages\fsharp.data\3.0.0\lib\netstandard2.0\FSharp.Data.dll"
+//#r @"C:\Users\Dieselmeister\.nuget\packages\fsharp.data\3.0.0\lib\netstandard2.0\FSharp.Data.dll"
+#r @"C:\Users\ich\.nuget\packages\fsharp.data\3.0.0\lib\netstandard2.0\FSharp.Data.dll"
 
 open FSharp.Data
 open System
@@ -133,4 +134,81 @@ tst
     )
 
 
+
+[<Literal>]
+let productSiteHtml = """
+
+<div id="productdetail"><nav class="breadcrumb"><a href="/index.php?id=12&amp;categoryID=4774&amp;catalogID=851">Hörbuch-Downloads</a> » <a href="/index.php?id=12&amp;categoryID=4777&amp;catalogID=851">PERRY RHODAN</a> » <a href="/index.php?id=12&amp;categoryID=4896&amp;catalogID=851">Hörbücher PERRY RHODAN NEO</a></nav>
+<div class="leftpane"><h2>Perry Rhodan Neo Nr. 189: Die Leiden des Androiden (Hörbuch-Download)</h2><form name="add" style="float:right" action="/caddy.php" method="post"><input name="productID" type="hidden" value="3688426"><input name="quantity" type="hidden" value="1"><input name="rewardFlag" type="hidden" value="0"><input name="action" type="hidden" value="add"><input name="pageID" type="hidden" value="50"><button class="buttonbuy" type="submit">in den Warenkorb</button></form>
+<p class="pricetag">
+<span class="price">9,95&nbsp;€</span><br>inkl. 19%&nbsp;MwSt. und<br> ggf. zzgl. Versand</p>
+<p>Das Jahr 2058: Nach dramatischen Abenteuern in den Tiefen des Weltraums wollen sich Perry Rhodan und seine Gefährten auf die Erde und deren Probleme konzentrieren. Gemeinsam arbeiten die Menschen daran, die Verwüstungen vergangener Kriege und Katastrophen zu beseitigen. Die Terranische Union wächst weiter zusammen.
+<br><br>
+Dann jedoch dringen Außerirdische ins Sonnensystem ein. Sie können sich unsichtbar machen, deshalb nennen die Menschen sie Laurins. Hinter diesem Vorstoß steckt offenbar die geheimnisvolle Allianz, die seit Langem gegen die Erdbewohner kämpft.
+<br><br>
+Perry Rhodan spürt der Allianz bis zum Rand der Milchstraße nach, wo er auf eine übermächtige Kriegsflotte stößt. Befehlshaber der Bestien ist Masmer Tronkh, ein erbitterter Feind der Menschheit. Als Rhodan dessen unheilvollen Pläne vereiteln will, bedeutet dies auch das Ende für die Leiden des Androiden ...</p></div><div class="rightpane"><img title="Perry Rhodan Neo Nr. 189: Die Leiden des Androiden (Hörbuch-Download)" class="image" id="mainimg" alt="Perry Rhodan Neo Nr. 189: Die Leiden des Androiden (Hörbuch-Download)" src="/prod_images/prod_3668694_8365410_2.jpg" border="0">
+				<div id="amazingaudioplayer-1" style="display:block;position:relative;width:300px;height:auto;margin:0px auto 0px;">
+					<ul class="amazingaudioplayer-audios" style="display:none;">
+						<li data-duration="0" data-image="" data-info="" data-album="" data-title="Perry Rhodan Neo Nr. 189: Die Leiden des Androiden (Hörbuch-Download)" data-artist="">
+							<div class="amazingaudioplayer-source" data-type="audio/mpeg" data-src="http://download.einsamedien.de.s3.amazonaws.com/storage/3688426/004_PRNEO_189_Die_Leiden_des_Androiden.mp3?AWSAccessKeyId=AKIAIAWFYTGZGQS2YDPA&amp;Expires=1547542722&amp;Signature=MeRDu5r6Myv2ZhcH1DQjTIvUkwo%3D">
+						</div></li>
+					</ul>
+				<div class="amazingaudioplayer-bar"><div class="amazingaudioplayer-playpause" style="display: block;"><div class="amazingaudioplayer-play" style='background-position: left top; width: 24px; height: 24px; background-image: url("https://www.einsamedien.de/audioplayerengine/playpause-24-24-1.png"); background-repeat: no-repeat; display: block; cursor: pointer;'></div><div class="amazingaudioplayer-pause" style='background-position: right top; width: 24px; height: 24px; background-image: url("https://www.einsamedien.de/audioplayerengine/playpause-24-24-1.png"); background-repeat: no-repeat; display: none; cursor: pointer;'></div></div><div class="amazingaudioplayer-bar-title" style="width: 80px; height: auto; text-indent: -91px; overflow: hidden; display: block; white-space: nowrap;"><span class="amazingaudioplayer-bar-title-text">Perry Rhodan Neo Nr. 189: Die Leiden des Androiden (Hörbuch-Download)</span></div><div class="amazingaudioplayer-volume" style="display: block;"><div class="amazingaudioplayer-volume-button" style='background-position: left top; width: 24px; height: 24px; background-image: url("https://www.einsamedien.de/audioplayerengine/volume-24-24-1.png"); background-repeat: no-repeat; display: block; position: relative; cursor: pointer;'></div><div class="amazingaudioplayer-volume-bar" style="padding: 8px; left: 0px; width: 8px; height: 64px; bottom: 100%; display: none; position: absolute; box-sizing: content-box;"><div class="amazingaudioplayer-volume-bar-adjust" style="width: 100%; height: 100%; display: block; position: relative; cursor: pointer;"><div class="amazingaudioplayer-volume-bar-adjust-active" style="left: 0px; width: 100%; height: 100%; bottom: 0px; display: block; position: absolute;"></div></div></div></div><div class="amazingaudioplayer-time">00:00 / 06:05</div><div class="amazingaudioplayer-progress" style="height: 8px; overflow: hidden; display: block; cursor: pointer;"><div class="amazingaudioplayer-progress-loaded" style="left: 0px; top: 0px; width: 100%; height: 100%; display: block; position: absolute;"></div><div class="amazingaudioplayer-progress-played" style="left: 0px; top: 0px; width: 0%; height: 100%; display: block; position: absolute;"></div></div><div class="amazingaudioplayer-bar-buttons-clear"></div></div><div class="amazingaudioplayer-bar-clear"></div><audio preload="auto"><source src="http://download.einsamedien.de.s3.amazonaws.com/storage/3688426/004_PRNEO_189_Die_Leiden_des_Androiden.mp3?AWSAccessKeyId=AKIAIAWFYTGZGQS2YDPA&amp;Expires=1547542722&amp;Signature=MeRDu5r6Myv2ZhcH1DQjTIvUkwo%3D" type="audio/mpeg"></audio></div>
+				<!-- div class="audioplayer">
+					<div id="audioplayer_1">
+						<script type="text/javascript">
+						AudioPlayer.embed("audioplayer_1", {
+							soundFile: "http%3A%2F%2Fdownload.einsamedien.de.s3.amazonaws.com%2Fstorage%2F3688426%2F004_PRNEO_189_Die_Leiden_des_Androiden.mp3%3FAWSAccessKeyId%3DAKIAIAWFYTGZGQS2YDPA%26Expires%3D1547542722%26Signature%3DMeRDu5r6Myv2ZhcH1DQjTIvUkwo%253D",
+							titles: "Perry Rhodan Neo Nr. 189: Die Leiden des Androiden (Hörbuch-Download)",
+							initialvolume: 75,
+		        			transparentpagebg: "yes",
+							autostart: "no",
+							animation: "yes"
+						});
+						</script>
+					</div>
+				</div --><ul class="properties"><li><span class="label">Autor:</span> Rainer Schorm</li><li><span class="label">Sprecher:</span> Hanno Dinger</li><li><span class="label">Länge:</span> 6 Stunden 28 Minuten</li><li><span class="label">Format:</span> MP3 - 192kb/s (Multitrack/Onetrack)</li><li><span class="label">Tracks:</span> 64</li><li><span class="label">Erscheinungsdatum:</span> 14.12.2018</li><li><span class="label">Copyright:</span> Eins A Medien GmbH, Köln;© Pabel-Moewig Verlag KG, Rastatt</li></ul></div>
+				</div>
+
+"""
+
+type ProductSite = HtmlProvider< productSiteHtml >
+
+let ps () = 
+    
+    let paragraphs =
+        ProductSite
+            .Parse(productSiteHtml)            
+            .Html
+            .Descendants ["p"]
+        |> Seq.toList
+    
+    let productDetail = 
+        paragraphs
+        |> List.tryFindIndex (fun i -> 
+            let idAttribute = i.TryGetAttribute("class")
+            match idAttribute with
+            | None -> false
+            | Some a ->
+                a.Value() = "pricetag"
+            )
+        |> Option.map( 
+            fun idx ->
+                //get next entry
+                let nextIdx = idx + 1
+                if (nextIdx + 1) > paragraphs.Length then
+                    None
+                else
+                    let nextEntry = paragraphs.[nextIdx]
+                    let description = nextEntry.InnerText()
+                    Some description
+        )
+    |> Option.flatten
+    
+    productDetail
+        
+            
+
+    
+            
 

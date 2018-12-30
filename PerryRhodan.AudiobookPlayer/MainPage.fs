@@ -27,6 +27,7 @@ open Services
     type ExternalMsg =
         | GotoPermissionDeniedPage
         | OpenAudioBookPlayer of AudioBook
+        | OpenAudioBookDetail of AudioBook
         | UpdateAudioBookGlobal  of AudioBookItem.Model * string
 
     
@@ -101,6 +102,8 @@ open Services
                     Cmd.ofMsg (ChangeBusyState state), None
                 | AudioBookItem.ExternalMsg.OpenAudioBookPlayer ab ->
                     Cmd.none, Some (OpenAudioBookPlayer ab)
+                | AudioBookItem.ExternalMsg.OpenAudioBookDetail ab ->
+                    Cmd.none, Some (OpenAudioBookDetail ab)
         
         let newDab = 
             model.Audiobooks 

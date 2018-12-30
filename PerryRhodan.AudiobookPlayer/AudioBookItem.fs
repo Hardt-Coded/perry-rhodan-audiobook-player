@@ -24,6 +24,7 @@
         | ChangeGlobalBusyState of bool
         | UpdateDownloadProgress of (int * int) option
         | OpenAudioBookPlayer
+        | OpenAudioBookDetail
 
         | DoNothing
 
@@ -34,6 +35,7 @@
         | RemoveFromDownloadQueue of Model
         | PageChangeBusyState of bool
         | OpenAudioBookPlayer of AudioBook
+        | OpenAudioBookDetail of AudioBook
 
 
     module Helpers =
@@ -93,6 +95,8 @@
             model |> onChangeGlobalBusyStateMsg state
         | Msg.OpenAudioBookPlayer  ->
             model |> onOpenAudioBookPlayerMsg
+        | Msg.OpenAudioBookDetail ->
+            model |> onOpenAudioBookDetailMsg
         | DoNothing ->
             model |> onDoNothingMsg
 
@@ -107,6 +111,7 @@
                 (fun a -> MarkAudioBookAsListend)
                 (fun a -> UnmarkAudioBookAsListend)
                 (fun a -> DoNothing)
+                (fun a -> Msg.OpenAudioBookDetail)
                 model.QueuedToDownload
                 model.AudioBook
             |> Cmd.ofAsyncMsgOption
@@ -176,6 +181,10 @@
         model, Cmd.none, Some (ExternalMsg.OpenAudioBookPlayer model.AudioBook)
 
     
+    and onOpenAudioBookDetailMsg model =
+        model, Cmd.none, Some (ExternalMsg.OpenAudioBookDetail model.AudioBook)
+
+
     and onDoNothingMsg model =
         model, Cmd.ofMsg (ChangeBusyState false), None
 
