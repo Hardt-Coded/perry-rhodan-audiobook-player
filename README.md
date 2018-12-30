@@ -16,13 +16,9 @@ Here is a demo video.
 [![IMAGE ALT TEXT](http://img.youtube.com/vi/qgTg-DQ2ASw/0.jpg)](http://www.youtube.com/watch?v=qgTg-DQ2ASw "Perry Rhodan Audio Book Player")
 
 
-2018-12-06:
+2018-12-30
 
-The Audioplayer currently working only on Android. I haven't implemented the audio player wrapper for iOS, yet. Nor do I own any apple devices. So community, go! 
-
-The WPF Application is more or less only a way to test some basic functions without the long running compiling process for the android emulator.
-
-Also there is currently no way to set the directory were the file will be stored.
+Detail/Description Page added for every audiop book (loading on the fly from the einsamedien page)
 
 
 2018-12-28:
@@ -35,3 +31,13 @@ the audio book on the fly while downloading.
 2018-12-11:
 
 Demo Video added, some small stuff, bugfixing bla.
+
+
+
+2018-12-06:
+
+The Audioplayer currently working only on Android. I haven't implemented the audio player wrapper for iOS, yet. Nor do I own any apple devices. So community, go! 
+
+The WPF Application is more or less only a way to test some basic functions without the long running compiling process for the android emulator.
+
+Also there is currently no way to set the directory were the file will be stored.
