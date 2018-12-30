@@ -19,8 +19,8 @@ open AudioPlayerService
 type AndroidDownloadFolder() =
     interface DependencyServices.IAndroidDownloadFolder with
         member this.GetAndroidDownloadFolder () =
-            let path = Android.OS.Environment.GetExternalStoragePublicDirectory (Android.OS.Environment.DirectoryDownloads)
-            path.AbsolutePath
+            let path = Android.OS.Environment.ExternalStorageDirectory.Path
+            path
 
 
 

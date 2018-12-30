@@ -26,10 +26,13 @@ let audioBookEntryActionSheet
     cmdMarkAsListend
     cmdMarkAsUnlistend
     cmdDownloadOnlyPicture 
+    cmdDescription
     isOnDownloadQueue
     audiobook =
     async {
         let buttons = [|
+            yield ("Description (Details)",cmdDescription audiobook)
+
             if audiobook.State.Downloaded then
                 yield ("Remove From Device",cmdDelete audiobook)
             elif (isOnDownloadQueue && not audiobook.State.Downloaded) then

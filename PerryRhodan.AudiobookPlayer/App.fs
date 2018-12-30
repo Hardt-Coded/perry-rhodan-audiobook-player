@@ -24,6 +24,7 @@ module App =
         | BrowserPage
         | AudioPlayerPage
         | PermissionDeniedPage
+        | AudioBookDetailPage
     
     type Model = 
       { IsNav:bool
@@ -31,6 +32,7 @@ module App =
         LoginPageModel:LoginPage.Model option
         BrowserPageModel:BrowserPage.Model option
         AudioPlayerPageModel:AudioPlayerPage.Model option
+        AudioBookDetailPageModel:AudioBookDetailPage.Model option
         CurrentPage: Pages
         NavIsVisible:bool 
         PageStack: Pages list}
@@ -40,6 +42,7 @@ module App =
         | LoginPageMsg of LoginPage.Msg 
         | BrowserPageMsg of BrowserPage.Msg 
         | AudioPlayerPageMsg of AudioPlayerPage.Msg
+        | AudioBookDetailPageMsg of AudioBookDetailPage.Msg
 
         | GotoMainPage
         | GotoBrowserPage
@@ -47,6 +50,8 @@ module App =
         | GotoAudioPlayerPage of AudioBook
         | GotoLoginPage
         | GotoPermissionDeniedPage
+        | OpenAudioBookDetailPage of AudioBook
+        | CloseAudioBookDetailPage
         | NavigationPopped of Pages
         | UpdateAudioBook of AudioBookItem.Model * string
         
@@ -56,6 +61,7 @@ module App =
                       LoginPageModel = None
                       BrowserPageModel = None
                       AudioPlayerPageModel = None 
+                      AudioBookDetailPageModel = None 
                       CurrentPage = MainPage
                       NavIsVisible = false 
                       PageStack = [ MainPage] }
@@ -79,6 +85,8 @@ module App =
             model |> onProcessBrowserPageMsg msg
         | AudioPlayerPageMsg msg ->
             model |> onProcessAudioPlayerMsg msg
+        | AudioBookDetailPageMsg msg ->
+            model |> onProcessAudioBookDetailPageMsg msg
         | GotoMainPage ->
             model |> onGotoMainPageMsg
         | GotoLoginPage ->
@@ -89,6 +97,10 @@ module App =
             model |> onGotoAudioPageMsg audioBook
         | GotoPermissionDeniedPage ->
             model |> onGotoPermissionDeniedMsg
+        | OpenAudioBookDetailPage ab ->
+            model |> onOpenAudioBookDetailPage ab
+        | CloseAudioBookDetailPage ->
+            model |> onCloseAudioBookDetailPage
         | NavigationPopped page ->
             model |> onNavigationPoppedMsg page
         | SetBrowserPageCookieContainerAfterSucceededLogin cc ->
@@ -140,6 +152,8 @@ module App =
                     Cmd.ofMsg (GotoAudioPlayerPage ab)
                 | MainPage.ExternalMsg.UpdateAudioBookGlobal (ab,cameFrom) ->
                     Cmd.ofMsg (UpdateAudioBook (ab, cameFrom))
+                | MainPage.ExternalMsg.OpenAudioBookDetail ab ->
+                    Cmd.ofMsg (OpenAudioBookDetailPage ab)
 
         let m,cmd, externalMsg = MainPage.update msg model.MainPageModel        
         let externalCmds =
@@ -179,6 +193,8 @@ module App =
                 Cmd.ofMsg (GotoAudioPlayerPage ab)
             | BrowserPage.ExternalMsg.UpdateAudioBookGlobal (ab,cameFrom) ->
                 Cmd.ofMsg (UpdateAudioBook (ab,cameFrom))
+            | BrowserPage.ExternalMsg.OpenAudioBookDetail ab ->
+                Cmd.ofMsg (OpenAudioBookDetailPage ab)
         
 
     and onProcessBrowserPageMsg msg model =
@@ -210,6 +226,27 @@ module App =
                 externalMsg |> audioPlayerExternalMsgToCommand
 
             {model with AudioPlayerPageModel = Some m}, Cmd.batch [(Cmd.map AudioPlayerPageMsg cmd); externalCmds]
+
+        | None -> model, Cmd.none
+
+    and onProcessAudioBookDetailPageMsg msg model =
+
+        let audioBookDetailPageExternalMsgToCommand externalMsg =
+            match externalMsg with
+            | None -> Cmd.none
+            | Some excmd -> 
+                match excmd with
+                | AudioBookDetailPage.ExternalMsg.CloseAudioBookDetailPage ->
+                    Cmd.ofMsg CloseAudioBookDetailPage    
+
+        match model.AudioBookDetailPageModel with
+        | Some audioBookDetailPageModel ->
+            let m,cmd,externalMsg = AudioBookDetailPage.update msg audioBookDetailPageModel
+
+            let externalCmds = 
+                externalMsg |> audioBookDetailPageExternalMsgToCommand
+
+            {model with AudioBookDetailPageModel = Some m}, Cmd.batch [(Cmd.map AudioBookDetailPageMsg cmd); externalCmds]
 
         | None -> model, Cmd.none
 
@@ -283,6 +320,15 @@ module App =
         let newPageModel = model |> addPageToPageStack PermissionDeniedPage
         {newPageModel with CurrentPage = PermissionDeniedPage}, Cmd.none
 
+
+    and onOpenAudioBookDetailPage audiobook model =
+        let newPageModel = model |> addPageToPageStack AudioBookDetailPage
+        let m,cmd = AudioBookDetailPage.init audiobook
+        { newPageModel with CurrentPage = AudioBookDetailPage; AudioBookDetailPageModel = Some m }, Cmd.batch [ (Cmd.map AudioBookDetailPageMsg cmd) ]
+
+    and onCloseAudioBookDetailPage model =
+        let newPageStack = model.PageStack |> List.filter (fun i -> i <> AudioBookDetailPage)
+        {model with PageStack = newPageStack }, Cmd.none
 
     and onNavigationPoppedMsg page model =
         if page = MainPage then
@@ -406,14 +452,39 @@ module App =
                             
                 )
             )
+
+        let audioBookDetailPage =
+            dependsOn model.AudioBookDetailPageModel (fun _ mdl ->
+                mdl
+                |> Option.map (
+                    fun m ->
+                        (AudioBookDetailPage.view m (AudioBookDetailPageMsg >> dispatch))
+                            .ToolbarItems([
+                                View.ToolbarItem(
+                                    icon="home_icon.png",
+                                    command=(fun ()-> dispatch GotoMainPage))
+                                View.ToolbarItem(
+                                    icon="browse_icon.png",
+                                    command=(fun ()-> dispatch GotoBrowserPage))
+                                    
+                                View.ToolbarItem(
+                                    text="Close",
+                                    command=(fun ()-> dispatch CloseAudioBookDetailPage))
+                                    ])
+                            .HasNavigationBar(true)
+                            .HasBackButton(true)
+                            
+                )
+            )
         
 
-
+        // gets the page from the title to manage the page stack
         let determinatePageByTitle title =            
             match title with
             | "Home" -> MainPage
             | "Browse your AudioBooks" -> BrowserPage
             | "Player" -> AudioPlayerPage
+            | "Detail" -> AudioBookDetailPage
             | "Login" -> LoginPage
             | _ -> MainPage
 
@@ -448,6 +519,9 @@ module App =
                     | AudioPlayerPage ->
                         if audioPlayerPage.IsSome then
                             yield audioPlayerPage.Value
+                    | AudioBookDetailPage ->
+                        if audioBookDetailPage.IsSome then
+                            yield audioBookDetailPage.Value
                     | PermissionDeniedPage ->
                         yield View.ContentPage(
                             title="Login Page",useSafeArea=true,

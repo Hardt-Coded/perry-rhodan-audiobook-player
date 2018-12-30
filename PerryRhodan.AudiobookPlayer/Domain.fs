@@ -130,6 +130,7 @@ let parseDownloadData htmlData =
     )
     |> Array.distinct
 
+
 let filterNewAudioBooks (local:AudioBook[]) (online:AudioBook[]) =    
     online
     |> Array.filter (fun i -> local |> Array.exists (fun l -> l.Id = i.Id) |> not)
@@ -140,10 +141,58 @@ let synchronizeAudiobooks (local:AudioBook[]) (online:AudioBook[]) =
     Array.concat [|local; differences|] 
 
 
+type ProductSite = HtmlProvider< SampleData.productSiteHtml >
 
+let parseProductPageForDescription html =
+    let paragraphs =
+        ProductSite
+            .Parse(html)            
+            .Html
+            .Descendants ["p"]
+        |> Seq.toList
     
+    let productDetail = 
+        paragraphs
+        |> List.tryFindIndex (fun i -> 
+            let idAttribute = i.TryGetAttribute("class")
+            match idAttribute with
+            | None -> false
+            | Some a ->
+                a.Value() = "pricetag"
+            )
+        |> Option.map( 
+            fun idx ->
+                //get next entry
+                let nextIdx = idx + 1
+                if (nextIdx + 1) > paragraphs.Length then
+                    None
+                else
+                    let nextEntry = paragraphs.[nextIdx]
+                    let description = nextEntry.InnerText()
+                    Some description
+        )
+        |> Option.flatten
+    
+    productDetail
 
-
+let parseProductPageForImage html =
+    let image =
+        ProductSite
+            .Parse(html)            
+            .Html
+            .Descendants ["img"]
+        |> Seq.tryFind (fun i -> i.AttributeValue("id") = "imgzoom")
+        |> Option.map (
+            fun i -> 
+                let imgSrc = i.AttributeValue("src")
+                if imgSrc = "" then None else Some imgSrc
+        )
+        |> Option.flatten
+    image
+    
+    
+    
+        
 
 module Filters = 
 

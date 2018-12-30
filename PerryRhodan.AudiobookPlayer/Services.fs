@@ -50,7 +50,8 @@ module Consts =
     let currentLocalDataFolder =  
         let baseFolder = 
             match Device.RuntimePlatform with
-            | Device.Android -> Path.Combine(DependencyService.Get<IAndroidDownloadFolder>().GetAndroidDownloadFolder (),"..")
+            | Device.Android -> DependencyService.Get<IAndroidDownloadFolder>().GetAndroidDownloadFolder ()
+            //| Device.Android -> Path.Combine(DependencyService.Get<IAndroidDownloadFolder>().GetAndroidDownloadFolder (),"..")
             | Device.iOS -> Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
             | _ -> Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
         Path.Combine(baseFolder,"PerryRhodan.AudioBookPlayer","data")
@@ -221,6 +222,7 @@ module WebAccess =
                 else return None
         }
 
+
     let getDownloadPage (cc:Map<string,string>) =
         async {       
             let seqCC = cc |> Map.toSeq
@@ -249,7 +251,6 @@ module WebAccess =
                     return Ok audioBooks
         }
 
-        
 
     let private getDownloadUrl cookies url =
         async {
@@ -421,6 +422,33 @@ module WebAccess =
                                 return Error (Exception e)
         }
 
+
+    let loadDescription audiobook =
+        async {
+            match audiobook.ProductSiteUrl with
+            | None -> return Ok (None,None)
+            | Some ps ->
+                let productPageUri = Uri(baseUrl + ps)
+                try
+                    let! productPage = Http.AsyncRequestString(productPageUri.AbsoluteUri)
+                    if productPage = "" then
+                        return Error (Other "ProductPage response is empty.")
+                    else
+                        let desc = productPage |> Domain.parseProductPageForDescription
+                        let img = 
+                            productPage 
+                            |> Domain.parseProductPageForImage
+                            |> Option.map (fun i ->
+                                let uri = Uri(baseUrl + i)
+                                uri.AbsoluteUri
+                            )
+                        
+                        
+                        return Ok (desc,img)
+                with
+                | _ as e ->
+                    return Error (Exception e)
+        }
 
 module SecureLoginStorage =
 
