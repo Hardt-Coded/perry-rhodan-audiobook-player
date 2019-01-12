@@ -23,10 +23,14 @@ Here is a demo video.
 [![IMAGE ALT TEXT](http://img.youtube.com/vi/qgTg-DQ2ASw/0.jpg)](http://www.youtube.com/watch?v=qgTg-DQ2ASw "Perry Rhodan Audio Book Player")
 
 
+2019-01-12
+
+Added data protection stuff to be ready for release in android appstore, some bugfixes, slider works also when player is not running, some ui enhancements
+
+
 2018-12-30
 
 Detail/Description Page added for every audiop book (loading on the fly from the einsamedien page)
-
 
 2018-12-28:
 
