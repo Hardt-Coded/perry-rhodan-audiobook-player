@@ -1,4 +1,11 @@
 # perry-rhodan-audiobook-player
+
+**Attention:** If you want to use the app (see releases), you have to know, that I am logging only crashes via microsofts appcenter.ms. Nothing else. No Passwords, no models, no events, only exceptions when the app crashes.
+
+**Achtung:** Für die deutschsprachigen Besucher: Wenn Ihr die App downloaden wollt, solltet ihr wissen, dass ich nur Abstürze mitlogge über Microsofts appcenter.ms, nichts mehr. Keine Passwörter, keine Events, keine Modeldaten, nur "Exceptions", wenn die App abstürzt.
+
+
+
 In F# "Fabulous" (Xamarin) written audiobook downloader and player for Perry Rhodan audiobooks.
 
 The audiobooks were hosted by https://www.einsamedien.de/ and have to be bought on their page. (the audiobooks are in german)
