@@ -18,6 +18,12 @@ module App =
     open System.Net
     open Fabulous.DynamicViews
     
+
+    type Language =
+        | English
+        | German
+
+
     type Pages = 
         | MainPage
         | LoginPage
@@ -25,6 +31,7 @@ module App =
         | AudioPlayerPage
         | PermissionDeniedPage
         | AudioBookDetailPage
+        | SettingsPage
     
     type Model = 
       { IsNav:bool
@@ -33,6 +40,9 @@ module App =
         BrowserPageModel:BrowserPage.Model option
         AudioPlayerPageModel:AudioPlayerPage.Model option
         AudioBookDetailPageModel:AudioBookDetailPage.Model option
+        SettingsPageModel:SettingsPage.Model option
+        
+        AppLanguage:Language
         CurrentPage: Pages
         NavIsVisible:bool 
         PageStack: Pages list}
@@ -43,6 +53,7 @@ module App =
         | BrowserPageMsg of BrowserPage.Msg 
         | AudioPlayerPageMsg of AudioPlayerPage.Msg
         | AudioBookDetailPageMsg of AudioBookDetailPage.Msg
+        | SettingsPageMsg of SettingsPage.Msg
 
         | GotoMainPage
         | GotoBrowserPage
@@ -50,6 +61,8 @@ module App =
         | GotoAudioPlayerPage of AudioBook
         | GotoLoginPage
         | GotoPermissionDeniedPage
+        | GotoSettingsPage
+
         | OpenAudioBookDetailPage of AudioBook
         | CloseAudioBookDetailPage
         | NavigationPopped of Pages
@@ -62,6 +75,8 @@ module App =
                       BrowserPageModel = None
                       AudioPlayerPageModel = None 
                       AudioBookDetailPageModel = None 
+                      SettingsPageModel = None 
+                      AppLanguage = English
                       CurrentPage = MainPage
                       NavIsVisible = false 
                       PageStack = [ MainPage] }
@@ -87,6 +102,8 @@ module App =
             model |> onProcessAudioPlayerMsg msg
         | AudioBookDetailPageMsg msg ->
             model |> onProcessAudioBookDetailPageMsg msg
+        | SettingsPageMsg msg ->
+            model |> onProcessSettingsPageMsg msg
         | GotoMainPage ->
             model |> onGotoMainPageMsg
         | GotoLoginPage ->
@@ -97,6 +114,8 @@ module App =
             model |> onGotoAudioPageMsg audioBook
         | GotoPermissionDeniedPage ->
             model |> onGotoPermissionDeniedMsg
+        | GotoSettingsPage ->
+            model |> onGotoSettingsPageMsg
         | OpenAudioBookDetailPage ab ->
             model |> onOpenAudioBookDetailPage ab
         | CloseAudioBookDetailPage ->
@@ -251,6 +270,28 @@ module App =
         | None -> model, Cmd.none
 
 
+
+    and onProcessSettingsPageMsg msg model =
+
+        let settingsPageExternalMsgToCommand externalMsg =
+            match externalMsg with
+            | None -> Cmd.none
+            | Some excmd -> 
+                Cmd.none  
+
+        match model.SettingsPageModel with
+        | Some settingsPageModel ->
+            let m,cmd,externalMsg = SettingsPage.update msg settingsPageModel
+
+            let externalCmds = 
+                externalMsg |> settingsPageExternalMsgToCommand
+
+            {model with SettingsPageModel = Some m}, Cmd.batch [(Cmd.map SettingsPageMsg cmd); externalCmds]
+
+        | None -> model, Cmd.none
+
+
+
     and addPageToPageStack page model =
         let hasItem = model.PageStack |> List.tryFind (fun i -> i = page)
         match hasItem with
@@ -318,7 +359,14 @@ module App =
 
     and onGotoPermissionDeniedMsg model =
         let newPageModel = model |> addPageToPageStack PermissionDeniedPage
+
         {newPageModel with CurrentPage = PermissionDeniedPage}, Cmd.none
+
+
+    and onGotoSettingsPageMsg model =
+        let newPageModel = model |> addPageToPageStack SettingsPage
+        let model,cmd,externalCmd = SettingsPage.init true
+        {newPageModel with SettingsPageModel = Some model; CurrentPage = SettingsPage}, (Cmd.map SettingsPageMsg cmd)
 
 
     and onOpenAudioBookDetailPage audiobook model =
@@ -390,6 +438,11 @@ module App =
                             View.ToolbarItem(
                                 icon="browse_icon.png",
                                 command=(fun ()-> dispatch GotoBrowserPage
+                            ))
+
+                            View.ToolbarItem(
+                                icon="settings_icon.png",
+                                command=(fun ()-> dispatch GotoSettingsPage
                             ))
                                 
                         ])
@@ -476,6 +529,26 @@ module App =
                             
                 )
             )
+
+        let settingsPage =
+            dependsOn model.SettingsPageModel (fun _ mdl ->
+                mdl
+                |> Option.map (
+                    fun m ->
+                        (SettingsPage.view m (SettingsPageMsg >> dispatch))
+                            .ToolbarItems([
+                                View.ToolbarItem(
+                                    icon="home_icon.png",
+                                    command=(fun ()-> dispatch GotoMainPage))
+                                View.ToolbarItem(
+                                    icon="browse_icon.png",
+                                    command=(fun ()-> dispatch GotoBrowserPage))                                    
+                                ])
+                            .HasNavigationBar(true)
+                            .HasBackButton(true)
+                            
+                )
+            )
         
 
         // gets the page from the title to manage the page stack
@@ -486,6 +559,7 @@ module App =
             | "Player" -> AudioPlayerPage
             | "Detail" -> AudioBookDetailPage
             | "Login" -> LoginPage
+            | "Settings" -> SettingsPage
             | _ -> MainPage
 
         // Workaround iOS bug: https://github.com/xamarin/Xamarin.Forms/issues/3509
@@ -522,6 +596,9 @@ module App =
                     | AudioBookDetailPage ->
                         if audioBookDetailPage.IsSome then
                             yield audioBookDetailPage.Value
+                    |SettingsPage ->
+                        if settingsPage.IsSome then
+                            yield settingsPage.Value
                     | PermissionDeniedPage ->
                         yield View.ContentPage(
                             title="Login Page",useSafeArea=true,

@@ -319,12 +319,12 @@ open Services
     
     let view (model: Model) dispatch =
         View.Grid(
-            rowdefs= [box "auto"; box "*"; box "auto"],
+            rowdefs= [box "auto"; box "*"; box "auto"; box "auto"],
             verticalOptions = LayoutOptions.Fill,
             children = [
 
-                yield View.Label(text="Browser Page", fontAttributes = FontAttributes.Bold,
-                                    fontSize = 16.0,
+                yield View.Label(text="Browse your Audiobooks", fontAttributes = FontAttributes.Bold,
+                                    fontSize = 25.0,
                                     horizontalOptions = LayoutOptions.Fill,
                                     horizontalTextAlignment = TextAlignment.Center,
                                     textColor = Consts.primaryTextColor,
@@ -334,7 +334,7 @@ open Services
                 yield View.StackLayout(padding = 10.0, verticalOptions = LayoutOptions.Start,
                     children = [ 
                             
-                        yield View.Button(text="Online Refresh", command = (fun () -> dispatch LoadOnlineAudiobooks))
+                        yield View.Button(text="Load Your Audiobooks", command = (fun () -> dispatch LoadOnlineAudiobooks))
                             
                         match model.SelectedGroupItems with
                         | None ->
@@ -347,7 +347,7 @@ open Services
                                 if model.LastSelectedGroup.IsSome then                                             
                                     yield View.Label(text=model.LastSelectedGroup.Value
                                         ,fontSize=22.0
-                                        ,textColor=Color.DarkViolet
+                                        ,textColor=Consts.primaryTextColor
                                         ,horizontalOptions=LayoutOptions.Fill
                                         ,horizontalTextAlignment=TextAlignment.Center)
                                         
@@ -355,9 +355,10 @@ open Services
                                     verticalOptions = LayoutOptions.Fill,
                                     content = 
                                         View.StackLayout(orientation=StackOrientation.Vertical,
+                                            verticalOptions = LayoutOptions.Fill,
                                             children= [
                                                 match groups with
-                                                | [||] -> yield View.Label(text="Press Online Refresh to load your Audiobooks")
+                                                | [||] -> yield View.Label(text="Press Load your Audiobooks to get your audiobooks from your einsamedien account")
                                                 | _ ->
                                                     for (idx,item) in groups |> Array.indexed do
                                                         yield 
@@ -365,20 +366,10 @@ open Services
                                                                 , margin = 2.0
                                                                 , fontSize = 20.0
                                                                 , textColor = Consts.secondaryTextColor
-                                                                //, backgroundColor = (if idx % 2 = 0 then Color.FromRgb(240,240,255) else Color.Transparent)
                                                                 , verticalOptions = LayoutOptions.Fill
                                                                 , verticalTextAlignment = TextAlignment.Center                                                                        
                                                                 , gestureRecognizers = [View.TapGestureRecognizer(command = (fun () -> dispatch (AddSelectGroup item)))]
-                                                                , created = (fun x -> 
-                                                                    //let tapRec = View.TapGestureRecognizer(command = (fun () -> dispatch (AddSelectGroup i)))
-                                                                    let tapRec = Xamarin.Forms.TapGestureRecognizer()
-                                                                    tapRec.Command <- makeCommand(fun () ->                                                                                 
-                                                                        x.BackgroundColor <- Color.FromRgb(200,200,255)
-                                                                        ()
-                                                                        )
-                                                                    x.GestureRecognizers.Add(tapRec)
-                                                                    ()
-                                                                    )
+                                                                
                                                                 )
                                                                     
                                                 ]
@@ -387,7 +378,7 @@ open Services
                             | AudioBookList (key, items) ->
                                 yield View.Label(text=key
                                         ,fontSize=22.0
-                                        ,textColor=Color.DarkViolet
+                                        ,textColor=Consts.primaryTextColor
                                         , horizontalOptions=LayoutOptions.Fill
                                         ,horizontalTextAlignment=TextAlignment.Center)
                                         
@@ -404,17 +395,23 @@ open Services
                                             ]
                                         )
                                         )
-                                let downloadQueueDispatch =
-                                    DownloadQueueMsg >> dispatch
-
-                                yield DownloadQueue.view model.DownloadQueueModel downloadQueueDispatch
+                                
                                             
-                        if (model.SelectedGroups.Length > 0) then
-                            yield View.Button(text = "Back",command = (fun ()-> dispatch RemoveLastSelectGroup))
+                        
                     ])
                     .GridRow(1)
 
-                    
+
+                if (model.SelectedGroups.Length > 0) then
+                    yield View.Button(text = "Back",command = (fun ()-> dispatch RemoveLastSelectGroup)).GridRow(2)
+                
+                let downloadQueueDispatch =
+                    DownloadQueueMsg >> dispatch
+
+                yield (DownloadQueue.view model.DownloadQueueModel downloadQueueDispatch).GridRow(3)
+
+
+                
 
                 if model.IsLoading then 
                     yield Common.createBusyLayer().GridRowSpan(2)

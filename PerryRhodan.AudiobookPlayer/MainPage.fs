@@ -1,5 +1,7 @@
 ﻿module MainPage
 
+open System.Globalization
+open System.Resources
 open Fabulous
 open Fabulous.Core
 open Fabulous.DynamicViews
@@ -8,6 +10,8 @@ open Domain
 open Plugin.Permissions.Abstractions
 open Common
 open Services
+
+    
 
     type Model = 
       { Audiobooks: AudioBookItem.Model[]

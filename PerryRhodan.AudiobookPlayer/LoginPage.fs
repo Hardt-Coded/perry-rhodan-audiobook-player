@@ -134,7 +134,14 @@ open Services
                                 , created = (fun e -> e.Unfocused.Add(fun args -> if model.Password<>e.Text then dispatch (ChangePassword e.Text)))
                                 )
                 
-                            yield View.Switch(isToggled = model.RememberLogin, toggled = (fun on -> dispatch (ChangeRememberLogin on.Value)), horizontalOptions = LayoutOptions.Center)
+                            yield View.StackLayout(orientation=StackOrientation.Horizontal,
+                                horizontalOptions = LayoutOptions.Center,
+                                children =[
+                                    Controls.secondaryTextColorLabel 16.0 "remember login"
+                                    View.Switch(isToggled = model.RememberLogin, toggled = (fun on -> dispatch (ChangeRememberLogin on.Value)), horizontalOptions = LayoutOptions.Center)
+                                ]
+                            )
+                                
                             yield View.Button(text = "Login", command = (fun () -> dispatch TryLogin), horizontalOptions = LayoutOptions.Center)
                             if model.LoginFailed then
                                 yield View.Label(text="Login Failed !!!!", textColor = Color.Red, horizontalOptions = LayoutOptions.Center, widthRequest=200.0, horizontalTextAlignment=TextAlignment.Center,fontSize=20.0)
