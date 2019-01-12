@@ -21,6 +21,7 @@
         | RemoveItemFromQueue of AudioBookItem.Model
         | DownloadCompleted of audioBook:AudioBookItem.Model * mp3path:string * imageFile:string option * thumbnail:string option
         | DownloadFailed of AudioBookItem.Model
+        | DeactivateLoading of AudioBookItem.Model
         | OpenLoginPage
         | StartProcessing
         | ChangeQueueState of QueueState
@@ -61,6 +62,8 @@
             model |> onDownloadCompleteMsg abModel mp3Path imageFullName thumbnail
         | DownloadFailed abModel ->
             model |> onDownloadFailedMsg abModel
+        | DeactivateLoading abModel ->
+            model |> onDeactivateLoadingMsg abModel
         | OpenLoginPage ->
             model |> onOpenLoginPageMsg
         | StartProcessing ->
@@ -92,15 +95,22 @@
     
     and onAddItemToQueueMsg abModel model =
         let newAbModel = {abModel with QueuedToDownload = true}
-        let newModel = {model with DownloadQueue = model.DownloadQueue @ [abModel]}
-        let cmd = 
+
+        let newModel = 
+            let isAlreadyInQueue = model.DownloadQueue |> List.exists (fun i -> i.AudioBook.Id = abModel.AudioBook.Id)
+            if isAlreadyInQueue then
+                model
+            else
+                {model with DownloadQueue = model.DownloadQueue @ [abModel]}
+
+        let cmd,exCmd = 
             match model.State with
-            | Idle -> Cmd.ofMsg StartProcessing                    
-            | Downloading -> Cmd.none
-        newModel, cmd, Some (UpdateAudioBook newAbModel)
+            | Idle -> Cmd.ofMsg StartProcessing, Some (UpdateAudioBook newAbModel)                
+            | Downloading -> Cmd.none, None
+        newModel, cmd, exCmd
     
-    and onRemoveItemFromQueueMsg abModel model =
-        let newAbModel = {abModel with QueuedToDownload = false}
+    and onRemoveItemFromQueueMsg abModel model =        
+        let newAbModel = {abModel with QueuedToDownload = false; IsDownloading = false}
         let newQueue = model.DownloadQueue |> List.filter (fun i -> i.AudioBook.FullName <> abModel.AudioBook.FullName)
         let newModel = {model with DownloadQueue = newQueue}
         let cmd = 
@@ -131,7 +141,7 @@
         | Some processedItem ->
             let newAudioBookState = {abModel.AudioBook.State with Downloaded = true; DownloadedFolder = Some mp3Path}
             let newAudioBook = {abModel.AudioBook with State = newAudioBookState; Picture = imageFullName; Thumbnail = thumbnail}             
-            let newProcessedItem = {processedItem with AudioBook = newAudioBook; IsLoading = false; QueuedToDownload = false }
+            let newProcessedItem = {processedItem with AudioBook = newAudioBook; IsDownloading = false; QueuedToDownload = false }
 
             let newModel = {model with DownloadQueue = newQueue; State = Idle}
 
@@ -146,11 +156,21 @@
             model, Cmd.none, None
         | Some processedItem ->
             // and to the end
-            let newItem = {processedItem with IsLoading = false; QueuedToDownload = true}
+            let newItem = {processedItem with IsDownloading = false; QueuedToDownload = true}
             let newQueue = tailQueue @ [newItem]
             let newModel = {model with DownloadQueue = newQueue; State = Idle}
             newModel, Cmd.ofMsg StartProcessing, Some (UpdateAudioBook newItem)
     
+
+    and onDeactivateLoadingMsg abModel model =
+        let newModel = {abModel with IsDownloading=false}
+        let newQueue= 
+            model.DownloadQueue 
+            |> List.map (fun i -> if i.AudioBook.Id = newModel.AudioBook.Id then newModel else i)
+
+        {model with DownloadQueue = newQueue}, Cmd.none, None
+
+
 
     and onOpenLoginPageMsg model =
         let newModel = {model with State = Idle}
@@ -165,7 +185,10 @@
                     
                     match model.CurrentSessionCookieContainer with                
                     | None ->
-                        return OpenLoginPage
+                        // deactivate loading spinner if login needed, 
+                        // because the startProcessing checks if loading already is actived, 
+                        // and do not start the download at all
+                        return [ DeactivateLoading audiobookItemModel; OpenLoginPage ]
                     | Some cc ->
                         let updateProgress (a,b) = dispatch (Msg.UpdateDownloadProgress (audiobookItemModel,(Some (a,b))))
                         
@@ -174,44 +197,45 @@
                         | Error e ->
                             match e with
                             | SessionExpired s -> 
-                                return OpenLoginPage
+                                return [ DeactivateLoading audiobookItemModel; OpenLoginPage ]
                             | Other o ->
                                 Common.Helpers.displayAlert("Error",o,"OK") |> ignore
-                                return DownloadFailed audiobookItemModel
+                                return [ DownloadFailed audiobookItemModel ]
                             | Exception e ->
                                 let ex = e.GetBaseException()
                                 let msg = ex.Message + "|" + ex.StackTrace
                                 Common.Helpers.displayAlert("Error",msg,"OK") |> ignore
-                                return DownloadFailed audiobookItemModel
+                                return [ DownloadFailed audiobookItemModel ]
                         | Ok (mp3Path,images) ->
                             let fullImage = images |> Option.map (fun (f,_) -> f)
                             let thumb = images |> Option.map (fun (_,t) -> t)
-                            return DownloadCompleted (audiobookItemModel, mp3Path, fullImage, thumb)            
-                }) |> Common.Cmd.ofAsyncWithInternalDispatch
+                            return [ DownloadCompleted (audiobookItemModel, mp3Path, fullImage, thumb) ]
+                }) |> Common.Cmd.ofMultipleAsyncMsgWithInternalDispatch
         
         
         let processQueue model =
             if model.State = Downloading then 
-                Cmd.ofMsg (ChangeQueueState Idle)
+                Cmd.ofMsg (ChangeQueueState Idle), model, None
             else
-                let (itemToProcess,_) = model.DownloadQueue |> Helpers.getTailHead
+                let (itemToProcess,queueTail) = model.DownloadQueue |> Helpers.getTailHead
                 match itemToProcess with
-                | None -> Cmd.ofMsg (ChangeQueueState Idle)
+                | None ->
+                    Cmd.none, model, None
                 | Some itemToProcess ->
-                    // Todo do it richt
-                    itemToProcess |> downloadAudiobook model
-        
-        
-        let (itemToProcess,queueTail) = model.DownloadQueue |> Helpers.getTailHead
-        match itemToProcess with
-        | None ->
-            model, Cmd.none, None
-        | Some itemToProcess ->
-            let newItemToProcess = {itemToProcess with IsLoading = true; QueuedToDownload = true}
-            let newQueue = newItemToProcess::queueTail
-            let newModel = {model with DownloadQueue = newQueue}
-            let processCmd = newModel |> processQueue
-            newModel, Cmd.batch [Cmd.ofMsg (ChangeQueueState Downloading); processCmd ], Some (UpdateAudioBook newItemToProcess)
+                    let newItemToProcess = {itemToProcess with IsDownloading = true; QueuedToDownload = true}
+                    let newQueue = newItemToProcess::queueTail
+                    let newModel = {model with DownloadQueue = newQueue}
+
+                    
+                    if not itemToProcess.IsDownloading then
+                        newItemToProcess |> downloadAudiobook model, newModel, Some (UpdateAudioBook newItemToProcess)
+                    else
+                        Cmd.none, model, None
+                    
+            
+        let processCmd, newModel,exCmd = model |> processQueue
+
+        newModel, Cmd.batch [Cmd.ofMsg (ChangeQueueState Downloading); processCmd ], exCmd
 
     
     and onChangeQueueStateMsg state model =
@@ -236,17 +260,25 @@
     
     let view model dispatch =
         View.StackLayout(
-            orientation = StackOrientation.Horizontal,
+            orientation = StackOrientation.Vertical,
             children = [
-                
-                for (idx,item) in model.DownloadQueue |> List.indexed do
-                    let cmd =
-                        if (idx > 0) then
-                            (fun () -> dispatch (OpenActionMenu item))
-                        else
-                            (fun () -> ())
+                if model.DownloadQueue.Length > 0 then
+                    yield Controls.secondaryTextColorLabel 16.0 "Queued Downloads:"
+                    yield View.StackLayout(
+                        orientation = StackOrientation.Horizontal,
+                        children = [
+                        
+                            for (idx,item) in model.DownloadQueue |> List.indexed do
+                                let cmd =
+                                    if (idx > 0) then
+                                        (fun () -> dispatch (OpenActionMenu item))
+                                    else
+                                        (fun () -> ())
 
-                    yield Controls.primaryColorSymbolLabelWithTapCommand cmd 35.0 true "\uf019"
+                                yield Controls.primaryColorSymbolLabelWithTapCommand cmd 35.0 true "\uf019"
+                        ]
+                )
             ]
         )
+        
 

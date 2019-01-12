@@ -131,7 +131,7 @@ open Services
                     
                     return (PlayStarted timer)
             }
-        ) |> Cmd.ofAsyncWithInternalDispatch
+        ) |> Cmd.ofAsyncMsgWithInternalDispatch
 
     let stopAudio model =
         //let audioPlayer = DependencyService.Get<Services.IAudioPlayer>()
@@ -311,7 +311,7 @@ open Services
         let (fn,duration) = model.AudioFileList.[newIndex]
         let currentDuration = duration |> toTimeSpan
         let currentDurationMs = duration
-
+               
         let newModel = 
             { model with 
                 CurrentAudioFileIndex = newIndex
@@ -319,13 +319,26 @@ open Services
                 CurrentDurationMs = Some currentDurationMs
                 CurrentAudioFile = Some fn
                 CurrentPosition = None }
-            
-        if newModel.CurrentState = Playing then            
-            newModel |> stopAudio |> ignore
+        
+        if model.CurrentState = Playing then            
+            model |> stopAudio |> ignore
 
             // do not play "next" file if on end of the audio book
             if (n>max) then
-                newModel, Cmd.none, None
+                let audioBook = {model.AudioBook with State = {model.AudioBook.State with Completed = true}}
+                let storeFinishedAudioBookCmd = 
+                    async { 
+                        let! res = audioBook |> Services.FileAccess.updateAudioBookInStateFile
+                        match res with
+                        | Error e ->
+                            do! Common.Helpers.displayAlert("Error save audiobook state! ",e,"Ok")
+                            return None
+                        | Ok _ ->
+                            return None
+                            
+                    } |> Cmd.ofAsyncMsgOption
+
+                { model with AudioBook = audioBook; CurrentState = Stopped }, storeFinishedAudioBookCmd, None
             else
                 let newModel = { newModel with AudioPlayerBusy = true }
                 let playAudioCmd = newModel |> playAudio
@@ -427,8 +440,19 @@ open Services
             if model.CurrentDurationMs.IsSome then
                 let newPos = ((model.CurrentDurationMs.Value |> float) * e) |> int
                 setAudioPositionAbsolute  newPos
-
-        {model with ProgressbarValue = e}, Cmd.none, None
+                let newModel =
+                    {model with 
+                        CurrentPosition = Some (newPos |> toTimeSpan)
+                        CurrentPositionMs = Some newPos                        
+                    }
+                {newModel with ProgressbarValue = e}, Cmd.none, None
+            else
+                model,Cmd.none, None
+        else
+            model,Cmd.none, None
+                
+           
+        
 
 
     and onUpdateSleepTimerMsg model =
@@ -483,8 +507,8 @@ open Services
                         horizontalOptions=LayoutOptions.Center,                        
                         children = [
                             yield (Controls.primaryTextColorLabel 25.0 (model.AudioBook.FullName ))
-                            yield (Controls.primaryTextColorLabel 40.0 (sprintf "Track: %i von %i" (model.CurrentAudioFileIndex + 1) model.AudioFileList.Length ))
-                            yield (Controls.primaryTextColorLabel 30.0 (sprintf "%s von %s" currentPos currentDuration))
+                            yield (Controls.primaryTextColorLabel 30.0 (sprintf "Track: %i of %i" (model.CurrentAudioFileIndex + 1) model.AudioFileList.Length ))
+                            yield (Controls.primaryTextColorLabel 30.0 (sprintf "%s of %s" currentPos currentDuration))
                         ]
                     ).GridRow(0)
                     

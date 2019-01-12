@@ -10,7 +10,7 @@
     type Model = { AudioBook: AudioBook
                    CurrentDownloadProgress: (int * int) option
                    QueuedToDownload: bool
-                   IsLoading: bool }
+                   IsDownloading: bool }
 
     type Msg =
         | OpenAudioBookActionMenu
@@ -65,7 +65,7 @@
                 return ChangeGlobalBusyState false
         } |> Cmd.ofAsyncMsg
     
-    let initModel audiobook = { AudioBook = audiobook; CurrentDownloadProgress = None; QueuedToDownload=false; IsLoading = false }
+    let initModel audiobook = { AudioBook = audiobook; CurrentDownloadProgress = None; QueuedToDownload=false; IsDownloading = false }
 
     
     let init audiobook = audiobook |> initModel, Cmd.none, None
@@ -112,7 +112,8 @@
                 (fun a -> UnmarkAudioBookAsListend)
                 (fun a -> DoNothing)
                 (fun a -> Msg.OpenAudioBookDetail)
-                model.QueuedToDownload
+                model.QueuedToDownload 
+                model.IsDownloading
                 model.AudioBook
             |> Cmd.ofAsyncMsgOption
             
@@ -170,7 +171,7 @@
     
     
     and onChangeBusyStateMsg state model =
-        {model with IsLoading = state}, Cmd.none, None
+        {model with IsDownloading = state}, Cmd.none, None
 
     
     and onChangeGlobalBusyStateMsg state model =
@@ -196,7 +197,7 @@
         |> Controls.renderAudiobookEntry 
             (fun ()-> dispatch (OpenAudioBookActionMenu)) 
             (fun ()-> dispatch (Msg.OpenAudioBookPlayer)) 
-            model.IsLoading 
+            model.IsDownloading 
             model.QueuedToDownload 
             model.CurrentDownloadProgress
     

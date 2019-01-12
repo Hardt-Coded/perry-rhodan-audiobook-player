@@ -28,6 +28,7 @@ let audioBookEntryActionSheet
     cmdDownloadOnlyPicture 
     cmdDescription
     isOnDownloadQueue
+    isCurrentlyDownloading
     audiobook =
     async {
         let buttons = [|
@@ -35,11 +36,12 @@ let audioBookEntryActionSheet
 
             if audiobook.State.Downloaded then
                 yield ("Remove From Device",cmdDelete audiobook)
-            elif (isOnDownloadQueue && not audiobook.State.Downloaded) then
+            elif (isOnDownloadQueue && not audiobook.State.Downloaded && not isCurrentlyDownloading) then
                 yield ("Remove From Download Queue",cmdRemoveFromDownloadQueue audiobook)
-            else 
+            elif (not isOnDownloadQueue && not audiobook.State.Downloaded) then
                 yield ("Download AudioBook",cmdDownload audiobook)
             
+
             
 
             if audiobook.State.Completed then
@@ -47,17 +49,17 @@ let audioBookEntryActionSheet
             else
                 yield ("Mark As Listend",cmdMarkAsListend audiobook)
 
-            if audiobook.Picture.IsNone then
-                yield ("Download Picture",cmdDownloadOnlyPicture audiobook)
+            //if audiobook.Picture.IsNone then
+            //    yield ("Download Picture",cmdDownloadOnlyPicture audiobook)
         |]
         return! Helpers.displayActionSheet (Some "Please Select...") (Some "Cancel") buttons
     }
     
-let greenCheckLabel = 
+let listendCheckLabel = 
     View.Label(text="\uf058",
         fontFamily=faFontFamilyName true,
         fontSize=25.0,
-        textColor=Color.GreenYellow,
+        textColor=Color.White,
         verticalOptions = LayoutOptions.Fill, 
         horizontalOptions = LayoutOptions.Fill, 
         verticalTextAlignment = TextAlignment.Center,
@@ -125,7 +127,7 @@ let audioBookStateOverlay
         rowdefs = [box "*"; box "*"; box "*"],
         children = [
             if (isComplete) then
-                yield greenCheckLabel.GridColumn(2).GridRow(2)
+                yield listendCheckLabel.GridColumn(2).GridRow(2)
             elif (isInDownloadQueue) then
                 yield inDownloadQueueLabel.GridColumn(2).GridRow(2)
             elif (not isDownloaded && not isComplete) then
@@ -202,7 +204,15 @@ let renderAudiobookEntry
                     openAudioBookPlayerCmd
                     ).GridColumn(0).GridRow(0)
 
-                yield View.Label(text=audiobook.FullName, fontSize = 15.0, textColor = Consts.primaryTextColor,lineBreakMode = LineBreakMode.WordWrap).GridColumn(1).GridRow(0)
+                yield View.Label(text=audiobook.FullName, 
+                    fontSize = 15.0, 
+                    verticalOptions = LayoutOptions.Fill, 
+                    horizontalOptions = LayoutOptions.Fill, 
+                    verticalTextAlignment = TextAlignment.Center,
+                    horizontalTextAlignment = TextAlignment.Center,
+                    textColor = Consts.secondaryTextColor,
+                    lineBreakMode = LineBreakMode.WordWrap
+                    ).GridColumn(1).GridRow(0)
                 yield View.Label(text="\uf142",fontFamily = faFontFamilyName true,
                     fontSize=35.0, 
                     margin = Thickness(0.0, 0.0 ,20.0 ,0.0),                    
@@ -248,6 +258,16 @@ let primaryTextColorLabel size text =
     View.Label(text=text,
         fontSize=size,
         textColor=Consts.primaryTextColor,
+        verticalOptions=LayoutOptions.Fill,
+        horizontalOptions=LayoutOptions.Fill,
+        horizontalTextAlignment=TextAlignment.Center,
+        verticalTextAlignment=TextAlignment.Center
+        )
+
+let secondaryTextColorLabel size text = 
+    View.Label(text=text,
+        fontSize=size,
+        textColor=Consts.secondaryTextColor,
         verticalOptions=LayoutOptions.Fill,
         horizontalOptions=LayoutOptions.Fill,
         horizontalTextAlignment=TextAlignment.Center,

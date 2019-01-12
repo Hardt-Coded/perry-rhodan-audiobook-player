@@ -311,14 +311,9 @@ module WebAccess =
                                     |> HttpHelpers.getFileSizeFromHttpHeadersOrDefaultValue 0) / (1024 * 1024)
                                 
                                 
-
-                                
-
-
-                                //use fileStream = new FileStream(targetFileName,FileMode.Create)
                                 use zipStream = new ZipInputStream(resp.ResponseStream)
 
-                                
+                                let mutable zipStreamFullLength = 0
 
                                 let zipSeq =
                                     seq {
@@ -328,7 +323,8 @@ module WebAccess =
                                             | null ->
                                                 entryAvailable <- false
                                             | entry -> 
-                                                yield (entry, zipStream.Length)
+                                                zipStreamFullLength <- zipStreamFullLength + (zipStream.Length |> int)
+                                                yield (entry, zipStreamFullLength)
                                             
                                     }
 
@@ -350,14 +346,14 @@ module WebAccess =
                                     progress
 
 
-                                let processMp3File initProgress entrySize (entry:ZipEntry) =
+                                let processMp3File initProgress zipStreamLength (entry:ZipEntry) =
                                     let name = Path.GetFileName(entry.Name)
                                     let extractFullPath = Path.Combine(unzipTargetFolder,name)
                                     if (File.Exists(extractFullPath)) then
                                         File.Delete(extractFullPath)
 
                                     use streamWriter = File.Create(extractFullPath)
-                                    let progress = copyStream zipStream streamWriter initProgress entrySize
+                                    let progress = copyStream zipStream streamWriter initProgress zipStreamLength
                                     streamWriter.Close()
                                     progress                    
 
@@ -391,12 +387,12 @@ module WebAccess =
                                 do! asyncFunc(fun () ->
                                     zipSeq
                                     |> Seq.iter (
-                                        fun (entry, entrySize) ->
+                                        fun (entry, streamLength) ->
                                             match entry with
                                             | ZipHelpers.Mp3File ->
-                                                globalProgress <- (entry |> processMp3File globalProgress (entrySize|>int))
+                                                globalProgress <- (entry |> processMp3File globalProgress streamLength)
                                             | ZipHelpers.PicFile ->
-                                                globalProgress <- (processPicFile globalProgress (entrySize|>int))
+                                                globalProgress <- (processPicFile globalProgress streamLength)
                                             | _ -> ()
                                     )
                                 )
@@ -410,9 +406,6 @@ module WebAccess =
                                     if File.Exists(imageFullName) && File.Exists(thumbFullName) then
                                         Some (imageFullName,thumbFullName)
                                     else None
-
-                                updateProgress (fileSize, fileSize)
-                            
 
                                 return Ok (unzipTargetFolder,imageFileNames)
                             with
