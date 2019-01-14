@@ -160,9 +160,16 @@ open Services
                         match saveRes with
                         | Error e ->
                             return (ShowErrorMessage e)
-                        | Ok _ ->
-                            let result = synchedAb |> Domain.Filters.nameFilter
-                            return (InitAudiobooks result)
+                        | Ok _ ->                            
+                            let! audioBooks = FileAccess.loadAudioBooksStateFile ()
+                            match audioBooks with
+                            | Error e -> return (ShowErrorMessage e)
+                            | Ok ab -> 
+                                match ab with
+                                | [||] -> return DoNothing
+                                | _ ->     
+                                    let result = ab |> Domain.Filters.nameFilter                                
+                                    return (InitAudiobooks result)
             } |> Cmd.ofAsyncMsg        
         
         
