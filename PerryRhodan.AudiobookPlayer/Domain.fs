@@ -61,7 +61,14 @@ let parseDownloadData htmlData =
     |> Seq.toArray 
     |> Array.filter (fun i -> i.AttributeValue("id") = "downloads")
     |> Array.tryHead
-    |> Option.map (fun i -> i.Descendants("li") |> Seq.toArray)
+    // only the audiobooks
+    |> Option.map (
+        fun i -> 
+            i.Descendants("li") 
+            |> Seq.filter (fun i -> not (i.InnerText().Contains("Impressum"))) 
+            |> Seq.filter (fun i -> i.Descendants("a") |> Seq.exists (fun i -> i.TryGetAttribute("href") |> Option.map(fun m -> m.Value().Contains("butler.php?action=audio")) |> Option.defaultValue false) )
+            |> Seq.toArray
+    )
     |> Option.defaultValue ([||])
     |> Array.Parallel.map (
         fun i ->
