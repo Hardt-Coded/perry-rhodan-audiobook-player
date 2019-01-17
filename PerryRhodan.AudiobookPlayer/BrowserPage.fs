@@ -138,6 +138,8 @@ open Services
                         let ex = e.GetBaseException()
                         let msg = ex.Message + "|" + ex.StackTrace
                         return (ShowErrorMessage msg)
+                    | Network msg ->
+                        return (ShowErrorMessage msg)
                 | Ok ab -> 
                     
                     // Synchronize it with local
@@ -248,7 +250,7 @@ open Services
 
 
     and onShowErrorMessageMsg e model =
-        Common.Helpers.displayAlert("Error",e,"OK") |> ignore
+        Common.Helpers.displayAlert("Error",e,"OK") |> Async.StartImmediate
         model, Cmd.ofMsg (ChangeBusyState false), None
     
 
@@ -329,8 +331,13 @@ open Services
             rowdefs= [box "auto"; box "*"; box "auto"; box "auto"],
             verticalOptions = LayoutOptions.Fill,
             children = [
+                let browseTitle = 
+                    match model.LastSelectedGroup with
+                    | None -> "Browse your Audiobooks"
+                    | Some t -> sprintf "Browse: %s" t                   
+                        
 
-                yield View.Label(text="Browse your Audiobooks", fontAttributes = FontAttributes.Bold,
+                yield View.Label(text=browseTitle, fontAttributes = FontAttributes.Bold,
                                     fontSize = 25.0,
                                     horizontalOptions = LayoutOptions.Fill,
                                     horizontalTextAlignment = TextAlignment.Center,
@@ -340,23 +347,19 @@ open Services
                     
                 yield View.StackLayout(padding = 10.0, verticalOptions = LayoutOptions.Start,
                     children = [ 
-                            
+                        
+                        
                         yield View.Button(text="Load Your Audiobooks", command = (fun () -> dispatch LoadOnlineAudiobooks))
                             
                         match model.SelectedGroupItems with
                         | None ->
-                            yield View.Label(text="Nothing here!")
+                            yield Controls.secondaryTextColorLabel 20.0 "Press 'Load your Audiobooks' to get your audiobooks from your einsamedien account"
 
                         | Some sg ->
                             match sg with
                             | GroupList gp ->
                                 let groups = gp |> Array.map (fun (key,_) -> key)
-                                if model.LastSelectedGroup.IsSome then                                             
-                                    yield View.Label(text=model.LastSelectedGroup.Value
-                                        ,fontSize=22.0
-                                        ,textColor=Consts.primaryTextColor
-                                        ,horizontalOptions=LayoutOptions.Fill
-                                        ,horizontalTextAlignment=TextAlignment.Center)
+
                                         
                                 yield View.ScrollView(horizontalOptions = LayoutOptions.Fill,
                                     verticalOptions = LayoutOptions.Fill,
@@ -365,7 +368,7 @@ open Services
                                             verticalOptions = LayoutOptions.Fill,
                                             children= [
                                                 match groups with
-                                                | [||] -> yield View.Label(text="Press Load your Audiobooks to get your audiobooks from your einsamedien account")
+                                                | [||] -> yield Controls.secondaryTextColorLabel 20.0 "Press 'Load your Audiobooks' to get your audiobooks from your einsamedien account"
                                                 | _ ->
                                                     for (idx,item) in groups |> Array.indexed do
                                                         yield 

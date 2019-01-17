@@ -12,6 +12,7 @@
     | SessionExpired of string
     | Other of string
     | Exception of exn
+    | Network of string
 
     let (|InvariantEqual|_|) (str:string) arg = 
         if String.Compare(str, arg, StringComparison.InvariantCultureIgnoreCase) = 0
@@ -106,15 +107,51 @@
     module Helpers =
         open Plugin.Permissions
         open Plugin.Permissions.Abstractions
+        open Microsoft.AppCenter.Analytics
+        open Microsoft.AppCenter.Crashes
         open Fabulous
         open Fabulous.Core
         
         let displayAlert(title, message, cancel) =
-            Application.Current.MainPage.DisplayAlert(title, message, cancel) |> Async.AwaitTask
+            let tsc = TaskCompletionSource()
+            
+            Device.BeginInvokeOnMainThread(
+                (fun () -> 
+                    async {
+                        try
+                            do! Application.Current.MainPage.DisplayAlert(title, message, cancel) |> Async.AwaitTask
+                            tsc.SetResult()
+                        with
+                        | _ as ex ->
+                            Crashes.TrackError(ex)
+                            tsc.SetResult()
+                    } |> Async.StartImmediate
+                )
+            )
+
+            tsc.Task |> Async.AwaitTask
+            
 
 
         let displayAlertWithConfirm(title, message, accept, cancel) =
-            Application.Current.MainPage.DisplayAlert(title, message, accept, cancel) |> Async.AwaitTask
+            let tsc = TaskCompletionSource<bool>()
+            
+            Device.BeginInvokeOnMainThread(
+                (fun () -> 
+                    async {
+                        try
+                            let! res = Application.Current.MainPage.DisplayAlert(title, message, accept, cancel) |> Async.AwaitTask
+                            tsc.SetResult(true)
+                        with
+                        | _ as ex ->
+                            Crashes.TrackError(ex)
+                            tsc.SetResult(false)
+                    } |> Async.StartImmediate
+                )
+            )
+
+            tsc.Task |> Async.AwaitTask
+            
 
 
         let askPermissionAsync permission = async {

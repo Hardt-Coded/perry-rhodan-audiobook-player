@@ -36,6 +36,7 @@
                 match e with
                 | SessionExpired e -> return (ShowErrorMessage e)
                 | Other e -> return (ShowErrorMessage e)
+                | Network e -> return (ShowErrorMessage e)
                 | Exception e ->
                     let ex = e.GetBaseException()
                     let msg = ex.Message + "|" + ex.StackTrace

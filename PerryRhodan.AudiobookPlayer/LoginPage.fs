@@ -29,6 +29,7 @@ open Services
         | ChangePassword of string
         | SetStoredCredentials of username:string * password:string * rememberLogin:bool
         | ChangeBusyState of bool
+        | ShowErrorMessage of string
         | DoNothing
     
     type ExternalMsg = 
@@ -56,8 +57,20 @@ open Services
         async {
             let! cc = WebAccess.login model.Username model.Password
             match cc with
-            | None -> return LoginFailed
-            | Some c -> return LoginSucceeded c
+            | Ok cc ->
+                match cc with
+                | None -> return LoginFailed
+                | Some c -> return LoginSucceeded c
+            | Error e ->
+                match e with
+                | SessionExpired e -> return (ShowErrorMessage e)
+                | Other e -> return (ShowErrorMessage e)
+                | Exception e ->
+                    let ex = e.GetBaseException()
+                    let msg = ex.Message + "|" + ex.StackTrace
+                    return (ShowErrorMessage msg)
+                | Network msg ->
+                    return (ShowErrorMessage msg)
         } |> Cmd.ofAsyncMsg
         
     
@@ -71,26 +84,65 @@ open Services
             | Ok _ -> return DoNothing
         } |> Cmd.ofAsyncMsg
 
-    let update msg model =
+    let rec update msg (model:Model) =
         match msg with
         | TryLogin ->            
-            model, Cmd.batch [(login model);Cmd.ofMsg (ChangeBusyState true)], None
+            model |> onTryLoginMsg
         | LoginSucceeded cc ->
-            let cmd = if model.RememberLogin then (storeCredentials model) else Cmd.none
-            model, Cmd.batch [cmd;Cmd.ofMsg (ChangeBusyState false)], Some (GotoForwardToBrowsing cc)
+            model |> onLoginSucceededMsg cc
         | LoginFailed ->
-            {model with LoginFailed = true}, Cmd.ofMsg (ChangeBusyState false), None
+            model |> onLoginFailedMsg
         | ChangeRememberLogin b ->
-            {model with RememberLogin = b}, Cmd.none, None
+            model |> onChangeRememberLoginMsg b
         | ChangeUsername u ->
-            {model with Username = u}, Cmd.none, None
+            model |> onChangeUsernameMsg u
         | ChangePassword p ->
-            {model with Password = p}, Cmd.none, None
+            model |> onChangePasswordMsg p
         | SetStoredCredentials (u,p,r) ->
-            {model with Username= u; Password = p; RememberLogin = r}, Cmd.none, None
+            model |> onSetStoredCredentialsMsg (u,p,r)
         | ChangeBusyState state -> 
-            {model with IsLoading = state}, Cmd.none, None
-        | DoNothing -> model,  Cmd.none, None
+            model |> onChangeBusyStateMsg state
+        | ShowErrorMessage e ->
+            model |> onShowErrorMessageMsg e
+        | DoNothing -> 
+            model,  Cmd.none, None
+    
+    and onTryLoginMsg model =
+        model, Cmd.batch [(login model);Cmd.ofMsg (ChangeBusyState true)], None
+    
+
+    and onLoginSucceededMsg cc model =
+        let cmd = if model.RememberLogin then (storeCredentials model) else Cmd.none
+        model, Cmd.batch [cmd;Cmd.ofMsg (ChangeBusyState false)], Some (GotoForwardToBrowsing cc)
+    
+
+    and onLoginFailedMsg model =
+        {model with LoginFailed = true}, Cmd.ofMsg (ChangeBusyState false), None
+
+
+    and onChangeRememberLoginMsg b model =
+        {model with RememberLogin = b}, Cmd.none, None
+
+
+    and onChangeUsernameMsg u model =
+        {model with Username = u}, Cmd.none, None
+
+
+    and onChangePasswordMsg p model =
+        {model with Password = p}, Cmd.none, None
+
+
+    and onSetStoredCredentialsMsg (u,p,r) model  =
+        {model with Username= u; Password = p; RememberLogin = r}, Cmd.none, None
+
+
+    and onChangeBusyStateMsg state model =
+        {model with IsLoading = state}, Cmd.none, None
+
+
+    and onShowErrorMessageMsg e model =
+        Common.Helpers.displayAlert("Error",e,"OK") |> Async.StartImmediate
+        model, Cmd.ofMsg (ChangeBusyState false), None
 
     
     

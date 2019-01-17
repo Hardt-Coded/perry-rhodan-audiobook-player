@@ -198,38 +198,83 @@ module WebAccess =
 
     open Consts
     open FileAccess
+    open System.Net
+    open System.Net.Sockets
+    open Microsoft.AppCenter.Crashes
+    open Microsoft.AppCenter.Analytics
+    
+    let handleException f =
+        async {
+            try
+                let! res = f()
+                return (Ok res)
+            with
+            | exn ->
+                let ex = exn.GetBaseException()
+                Crashes.TrackError(ex)
+                match ex with
+                | :? WebException | :? SocketException ->
+                    return Error (Network "Network Error. Please check your internet connection and try again.")
+                | :? TimeoutException ->
+                    return Error (Network "Network Timeout Error. Please check your internet connection and try again.")
+                | _ ->
+                    return Error (Other "Internal App Error. Please try again or contact support.")
+        }
+        
 
     let login username password =
         async {
-            let! resp = 
-                Http.AsyncRequest(
-                    baseUrl + "butler.php",
-                    body = FormValues [("action","login"); ("username",username); ("password",password)],
-                    httpMethod = HttpMethod.Post,
-                    customizeHttpRequest = 
-                        (fun req ->                         
-                            req.AllowAutoRedirect <- false
-                            req
-                        )
+                let! res = 
+                    (fun () -> 
+                        Http.AsyncRequest(
+                            baseUrl + "butler.php",
+                            body = FormValues [("action","login"); ("username",username); ("password",password)],
+                            httpMethod = HttpMethod.Post,
+                            customizeHttpRequest = 
+                                (fun req ->                         
+                                    req.AllowAutoRedirect <- false
+                                    req
+                                )
+                            )
+                    )
+                    |> handleException
+
+                return 
+                    res
+                    |> Result.bind(
+                        fun (resp) ->
+                            let location = resp.Headers |> Seq.filter (fun m -> m.Key = "Location") |> Seq.tryHead
+                            match location with
+                            | None -> 
+                                Analytics.TrackEvent("no location on login response found")
+                                Error (Other "Unexpected Server Behavior. Please try again or contact support.")
+                            | Some v ->
+                                if v.Value.Contains("98") then Ok (None)
+                                else if v.Value.Contains("61") then Ok (Some resp.Cookies)
+                                else Ok (None)                        
                     )
         
-            let location = resp.Headers |> Seq.filter (fun m -> m.Key = "Location") |> Seq.tryHead
-            match location with
-            | None -> return None
-            | Some v ->
-                if v.Value.Contains("98") then return None
-                else if v.Value.Contains("61") then return (Some resp.Cookies)
-                else return None
+                
         }
+
+    
+        
 
 
     let getDownloadPage (cc:Map<string,string>) =
         async {       
             let seqCC = cc |> Map.toSeq
-            let! html = Http.AsyncRequestString(baseUrl + "index.php?id=61",cookies = seqCC, httpMethod="GET")
-    
-            if (html.Contains("<input name=\"username\"")) then return Error (SessionExpired "Session expired!")
-            else return Ok html
+
+            let! res = 
+                fun () -> Http.AsyncRequestString(baseUrl + "index.php?id=61",cookies = seqCC, httpMethod="GET")
+                |> handleException
+
+            return res 
+                |> Result.bind (
+                    fun html ->
+                        if (html.Contains("<input name=\"username\"")) then Error (SessionExpired "Online Session expired!")
+                        else Ok html
+                )
         }
     
     
@@ -255,164 +300,190 @@ module WebAccess =
     let private getDownloadUrl cookies url =
         async {
             let seqCC = cookies |> Map.toSeq
-            let! resp = 
-                Http.AsyncRequest(
-                    baseUrl + url,                
-                    httpMethod = HttpMethod.Get,
-                    cookies = seqCC,
-                    customizeHttpRequest = 
-                        (fun req ->                         
-                            req.AllowAutoRedirect <- false
-                            req
+
+            let! res = 
+                (fun () ->
+                    Http.AsyncRequest(
+                        baseUrl + url,                
+                        httpMethod = HttpMethod.Get,
+                        cookies = seqCC,
+                        customizeHttpRequest = 
+                            (fun req ->                         
+                                req.AllowAutoRedirect <- false
+                                req
+                            )
                         )
-                    )
-            if (not (resp.Headers.ContainsKey("Location"))) then
-                return Error (Other "DownloadUrl not found!")
-            else
-                let downloadUrl = resp.Headers.Item "Location"
-                if (downloadUrl.Contains("index.php?id=98")) then
-                    return Error (SessionExpired "Session expired!")
-                else
-                    return Ok downloadUrl
+                )
+                |> handleException
+
+            return
+                res
+                |> Result.bind (
+                    fun resp ->
+                        if (not (resp.Headers.ContainsKey("Location"))) then
+                            Error (Other "DownloadUrl not found!")
+                        else
+                            let downloadUrl = resp.Headers.Item "Location"
+                            if (downloadUrl.Contains("index.php?id=98")) then
+                                Error (SessionExpired "Session expired!")
+                            else
+                                Ok downloadUrl
+                )
+                
+            
         }
 
 
     let downloadAudiobook cookies updateProgress audiobook =
         async {
-            if (audiobook.State.Downloaded) then 
-                return Error (Other "Audiobook alread downloaded!")
-            else
-                let audioBookFolder = Path.Combine(audioBookDownloadFolderBase,audiobook.FullName)        
-                if not (Directory.Exists(audioBookFolder)) then
-                    Directory.CreateDirectory(audioBookFolder) |> ignore
+            try
+                if (audiobook.State.Downloaded) then 
+                    return Error (Other "Audiobook alread downloaded!")
+                else
+                    let audioBookFolder = Path.Combine(audioBookDownloadFolderBase,audiobook.FullName)        
+                    if not (Directory.Exists(audioBookFolder)) then
+                        Directory.CreateDirectory(audioBookFolder) |> ignore
                 
-                match audiobook.DownloadUrl with
-                | None -> return Error (Other "no download url for this audiobook available")
-                | Some abDownloadUrl ->        
-                    match! (abDownloadUrl |> getDownloadUrl cookies) with
-                    | Error e -> 
-                        return Error e
+                    match audiobook.DownloadUrl with
+                    | None -> return Error (Other "no download url for this audiobook available")
+                    | Some abDownloadUrl ->        
+                        match! (abDownloadUrl |> getDownloadUrl cookies) with
+                        | Error e -> 
+                            return Error e
 
-                    | Ok url -> 
-                        try
-                            let! resp = Http.AsyncRequestStream(url,httpMethod=HttpMethod.Get)
+                        | Ok url -> 
+                            try
+                                let! resp = Http.AsyncRequestStream(url,httpMethod=HttpMethod.Get)
 
-                            let targetFileName = Path.Combine(audioBookFolder,audiobook.FullName.Replace(" ","_") + ".zip")
-                            if (resp.StatusCode <> 200) then 
-                                return Error (Other (sprintf "download statuscode %i" resp.StatusCode))
-                            else
+                                let targetFileName = Path.Combine(audioBookFolder,audiobook.FullName.Replace(" ","_") + ".zip")
+                                if (resp.StatusCode <> 200) then 
+                                    return Error (Other (sprintf "download statuscode %i" resp.StatusCode))
+                                else
                                 
-                                let unzipTargetFolder = Path.Combine(audioBookFolder,"audio")
-                                if not (Directory.Exists(unzipTargetFolder)) then
-                                    Directory.CreateDirectory(unzipTargetFolder) |> ignore
+                                    let unzipTargetFolder = Path.Combine(audioBookFolder,"audio")
+                                    if not (Directory.Exists(unzipTargetFolder)) then
+                                        Directory.CreateDirectory(unzipTargetFolder) |> ignore
                                 
-                                let fileSize = 
-                                    (resp.Headers
-                                    |> HttpHelpers.getFileSizeFromHttpHeadersOrDefaultValue 0) / (1024 * 1024)
+                                    let fileSize = 
+                                        (resp.Headers
+                                        |> HttpHelpers.getFileSizeFromHttpHeadersOrDefaultValue 0) / (1024 * 1024)
                                 
                                 
-                                use zipStream = new ZipInputStream(resp.ResponseStream)
+                                    use zipStream = new ZipInputStream(resp.ResponseStream)
 
-                                let mutable zipStreamFullLength = 0
+                                    let mutable zipStreamFullLength = 0
 
-                                let zipSeq =
-                                    seq {
-                                        let mutable entryAvailable = true
-                                        while entryAvailable do
-                                            match zipStream.GetNextEntry() with
-                                            | null ->
-                                                entryAvailable <- false
-                                            | entry -> 
-                                                zipStreamFullLength <- zipStreamFullLength + (zipStream.Length |> int)
-                                                yield (entry, zipStreamFullLength)
+                                    let zipSeq =
+                                        seq {
+                                            let mutable entryAvailable = true
+                                            while entryAvailable do
+                                                match zipStream.GetNextEntry() with
+                                                | null ->
+                                                    entryAvailable <- false
+                                                | entry -> 
+                                                    zipStreamFullLength <- zipStreamFullLength + (zipStream.Length |> int)
+                                                    yield (entry, zipStreamFullLength)
                                             
-                                    }
+                                        }
 
-                                let buffer:byte[] = Array.zeroCreate (500*1024)
+                                    let buffer:byte[] = Array.zeroCreate (500*1024)
 
-                                let copyStream (src:Stream) (dst:Stream) initProgress entrySize =
+                                    let copyStream (src:Stream) (dst:Stream) initProgress entrySize =
                                     
-                                    let mutable copying = true
-                                    let mutable progress = initProgress
-                                    while copying do
-                                        let bytesRead = src.Read(buffer,0,buffer.Length)
-                                        progress <- progress + bytesRead
-                                        updateProgress (progress / (1024 * 1024), entrySize / (1024 * 1024))
-                                        if bytesRead > 0 then
-                                            dst.Write(buffer, 0, bytesRead)
-                                        else
-                                            dst.Flush()
-                                            copying <- false
-                                    progress
+                                        let mutable copying = true
+                                        let mutable progress = initProgress
+                                        while copying do
+                                            let bytesRead = src.Read(buffer,0,buffer.Length)
+                                            progress <- progress + bytesRead
+                                            updateProgress (progress / (1024 * 1024), entrySize / (1024 * 1024))
+                                            if bytesRead > 0 then
+                                                dst.Write(buffer, 0, bytesRead)
+                                            else
+                                                dst.Flush()
+                                                copying <- false
+                                        progress
 
 
-                                let processMp3File initProgress zipStreamLength (entry:ZipEntry) =
-                                    let name = Path.GetFileName(entry.Name)
-                                    let extractFullPath = Path.Combine(unzipTargetFolder,name)
-                                    if (File.Exists(extractFullPath)) then
-                                        File.Delete(extractFullPath)
+                                    let processMp3File initProgress zipStreamLength (entry:ZipEntry) =
+                                        let name = Path.GetFileName(entry.Name)
+                                        let extractFullPath = Path.Combine(unzipTargetFolder,name)
+                                        if (File.Exists(extractFullPath)) then
+                                            File.Delete(extractFullPath)
 
-                                    use streamWriter = File.Create(extractFullPath)
-                                    let progress = copyStream zipStream streamWriter initProgress zipStreamLength
-                                    streamWriter.Close()
-                                    progress                    
+                                        use streamWriter = File.Create(extractFullPath)
+                                        let progress = copyStream zipStream streamWriter initProgress zipStreamLength
+                                        streamWriter.Close()
+                                        progress                    
 
 
-                                let processPicFile initProgress entrySize =
-                                    let mutable progress = initProgress
-                                    let imageFullName = Path.Combine(audioBookFolder,audiobook.FullName + ".jpg")
-                                    if not (File.Exists(imageFullName)) then
-                                        use streamWriter = File.Create(imageFullName)
-                                        progress <- copyStream zipStream streamWriter initProgress entrySize
-                                        streamWriter.Close()                                        
+                                    let processPicFile initProgress entrySize =
+                                        let mutable progress = initProgress
+                                        let imageFullName = Path.Combine(audioBookFolder,audiobook.FullName + ".jpg")
+                                        if not (File.Exists(imageFullName)) then
+                                            use streamWriter = File.Create(imageFullName)
+                                            progress <- copyStream zipStream streamWriter initProgress entrySize
+                                            streamWriter.Close()                                        
 
-                                    let thumbFullName = Path.Combine(audioBookFolder,audiobook.FullName + ".thumb.jpg")
+                                        let thumbFullName = Path.Combine(audioBookFolder,audiobook.FullName + ".thumb.jpg")
                                                 
-                                    if not (File.Exists(thumbFullName)) then
-                                        use thumb = SixLabors.ImageSharp.Image.Load(imageFullName)
-                                        thumb.Mutate(fun x -> 
-                                            x.Resize(200,200) |> ignore
-                                            ()
-                                            ) |> ignore                                        
+                                        if not (File.Exists(thumbFullName)) then
+                                            use thumb = SixLabors.ImageSharp.Image.Load(imageFullName)
+                                            thumb.Mutate(fun x -> 
+                                                x.Resize(200,200) |> ignore
+                                                ()
+                                                ) |> ignore                                        
 
-                                        use fileStream = new FileStream(thumbFullName,FileMode.Create)
-                                        thumb.SaveAsJpeg(fileStream)
-                                        fileStream.Close()
+                                            use fileStream = new FileStream(thumbFullName,FileMode.Create)
+                                            thumb.SaveAsJpeg(fileStream)
+                                            fileStream.Close()
                                     
-                                    progress
+                                        progress
 
                                 
-                                let mutable globalProgress = 0
+                                    let mutable globalProgress = 0
 
-                                do! asyncFunc(fun () ->
-                                    zipSeq
-                                    |> Seq.iter (
-                                        fun (entry, streamLength) ->
-                                            match entry with
-                                            | ZipHelpers.Mp3File ->
-                                                globalProgress <- (entry |> processMp3File globalProgress streamLength)
-                                            | ZipHelpers.PicFile ->
-                                                globalProgress <- (processPicFile globalProgress streamLength)
-                                            | _ -> ()
+                                    do! asyncFunc(fun () ->
+                                        zipSeq
+                                        |> Seq.iter (
+                                            fun (entry, streamLength) ->
+                                                match entry with
+                                                | ZipHelpers.Mp3File ->
+                                                    globalProgress <- (entry |> processMp3File globalProgress streamLength)
+                                                | ZipHelpers.PicFile ->
+                                                    globalProgress <- (processPicFile globalProgress streamLength)
+                                                | _ -> ()
+                                        )
                                     )
-                                )
                                 
-                                zipStream.Close()
-                                resp.ResponseStream.Close()       
-                                let imageFullName = Path.Combine(audioBookFolder,audiobook.FullName + ".jpg")
-                                let thumbFullName = Path.Combine(audioBookFolder,audiobook.FullName + ".thumb.jpg")
+                                    zipStream.Close()
+                                    resp.ResponseStream.Close()       
+                                    let imageFullName = Path.Combine(audioBookFolder,audiobook.FullName + ".jpg")
+                                    let thumbFullName = Path.Combine(audioBookFolder,audiobook.FullName + ".thumb.jpg")
 
-                                let imageFileNames = 
-                                    if File.Exists(imageFullName) && File.Exists(thumbFullName) then
-                                        Some (imageFullName,thumbFullName)
-                                    else None
+                                    let imageFileNames = 
+                                        if File.Exists(imageFullName) && File.Exists(thumbFullName) then
+                                            Some (imageFullName,thumbFullName)
+                                        else None
 
-                                return Ok (unzipTargetFolder,imageFileNames)
-                            with
-                            | _ as e -> 
-                                let text = e.Message
-                                let ex = e
-                                return Error (Exception e)
+                                    return Ok (unzipTargetFolder,imageFileNames)
+                                with
+                                | :? WebException | :? SocketException ->
+                                    return Error (Network "Network Error. Please check your internet connection and try again.")
+                                | :? TimeoutException ->
+                                    return Error (Network "Network Timeout Error. Please check your internet connection and try again.")
+                                | _ ->
+                                    return Error (Other "Internal App Error. Please try again or contact support.")
+            with
+            | exn ->
+                let ex = exn.GetBaseException()
+                Crashes.TrackError(ex)
+                match ex with
+                | :? WebException | :? SocketException ->
+                    return Error (Network "Network Error. Please check your internet connection and try again.")
+                | :? TimeoutException ->
+                    return Error (Network "Network Timeout Error. Please check your internet connection and try again.")
+                | _ ->
+                    return Error (Other "Internal App Error. Please try again or contact support.")
         }
 
 
@@ -422,25 +493,30 @@ module WebAccess =
             | None -> return Ok (None,None)
             | Some ps ->
                 let productPageUri = Uri(baseUrl + ps)
-                try
-                    let! productPage = Http.AsyncRequestString(productPageUri.AbsoluteUri)
-                    if productPage = "" then
-                        return Error (Other "ProductPage response is empty.")
-                    else
-                        let desc = productPage |> Domain.parseProductPageForDescription
-                        let img = 
-                            productPage 
-                            |> Domain.parseProductPageForImage
-                            |> Option.map (fun i ->
-                                let uri = Uri(baseUrl + i)
-                                uri.AbsoluteUri
-                            )
-                        
-                        
-                        return Ok (desc,img)
-                with
-                | _ as e ->
-                    return Error (Exception e)
+
+                let! productPageRes = 
+                    (fun () -> Http.AsyncRequestString(productPageUri.AbsoluteUri))
+                    |> handleException
+                return productPageRes
+                    |> Result.bind (
+                        fun productPage ->
+                            if productPage = "" then
+                                Error (Other "ProductPage response is empty.")
+                            else
+                                let desc = productPage |> Domain.parseProductPageForDescription
+                                let img = 
+                                    productPage 
+                                    |> Domain.parseProductPageForImage
+                                    |> Option.map (fun i ->
+                                        let uri = Uri(baseUrl + i)
+                                        uri.AbsoluteUri
+                                    )
+                                    
+                                    
+                                Ok (desc,img)
+                    )
+                
+                
         }
 
 module SecureLoginStorage =
