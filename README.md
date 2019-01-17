@@ -23,6 +23,14 @@ Here is a demo video.
 [![IMAGE ALT TEXT](http://img.youtube.com/vi/qgTg-DQ2ASw/0.jpg)](http://www.youtube.com/watch?v=qgTg-DQ2ASw "Perry Rhodan Audio Book Player")
 
 
+2019-01-14/14
+
+Bugfixes:
+- refresh audiobook from online displays afterwards only the new audio books
+- in some cases (if you account contains ebooks) the parsing of the site will stuck on a very weird manner.
+the task stops on a Regex.IsMatch of a string with a length > 1000 (I honestly don't know if the size has something to do with it.). But I reproduce the error on the emulator in debug mode. And when I pause the process the code stops right on  "Regex.IsMatch..." - see Domain.fs parseHtml-ish-function - with no reason. No error, nothing. If I run the same function on the pc in a repl with the same data, it works without stuck. Maybe a mono/android thingy.
+
+
 2019-01-13
 
 The app is finally available in the google play store.
