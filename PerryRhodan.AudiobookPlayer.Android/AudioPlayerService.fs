@@ -16,6 +16,8 @@ module rec AudioPlayerService =
     open Android.Support.V4.Media.Session
     open Android.Support.V4.Media
     open Android.Support.V4.App
+
+    open Microsoft.AppCenter.Crashes
     
     open Services
     
@@ -25,8 +27,12 @@ module rec AudioPlayerService =
 
         override this.OnReceive (context, intent) =
             if (intent.Action = AudioManager.ActionAudioBecomingNoisy) then
-                if audioPlayer.OnNoisyHeadPhone.IsSome then
-                    audioPlayer.OnNoisyHeadPhone.Value()
+                try
+                    if audioPlayer.OnNoisyHeadPhone.IsSome then
+                        audioPlayer.OnNoisyHeadPhone.Value()
+                with
+                | ex ->
+                    Crashes.TrackError(ex)
                 
 
             

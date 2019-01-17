@@ -10,6 +10,7 @@
     type QueueState =
         | Idle
         | Downloading
+        | Paused
         
 
     type Model = { DownloadQueue: AudioBookItem.Model list 
@@ -24,10 +25,12 @@
         | DeactivateLoading of AudioBookItem.Model
         | OpenLoginPage
         | StartProcessing
+        | PauseProcessing
         | ChangeQueueState of QueueState
         | UpdateDownloadProgress of AudioBookItem.Model * (int * int) option
         | ChangeGlobalBusyState of bool
         | OpenActionMenu of AudioBookItem.Model
+        | ShowErrorMessage of string
 
     type ExternalMsg =
         | ExOpenLoginPage
@@ -68,6 +71,8 @@
             model |> onOpenLoginPageMsg
         | StartProcessing ->
             model |> onStartProcessingMsg
+        | PauseProcessing ->
+            model |> onPauseProcessingMsg
         | ChangeQueueState state ->
             model |> onChangeQueueStateMsg state
         | Msg.UpdateDownloadProgress (abModel,progress) ->
@@ -76,6 +81,8 @@
             model |> onChangeGlobalBusyStateMsg state
         | OpenActionMenu abModel ->
             model |> onOpenActionMenuMsg abModel
+        | ShowErrorMessage e ->
+            model |> onShowErrorMessageMsg e
 
     
     and onOpenActionMenuMsg abModel model =
@@ -106,7 +113,7 @@
         let cmd,exCmd = 
             match model.State with
             | Idle -> Cmd.ofMsg StartProcessing, Some (UpdateAudioBook newAbModel)                
-            | Downloading -> Cmd.none, None
+            | Downloading | Paused -> Cmd.none, None
         newModel, cmd, exCmd
     
     and onRemoveItemFromQueueMsg abModel model =        
@@ -116,7 +123,8 @@
         let cmd = 
             match model.State with
             | Idle -> Cmd.ofMsg StartProcessing                    
-            | Downloading -> Cmd.none
+            | Downloading | Paused -> Cmd.none
+            
         newModel, cmd, Some (UpdateAudioBook newAbModel)
         
     
@@ -126,9 +134,8 @@
             async {
                 let! res = audioBook |> FileAccess.updateAudioBookInStateFile            
                 match res with
-                | Error e ->
-                    Common.Helpers.displayAlert("Error",e,"OK") |> ignore
-                    return ChangeGlobalBusyState false
+                | Error e ->                    
+                    return ShowErrorMessage e
                 | Ok _ ->
                     return ChangeGlobalBusyState false
             } |> Cmd.ofAsyncMsg
@@ -199,13 +206,18 @@
                             | SessionExpired s -> 
                                 return [ DeactivateLoading audiobookItemModel; OpenLoginPage ]
                             | Other o ->
-                                Common.Helpers.displayAlert("Error",o,"OK") |> ignore
-                                return [ DownloadFailed audiobookItemModel ]
+                                return [ DownloadFailed audiobookItemModel; ShowErrorMessage o ]
+                            | Network o ->
+                                
+                                return [ 
+                                    yield PauseProcessing; 
+                                    if model.State <> Paused then
+                                        yield ShowErrorMessage o 
+                                ]
                             | Exception e ->
                                 let ex = e.GetBaseException()
                                 let msg = ex.Message + "|" + ex.StackTrace
-                                Common.Helpers.displayAlert("Error",msg,"OK") |> ignore
-                                return [ DownloadFailed audiobookItemModel ]
+                                return [ DownloadFailed audiobookItemModel; ShowErrorMessage msg ]
                         | Ok (mp3Path,images) ->
                             let fullImage = images |> Option.map (fun (f,_) -> f)
                             let thumb = images |> Option.map (fun (_,t) -> t)
@@ -238,6 +250,27 @@
         newModel, Cmd.batch [Cmd.ofMsg (ChangeQueueState Downloading); processCmd ], exCmd
 
     
+    and onPauseProcessingMsg model =
+
+        let retryCommand = 
+            async {
+                // wait 30 Seconds
+                do! Async.Sleep 30000
+                return StartProcessing
+            } |> Cmd.ofAsyncMsg
+
+        let (currentProcessingItem,queueTail) = model.DownloadQueue |> Helpers.getTailHead
+        match currentProcessingItem with
+        | None ->
+            model,Cmd.none,None
+        | Some currentProcessingItem ->
+            let newCurrentProcessingItem = {currentProcessingItem with IsDownloading = false}
+            let newQueue = newCurrentProcessingItem::queueTail
+            let newModel = {model with State = Paused; DownloadQueue = newQueue}
+            newModel, retryCommand, None
+    
+    
+    
     and onChangeQueueStateMsg state model =
         let newModel = {model with State = state}
         newModel, Cmd.none, None
@@ -254,6 +287,11 @@
     
     and onChangeGlobalBusyStateMsg state model =
         model, Cmd.none, Some (PageChangeBusyState state)
+
+    
+    and onShowErrorMessageMsg e model =
+        Common.Helpers.displayAlert("Error",e,"OK") |> Async.StartImmediate
+        model, Cmd.ofMsg (ChangeGlobalBusyState false), None
     
     
     
@@ -264,18 +302,26 @@
             children = [
                 if model.DownloadQueue.Length > 0 then
                     yield Controls.secondaryTextColorLabel 16.0 "Queued Downloads:"
+                    if model.State = Paused then
+                        yield Controls.secondaryTextColorLabel 16.0 "(network error - retrying in 30 seconds):"
                     yield View.StackLayout(
                         orientation = StackOrientation.Horizontal,
                         children = [
                         
                             for (idx,item) in model.DownloadQueue |> List.indexed do
-                                let cmd =
+                                let (cmd,isRed) =
                                     if (idx > 0) then
-                                        (fun () -> dispatch (OpenActionMenu item))
+                                        (fun () -> dispatch (OpenActionMenu item)), true
                                     else
-                                        (fun () -> ())
+                                        (fun () -> ()), false
+                                
+                                let item = 
+                                    if isRed then
+                                        (Controls.primaryColorSymbolLabelWithTapCommand cmd 35.0 true "\uf019").TextColor(Color.Red)
+                                    else
+                                        Controls.primaryColorSymbolLabelWithTapCommand cmd 35.0 true "\uf019"
 
-                                yield Controls.primaryColorSymbolLabelWithTapCommand cmd 35.0 true "\uf019"
+                                yield item
                         ]
                 )
             ]
