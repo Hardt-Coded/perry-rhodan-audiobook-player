@@ -59,7 +59,7 @@
 
     let view model dispatch =
         View.ContentPage(
-            title="Settings",useSafeArea=true,
+            title=Translations.current.SettingsPage,useSafeArea=true,
             backgroundColor = Consts.backgroundColor,
             content = View.Grid(
                 children = [

@@ -17,6 +17,7 @@
     <None Include="repl_stuff.fsx" />
     <Compile Include="SampleData.fs" />
     <Compile Include="Common.fs" />
+    <Compile Include="Translations.fs" />
     <Compile Include="Domain.fs" />
     <Compile Include="Services.fs" />
     <Compile Include="Controls.fs" />

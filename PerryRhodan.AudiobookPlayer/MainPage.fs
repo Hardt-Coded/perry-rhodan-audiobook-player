@@ -128,7 +128,7 @@ open Services
                 let! audioBooks = FileAccess.loadAudioBooksStateFile ()
                 match audioBooks with
                 | Error e -> 
-                    do! Common.Helpers.displayAlert("Error on loading Local Audiobooks",e,"OK")
+                    do! Common.Helpers.displayAlert(Translations.current.ErrorLoadingLocalAudiobook,e,"OK")
                     return Some (ChangeBusyState false)
                 | Ok ab -> 
                     match ab with
@@ -162,7 +162,7 @@ open Services
                 rowdefs= [box "auto"; box "*"],
                 verticalOptions = LayoutOptions.Fill,
                 children = [
-                    yield View.Label(text="Audiobooks On Device", fontAttributes = FontAttributes.Bold,
+                    yield View.Label(text=Translations.current.AudiobookOnDevice, fontAttributes = FontAttributes.Bold,
                                                     fontSize = 25.0,
                                                     horizontalOptions = LayoutOptions.Fill,
                                                     horizontalTextAlignment = TextAlignment.Center,
@@ -176,7 +176,7 @@ open Services
                             yield dependsOn (model.Audiobooks) (fun _ (abItems) ->
                                 match abItems with
                                 | [||]  ->
-                                    View.Label(text="There are currently no audiobooks on your device. Use the button on the upper right corner to browse your online audio books.", fontSize=25.0, textColor=Consts.secondaryTextColor)
+                                    View.Label(text=Translations.current.NoAudiobooksOnDevice, fontSize=25.0, textColor=Consts.secondaryTextColor)
                                 | _ ->
                                     View.ScrollView(horizontalOptions = LayoutOptions.Fill,
                                             verticalOptions = LayoutOptions.Fill,

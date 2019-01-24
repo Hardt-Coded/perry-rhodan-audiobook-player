@@ -158,6 +158,9 @@ open Services
                     | Some la ->
                         let loadedFlatten = la |> AudioBooks.flatten
                         let synchedAb = Domain.filterNewAudioBooks loadedFlatten ab
+                        if synchedAb.Length > 0 then
+                            let message = synchedAb |> Array.map (fun i -> i.FullName) |> String.concat "\r\n"
+                            do! Common.Helpers.displayAlert(Translations.current.NewAudioBooksSinceLastRefresh,message,"OK")
                         let! saveRes = synchedAb |> FileAccess.insertNewAudioBooksInStateFile 
                         match saveRes with
                         | Error e ->
@@ -333,8 +336,8 @@ open Services
             children = [
                 let browseTitle = 
                     match model.LastSelectedGroup with
-                    | None -> "Browse your Audiobooks"
-                    | Some t -> sprintf "Browse: %s" t                   
+                    | None -> Translations.current.BrowseAudioBooks
+                    | Some t -> sprintf "%s: %s" Translations.current.Browse t                   
                         
 
                 yield View.Label(text=browseTitle, fontAttributes = FontAttributes.Bold,
@@ -349,11 +352,11 @@ open Services
                     children = [ 
                         
                         
-                        yield View.Button(text="Load Your Audiobooks", command = (fun () -> dispatch LoadOnlineAudiobooks))
+                        yield View.Button(text=Translations.current.LoadYourAudioBooks, command = (fun () -> dispatch LoadOnlineAudiobooks))
                             
                         match model.SelectedGroupItems with
                         | None ->
-                            yield Controls.secondaryTextColorLabel 20.0 "Press 'Load your Audiobooks' to get your audiobooks from your einsamedien account"
+                            yield Controls.secondaryTextColorLabel 20.0 Translations.current.LoadYourAudioBooksHint
 
                         | Some sg ->
                             match sg with
@@ -368,7 +371,7 @@ open Services
                                             verticalOptions = LayoutOptions.Fill,
                                             children= [
                                                 match groups with
-                                                | [||] -> yield Controls.secondaryTextColorLabel 20.0 "Press 'Load your Audiobooks' to get your audiobooks from your einsamedien account"
+                                                | [||] -> yield Controls.secondaryTextColorLabel 20.0 Translations.current.LoadYourAudioBooksHint
                                                 | _ ->
                                                     for (idx,item) in groups |> Array.indexed do
                                                         yield 
@@ -386,12 +389,7 @@ open Services
                                             ))
                                         
                             | AudioBookList (key, items) ->
-                                yield View.Label(text=key
-                                        ,fontSize=22.0
-                                        ,textColor=Consts.primaryTextColor
-                                        , horizontalOptions=LayoutOptions.Fill
-                                        ,horizontalTextAlignment=TextAlignment.Center)
-                                        
+                                
                                 yield View.ScrollView(horizontalOptions = LayoutOptions.Fill,
                                     verticalOptions = LayoutOptions.Fill,
                                     content = 
@@ -413,7 +411,7 @@ open Services
 
 
                 if (model.SelectedGroups.Length > 0) then
-                    yield View.Button(text = "Back",command = (fun ()-> dispatch RemoveLastSelectGroup)).GridRow(2)
+                    yield View.Button(text = Translations.current.Back,command = (fun ()-> dispatch RemoveLastSelectGroup)).GridRow(2)
                 
                 let downloadQueueDispatch =
                     DownloadQueueMsg >> dispatch

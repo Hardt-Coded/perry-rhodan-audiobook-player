@@ -170,16 +170,14 @@ open Services
                 let! res =  newAudioBook |> FileAccess.updateAudioBookInStateFile
                 match res with
                 | Error e ->
-                    do! Common.Helpers.displayAlert("Error save Position",e,"Ok")
+                    do! Common.Helpers.displayAlert(Translations.current.Error_Save_Position,e,"Ok")
                     return (Some Stop)
                 | Ok _ ->
                     if (model.CurrentState = Stopped) then
                         return None
                     else
-                        //return Some (SaveCurrentPosition newAudioBook)
                         return None
             | _,_ ->
-                //return Some (SaveCurrentPosition model.AudioBook)
                 return None
         } |> Cmd.ofAsyncMsgOption
     
@@ -267,7 +265,7 @@ open Services
             async {
                 let buttons = [|
                     
-                    yield ("off",   (fun () -> StartSleepTimer None)())    
+                    yield (Translations.current.Off,   (fun () -> StartSleepTimer None)())    
                     yield ("30 sek",(fun () -> StartSleepTimer (Some (TimeSpan.FromSeconds(30.0) ))) ())
                     yield ("5 min", (fun () -> StartSleepTimer (Some (TimeSpan.FromMinutes(5.0) ))) ())
                     yield ("15 min",(fun () -> StartSleepTimer (Some (TimeSpan.FromMinutes(15.0) ))) ())
@@ -278,7 +276,7 @@ open Services
                     yield ("90 min",(fun () -> StartSleepTimer (Some (TimeSpan.FromMinutes(90.0) ))) ())
                         
                 |]
-                return! Helpers.displayActionSheet (Some "Select Sleep Time ...") (Some "Cancel") buttons
+                return! Helpers.displayActionSheet (Some Translations.current.Select_Sleep_Timer) (Some Translations.current.Cancel) buttons
             } |> Cmd.ofAsyncMsgOption
 
         model, (openSleepTimerActionMenu ()), None
@@ -331,7 +329,7 @@ open Services
                         let! res = audioBook |> Services.FileAccess.updateAudioBookInStateFile
                         match res with
                         | Error e ->
-                            do! Common.Helpers.displayAlert("Error save audiobook state! ",e,"Ok")
+                            do! Common.Helpers.displayAlert(Translations.current.Error_Saving_AudioBookState,e,"Ok")
                             return None
                         | Ok _ ->
                             return None
@@ -488,8 +486,21 @@ open Services
 
 
     let view (model: Model) dispatch =
+        
+        let title = model.AudioBook.FullName        
+        
+        let currentTrackString = 
+            let numCurrentTrack = model.CurrentAudioFileIndex + 1
+            let numAllTracks = model.AudioFileList.Length
+            sprintf "Track: %i %s %i" numCurrentTrack Translations.current.Of numAllTracks
+
+        let currentTimeString = 
+            let currentPos = (model.CurrentPosition |> Option.defaultValue TimeSpan.Zero).ToString("hh\:mm\:ss")
+            let currentDuration = (model.CurrentDuration |> Option.defaultValue TimeSpan.Zero).ToString("hh\:mm\:ss")
+            sprintf "%s %s %s" currentPos Translations.current.Of currentDuration
+
         View.ContentPage(
-          title="Player",useSafeArea=true,
+          title=Translations.current.AudioPlayerPage,useSafeArea=true,
           backgroundColor = Consts.backgroundColor,
           content = 
             View.Grid(padding = 20.0,
@@ -499,19 +510,20 @@ open Services
                 
                 children = [
 
-                    // Todo: Data Stuff
-                    let currentPos = (model.CurrentPosition |> Option.defaultValue TimeSpan.Zero).ToString("hh\:mm\:ss")
-                    let currentDuration = (model.CurrentDuration |> Option.defaultValue TimeSpan.Zero).ToString("hh\:mm\:ss")
-                    yield View.StackLayout(orientation = StackOrientation.Vertical,
-                        verticalOptions=LayoutOptions.Fill,
-                        horizontalOptions=LayoutOptions.Center,                        
-                        children = [
-                            yield (Controls.primaryTextColorLabel 25.0 (model.AudioBook.FullName ))
-                            yield (Controls.primaryTextColorLabel 30.0 (sprintf "Track: %i of %i" (model.CurrentAudioFileIndex + 1) model.AudioFileList.Length ))
-                            yield (Controls.primaryTextColorLabel 30.0 (sprintf "%s of %s" currentPos currentDuration))
-                        ]
-                    ).GridRow(0)
-                    
+                    yield dependsOn 
+                        (title,currentTrackString,currentTimeString) 
+                        (fun model (title,currentTrackString,currentTimeString) ->
+                            View.Grid(
+                                horizontalOptions = LayoutOptions.Fill,
+                                verticalOptions = LayoutOptions.Fill,                
+                                rowdefs = [ box "auto"; box "auto"; box "auto" ],
+                                children = [
+                                    yield (Controls.primaryTextColorLabel 25.0 (title)).GridRow(0)
+                                    yield (Controls.primaryTextColorLabel 30.0 (currentTrackString)).GridRow(1).HorizontalOptions(LayoutOptions.Center)
+                                    yield (Controls.primaryTextColorLabel 30.0 (currentTimeString)).GridRow(2).HorizontalOptions(LayoutOptions.Center)
+                                ]
+                            ).GridRow(0)
+                    )
                     
                     yield View.Image(
                         source=

@@ -53,7 +53,6 @@ module rec AudioPlayerService =
 
         let mutable noisyHeadPhoneReceiver = None
 
-        let audioManager = Application.Context.GetSystemService(Context.AudioService) :?> AudioManager
     
         let mediaPlayer = 
             let m = new MediaPlayer()
@@ -78,11 +77,24 @@ module rec AudioPlayerService =
             m
 
         
+        let registerNoisyHeadPhoneReciever this =
+            match noisyHeadPhoneReceiver with
+            | None -> 
+                noisyHeadPhoneReceiver <- Some ( new NoisyHeadPhoneReceiver(this) )
+                let noiseHpIntentFilter = new IntentFilter(AudioManager.ActionAudioBecomingNoisy)
+                Application.Context.RegisterReceiver(noisyHeadPhoneReceiver.Value, noiseHpIntentFilter) |> ignore
+            | Some _ ->
+                ()
 
-       
-       
 
-
+        let unregisterNoisyHeadPhoneReciever () =
+            match noisyHeadPhoneReceiver with
+            | None -> ()
+            | Some r ->
+                Application.Context.UnregisterReceiver(r)
+                noisyHeadPhoneReceiver <- None
+                ()
+                
         interface DependencyServices.IAudioPlayer with
         
             member this.LastPositionBeforeStop with get () = lastPositionBeforeStop
@@ -93,26 +105,24 @@ module rec AudioPlayerService =
                 with get () = onCompletion
                 and set p = onCompletion <- p
 
+
             member this.OnNoisyHeadPhone 
                 with get () = onNoisyHeadPhone
                 and set p = onNoisyHeadPhone <- p
+
 
             member this.OnInfo 
                 with get () = onInfo
                 and set p = onInfo <- p
 
+
             member this.PlayFile file position =
                 async {
-                    noisyHeadPhoneReceiver <- Some ( new NoisyHeadPhoneReceiver(this) )
-                    let noiseHpIntentFilter = new IntentFilter(AudioManager.ActionAudioBecomingNoisy)
-                    Application.Context.RegisterReceiver(noisyHeadPhoneReceiver.Value, noiseHpIntentFilter) |> ignore
-
+                    this |> registerNoisyHeadPhoneReciever
                     mediaPlayer.Reset()
                     do! mediaPlayer.SetDataSourceAsync(file) |> Async.AwaitTask
                     onAfterPrepare <- Some (fun () -> mediaPlayer.SeekTo(position))
                     mediaPlayer.PrepareAsync()
-                    
-                    
                     return ()
                 }
 
@@ -120,14 +130,12 @@ module rec AudioPlayerService =
             member this.Stop () =
                 if (mediaPlayer.IsPlaying) then
                     mediaPlayer.Pause()
-                    lastPositionBeforeStop <- Some mediaPlayer.CurrentPosition
-                
+                    lastPositionBeforeStop <- Some mediaPlayer.CurrentPosition                
                 else
                     lastPositionBeforeStop <- Some mediaPlayer.CurrentPosition
 
                 mediaPlayer.Stop()
-
-                Application.Context.UnregisterReceiver(noisyHeadPhoneReceiver.Value)
+                unregisterNoisyHeadPhoneReciever ()
                 ()
 
             member this.GotToPosition ms =

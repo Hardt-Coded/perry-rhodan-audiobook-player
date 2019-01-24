@@ -133,7 +133,7 @@ module FileAccess =
 
             if res 
             then return (Ok ())
-            else return (Error "error storing audiobook data into database.")
+            else return (Error Translations.current.ErrorDbWriteAccess)
             
         }
 
@@ -141,7 +141,7 @@ module FileAccess =
     let removeAudiobook audiobook = 
         try
             match audiobook.State.DownloadedFolder with
-            | None -> Error ("Audiobook is not downloaded!")
+            | None -> Error (Translations.current.ErrorDownloadAudiobook)
             | Some folder ->
                 Directory.Delete(folder,true)
                 Ok ()
@@ -214,11 +214,11 @@ module WebAccess =
                 Crashes.TrackError(ex)
                 match ex with
                 | :? WebException | :? SocketException ->
-                    return Error (Network "Network Error. Please check your internet connection and try again.")
+                    return Error (Network Translations.current.NetworkError)
                 | :? TimeoutException ->
-                    return Error (Network "Network Timeout Error. Please check your internet connection and try again.")
+                    return Error (Network Translations.current.NetworkTimeoutError)
                 | _ ->
-                    return Error (Other "Internal App Error. Please try again or contact support.")
+                    return Error (Other Translations.current.InternalError)
         }
         
 
@@ -247,7 +247,7 @@ module WebAccess =
                             match location with
                             | None -> 
                                 Analytics.TrackEvent("no location on login response found")
-                                Error (Other "Unexpected Server Behavior. Please try again or contact support.")
+                                Error (Other Translations.current.UnexpectedServerBehaviorError)
                             | Some v ->
                                 if v.Value.Contains("98") then Ok (None)
                                 else if v.Value.Contains("61") then Ok (Some resp.Cookies)
@@ -272,7 +272,7 @@ module WebAccess =
             return res 
                 |> Result.bind (
                     fun html ->
-                        if (html.Contains("<input name=\"username\"")) then Error (SessionExpired "Online Session expired!")
+                        if (html.Contains("<input name=\"username\"")) then Error (SessionExpired Translations.current.SessionExpired)
                         else Ok html
                 )
         }
@@ -321,11 +321,11 @@ module WebAccess =
                 |> Result.bind (
                     fun resp ->
                         if (not (resp.Headers.ContainsKey("Location"))) then
-                            Error (Other "DownloadUrl not found!")
+                            Error (Other Translations.current.NoDownloadUrlFoundError)
                         else
                             let downloadUrl = resp.Headers.Item "Location"
                             if (downloadUrl.Contains("index.php?id=98")) then
-                                Error (SessionExpired "Session expired!")
+                                Error (SessionExpired Translations.current.SessionExpired)
                             else
                                 Ok downloadUrl
                 )
@@ -338,14 +338,14 @@ module WebAccess =
         async {
             try
                 if (audiobook.State.Downloaded) then 
-                    return Error (Other "Audiobook alread downloaded!")
+                    return Error (Other "Audiobook already downloaded!")
                 else
                     let audioBookFolder = Path.Combine(audioBookDownloadFolderBase,audiobook.FullName)        
                     if not (Directory.Exists(audioBookFolder)) then
                         Directory.CreateDirectory(audioBookFolder) |> ignore
                 
                     match audiobook.DownloadUrl with
-                    | None -> return Error (Other "no download url for this audiobook available")
+                    | None -> return Error (Other Translations.current.NoDownloadUrlFoundError)
                     | Some abDownloadUrl ->        
                         match! (abDownloadUrl |> getDownloadUrl cookies) with
                         | Error e -> 
@@ -468,22 +468,22 @@ module WebAccess =
                                     return Ok (unzipTargetFolder,imageFileNames)
                                 with
                                 | :? WebException | :? SocketException ->
-                                    return Error (Network "Network Error. Please check your internet connection and try again.")
+                                    return Error (Network Translations.current.NetworkError)
                                 | :? TimeoutException ->
-                                    return Error (Network "Network Timeout Error. Please check your internet connection and try again.")
+                                    return Error (Network Translations.current.NetworkTimeoutError)
                                 | _ ->
-                                    return Error (Other "Internal App Error. Please try again or contact support.")
+                                    return Error (Other Translations.current.InternalError)
             with
             | exn ->
                 let ex = exn.GetBaseException()
                 Crashes.TrackError(ex)
                 match ex with
                 | :? WebException | :? SocketException ->
-                    return Error (Network "Network Error. Please check your internet connection and try again.")
+                    return Error (Network Translations.current.NetworkError)
                 | :? TimeoutException ->
-                    return Error (Network "Network Timeout Error. Please check your internet connection and try again.")
+                    return Error (Network Translations.current.NetworkTimeoutError)
                 | _ ->
-                    return Error (Other "Internal App Error. Please try again or contact support.")
+                    return Error (Other Translations.current.InternalError)
         }
 
 
@@ -501,7 +501,7 @@ module WebAccess =
                     |> Result.bind (
                         fun productPage ->
                             if productPage = "" then
-                                Error (Other "ProductPage response is empty.")
+                                Error (Other Translations.current.ProductPageEmptyError)
                             else
                                 let desc = productPage |> Domain.parseProductPageForDescription
                                 let img = 

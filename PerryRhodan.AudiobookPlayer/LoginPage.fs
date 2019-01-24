@@ -141,7 +141,7 @@ open Services
 
 
     and onShowErrorMessageMsg e model =
-        Common.Helpers.displayAlert("Error",e,"OK") |> Async.StartImmediate
+        Common.Helpers.displayAlert(Translations.current.Error,e,"OK") |> Async.StartImmediate
         model, Cmd.ofMsg (ChangeBusyState false), None
 
     
@@ -152,14 +152,14 @@ open Services
     
     let view (model: Model) dispatch =
         View.ContentPage(
-          title="Login",useSafeArea=true,
+          title=Translations.current.LoginPage,useSafeArea=true,
           backgroundColor = Consts.backgroundColor,
           content = View.Grid(
                 children = [
                     yield View.StackLayout(padding = 10.0, 
                         verticalOptions = LayoutOptions.Center,
                         children = [ 
-                            yield View.Label(text="Login to your EinsAMedien-Account"
+                            yield View.Label(text=Translations.current.LoginToEinsAMedienAccount
                                 , horizontalOptions = LayoutOptions.Center                                
                                 , horizontalTextAlignment=TextAlignment.Center
                                 , textColor = Consts.primaryTextColor
@@ -168,7 +168,7 @@ open Services
                             // TextChange Event cause actually a invite look, the debouncer doen't help
                             // Move to complete and lost focus event
                             yield View.Entry(text = model.Username
-                                , placeholder = "Username"
+                                , placeholder = Translations.current.Username
                                 , textColor = Consts.primaryTextColor
                                 , backgroundColor = Consts.backgroundColor
                                 , placeholderColor = Consts.secondaryTextColor                                
@@ -177,7 +177,7 @@ open Services
                                 , created = (fun e -> e.Unfocused.Add(fun args -> if model.Username<>e.Text then dispatch (ChangeUsername e.Text)))
                                 )
                             yield View.Entry(text = model.Password
-                                , placeholder = "Password"
+                                , placeholder = Translations.current.Password
                                 , textColor = Consts.primaryTextColor
                                 , backgroundColor = Consts.backgroundColor
                                 , placeholderColor = Consts.secondaryTextColor                                
@@ -189,14 +189,14 @@ open Services
                             yield View.StackLayout(orientation=StackOrientation.Horizontal,
                                 horizontalOptions = LayoutOptions.Center,
                                 children =[
-                                    Controls.secondaryTextColorLabel 16.0 "remember login"
+                                    Controls.secondaryTextColorLabel 16.0 Translations.current.RememberLogin
                                     View.Switch(isToggled = model.RememberLogin, toggled = (fun on -> dispatch (ChangeRememberLogin on.Value)), horizontalOptions = LayoutOptions.Center)
                                 ]
                             )
                                 
-                            yield View.Button(text = "Login", command = (fun () -> dispatch TryLogin), horizontalOptions = LayoutOptions.Center)
+                            yield View.Button(text = Translations.current.Login, command = (fun () -> dispatch TryLogin), horizontalOptions = LayoutOptions.Center)
                             if model.LoginFailed then
-                                yield View.Label(text="Login Failed !!!!", textColor = Color.Red, horizontalOptions = LayoutOptions.Center, widthRequest=200.0, horizontalTextAlignment=TextAlignment.Center,fontSize=20.0)
+                                yield View.Label(text=Translations.current.LoginFailed, textColor = Color.Red, horizontalOptions = LayoutOptions.Center, widthRequest=200.0, horizontalTextAlignment=TextAlignment.Center,fontSize=20.0)
 
                             ]    
                         )

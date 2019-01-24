@@ -94,7 +94,7 @@
                     yield ("Remove from Download Queue",(fun a -> (RemoveItemFromQueue audiobook)) audiobook)
                         
                 |]
-                return! Helpers.displayActionSheet (Some audiobook.AudioBook.FullName) (Some "Cancel") buttons
+                return! Helpers.displayActionSheet (Some audiobook.AudioBook.FullName) (Some Translations.current.Cancel) buttons
             } |> Cmd.ofAsyncMsgOption
 
         model, (abModel |> openDownloadQueueActionMenu), None
@@ -290,7 +290,7 @@
 
     
     and onShowErrorMessageMsg e model =
-        Common.Helpers.displayAlert("Error",e,"OK") |> Async.StartImmediate
+        Common.Helpers.displayAlert(Translations.current.Error,e,"OK") |> Async.StartImmediate
         model, Cmd.ofMsg (ChangeGlobalBusyState false), None
     
     

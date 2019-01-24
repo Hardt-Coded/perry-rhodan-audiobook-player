@@ -59,7 +59,7 @@
             let! res = model.AudioBook |> FileAccess.updateAudioBookInStateFile            
             match res with
             | Error e ->
-                Common.Helpers.displayAlert("Error",e,"OK") |> Async.StartImmediate
+                Common.Helpers.displayAlert(Translations.current.Error,e,"OK") |> Async.StartImmediate
                 return ChangeGlobalBusyState false
             | Ok _ ->
                 return ChangeGlobalBusyState false
@@ -143,7 +143,7 @@
         let newAudioBook = {model.AudioBook with State = newState; }
         match FileAccess.removeAudiobook model.AudioBook with
         | Error e ->
-            Common.Helpers.displayAlert("Error Remove Audiobook",e,"OK") |> Async.StartImmediate
+            Common.Helpers.displayAlert(Translations.current.ErrorRemoveAudioBook,e,"OK") |> Async.StartImmediate
             model,Cmd.none,None
         | Ok _ ->
             let newModel = {model with AudioBook = newAudioBook }
