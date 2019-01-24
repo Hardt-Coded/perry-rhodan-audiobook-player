@@ -32,27 +32,25 @@ let audioBookEntryActionSheet
     audiobook =
     async {
         let buttons = [|
-            yield ("Description (Details)",cmdDescription audiobook)
+            yield (Translations.current.AudioBookDescription,cmdDescription audiobook)
 
             if audiobook.State.Downloaded then
-                yield ("Remove From Device",cmdDelete audiobook)
+                yield (Translations.current.RemoveFromDevice,cmdDelete audiobook)
             elif (isOnDownloadQueue && not audiobook.State.Downloaded && not isCurrentlyDownloading) then
-                yield ("Remove From Download Queue",cmdRemoveFromDownloadQueue audiobook)
+                yield (Translations.current.RemoveFromDownloaQueue,cmdRemoveFromDownloadQueue audiobook)
             elif (not isOnDownloadQueue && not audiobook.State.Downloaded) then
-                yield ("Download AudioBook",cmdDownload audiobook)
+                yield (Translations.current.DownloadAudioBook,cmdDownload audiobook)
             
 
             
 
             if audiobook.State.Completed then
-                yield ("Unmark As Listend",cmdMarkAsUnlistend audiobook)                
+                yield (Translations.current.UnmarkAsListend,cmdMarkAsUnlistend audiobook)                
             else
-                yield ("Mark As Listend",cmdMarkAsListend audiobook)
+                yield (Translations.current.MarkAsListend,cmdMarkAsListend audiobook)
 
-            //if audiobook.Picture.IsNone then
-            //    yield ("Download Picture",cmdDownloadOnlyPicture audiobook)
         |]
-        return! Helpers.displayActionSheet (Some "Please Select...") (Some "Cancel") buttons
+        return! Helpers.displayActionSheet (Some Translations.current.PleaseSelect) (Some Translations.current.Cancel) buttons
     }
     
 let listendCheckLabel = 

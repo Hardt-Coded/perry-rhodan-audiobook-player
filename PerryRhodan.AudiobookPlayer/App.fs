@@ -433,7 +433,7 @@ module App =
                     (audioPlayerOverlay abMdl)
                     (MainPage.view mdl (mainPageDispatch))
                     model.MainPageModel.IsLoading
-                    "Home")
+                    Translations.current.MainPage)
                         .ToolbarItems([
                             View.ToolbarItem(
                                 icon="browse_icon.png",
@@ -472,7 +472,7 @@ module App =
                             (audioPlayerOverlay abMdl)
                             (BrowserPage.view m (BrowserPageMsg >> dispatch))
                             (model.BrowserPageModel |> Option.map (fun bm -> bm.IsLoading) |> Option.defaultValue false)
-                            "Browse your AudioBooks")
+                            Translations.current.BrowserPage)
                             .ToolbarItems([
                                 View.ToolbarItem(
                                     icon="home_icon.png",
@@ -552,15 +552,14 @@ module App =
         
 
         // gets the page from the title to manage the page stack
-        let determinatePageByTitle title =            
-            match title with
-            | "Home" -> MainPage
-            | "Browse your AudioBooks" -> BrowserPage
-            | "Player" -> AudioPlayerPage
-            | "Detail" -> AudioBookDetailPage
-            | "Login" -> LoginPage
-            | "Settings" -> SettingsPage
-            | _ -> MainPage
+        let determinatePageByTitle title = 
+            if title = Translations.current.MainPage then MainPage
+            elif title = Translations.current.BrowserPage then BrowserPage
+            elif title = Translations.current.AudioPlayerPage then AudioPlayerPage
+            elif title = Translations.current.AudioBookDetailPage then AudioBookDetailPage
+            elif title = Translations.current.LoginPage then LoginPage
+            elif title = Translations.current.SettingsPage then SettingsPage
+            else MainPage            
 
         // Workaround iOS bug: https://github.com/xamarin/Xamarin.Forms/issues/3509
         let dispatchNavPopped =
@@ -601,8 +600,8 @@ module App =
                             yield settingsPage.Value
                     | PermissionDeniedPage ->
                         yield View.ContentPage(
-                            title="Login Page",useSafeArea=true,
-                            content = View.Label(text="Sorry without Permission the App is not useable!", horizontalOptions = LayoutOptions.Center, widthRequest=200.0, horizontalTextAlignment=TextAlignment.Center,fontSize=20.0)
+                            title=Translations.current.PermissionDeniedPage,useSafeArea=true,
+                            content = View.Label(text=Translations.current.PermissionError, horizontalOptions = LayoutOptions.Center, widthRequest=200.0, horizontalTextAlignment=TextAlignment.Center,fontSize=20.0)
                         )
 
             ]            
@@ -626,7 +625,7 @@ type App () as app =
         |> Program.withErrorHandler(
             fun (s,exn)-> 
                 let baseException = exn.GetBaseException()
-                Common.Helpers.displayAlert("Error",
+                Common.Helpers.displayAlert(Translations.current.Error,
                     (sprintf "%s / %s" s baseException.Message),
                     "OK") |> Async.RunSynchronously
         )

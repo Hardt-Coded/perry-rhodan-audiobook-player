@@ -69,7 +69,7 @@
 
 
     and onShowErrorMessageMsg e model =
-        Common.Helpers.displayAlert("Error",e,"OK") |> ignore
+        Common.Helpers.displayAlert(Translations.current.Error,e,"OK") |> ignore
         model, Cmd.ofMsg (ChangeBusyState false), None
     
 
@@ -80,7 +80,7 @@
     
     let view model dispatch =
         View.ContentPage(
-            title="Detail",useSafeArea=true,
+            title=Translations.current.AudioBookDetailPage,useSafeArea=true,
             backgroundColor = Consts.backgroundColor,
             content = View.Grid(
                 children = [
@@ -108,7 +108,7 @@
                                                 margin=Thickness(10.0,10.0,10.0,10.0)
                                                 )
                                                 
-                                        yield View.Button(text="Close",command= (fun ()-> dispatch Close))
+                                        yield View.Button(text=Translations.current.Close,command= (fun ()-> dispatch Close))
                                     ]
                                 )
                         )

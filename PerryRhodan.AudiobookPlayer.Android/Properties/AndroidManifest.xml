@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionName="1.03" package="hits.rhodan.audiobooks" android:installLocation="auto" android:versionCode="4">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionName="1.04" package="hits.rhodan.audiobooks" android:installLocation="auto" android:versionCode="5">
 	<uses-sdk android:minSdkVersion="21" android:targetSdkVersion="27" />
 	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 	<uses-permission android:name="android.permission.WAKE_LOCK" />
-	<application android:label="PerryRhodan.AudiobookPlayer.Android" android:icon="@mipmap/ic_launcher"></application>
+	<application android:label="Eins A Medien Audiobook Player" android:icon="@mipmap/ic_launcher"></application>
 </manifest>
