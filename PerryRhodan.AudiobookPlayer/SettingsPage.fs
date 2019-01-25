@@ -68,10 +68,19 @@
                                 View.StackLayout(
                                     orientation=StackOrientation.Vertical,
                                     children=[
-                                        yield (Controls.secondaryTextColorLabel 16.0 Common.Texts.dataProtectionText)
-                                            .Margin(10.0)
-                                            .HorizontalOptions(LayoutOptions.Fill)
-                                            .HorizontalTextAlignment(TextAlignment.Start)
+                                        
+                                        yield View.Button(
+                                            text=(if model.DataProtectionStuff then Translations.current.HideDataProtection else Translations.current.ShowDataProtection),                                                                                        
+                                            command=(fun ()-> dispatch (if model.DataProtectionStuff then HideDataProtectionStuff else ShowDataProtectionStuff))
+                                        )
+
+                                        if (model.DataProtectionStuff) then
+                                            let viewSource = UrlWebViewSource(Url="http://hardt-solutions.com/PrivacyPolicies/EinsAMedienAudiobookPlayer.html")
+
+                                            yield View.WebView(source=viewSource,
+                                                horizontalOptions=LayoutOptions.FillAndExpand,
+                                                verticalOptions=LayoutOptions.FillAndExpand
+                                                )
                                            
                                         //yield View.Picker(
                                         //    itemsSource=["English";"German"],
@@ -81,12 +90,7 @@
                                         //    textColor = Consts.secondaryTextColor
                                         //)
 
-                                        //yield View.Button(
-                                        //    text=(if model.DataProtectionStuff then "Hide Data Protection Agreement" else "Show Data Protection Agreement"),                                                                                        
-                                        //    inputTransparent = true,
-                                        //    fontSize = 20.0,
-                                        //    textColor = Consts.secondaryTextColor
-                                        //)
+                                        
                                     ]
                                 )
                         )                    

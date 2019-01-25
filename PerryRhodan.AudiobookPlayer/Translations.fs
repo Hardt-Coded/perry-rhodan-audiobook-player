@@ -56,6 +56,9 @@
           PermissionDeniedPage:string
           AudioBookDetailPage:string
           SettingsPage:string
+          ShowDataProtection:string
+          HideDataProtection:string
+          
 
 
         }
@@ -112,6 +115,8 @@
                 PermissionDeniedPage="Permission Error"
                 AudioBookDetailPage="Detail"
                 SettingsPage="Settings"
+                ShowDataProtection="Show Data Protection and Privacy Information"
+                HideDataProtection="Hide Data Protection and Privacy Information"
             }
 
     
@@ -166,6 +171,8 @@
                 PermissionDeniedPage="Berechtigungsfehler"
                 AudioBookDetailPage="Hörbuchinfo"
                 SettingsPage="Einstellungen"
+                ShowDataProtection="Datenschutzbestimmungen anzeigen"
+                HideDataProtection="Datenschutzbestimmungen verstecken"
             }
 
 
