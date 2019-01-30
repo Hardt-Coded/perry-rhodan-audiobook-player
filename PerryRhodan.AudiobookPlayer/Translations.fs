@@ -48,6 +48,7 @@
           ProductPageEmptyError:string
           Back:string
           NewAudioBooksSinceLastRefresh:string
+          MissingLoginCredentials:string
 
           MainPage:string
           LoginPage:string
@@ -107,6 +108,7 @@
                 ProductPageEmptyError="ProductPage response is empty."
                 Back="Back"
                 NewAudioBooksSinceLastRefresh="New Audiobooks since last refresh:"
+                MissingLoginCredentials= "Please enter Username and Password from your Eins A Medien Account."
 
                 MainPage="Home"
                 LoginPage="Login"
@@ -163,6 +165,7 @@
                 ProductPageEmptyError="Die Produktseite gibt keine Daten zurück."
                 Back="Zurück"
                 NewAudioBooksSinceLastRefresh="Neue Hörbücher seit der letzten Aktualisierung:"
+                MissingLoginCredentials="Bitte geben Sie Benutzername und Kennwort Ihres Eins A Medien Accounts ein."
 
                 MainPage="Startseite"
                 LoginPage="Login"
