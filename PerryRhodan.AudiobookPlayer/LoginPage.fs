@@ -47,7 +47,13 @@ open Services
                 System.Diagnostics.Debug.WriteLine("Error loading cred: " + e)
                 return DoNothing
             | Ok (username,password,rl) ->
-                return SetStoredCredentials (username,password,rl)
+                match username,password with
+                | Some usr, Some pw ->
+                    return SetStoredCredentials (usr,pw,rl)
+                | _, _ ->
+                    return SetStoredCredentials ("","",rl)
+                    
+                
         } |> Cmd.ofAsyncMsg
 
     let init cameFrom = initModel cameFrom, loadStoredCredentials
@@ -108,7 +114,11 @@ open Services
             model,  Cmd.none, None
     
     and onTryLoginMsg model =
-        model, Cmd.batch [(login model);Cmd.ofMsg (ChangeBusyState true)], None
+        match model.Username,model.Password with
+        | "", "" ->
+            model, Cmd.ofMsg (ShowErrorMessage Translations.current.MissingLoginCredentials), None
+        | _, _ ->
+            model, Cmd.batch [(login model);Cmd.ofMsg (ChangeBusyState true)], None
     
 
     and onLoginSucceededMsg cc model =

@@ -337,13 +337,15 @@ module WebAccess =
     let downloadAudiobook cookies updateProgress audiobook =
         async {
             try
+                Microsoft.AppCenter.Analytics.Analytics.TrackEvent("download audiobook")
+
                 if (audiobook.State.Downloaded) then 
                     return Error (Other "Audiobook already downloaded!")
                 else
                     let audioBookFolder = Path.Combine(audioBookDownloadFolderBase,audiobook.FullName)        
                     if not (Directory.Exists(audioBookFolder)) then
                         Directory.CreateDirectory(audioBookFolder) |> ignore
-                
+                    
                     match audiobook.DownloadUrl with
                     | None -> return Error (Other Translations.current.NoDownloadUrlFoundError)
                     | Some abDownloadUrl ->        
@@ -525,6 +527,12 @@ module SecureLoginStorage =
     let private secStorePasswordKey = "perryRhodanAudioBookPassword"
     let private secStoreRememberLoginKey = "perryRhodanAudioBookRememberLogin"
 
+    let getSecuredValue key =
+        async {
+            let! value =  SecureStorage.GetAsync(key) |> Async.AwaitTask
+            return if value  = null then None else Some value
+        }
+
     let saveLoginCredentials username password rememberLogin =
         async {
             try
@@ -539,10 +547,10 @@ module SecureLoginStorage =
     let loadLoginCredentials () =
         async {
             try
-                let! username =  SecureStorage.GetAsync(secStoreUsernameKey) |> Async.AwaitTask
-                let! password =  SecureStorage.GetAsync(secStorePasswordKey) |> Async.AwaitTask
-                let! rememberLoginStr =  SecureStorage.GetAsync(secStoreRememberLoginKey) |> Async.AwaitTask
-                return Ok (username,password,(rememberLoginStr = "Jupp"))
+                let! username =  secStoreUsernameKey |> getSecuredValue
+                let! password =  secStorePasswordKey|> getSecuredValue
+                let! rememberLoginStr = secStoreRememberLoginKey |> getSecuredValue
+                return Ok (username,password,(rememberLoginStr = Some "Jupp"))
             with
             | _ as e -> return (Error (e.Message))
         }
