@@ -15,6 +15,7 @@ open Services
 
     type Model = 
       { Audiobooks: AudioBookItem.Model[]
+        LastTimeListendAudioBook: AudioBookItem.Model option
         IsLoading:bool }
 
     type Msg = 
@@ -35,7 +36,7 @@ open Services
         | UpdateAudioBookGlobal  of AudioBookItem.Model * string
 
     
-    let initModel = { Audiobooks = [||]; IsLoading = false }
+    let initModel = { Audiobooks = [||]; IsLoading = false; LastTimeListendAudioBook = None }
 
     
     let init () = initModel, Cmd.ofMsg AskForAppPermission
@@ -60,7 +61,22 @@ open Services
         | DoNothing ->
             model |> onDoNothingMsg
 
+    and unbusyMsg =
+        (ChangeBusyState false)
+
+
+    and busyMsg =
+        (ChangeBusyState true)
     
+    
+    and unbusyCmd =
+        Cmd.ofMsg unbusyMsg
+
+
+    and busyCmd =
+        Cmd.ofMsg busyMsg
+
+
     and onUpdateAudioBookMsg ab model =
         let newAudioBooks =
             model.Audiobooks
@@ -73,7 +89,16 @@ open Services
             )
             |> Array.filter (fun i -> i.AudioBook.State.Downloaded)
 
-        { model with Audiobooks = newAudioBooks }, Cmd.none, None
+        let newLastListend =
+            model.LastTimeListendAudioBook
+            |> Option.map (fun i ->
+                if (i.AudioBook.FullName = ab.AudioBook.FullName) then
+                    ab
+                else
+                    i
+            )
+
+        { model with Audiobooks = newAudioBooks; LastTimeListendAudioBook = newLastListend }, Cmd.none, None
     
     
     and onAskForAppPermissionMsg model =
@@ -100,7 +125,7 @@ open Services
                     Cmd.ofMsg DoNothing, None
                 | AudioBookItem.ExternalMsg.RemoveFromDownloadQueue mdl ->
                     Cmd.ofMsg DoNothing, None
-                | AudioBookItem.ExternalMsg.OpenLoginPage ->
+                | AudioBookItem.ExternalMsg.OpenLoginPage _ ->
                     Cmd.ofMsg DoNothing, None
                 | AudioBookItem.ExternalMsg.PageChangeBusyState state ->
                     Cmd.ofMsg (ChangeBusyState state), None
@@ -116,7 +141,7 @@ open Services
         {model with Audiobooks = newDab}, Cmd.batch [(Cmd.map2 newModel AudioBooksItemMsg cmd); externalCmds ], mainPageMsg
 
     
-    
+
     and onPermissionDeniedMsg model =
         model, Cmd.none, Some GotoPermissionDeniedPage
     
@@ -129,54 +154,100 @@ open Services
                 match audioBooks with
                 | Error e -> 
                     do! Common.Helpers.displayAlert(Translations.current.ErrorLoadingLocalAudiobook,e,"OK")
-                    return Some (ChangeBusyState false)
+                    return Some unbusyMsg
                 | Ok ab -> 
                     match ab with
-                    | [||] -> return Some (ChangeBusyState false)
+                    | [||] -> return Some unbusyMsg
                     | _ ->
                         let ab = 
                             ab
                             |> Array.filter (fun i -> i.State.Downloaded)
-                            |> Array.sortByDescending ( fun i -> i.FullName)
+                            |> Array.sortBy ( fun i -> i.FullName)
                         
                         return Some (LocalAudioBooksLoaded ab)
             } |> Common.Cmd.ofAsyncMsgOption
         
-        model, Cmd.batch [ Cmd.ofMsg (ChangeBusyState true); loadLocalAudioBooks ()], None
+        model, Cmd.batch [ busyCmd; loadLocalAudioBooks ()], None
 
     
     and onLocalAudioBooksLoadedMsg ab model =
-        let mapedAb = ab |> Array.map (fun i -> AudioBookItem.initModel i)
-        { model with Audiobooks = mapedAb }, Cmd.ofMsg (ChangeBusyState false), None
+        // look out for the last listend
+        let getLastListendAb () =
+            ab 
+            |> Array.sortByDescending (fun i -> i.State.LastTimeListend) 
+            |> Array.tryHead
+            |> Option.map (fun i -> 
+                match i.State.LastTimeListend with
+                | None -> None
+                | Some _ -> Some (i |> AudioBookItem.initModel)
+            ) 
+            |> Option.flatten
+        
+        let lastTimeListendAudiobook = 
+            match ab with
+            | [||] | [|_|] ->
+                let hideOption =
+                    Services.SecureLoginStorage.getSecuredValue SettingsPage.hideLastListendSettingsKey |> Async.RunSynchronously
+                    |> Option.map (fun i -> if i="1" then true else false)
+                    |> Option.defaultValue false
+                if hideOption then
+                    None
+                else
+                    getLastListendAb ()
+            | _ ->
+                getLastListendAb ()
+            
+
+        let mapedAb = ab |> Array.Parallel.map (fun i -> AudioBookItem.initModel i)
+        { model with Audiobooks = mapedAb; LastTimeListendAudioBook = lastTimeListendAudiobook }, unbusyCmd, None
     
     and onChangeBusyStateMsg state model =
         {model with IsLoading = state}, Cmd.none, None
 
     
     and onDoNothingMsg model =
-        model, Cmd.ofMsg (ChangeBusyState false), None
+        model, unbusyCmd, None
 
 
     let view (model: Model) dispatch =
             View.Grid(
-                rowdefs= [box "auto"; box "*"],
+                rowdefs= [box "auto"; box "auto"; box "auto"; box "*"],
+                rowSpacing = 0.,
                 verticalOptions = LayoutOptions.Fill,
                 children = [
+
+                    match model.LastTimeListendAudioBook with
+                    | None ->()
+                    | Some labItem ->
+                        yield View.Label(text=Translations.current.LastListendAudioBookTitle, fontAttributes = FontAttributes.Bold,
+                            fontSize = 25.,
+                            horizontalOptions = LayoutOptions.Fill,
+                            horizontalTextAlignment = TextAlignment.Center,
+                            textColor = Consts.primaryTextColor,
+                            backgroundColor = Consts.cardColor,
+                            margin=0.).GridRow(0)
+
+                        let audioBookItemDispatch =
+                            let d msg = AudioBooksItemMsg (labItem,msg)
+                            d >> dispatch
+
+                        yield (AudioBookItem.view labItem audioBookItemDispatch).Margin(10.).GridRow(1)
+
                     yield View.Label(text=Translations.current.AudiobookOnDevice, fontAttributes = FontAttributes.Bold,
-                                                    fontSize = 25.0,
+                                                    fontSize = 25.,
                                                     horizontalOptions = LayoutOptions.Fill,
                                                     horizontalTextAlignment = TextAlignment.Center,
                                                     textColor = Consts.primaryTextColor,
                                                     backgroundColor = Consts.cardColor,
-                                                    margin=0.0).GridRow(0)
+                                                    margin=0.).GridRow(2)
 
-                    yield View.StackLayout(padding = 10.0, verticalOptions = LayoutOptions.Start,
+                    yield View.StackLayout(padding = 10., verticalOptions = LayoutOptions.Start,
                         children = [ 
                               
                             yield dependsOn (model.Audiobooks) (fun _ (abItems) ->
                                 match abItems with
                                 | [||]  ->
-                                    View.Label(text=Translations.current.NoAudiobooksOnDevice, fontSize=25.0, textColor=Consts.secondaryTextColor)
+                                    View.Label(text=Translations.current.NoAudiobooksOnDevice, fontSize=25., textColor=Consts.secondaryTextColor)
                                 | _ ->
                                     View.ScrollView(horizontalOptions = LayoutOptions.Fill,
                                             verticalOptions = LayoutOptions.Fill,
@@ -193,11 +264,11 @@ open Services
                                               )
                                 
                                 )
-                        ]).GridRow(1)
+                        ]).GridRow(3)
 
 
                     if model.IsLoading then 
-                        yield Common.createBusyLayer().GridRowSpan(2)
+                        yield Common.createBusyLayer().GridRowSpan(4)
                 ]
                 )
     

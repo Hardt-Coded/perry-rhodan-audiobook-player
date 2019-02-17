@@ -10,6 +10,7 @@ open Common
 open Common.Extensions
 open Controls
 open Services
+open Global
 
 
     
@@ -18,7 +19,8 @@ open Services
         Password:string
         LoginFailed:bool
         RememberLogin:bool 
-        IsLoading:bool }
+        IsLoading:bool
+        CameFrom: LoginRequestCameFrom }
 
     type Msg = 
         | TryLogin 
@@ -33,9 +35,9 @@ open Services
         | DoNothing
     
     type ExternalMsg = 
-        | GotoForwardToBrowsing of Map<string,string>
+        | GotoForwardToBrowsing of Map<string,string> * LoginRequestCameFrom
 
-    let initModel () = { Username = ""; Password = ""; LoginFailed = false; RememberLogin = false; IsLoading = false }
+    let initModel cameFrom = { Username = ""; Password = ""; LoginFailed = false; RememberLogin = false; IsLoading = false; CameFrom = cameFrom }
 
 
     let loadStoredCredentials = 
@@ -123,7 +125,7 @@ open Services
 
     and onLoginSucceededMsg cc model =
         let cmd = if model.RememberLogin then (storeCredentials model) else Cmd.none
-        model, Cmd.batch [cmd;Cmd.ofMsg (ChangeBusyState false)], Some (GotoForwardToBrowsing cc)
+        model, Cmd.batch [cmd;Cmd.ofMsg (ChangeBusyState false)], Some (GotoForwardToBrowsing (cc,model.CameFrom))
     
 
     and onLoginFailedMsg model =
@@ -166,7 +168,7 @@ open Services
           backgroundColor = Consts.backgroundColor,
           content = View.Grid(
                 children = [
-                    yield View.StackLayout(padding = 10.0, 
+                    yield View.StackLayout(padding = 10., 
                         verticalOptions = LayoutOptions.Center,
                         children = [ 
                             yield View.Label(text=Translations.current.LoginToEinsAMedienAccount
@@ -174,7 +176,7 @@ open Services
                                 , horizontalTextAlignment=TextAlignment.Center
                                 , textColor = Consts.primaryTextColor
                                 , backgroundColor = Consts.cardColor
-                                , fontSize=16.0)
+                                , fontSize=16.)
                             // TextChange Event cause actually a invite look, the debouncer doen't help
                             // Move to complete and lost focus event
                             yield View.Entry(text = model.Username
@@ -199,14 +201,14 @@ open Services
                             yield View.StackLayout(orientation=StackOrientation.Horizontal,
                                 horizontalOptions = LayoutOptions.Center,
                                 children =[
-                                    Controls.secondaryTextColorLabel 16.0 Translations.current.RememberLogin
+                                    Controls.secondaryTextColorLabel 16. Translations.current.RememberLogin
                                     View.Switch(isToggled = model.RememberLogin, toggled = (fun on -> dispatch (ChangeRememberLogin on.Value)), horizontalOptions = LayoutOptions.Center)
                                 ]
                             )
                                 
                             yield View.Button(text = Translations.current.Login, command = (fun () -> dispatch TryLogin), horizontalOptions = LayoutOptions.Center)
                             if model.LoginFailed then
-                                yield View.Label(text=Translations.current.LoginFailed, textColor = Color.Red, horizontalOptions = LayoutOptions.Center, widthRequest=200.0, horizontalTextAlignment=TextAlignment.Center,fontSize=20.0)
+                                yield View.Label(text=Translations.current.LoginFailed, textColor = Color.Red, horizontalOptions = LayoutOptions.Center, widthRequest=200., horizontalTextAlignment=TextAlignment.Center,fontSize=20.)
 
                             ]    
                         )

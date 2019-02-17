@@ -6,6 +6,7 @@
     open Fabulous.DynamicViews
     open Xamarin.Forms
     open Services
+    open Global
 
     type Model = { AudioBook: AudioBook
                    CurrentDownloadProgress: (int * int) option
@@ -29,7 +30,7 @@
         | DoNothing
 
     type ExternalMsg =
-        | OpenLoginPage
+        | OpenLoginPage of LoginRequestCameFrom
         | UpdateAudioBook of Model
         | AddToDownloadQueue of Model
         | RemoveFromDownloadQueue of Model

@@ -1,7 +1,7 @@
 ﻿#r "netstandard"
 #r "System.Xml.Linq"
-#r @"C:\Users\Dieselmeister\.nuget\packages\fsharp.data\3.0.0\lib\netstandard2.0\FSharp.Data.dll"
-//#r @"C:\Users\ich\.nuget\packages\fsharp.data\3.0.0\lib\netstandard2.0\FSharp.Data.dll"
+#r @"C:\Users\Dieselmeister\.nuget\packages\fsharp.data\3..\lib\netstandard2.\FSharp.Data.dll"
+//#r @"C:\Users\ich\.nuget\packages\fsharp.data\3..\lib\netstandard2.\FSharp.Data.dll"
 
 open FSharp.Data
 open System

@@ -6,6 +6,9 @@
     open Fabulous.Core
     open Common
 
+
+    let hideLastListendSettingsKey = "Rhodan_HideLastListendWhenOnlyOneAudioBookOnDevice"
+
     type Language =
         | English
         | German
@@ -14,19 +17,27 @@
     type Model = 
         { Language: Language 
           FirstStart: bool
-          DataProtectionStuff: bool }
+          DataProtectionStuff: bool
+          HideLastListendWhenOnlyOneAudioBookOnDevice: bool }
 
     
     type Msg =
         | SetLanguage of Language
         | ShowDataProtectionStuff
         | HideDataProtectionStuff
+        | ToggleHideLastListend of bool
 
     
     let initModel firstStart = 
+        let getHideLastListendSetting () = 
+            Services.SecureLoginStorage.getSecuredValue hideLastListendSettingsKey |> Async.RunSynchronously
+            |> Option.map (fun i -> if i="1" then true else false)
+            |> Option.defaultValue false
+
         { Language = English
           FirstStart = firstStart 
-          DataProtectionStuff = false }
+          DataProtectionStuff = false
+          HideLastListendWhenOnlyOneAudioBookOnDevice = getHideLastListendSetting () }
 
 
     let init firstStart =
@@ -41,8 +52,13 @@
             model |> onShowDataProtectionStuffMsg
         | HideDataProtectionStuff ->
             model |> onHideDataProtectionStuffMsg
-
+        | ToggleHideLastListend b ->
+            model |> onHideLastListendMsg b
     
+    and onHideLastListendMsg b model =
+        (hideLastListendSettingsKey |> Services.SecureLoginStorage.setSecuredValue (if b then "1" else "0") )|> Async.RunSynchronously
+        {model with HideLastListendWhenOnlyOneAudioBookOnDevice = b}, Cmd.none, None
+
     and onSetLanguageMsg language (model:Model) =
         { model with Language = language }, Cmd.none, None
     
@@ -74,6 +90,14 @@
                                             command=(fun ()-> dispatch (if model.DataProtectionStuff then HideDataProtectionStuff else ShowDataProtectionStuff))
                                         )
 
+                                        yield View.StackLayout(orientation=StackOrientation.Horizontal,
+                                            horizontalOptions = LayoutOptions.Center,
+                                            children =[
+                                                Controls.secondaryTextColorLabel 18. Translations.current.HideLastListendWhenOnlyOneAudioBookOnDevice
+                                                View.Switch(isToggled = model.HideLastListendWhenOnlyOneAudioBookOnDevice, toggled = (fun on -> dispatch (ToggleHideLastListend on.Value)), horizontalOptions = LayoutOptions.Center)
+                                            ]
+                                        )
+
                                         if (model.DataProtectionStuff) then
                                             let viewSource = UrlWebViewSource(Url="http://hardt-solutions.com/PrivacyPolicies/EinsAMedienAudiobookPlayer.html")
 
@@ -82,13 +106,7 @@
                                                 verticalOptions=LayoutOptions.FillAndExpand
                                                 )
                                            
-                                        //yield View.Picker(
-                                        //    itemsSource=["English";"German"],
-                                        //    selectedIndex=0,                                            
-                                        //    title="Language: ",
-                                        //    inputTransparent = true,
-                                        //    textColor = Consts.secondaryTextColor
-                                        //)
+                                        
 
                                         
                                     ]

@@ -134,10 +134,11 @@ open Services
         ) |> Cmd.ofAsyncMsgWithInternalDispatch
 
     let stopAudio model =
-        //let audioPlayer = DependencyService.Get<Services.IAudioPlayer>()
         audioPlayer.Stop () |> ignore
+        // Unregister all delegates from the audio service
         audioPlayer.OnCompletion <- None
         audioPlayer.OnNoisyHeadPhone <- None
+        audioPlayer.OnInfo <- None
         match model.CurrentPlayingStateUpdateTimer with
         | None -> None
         | Some timer ->
@@ -156,31 +157,38 @@ open Services
     let setAudioPositionAbsolute value =
         audioPlayer.GotToPosition (value) |> ignore
 
-    
-    let saveCurrentPosition model =
+
+    let saveNewAudioBookStateCmd model =
         async {
-            do! Async.Sleep 5000
-
-            match model.CurrentPosition, model.CurrentAudioFile with
-            | Some cp, Some file ->
-                let newPos = { Position = cp; Filename = file } 
-                let newState = { model.AudioBook.State with CurrentPosition = Some newPos }
-                let newAudioBook = { model.AudioBook with State = newState }
-
-                let! res =  newAudioBook |> FileAccess.updateAudioBookInStateFile
-                match res with
-                | Error e ->
-                    do! Common.Helpers.displayAlert(Translations.current.Error_Save_Position,e,"Ok")
-                    return (Some Stop)
-                | Ok _ ->
-                    if (model.CurrentState = Stopped) then
-                        return None
-                    else
-                        return None
-            | _,_ ->
-                return None
+            let! res =  model.AudioBook |> FileAccess.updateAudioBookInStateFile
+            match res with
+            | Error e ->
+                do! Common.Helpers.displayAlert(Translations.current.Error_Saving_AudioBookState,e,"Ok")
+                return (Some Stop)
+            | Ok _ ->
+                if (model.CurrentState = Stopped) then
+                    return None
+                else
+                    return None
         } |> Cmd.ofAsyncMsgOption
-    
+
+
+    let setCurrentPositionToAudiobookState model =
+        match model.CurrentPosition, model.CurrentAudioFile with
+        | Some cp, Some file ->
+            let newPos = { Position = cp; Filename = file } 
+            let newState = { model.AudioBook.State with CurrentPosition = Some newPos }
+            let newAudioBook = { model.AudioBook with State = newState }
+            { model with AudioBook = newAudioBook }
+        | _,_ ->
+            model
+
+    let updateLastListendTimeInAudioBookState model =        
+        let newAbState = 
+            {model.AudioBook.State with LastTimeListend = Some DateTime.UtcNow }
+        let newAudioBook = {model.AudioBook with State=newAbState}
+        {model with AudioBook = newAudioBook }
+        
     
     let sleepTimerUpdateCmd model =
         async {
@@ -192,6 +200,10 @@ open Services
                 return Some DecreaseSleepTimer
         } |> Cmd.ofAsyncMsgOption
 
+
+    
+            
+        
 
     let unsetBusyCmd = Cmd.ofMsg (ChangeBusyState false)
 
@@ -211,8 +223,8 @@ open Services
           AudioFileList = []
           IsLoading=false
           CurrentPlayingStateUpdateTimer=None
-          TrackPositionProcess=0.0
-          ProgressbarValue = 0.0 
+          TrackPositionProcess=0.
+          ProgressbarValue = 0. 
           TimeUntilSleeps = None
           AudioPlayerBusy = false }
 
@@ -266,14 +278,14 @@ open Services
                 let buttons = [|
                     
                     yield (Translations.current.Off,   (fun () -> StartSleepTimer None)())    
-                    yield ("30 sek",(fun () -> StartSleepTimer (Some (TimeSpan.FromSeconds(30.0) ))) ())
-                    yield ("5 min", (fun () -> StartSleepTimer (Some (TimeSpan.FromMinutes(5.0) ))) ())
-                    yield ("15 min",(fun () -> StartSleepTimer (Some (TimeSpan.FromMinutes(15.0) ))) ())
-                    yield ("30 min",(fun () -> StartSleepTimer (Some (TimeSpan.FromMinutes(30.0) ))) ())
-                    yield ("45 min",(fun () -> StartSleepTimer (Some (TimeSpan.FromMinutes(45.0) ))) ())
-                    yield ("60 min",(fun () -> StartSleepTimer (Some (TimeSpan.FromMinutes(60.0) ))) ())
-                    yield ("75 min",(fun () -> StartSleepTimer (Some (TimeSpan.FromMinutes(75.0) ))) ())
-                    yield ("90 min",(fun () -> StartSleepTimer (Some (TimeSpan.FromMinutes(90.0) ))) ())
+                    yield ("30 sek",(fun () -> StartSleepTimer (Some (TimeSpan.FromSeconds(30.) ))) ())
+                    yield ("5 min", (fun () -> StartSleepTimer (Some (TimeSpan.FromMinutes(5.) ))) ())
+                    yield ("15 min",(fun () -> StartSleepTimer (Some (TimeSpan.FromMinutes(15.) ))) ())
+                    yield ("30 min",(fun () -> StartSleepTimer (Some (TimeSpan.FromMinutes(30.) ))) ())
+                    yield ("45 min",(fun () -> StartSleepTimer (Some (TimeSpan.FromMinutes(45.) ))) ())
+                    yield ("60 min",(fun () -> StartSleepTimer (Some (TimeSpan.FromMinutes(60.) ))) ())
+                    yield ("75 min",(fun () -> StartSleepTimer (Some (TimeSpan.FromMinutes(75.) ))) ())
+                    yield ("90 min",(fun () -> StartSleepTimer (Some (TimeSpan.FromMinutes(90.) ))) ())
                         
                 |]
                 return! Helpers.displayActionSheet (Some Translations.current.Select_Sleep_Timer) (Some Translations.current.Cancel) buttons
@@ -284,12 +296,17 @@ open Services
     
     and onPlayMsg model = 
         let playAudioCmd = model |> playAudio
-        let newModel = {model with CurrentState = Playing}
-        newModel, Cmd.batch [ playAudioCmd; model |> saveCurrentPosition ], None
+        
+        let newModel = 
+            {model with CurrentState = Playing}
+            |> setCurrentPositionToAudiobookState
+            |> updateLastListendTimeInAudioBookState
+        
+        newModel, Cmd.batch [ playAudioCmd; newModel |> saveNewAudioBookStateCmd ], None
 
 
     and onPlayStartedMsg timer model =
-        {model with CurrentPlayingStateUpdateTimer = Some timer; AudioPlayerBusy = false }, Cmd.none, None
+        { model with CurrentPlayingStateUpdateTimer = Some timer; AudioPlayerBusy = false }, Cmd.none, None
 
 
     and onStopMsg model =
@@ -297,8 +314,11 @@ open Services
             model 
             |> stopAudio
             |> Option.map (toTimeSpan)
-        let newModel = { model with CurrentState = Stopped; CurrentPlayingStateUpdateTimer = None; CurrentPosition = lastPosition}
-        newModel, newModel |> saveCurrentPosition , None
+        let newModel = 
+            { model with CurrentState = Stopped; CurrentPlayingStateUpdateTimer = None; CurrentPosition = lastPosition}
+            |> setCurrentPositionToAudiobookState
+            |> updateLastListendTimeInAudioBookState
+        newModel, newModel |> saveNewAudioBookStateCmd , None
 
     
     and onNextAudioFileMsg model =
@@ -324,23 +344,20 @@ open Services
             // do not play "next" file if on end of the audio book
             if (n>max) then
                 let audioBook = {model.AudioBook with State = {model.AudioBook.State with Completed = true}}
-                let storeFinishedAudioBookCmd = 
-                    async { 
-                        let! res = audioBook |> Services.FileAccess.updateAudioBookInStateFile
-                        match res with
-                        | Error e ->
-                            do! Common.Helpers.displayAlert(Translations.current.Error_Saving_AudioBookState,e,"Ok")
-                            return None
-                        | Ok _ ->
-                            return None
-                            
-                    } |> Cmd.ofAsyncMsgOption
+                let newModel =
+                    { model with AudioBook = audioBook; CurrentState = Stopped }
+                    |> setCurrentPositionToAudiobookState
+                    |> updateLastListendTimeInAudioBookState
 
-                { model with AudioBook = audioBook; CurrentState = Stopped }, storeFinishedAudioBookCmd, None
+                newModel, newModel |> saveNewAudioBookStateCmd, None
             else
-                let newModel = { newModel with AudioPlayerBusy = true }
+                let newModel = 
+                    { newModel with AudioPlayerBusy = true }
+                    |> setCurrentPositionToAudiobookState
+                    |> updateLastListendTimeInAudioBookState
+
                 let playAudioCmd = newModel |> playAudio
-                newModel, playAudioCmd, None
+                newModel, Cmd.batch [ playAudioCmd; newModel |> saveNewAudioBookStateCmd ], None
         else
             newModel, Cmd.none, None
 
@@ -418,7 +435,7 @@ open Services
 
     and onUpdatePositionMsg (position, duration) model =
         let trackProcess = 
-            if (duration = 0) then 0.0
+            if (duration = 0) then 0.
             else
                 (position |> float) / (duration |> float)
 
@@ -432,8 +449,8 @@ open Services
 
 
     and onProgressBarChangedMsg e model =
-        let min = model.TrackPositionProcess - 0.03
-        let max = model.TrackPositionProcess + 0.03
+        let min = model.TrackPositionProcess - 0.3
+        let max = model.TrackPositionProcess + 0.3
         if (e < min || e > max ) then
             if model.CurrentDurationMs.IsSome then
                 let newPos = ((model.CurrentDurationMs.Value |> float) * e) |> int
@@ -458,7 +475,7 @@ open Services
         | None ->
             model, Cmd.none, None
         | Some t ->
-            let sleepTime = t.Subtract(TimeSpan.FromSeconds(1.0))
+            let sleepTime = t.Subtract(TimeSpan.FromSeconds(1.))
             if sleepTime <= TimeSpan.Zero then
                 {model with TimeUntilSleeps = None},Cmd.ofMsg Stop, None
             else
@@ -467,7 +484,8 @@ open Services
 
     
     and onSaveCurrentPosition model =
-        model, model |> saveCurrentPosition, None
+        let newModel =model |> setCurrentPositionToAudiobookState
+        newModel, newModel |> saveNewAudioBookStateCmd, None
 
 
     and onStartSleepTimer sleepTime model =
@@ -503,7 +521,7 @@ open Services
           title=Translations.current.AudioPlayerPage,useSafeArea=true,
           backgroundColor = Consts.backgroundColor,
           content = 
-            View.Grid(padding = 20.0,
+            View.Grid(padding = 20.,
                 horizontalOptions = LayoutOptions.Fill,
                 verticalOptions = LayoutOptions.Fill,                
                 rowdefs = [ box "*"; box "*"; box "*"; box "auto" ],
@@ -518,9 +536,9 @@ open Services
                                 verticalOptions = LayoutOptions.Fill,                
                                 rowdefs = [ box "auto"; box "auto"; box "auto" ],
                                 children = [
-                                    yield (Controls.primaryTextColorLabel 25.0 (title)).GridRow(0)
-                                    yield (Controls.primaryTextColorLabel 30.0 (currentTrackString)).GridRow(1).HorizontalOptions(LayoutOptions.Center)
-                                    yield (Controls.primaryTextColorLabel 30.0 (currentTimeString)).GridRow(2).HorizontalOptions(LayoutOptions.Center)
+                                    yield (Controls.primaryTextColorLabel 25. (title)).GridRow(0)
+                                    yield (Controls.primaryTextColorLabel 30. (currentTrackString)).GridRow(1).HorizontalOptions(LayoutOptions.Center)
+                                    yield (Controls.primaryTextColorLabel 30. (currentTimeString)).GridRow(2).HorizontalOptions(LayoutOptions.Center)
                                 ]
                             ).GridRow(0)
                     )
@@ -548,23 +566,23 @@ open Services
                         coldefs=[box "*";box "*";box "*";box "*";box "*"],
                         rowdefs=[box "*";box "*" ],
                         children=[
-                            yield (Controls.primaryColorSymbolLabelWithTapCommand ((fun () -> dispatch PreviousAudioFile) |> runIfNotBusy) 30.0 true "\uf048").GridColumn(0).GridRow(0)
-                            yield (Controls.primaryColorSymbolLabelWithTapCommand ((fun () -> dispatch JumpBackwards) |> runIfNotBusy) 30.0 true "\uf04a").GridColumn(1).GridRow(0)
+                            yield (Controls.primaryColorSymbolLabelWithTapCommand ((fun () -> dispatch PreviousAudioFile) |> runIfNotBusy) 30. true "\uf048").GridColumn(0).GridRow(0)
+                            yield (Controls.primaryColorSymbolLabelWithTapCommand ((fun () -> dispatch JumpBackwards) |> runIfNotBusy) 30. true "\uf04a").GridColumn(1).GridRow(0)
 
                             match model.CurrentState with
                             | Stopped ->
-                                yield (Controls.primaryColorSymbolLabelWithTapCommand (fun () -> dispatch Play) 60.0 false "\uf144").GridColumn(2).GridRow(0)
+                                yield (Controls.primaryColorSymbolLabelWithTapCommand (fun () -> dispatch Play) 60. false "\uf144").GridColumn(2).GridRow(0)
                             | Playing ->
-                                yield (Controls.primaryColorSymbolLabelWithTapCommand (fun () -> dispatch Stop) 60.0 false "\uf28b").GridColumn(2).GridRow(0)
+                                yield (Controls.primaryColorSymbolLabelWithTapCommand (fun () -> dispatch Stop) 60. false "\uf28b").GridColumn(2).GridRow(0)
                                 
                             
-                            yield (Controls.primaryColorSymbolLabelWithTapCommand ((fun () -> dispatch JumpForward) |> runIfNotBusy) 30.0 true "\uf04e").GridColumn(3).GridRow(0)
-                            yield (Controls.primaryColorSymbolLabelWithTapCommand ((fun () -> dispatch NextAudioFile) |> runIfNotBusy) 30.0 true "\uf051").GridColumn(4).GridRow(0)
+                            yield (Controls.primaryColorSymbolLabelWithTapCommand ((fun () -> dispatch JumpForward) |> runIfNotBusy) 30. true "\uf04e").GridColumn(3).GridRow(0)
+                            yield (Controls.primaryColorSymbolLabelWithTapCommand ((fun () -> dispatch NextAudioFile) |> runIfNotBusy) 30. true "\uf051").GridColumn(4).GridRow(0)
                             
                             yield (View.Slider(
                                     value=model.TrackPositionProcess,
-                                    minimumMaximum = (0.0,1.0),
-                                    //minimum = 0.0, maximum = 1.0, 
+                                    minimumMaximum = (0.,1.),
+                                    //minimum = 0., maximum = 1., 
                                     horizontalOptions = LayoutOptions.Fill,
                                     valueChanged= (fun e -> dispatch (ProgressBarChanged e.NewValue))
                                   )).GridColumnSpan(5).GridRow(1)
@@ -573,10 +591,14 @@ open Services
                     
                     yield View.StackLayout(orientation=StackOrientation.Horizontal,
                             children=[
-                                yield (Controls.primaryColorSymbolLabelWithTapCommand (fun () -> dispatch OpenSleepTimerActionMenu) 45.0 true "\uf017")
-                                if model.TimeUntilSleeps.IsSome then
-                                    let currentSleepTime = (model.TimeUntilSleeps |> Option.defaultValue TimeSpan.Zero).ToString("mm\:ss")
-                                    yield (Controls.primaryTextColorLabel 30.0 (sprintf "%s" currentSleepTime))
+                                yield (Controls.primaryColorSymbolLabelWithTapCommand (fun () -> dispatch OpenSleepTimerActionMenu) 45. true "\uf017")
+
+                                match model.TimeUntilSleeps with
+                                | None -> ()
+                                | Some tus ->
+                                    let formatedTus =
+                                        sprintf "%02i:%02i" (tus.TotalMinutes |> int) tus.Seconds
+                                    yield (Controls.primaryTextColorLabel 30. formatedTus)
                             ]
                         ).GridRow(3)
                     
@@ -589,7 +611,7 @@ open Services
 
     let viewSmall openPlayerPageCommand (model: Model) dispatch =
         View.Grid(
-            coldefs=[box "*"; box "auto"; box "auto"; box "auto"],
+            coldefs=[box "auto"; box "*"; box "auto"; box "auto"; box "auto"],
             backgroundColor=Consts.cardColor,
             gestureRecognizers = [
                 View.TapGestureRecognizer(command=openPlayerPageCommand)
@@ -597,26 +619,41 @@ open Services
             children = [
                 let currentPos = (model.CurrentPosition |> Option.defaultValue TimeSpan.Zero).ToString("hh\:mm\:ss")
 
-                yield (Controls.primaryTextColorLabel 12.0 (model.AudioBook.FullName ))
-                    .GridColumn(0)
-                    .With(horizontalOptions=LayoutOptions.Start, margin=Thickness(5.0,0.0,0.0,0.0))
+                yield View.Image(
+                    source=
+                        match model.AudioBook.Picture with
+                        | None -> "AudioBookPlaceholder_Dark.png"
+                        | Some p -> p
+                        ,
+                    horizontalOptions=LayoutOptions.Fill,
+                    verticalOptions=LayoutOptions.Fill,
+                    aspect=Aspect.AspectFit,
+                    widthRequest = 30.,
+                    heightRequest = 30.,
+                    margin=Thickness(5.,3.,5.,3.)
+                    
+                    ).GridColumn(0)
+
+                yield (Controls.primaryTextColorLabel 12. (model.AudioBook.FullName ))
+                    .GridColumn(1)
+                    .With(horizontalOptions=LayoutOptions.Start, margin=Thickness(5.,0.,0.,0.))
                     
 
-                yield (Controls.primaryTextColorLabel 12.0 (sprintf "%i/%i" (model.CurrentAudioFileIndex + 1) model.AudioFileList.Length ))
-                    .GridColumn(1)
-                yield (Controls.primaryTextColorLabel 12.0 (sprintf "%s" currentPos))
+                yield (Controls.primaryTextColorLabel 12. (sprintf "%i/%i" (model.CurrentAudioFileIndex + 1) model.AudioFileList.Length ))
                     .GridColumn(2)
+                yield (Controls.primaryTextColorLabel 12. (sprintf "%s" currentPos))
+                    .GridColumn(3)
                 match model.CurrentState with
                 | Stopped ->
-                    yield (Controls.primaryColorSymbolLabelWithTapCommandRightAlign (fun () -> dispatch Play) 30.0 false "\uf144")
-                        .GridColumn(3)
+                    yield (Controls.primaryColorSymbolLabelWithTapCommandRightAlign (fun () -> dispatch Play) 30. false "\uf144")
+                        .GridColumn(4)
                         .GridRow(0)
-                        .With(margin=Thickness(5.0,3.0,5.0,3.0))
+                        .With(margin=Thickness(5.,3.,5.,3.))
                 | Playing ->
-                    yield (Controls.primaryColorSymbolLabelWithTapCommandRightAlign (fun () -> dispatch Stop) 30.0 false "\uf28b")
-                        .GridColumn(3)
+                    yield (Controls.primaryColorSymbolLabelWithTapCommandRightAlign (fun () -> dispatch Stop) 30. false "\uf28b")
+                        .GridColumn(4)
                         .GridRow(0)
-                        .With(margin=Thickness(5.0,3.0,5.0,3.0))
+                        .With(margin=Thickness(5.,3.,5.,3.))
 
             ]
         )

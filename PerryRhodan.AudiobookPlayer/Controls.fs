@@ -56,7 +56,7 @@ let audioBookEntryActionSheet
 let listendCheckLabel = 
     View.Label(text="\uf058",
         fontFamily=faFontFamilyName true,
-        fontSize=25.0,
+        fontSize=25.,
         textColor=Color.White,
         verticalOptions = LayoutOptions.Fill, 
         horizontalOptions = LayoutOptions.Fill, 
@@ -67,7 +67,7 @@ let listendCheckLabel =
 let arrowDownLabel = 
     View.Label(text="\uf358",
         fontFamily=faFontFamilyName false,
-        fontSize=25.0,
+        fontSize=25.,
         textColor=Consts.primaryTextColor,
         verticalOptions = LayoutOptions.Fill, 
         horizontalOptions = LayoutOptions.Fill, 
@@ -78,7 +78,7 @@ let arrowDownLabel =
 let inDownloadQueueLabel =
     View.Label(text="\uf0c9",
         fontFamily=faFontFamilyName true,
-        fontSize=25.0,
+        fontSize=25.,
         textColor=Consts.primaryTextColor,
         verticalOptions = LayoutOptions.Fill, 
         horizontalOptions = LayoutOptions.Fill, 
@@ -89,7 +89,7 @@ let inDownloadQueueLabel =
 let playerSymbolLabel =
     View.Label(text="\uf144",
         fontFamily=faFontFamilyName false,
-        fontSize=25.0,
+        fontSize=25.,
         textColor=Consts.primaryTextColor,
         verticalOptions = LayoutOptions.Fill, 
         horizontalOptions = LayoutOptions.Fill, 
@@ -100,8 +100,8 @@ let playerSymbolLabel =
 let showDownloadProgress (f,t) =
     View.Label(text=(sprintf "%i / %i" f t),
         fontFamily=faFontFamilyName true,
-        fontSize=12.0,
-        margin=3.0,
+        fontSize=12.,
+        margin=3.,
         textColor=Consts.primaryTextColor,
         verticalOptions = LayoutOptions.Fill, 
         horizontalOptions = LayoutOptions.Fill, 
@@ -172,8 +172,8 @@ let renderAudiobookEntry
     audiobook =
         View.Grid(
             backgroundColor = Consts.cardColor,
-            margin=5.0,
-            heightRequest = 120.0,
+            margin=5.,
+            heightRequest = 120.,
             coldefs = [box "auto";box "*"; box "auto"],
             rowdefs = [box "auto"],
             children = [
@@ -203,7 +203,7 @@ let renderAudiobookEntry
                     ).GridColumn(0).GridRow(0)
 
                 yield View.Label(text=audiobook.FullName, 
-                    fontSize = 15.0, 
+                    fontSize = 15., 
                     verticalOptions = LayoutOptions.Fill, 
                     horizontalOptions = LayoutOptions.Fill, 
                     verticalTextAlignment = TextAlignment.Center,
@@ -212,8 +212,8 @@ let renderAudiobookEntry
                     lineBreakMode = LineBreakMode.WordWrap
                     ).GridColumn(1).GridRow(0)
                 yield View.Label(text="\uf142",fontFamily = faFontFamilyName true,
-                    fontSize=35.0, 
-                    margin = Thickness(0.0, 0.0 ,20.0 ,0.0),                    
+                    fontSize=35., 
+                    margin = Thickness(0., 0. ,20. ,0.),                    
                     verticalOptions = LayoutOptions.Fill, 
                     horizontalOptions = LayoutOptions.Fill, 
                     verticalTextAlignment = TextAlignment.Center,
@@ -238,14 +238,14 @@ let tapLabelWithFaIcon faIcon faBold onTab textColor fontSize text =
                 fontSize=fontSize,
                 verticalOptions = LayoutOptions.Center,
                 verticalTextAlignment = TextAlignment.Center,
-                margin = Thickness(0.0, 0.0, 4.0, 0.0)
+                margin = Thickness(0., 0., 4., 0.)
                 
             )
             View.Label(text=text,
                 textColor=textColor,                
                 verticalOptions = LayoutOptions.Center,
                 verticalTextAlignment = TextAlignment.Center,
-                fontSize=(fontSize + 2.0)
+                fontSize=(fontSize + 2.)
             )
         ],
         gestureRecognizers = [
@@ -318,7 +318,7 @@ let contentPageWithBottomOverlay (bottomOverlay:ViewElement option) (content:Vie
         isBusy = isBusy,
         content = 
             View.Grid(rowdefs = [box "*"; box "auto"],
-                rowSpacing = 0.0,
+                rowSpacing = 0.,
                 children = [
                     yield content.GridRow(0)
                     if bottomOverlay.IsSome then

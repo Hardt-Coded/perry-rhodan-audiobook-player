@@ -533,12 +533,17 @@ module SecureLoginStorage =
             return if value  = null then None else Some value
         }
 
+    let setSecuredValue value key =
+        async {
+            do! SecureStorage.SetAsync(key,value) |> Async.AwaitTask            
+        }
+
     let saveLoginCredentials username password rememberLogin =
         async {
             try
-                do! SecureStorage.SetAsync(secStoreUsernameKey,username) |> Async.AwaitTask
-                do! SecureStorage.SetAsync(secStorePasswordKey,password) |> Async.AwaitTask
-                do! SecureStorage.SetAsync(secStoreRememberLoginKey,(if rememberLogin then "Jupp" else "")) |> Async.AwaitTask
+                do! secStoreUsernameKey |> setSecuredValue username
+                do! secStorePasswordKey |> setSecuredValue password
+                do! secStoreRememberLoginKey |> setSecuredValue (if rememberLogin then "Jupp" else "")
                 return Ok true
             with
             | _ as e -> return (Error (e.Message))
