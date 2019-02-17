@@ -98,14 +98,14 @@
                                                 horizontalOptions=LayoutOptions.Fill,
                                                 verticalOptions=LayoutOptions.Fill
                                                 )
-                                                .Margin(Thickness(10.0,10.0,10.0,10.0))
+                                                .Margin(Thickness(10.,10.,10.,10.))
                                         if (model.Description.IsSome) then
                                             yield View.Label(
-                                                fontSize=20.0,
+                                                fontSize=20.,
                                                 text=model.Description.Value,
                                                 horizontalTextAlignment=TextAlignment.Start,
                                                 textColor=Common.Consts.secondaryTextColor,
-                                                margin=Thickness(10.0,10.0,10.0,10.0)
+                                                margin=Thickness(10.,10.,10.,10.)
                                                 )
                                                 
                                         yield View.Button(text=Translations.current.Close,command= (fun ()-> dispatch Close))

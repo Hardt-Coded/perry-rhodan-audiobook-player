@@ -14,10 +14,11 @@ type AudioBookState =
     { Completed:bool
       CurrentPosition: AudioBookPosition option
       Downloaded:bool
-      DownloadedFolder:string option }
+      DownloadedFolder:string option
+      LastTimeListend: DateTime option }
     
     with
-        static member Empty = {Completed = false; CurrentPosition = None; Downloaded=false; DownloadedFolder = None}
+        static member Empty = {Completed = false; CurrentPosition = None; Downloaded=false; DownloadedFolder = None; LastTimeListend = None}
 
 type AudioBook =
     { Id:int
@@ -55,6 +56,7 @@ type AudioBookListType =
 let downloadNameRegex = Regex(@"([A-Za-z .-]*)(\d*)(:| - )([\w\säöüÄÖÜ.:!\-]*[\(\)Teil \d]*)(.*)(( - Multitrack \/ Onetrack)|( - Multitrack)|( - Onetrack))")
 
 type DownloadSite = HtmlProvider< SampleData.htmlSample >
+
 
 let parseDownloadData htmlData =
     DownloadSite.Parse(htmlData).Html.Descendants("div")

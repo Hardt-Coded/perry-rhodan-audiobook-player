@@ -6,6 +6,7 @@
     open Fabulous.DynamicViews
     open Xamarin.Forms
     open Services
+    open Global
 
     type QueueState =
         | Idle
@@ -33,7 +34,7 @@
         | ShowErrorMessage of string
 
     type ExternalMsg =
-        | ExOpenLoginPage
+        | ExOpenLoginPage of LoginRequestCameFrom
         | UpdateAudioBook of AudioBookItem.Model
         | UpdateDownloadProgress of AudioBookItem.Model * (int * int) option
         | PageChangeBusyState of bool
@@ -181,7 +182,7 @@
 
     and onOpenLoginPageMsg model =
         let newModel = {model with State = Idle}
-        newModel, Cmd.none, Some ExOpenLoginPage
+        newModel, Cmd.none, Some (ExOpenLoginPage DownloadAudioBook)
     
 
     and onStartProcessingMsg model =
@@ -301,9 +302,9 @@
             orientation = StackOrientation.Vertical,
             children = [
                 if model.DownloadQueue.Length > 0 then
-                    yield Controls.secondaryTextColorLabel 16.0 "Queued Downloads:"
+                    yield Controls.secondaryTextColorLabel 16. "Queued Downloads:"
                     if model.State = Paused then
-                        yield Controls.secondaryTextColorLabel 16.0 "(network error - retrying in 30 seconds):"
+                        yield Controls.secondaryTextColorLabel 16. "(network error - retrying in 30 seconds):"
                     yield View.StackLayout(
                         orientation = StackOrientation.Horizontal,
                         children = [
@@ -317,9 +318,9 @@
                                 
                                 let item = 
                                     if isRed then
-                                        (Controls.primaryColorSymbolLabelWithTapCommand cmd 35.0 true "\uf019").TextColor(Color.Red)
+                                        (Controls.primaryColorSymbolLabelWithTapCommand cmd 35. true "\uf019").TextColor(Color.Red)
                                     else
-                                        Controls.primaryColorSymbolLabelWithTapCommand cmd 35.0 true "\uf019"
+                                        Controls.primaryColorSymbolLabelWithTapCommand cmd 35. true "\uf019"
 
                                 yield item
                         ]

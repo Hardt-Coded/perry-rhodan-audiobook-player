@@ -9,6 +9,8 @@
         { Error:string 
           Close:string
           Cancel:string
+          Yes:string
+          No:string
           Error_Save_Position:string
           Off:string
           Select_Sleep_Timer:string
@@ -48,7 +50,12 @@
           ProductPageEmptyError:string
           Back:string
           NewAudioBooksSinceLastRefresh:string
+          NoNewAudioBooksSinceLastRefresh:string
           MissingLoginCredentials:string
+          LastListendAudioBookTitle:string
+          Quit:string
+          QuitQuestionTitle:string
+          QuitQuestionMessage:string
 
           MainPage:string
           LoginPage:string
@@ -59,6 +66,8 @@
           SettingsPage:string
           ShowDataProtection:string
           HideDataProtection:string
+
+          HideLastListendWhenOnlyOneAudioBookOnDevice:string
           
 
 
@@ -69,6 +78,8 @@
             {   Error = "Error" 
                 Close = "Close"
                 Cancel="Cancel"
+                Yes="Yes"
+                No="No"
                 Error_Save_Position = "Error saving Position."
                 Off = "off"
                 Select_Sleep_Timer="Select Sleep Timer ..."
@@ -108,7 +119,12 @@
                 ProductPageEmptyError="ProductPage response is empty."
                 Back="Back"
                 NewAudioBooksSinceLastRefresh="New Audiobooks since last refresh:"
+                NoNewAudioBooksSinceLastRefresh = "Sorry! No new audiobooks since last refresh."
                 MissingLoginCredentials= "Please enter Username and Password from your Eins A Medien Account."
+                LastListendAudioBookTitle="Last listend Audiobook"
+                Quit="Quit"
+                QuitQuestionTitle="Quit Application"
+                QuitQuestionMessage="The Player is current running, do you want to quit the application any way?"
 
                 MainPage="Home"
                 LoginPage="Login"
@@ -119,12 +135,16 @@
                 SettingsPage="Settings"
                 ShowDataProtection="Show Data Protection and Privacy Information"
                 HideDataProtection="Hide Data Protection and Privacy Information"
+
+                HideLastListendWhenOnlyOneAudioBookOnDevice="Hide the last listend audiobook area when only on audiobook is on your device"
             }
 
     
         static member German =
             {   Error = "Fehler" 
                 Close = "Schließen"
+                Yes="Ja"
+                No="Nein"
                 Cancel="Abbrechen"
                 Error_Save_Position = "Fehler beim Speichern der aktuellen Hörbuchposition."
                 Off = "aus"
@@ -165,7 +185,12 @@
                 ProductPageEmptyError="Die Produktseite gibt keine Daten zurück."
                 Back="Zurück"
                 NewAudioBooksSinceLastRefresh="Neue Hörbücher seit der letzten Aktualisierung:"
+                NoNewAudioBooksSinceLastRefresh = "Sorry! Leider noch keine neue Hörbücher seit der letzten Aktualisierung."
                 MissingLoginCredentials="Bitte geben Sie Benutzername und Kennwort Ihres Eins A Medien Accounts ein."
+                LastListendAudioBookTitle="Zuletzt gehörtes Hörbuch"
+                Quit="Beenden"
+                QuitQuestionTitle="Programm beenden"
+                QuitQuestionMessage="Der Player läuft noch, wollen Sie das Programm trotzdem beenden?"
 
                 MainPage="Startseite"
                 LoginPage="Login"
@@ -176,6 +201,8 @@
                 SettingsPage="Einstellungen"
                 ShowDataProtection="Datenschutzbestimmungen anzeigen"
                 HideDataProtection="Datenschutzbestimmungen verstecken"
+
+                HideLastListendWhenOnlyOneAudioBookOnDevice="Verstecke 'Zuletzt gehörtes Hörbuch' wenn nur eins auf dem Gerät ist."
             }
 
 

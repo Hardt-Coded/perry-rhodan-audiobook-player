@@ -17,21 +17,10 @@ module App =
     open Xamarin.Essentials
     open System.Net
     open Fabulous.DynamicViews
+    open Global
     
 
-    type Language =
-        | English
-        | German
 
-
-    type Pages = 
-        | MainPage
-        | LoginPage
-        | BrowserPage
-        | AudioPlayerPage
-        | PermissionDeniedPage
-        | AudioBookDetailPage
-        | SettingsPage
     
     type Model = 
       { IsNav:bool
@@ -45,7 +34,8 @@ module App =
         AppLanguage:Language
         CurrentPage: Pages
         NavIsVisible:bool 
-        PageStack: Pages list}
+        PageStack: Pages list
+        BacktapsOnMainSite:int }
 
     type Msg = 
         | MainPageMsg of MainPage.Msg 
@@ -57,9 +47,9 @@ module App =
 
         | GotoMainPage
         | GotoBrowserPage
-        | SetBrowserPageCookieContainerAfterSucceededLogin of Map<string,string>
+        | ProcessFurtherActionsOnBrowserPageAfterLogin of Map<string,string> * LoginRequestCameFrom
         | GotoAudioPlayerPage of AudioBook
-        | GotoLoginPage
+        | GotoLoginPage of LoginRequestCameFrom
         | GotoPermissionDeniedPage
         | GotoSettingsPage
 
@@ -67,6 +57,8 @@ module App =
         | CloseAudioBookDetailPage
         | NavigationPopped of Pages
         | UpdateAudioBook of AudioBookItem.Model * string
+
+        | QuitApplication
         
 
     let initModel = { IsNav = false
@@ -79,7 +71,8 @@ module App =
                       AppLanguage = English
                       CurrentPage = MainPage
                       NavIsVisible = false 
-                      PageStack = [ MainPage] }
+                      PageStack = [ MainPage]
+                      BacktapsOnMainSite = 0 }
 
 
 
@@ -106,8 +99,8 @@ module App =
             model |> onProcessSettingsPageMsg msg
         | GotoMainPage ->
             model |> onGotoMainPageMsg
-        | GotoLoginPage ->
-            model |> onGotoLoginPageMsg
+        | GotoLoginPage cameFrom ->
+            model |> onGotoLoginPageMsg cameFrom
         | GotoBrowserPage ->
             model |> onGotoBrowserPageMsg
         | GotoAudioPlayerPage audioBook ->
@@ -122,11 +115,43 @@ module App =
             model |> onCloseAudioBookDetailPage
         | NavigationPopped page ->
             model |> onNavigationPoppedMsg page
-        | SetBrowserPageCookieContainerAfterSucceededLogin cc ->
-            model |> onSetBrowserPageCookieContainerAfterSucceedLoginMsg cc
+        | ProcessFurtherActionsOnBrowserPageAfterLogin (cc,cameFrom) ->
+            model |> onSetBrowserPageCookieContainerAfterSucceedLoginMsg cc cameFrom
         | UpdateAudioBook (ab, cameFrom) ->
             model |> onUpdateAudioBookMsg ab cameFrom
+        | QuitApplication ->
+            model |> onQuitApplication
+    
+    and onQuitApplication model =
+
+        let quitApp () =
+            try
+                Process.GetCurrentProcess().CloseMainWindow() |> ignore
+            with
+            | _ as ex ->
+                Crashes.TrackError ex
+
+        let quitAppWithMessage () =
+            async {
+                let! yes = Common.Helpers.displayAlertWithConfirm(Translations.current.QuitQuestionTitle,Translations.current.QuitQuestionMessage,Translations.current.Yes,Translations.current.No)
+                if yes then
+                    quitApp()
+                return None
+            } |> Cmd.ofAsyncMsgOption
+
+        let isPlayerRunning = 
+            model.AudioPlayerPageModel 
+            |> Option.map (fun i -> i.CurrentState = AudioPlayerPage.PlayerState.Playing)
+            |> Option.defaultValue false
+
+        if isPlayerRunning then
+            model, quitAppWithMessage()            
+        else
+            quitApp()
+            model, Cmd.none
         
+    
+
     and onUpdateAudioBookMsg ab cameFrom model =
 
         let mainPageMsg = 
@@ -187,8 +212,8 @@ module App =
             | None -> Cmd.none
             | Some excmd -> 
                 match excmd with
-                | LoginPage.ExternalMsg.GotoForwardToBrowsing c ->                    
-                    Cmd.batch ([ Cmd.ofMsg (SetBrowserPageCookieContainerAfterSucceededLogin c); Cmd.ofMsg GotoBrowserPage ])
+                | LoginPage.ExternalMsg.GotoForwardToBrowsing (cookies,cameFrom) ->                    
+                    Cmd.batch ([ Cmd.ofMsg (ProcessFurtherActionsOnBrowserPageAfterLogin (cookies,cameFrom)); Cmd.ofMsg GotoBrowserPage ])
 
         match model.LoginPageModel with
         | Some loginPageModel ->
@@ -206,8 +231,8 @@ module App =
         | None -> Cmd.none
         | Some excmd -> 
             match excmd with
-            | BrowserPage.ExternalMsg.OpenLoginPage ->
-                Cmd.ofMsg (GotoLoginPage)
+            | BrowserPage.ExternalMsg.OpenLoginPage cameFrom ->
+                Cmd.ofMsg (GotoLoginPage cameFrom)
             | BrowserPage.ExternalMsg.OpenAudioBookPlayer ab ->
                 Cmd.ofMsg (GotoAudioPlayerPage ab)
             | BrowserPage.ExternalMsg.UpdateAudioBookGlobal (ab,cameFrom) ->
@@ -309,19 +334,11 @@ module App =
         {newModel with CurrentPage = MainPage}, Cmd.batch [ (Cmd.ofMsg (MainPageMsg MainPage.Msg.LoadLocalAudiobooks)) ]
 
 
-    and onGotoLoginPageMsg model =
+    and onGotoLoginPageMsg cameFrom model =
         let newPageModel = model |> addPageToPageStack LoginPage
-        match model.LoginPageModel with
-        | None ->
-            let m,cmd = LoginPage.init ()
-            {newPageModel with CurrentPage = LoginPage; LoginPageModel = Some m},Cmd.batch [ (Cmd.map LoginPageMsg cmd) ]
-        | Some lpm  -> 
-            let newModel = 
-                if not lpm.RememberLogin then
-                    {lpm with Username = ""; Password = ""}
-                else
-                    lpm
-            {newPageModel with CurrentPage = LoginPage; LoginPageModel = Some newModel}, Cmd.none
+        let m,cmd = LoginPage.init cameFrom
+        {newPageModel with CurrentPage = LoginPage; LoginPageModel = Some m},Cmd.batch [ (Cmd.map LoginPageMsg cmd) ]
+        
 
 
     and onGotoBrowserPageMsg model =
@@ -380,7 +397,13 @@ module App =
 
     and onNavigationPoppedMsg page model =
         if page = MainPage then
-            {model with PageStack = [MainPage]}, (Cmd.ofMsg (MainPageMsg MainPage.Msg.LoadLocalAudiobooks))
+            let cmd =                 
+                if (model.BacktapsOnMainSite > 1) then
+                    Cmd.ofMsg QuitApplication
+                else
+                    Cmd.ofMsg (MainPageMsg MainPage.Msg.LoadLocalAudiobooks)
+
+            {model with PageStack = [MainPage];BacktapsOnMainSite = model.BacktapsOnMainSite + 1}, cmd
         else
             let newPageStack = model.PageStack |> List.filter ( fun i -> i <> page && i <> LoginPage)
 
@@ -392,18 +415,27 @@ module App =
                 else
                     Cmd.none
 
-            {model with PageStack = newPageStack}, cmd
+            {model with PageStack = newPageStack; BacktapsOnMainSite = 0}, cmd
 
 
-    and onSetBrowserPageCookieContainerAfterSucceedLoginMsg cc model =
+    and onSetBrowserPageCookieContainerAfterSucceedLoginMsg cc cameFrom model =
         match model.BrowserPageModel with 
         | None -> model, Cmd.none
         | Some bm ->
     
         let downloadQueueModel = {bm.DownloadQueueModel with CurrentSessionCookieContainer = Some cc}
-        let bModel = {bm with CurrentSessionCookieContainer = Some cc; DownloadQueueModel = downloadQueueModel}
+        let browserPageModel = {bm with CurrentSessionCookieContainer = Some cc; DownloadQueueModel = downloadQueueModel}
+        let cmd = 
+            Cmd.batch [
+                match cameFrom with
+                | RefreshAudiobooks ->
+                    yield Cmd.ofMsg (BrowserPageMsg BrowserPage.Msg.LoadOnlineAudiobooks)
+                | DownloadAudioBook ->
+                    yield Cmd.ofMsg (BrowserPageMsg BrowserPage.Msg.StartDownloadQueue)
+            ]
+
         
-        { model with BrowserPageModel = Some bModel}, Cmd.batch [Cmd.ofMsg (BrowserPageMsg BrowserPage.Msg.LoadLocalAudiobooks) ]
+        { model with BrowserPageModel = Some browserPageModel}, cmd
 
 
     let view (model: Model) dispatch =
@@ -435,6 +467,11 @@ module App =
                     model.MainPageModel.IsLoading
                     Translations.current.MainPage)
                         .ToolbarItems([
+                            View.ToolbarItem(
+                                text=Translations.current.Quit,
+                                command = (fun () -> dispatch QuitApplication)
+                            )
+
                             View.ToolbarItem(
                                 icon="browse_icon.png",
                                 command=(fun ()-> dispatch GotoBrowserPage
@@ -601,10 +638,10 @@ module App =
                     | PermissionDeniedPage ->
                         yield View.ContentPage(
                             title=Translations.current.PermissionDeniedPage,useSafeArea=true,
-                            content = View.Label(text=Translations.current.PermissionError, horizontalOptions = LayoutOptions.Center, widthRequest=200.0, horizontalTextAlignment=TextAlignment.Center,fontSize=20.0)
+                            content = View.Label(text=Translations.current.PermissionError, horizontalOptions = LayoutOptions.Center, widthRequest=200., horizontalTextAlignment=TextAlignment.Center,fontSize=20.)
                         )
 
-            ]            
+            ]
         )
 
 
@@ -639,36 +676,19 @@ type App () as app =
     //do runner.EnableLiveUpdate()
 #endif    
 
-    // Uncomment this code to save the application state to app.Properties using Newtonsoft.Json
-    // See https://fsprojects.github.io/Fabulous/models.html for further  instructions.
-#if APPSAVE
-    let modelId = "model"
     override __.OnSleep() = 
-
-        let json = Newtonsoft.Json.JsonConvert.SerializeObject(runner.CurrentModel)
-        Console.WriteLine("OnSleep: saving model into app.Properties, json = {0}", json)
-
-        app.Properties.[modelId] <- json
+        base.OnSleep()
+        ()
 
     override __.OnResume() = 
-        Console.WriteLine "OnResume: checking for model in app.Properties"
-        try 
-            match app.Properties.TryGetValue modelId with
-            | true, (:? string as json) -> 
-
-                Console.WriteLine("OnResume: restoring model from app.Properties, json = {0}", json)
-                let model = Newtonsoft.Json.JsonConvert.DeserializeObject<App.Model>(json)
-
-                Console.WriteLine("OnResume: restoring model from app.Properties, model = {0}", (sprintf "%0A" model))
-                runner.SetCurrentModel (model, Cmd.none)
-
-            | _ -> ()
-        with ex -> 
-            App.program.onError("Error while restoring model found in app.Properties", ex)
+        base.OnResume()
+        ()
 
     override this.OnStart() = 
-        Console.WriteLine "OnStart: using same logic as OnResume()"
-        this.OnResume()
-#endif
+        base.OnStart()
+        ()
+
+    
+
 
 

@@ -11,6 +11,7 @@ open Common
 open System.Text.RegularExpressions
 open Fabulous.DynamicViews
 open Services
+open Global
 
 
     type Model = 
@@ -33,7 +34,7 @@ open Services
         | RemoveLastSelectGroup
         | ShowErrorMessage of string
         | ChangeBusyState of bool
-        | GoToLoginPage
+        | GoToLoginPage of LoginRequestCameFrom
 
         | AudioBooksItemMsg of AudioBookItem.Model * AudioBookItem.Msg
         | DownloadQueueMsg of DownloadQueue.Msg
@@ -46,7 +47,7 @@ open Services
         
 
     type ExternalMsg =
-        | OpenLoginPage
+        | OpenLoginPage of LoginRequestCameFrom
         | OpenAudioBookPlayer of AudioBook 
         | OpenAudioBookDetail of AudioBook
         | UpdateAudioBookGlobal  of AudioBookItem.Model *  string
@@ -77,14 +78,13 @@ open Services
         } |> Cmd.ofAsyncMsg
     
 
-
-    let init () = initModel, Cmd.batch [(loadLocalAudioBooks ());Cmd.ofMsg (ChangeBusyState true)], None
-
-
-    let unsetBusyCmd = Cmd.ofMsg (ChangeBusyState false)
+    let unbusyCmd = Cmd.ofMsg (ChangeBusyState false)
 
 
-    let setBusyCmd = Cmd.ofMsg (ChangeBusyState true)
+    let busyCmd = Cmd.ofMsg (ChangeBusyState true)
+
+
+    let init () = initModel, Cmd.batch [(loadLocalAudioBooks ()); busyCmd], None
 
 
     let rec update msg model =
@@ -105,8 +105,8 @@ open Services
             model |> onShowErrorMessageMsg e
         | ChangeBusyState state -> 
             model |> onChangeBusyStateMsg state
-        | GoToLoginPage ->
-            model |> onGotoLoginPageMsg
+        | GoToLoginPage cameFrom ->
+            model |> onGotoLoginPageMsg cameFrom
         | AudioBooksItemMsg (abModel, msg) ->
             model |> onProcessAudioBookItemMsg abModel msg
         | DownloadQueueMsg msg ->
@@ -119,11 +119,21 @@ open Services
             model |> onDoNothingMsg            
 
     and onLoadLocalAudiobooksMsg model =
-        model, Cmd.batch [(loadLocalAudioBooks ());Cmd.ofMsg (ChangeBusyState true)], None
+        model, Cmd.batch [(loadLocalAudioBooks ()); busyCmd], None
     
 
     and onLoadOnlineAudiobooksMsg model =
         
+        let notifyAfterSync (synchedAb:AudioBook[]) =
+            async {
+                match synchedAb with
+                | [||] ->
+                    do! Common.Helpers.displayAlert(Translations.current.NoNewAudioBooksSinceLastRefresh," ¯\_(ツ)_/¯","OK")
+                | _ ->
+                    let message = synchedAb |> Array.map (fun i -> i.FullName) |> String.concat "\r\n"
+                    do! Common.Helpers.displayAlert(Translations.current.NewAudioBooksSinceLastRefresh,message,"OK")
+            }
+
         let loadOnlineAudioBooks model =
             async {
                 let! audioBooks = 
@@ -132,7 +142,7 @@ open Services
                 match audioBooks with
                 | Error e -> 
                     match e with
-                    | SessionExpired e -> return GoToLoginPage
+                    | SessionExpired e -> return (GoToLoginPage RefreshAudiobooks)
                     | Other e -> return (ShowErrorMessage e)
                     | Exception e ->
                         let ex = e.GetBaseException()
@@ -158,32 +168,34 @@ open Services
                     | Some la ->
                         let loadedFlatten = la |> AudioBooks.flatten
                         let synchedAb = Domain.filterNewAudioBooks loadedFlatten ab
-                        if synchedAb.Length > 0 then
-                            let message = synchedAb |> Array.map (fun i -> i.FullName) |> String.concat "\r\n"
-                            do! Common.Helpers.displayAlert(Translations.current.NewAudioBooksSinceLastRefresh,message,"OK")
-                        let! saveRes = synchedAb |> FileAccess.insertNewAudioBooksInStateFile 
-                        match saveRes with
-                        | Error e ->
-                            return (ShowErrorMessage e)
-                        | Ok _ ->                            
-                            let! audioBooks = FileAccess.loadAudioBooksStateFile ()
-                            match audioBooks with
-                            | Error e -> return (ShowErrorMessage e)
-                            | Ok ab -> 
-                                match ab with
-                                | [||] -> return DoNothing
-                                | _ ->     
-                                    let result = ab |> Domain.Filters.nameFilter                                
-                                    return (InitAudiobooks result)
+                        do! synchedAb |> notifyAfterSync
+                        match synchedAb with
+                        | [||] ->
+                            return DoNothing
+                        | _ ->
+                            let! saveRes = synchedAb |> FileAccess.insertNewAudioBooksInStateFile 
+                            match saveRes with
+                            | Error e ->
+                                return (ShowErrorMessage e)
+                            | Ok _ ->                            
+                                let! audioBooks = FileAccess.loadAudioBooksStateFile ()
+                                match audioBooks with
+                                | Error e -> return (ShowErrorMessage e)
+                                | Ok ab -> 
+                                    match ab with
+                                    | [||] -> return DoNothing
+                                    | _ ->     
+                                        let result = ab |> Domain.Filters.nameFilter                                
+                                        return (InitAudiobooks result)
             } |> Cmd.ofAsyncMsg        
         
         
         match model.CurrentSessionCookieContainer with
         | None ->
-            model, Cmd.none, Some OpenLoginPage
+            model, Cmd.none, Some (OpenLoginPage RefreshAudiobooks)
         | Some cc ->
             let loadAudioBooksCmd = model |> loadOnlineAudioBooks
-            model, Cmd.batch [loadAudioBooksCmd; setBusyCmd], None
+            model, Cmd.batch [loadAudioBooksCmd; busyCmd], None
 
 
     and filterAudiobooksByGroups model =        
@@ -199,9 +211,9 @@ open Services
 
 
     and onInitAudiobooksMsg ab model =
-        let newModel = {model with AudioBooks = Some ab}            
+        let newModel = { model with AudioBooks = Some ab }       
         let showAudiobooksCmd = newModel |> filterAudiobooksByGroups
-        newModel, Cmd.batch [ showAudiobooksCmd; unsetBusyCmd], None
+        newModel, Cmd.batch [ showAudiobooksCmd; unbusyCmd], None
     
     
     and onShowAudiobooksMsg ab model =
@@ -231,7 +243,7 @@ open Services
             )
         let newModel = {newModel with DisplayedAudioBooks = syncDab }
         let cmd = if model.DownloadQueueModel.DownloadQueue.Length > 0 then Cmd.ofMsg StartDownloadQueue else Cmd.none                
-        newModel, Cmd.batch [ unsetBusyCmd; cmd ], None
+        newModel, Cmd.batch [ unbusyCmd; cmd ], None
 
 
     and onAddSelectGroupMsg group model =
@@ -261,8 +273,8 @@ open Services
         {model with IsLoading = state}, Cmd.none, None
     
 
-    and onGotoLoginPageMsg model =
-        model,Cmd.none,Some OpenLoginPage
+    and onGotoLoginPageMsg cameFrom model =
+        model,Cmd.none,Some (OpenLoginPage cameFrom)
     
 
     and onProcessAudioBookItemMsg abModel msg model =
@@ -278,8 +290,8 @@ open Services
                     Cmd.ofMsg (DownloadQueueMsg (DownloadQueue.Msg.AddItemToQueue mdl)), None
                 | AudioBookItem.ExternalMsg.RemoveFromDownloadQueue mdl ->
                     Cmd.ofMsg (DownloadQueueMsg (DownloadQueue.Msg.RemoveItemFromQueue mdl)), None
-                | AudioBookItem.ExternalMsg.OpenLoginPage ->
-                    Cmd.ofMsg DoNothing, Some OpenLoginPage
+                | AudioBookItem.ExternalMsg.OpenLoginPage cameFrom ->
+                    Cmd.ofMsg DoNothing, Some (OpenLoginPage cameFrom)
                 | AudioBookItem.ExternalMsg.PageChangeBusyState state ->
                     Cmd.ofMsg (ChangeBusyState state), None
                 | AudioBookItem.ExternalMsg.OpenAudioBookPlayer ab ->
@@ -301,8 +313,8 @@ open Services
             | None -> Cmd.none, None
             | Some excmd -> 
                 match excmd with
-                | DownloadQueue.ExternalMsg.ExOpenLoginPage ->
-                    Cmd.ofMsg DoNothing, Some OpenLoginPage
+                | DownloadQueue.ExternalMsg.ExOpenLoginPage cameFrom ->
+                    Cmd.ofMsg DoNothing, Some (OpenLoginPage cameFrom)
                 | DownloadQueue.ExternalMsg.UpdateAudioBook abModel ->
                     Cmd.ofMsg (UpdateAudioBookItemList abModel), Some (UpdateAudioBookGlobal (abModel, "Browser"))
                 | DownloadQueue.ExternalMsg.UpdateDownloadProgress (abModel,progress) ->
@@ -325,7 +337,7 @@ open Services
 
     
     and onDoNothingMsg model =
-        model, Cmd.ofMsg (ChangeBusyState false), None
+        model, unbusyCmd, None
 
 
     
@@ -341,14 +353,14 @@ open Services
                         
 
                 yield View.Label(text=browseTitle, fontAttributes = FontAttributes.Bold,
-                                    fontSize = 25.0,
+                                    fontSize = 25.,
                                     horizontalOptions = LayoutOptions.Fill,
                                     horizontalTextAlignment = TextAlignment.Center,
                                     textColor = Consts.primaryTextColor,
                                     backgroundColor = Consts.cardColor,
-                                    margin=0.0).GridRow(0)
+                                    margin=0.).GridRow(0)
                     
-                yield View.StackLayout(padding = 10.0, verticalOptions = LayoutOptions.Start,
+                yield View.StackLayout(padding = 10., verticalOptions = LayoutOptions.Start,
                     children = [ 
                         
                         
@@ -356,7 +368,7 @@ open Services
                             
                         match model.SelectedGroupItems with
                         | None ->
-                            yield Controls.secondaryTextColorLabel 20.0 Translations.current.LoadYourAudioBooksHint
+                            yield Controls.secondaryTextColorLabel 20. Translations.current.LoadYourAudioBooksHint
 
                         | Some sg ->
                             match sg with
@@ -371,13 +383,13 @@ open Services
                                             verticalOptions = LayoutOptions.Fill,
                                             children= [
                                                 match groups with
-                                                | [||] -> yield Controls.secondaryTextColorLabel 20.0 Translations.current.LoadYourAudioBooksHint
+                                                | [||] -> yield Controls.secondaryTextColorLabel 20. Translations.current.LoadYourAudioBooksHint
                                                 | _ ->
                                                     for (idx,item) in groups |> Array.indexed do
                                                         yield 
                                                             View.Label(text=item
-                                                                , margin = 2.0
-                                                                , fontSize = 20.0
+                                                                , margin = 2.
+                                                                , fontSize = 20.
                                                                 , textColor = Consts.secondaryTextColor
                                                                 , verticalOptions = LayoutOptions.Fill
                                                                 , verticalTextAlignment = TextAlignment.Center                                                                        
