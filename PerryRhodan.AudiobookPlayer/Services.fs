@@ -93,6 +93,14 @@ module FileAccess =
                             .FindAll()                             
                             |> Seq.toArray
                             |> Array.sortBy (fun i -> i.FullName)
+                            |> Array.Parallel.map (
+                                fun i ->
+                                    if obj.ReferenceEquals(i.State.LastTimeListend,null) then
+                                        let newMdl = {i.State with LastTimeListend = None }
+                                        { i with State = newMdl }
+                                    else
+                                        i
+                            )
 
                     audioBooks
                 )
