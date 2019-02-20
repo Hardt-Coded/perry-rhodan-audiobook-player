@@ -1,6 +1,6 @@
 ﻿#r "netstandard"
 #r "System.Xml.Linq"
-#r @"C:\Users\Dieselmeister\.nuget\packages\fsharp.data\3..\lib\netstandard2.\FSharp.Data.dll"
+#r @"C:\Users\Dieselmeister\.nuget\packages\fsharp.data\3.0.0\lib\netstandard2.0\FSharp.Data.dll"
 //#r @"C:\Users\ich\.nuget\packages\fsharp.data\3..\lib\netstandard2.\FSharp.Data.dll"
 
 open FSharp.Data
@@ -53,8 +53,8 @@ let regexMatch pattern input =
 
 let regexMatchOpt pattern input =
     input
-    |> Option.map (regexMatch pattern)
-    |> Option.flatten
+    |> Option.bind (regexMatch pattern)
+    
 
 let regexMatchGroup pattern group input =
     let res = Regex.Match(input,pattern)
@@ -65,8 +65,8 @@ let regexMatchGroup pattern group input =
 
 let regexMatchGroupOpt pattern group input =
     input
-    |> Option.map (regexMatchGroup group pattern)
-    |> Option.flatten
+    |> Option.bind (regexMatchGroup group pattern)
+    
 
 
 open System.IO
@@ -227,7 +227,7 @@ let ps () =
             | Some a ->
                 a.Value() = "pricetag"
             )
-        |> Option.map( 
+        |> Option.bind( 
             fun idx ->
                 //get next entry
                 let nextIdx = idx + 1
@@ -237,8 +237,7 @@ let ps () =
                     let nextEntry = paragraphs.[nextIdx]
                     let description = nextEntry.InnerText()
                     Some description
-        )
-    |> Option.flatten
+        )    
     
     productDetail
         

@@ -398,10 +398,7 @@ module App =
     and onNavigationPoppedMsg page model =
         if page = MainPage then
             let cmd =                 
-                if (model.BacktapsOnMainSite > 1) then
-                    Cmd.ofMsg QuitApplication
-                else
-                    Cmd.ofMsg (MainPageMsg MainPage.Msg.LoadLocalAudiobooks)
+                Cmd.ofMsg (MainPageMsg MainPage.Msg.LoadLocalAudiobooks)
 
             {model with PageStack = [MainPage];BacktapsOnMainSite = model.BacktapsOnMainSite + 1}, cmd
         else

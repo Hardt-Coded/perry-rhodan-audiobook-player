@@ -176,12 +176,13 @@ open Services
             ab 
             |> Array.sortByDescending (fun i -> i.State.LastTimeListend) 
             |> Array.tryHead
-            |> Option.map (fun i -> 
+            |> Option.bind (fun i -> 
+                //let ltl = if obj.ReferenceEquals(i.State.LastTimeListend,null) then None else i.State.LastTimeListend
                 match i.State.LastTimeListend with
                 | None -> None
                 | Some _ -> Some (i |> AudioBookItem.initModel)
             ) 
-            |> Option.flatten
+            
         
         let lastTimeListendAudiobook = 
             match ab with
