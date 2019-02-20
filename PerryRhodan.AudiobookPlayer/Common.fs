@@ -240,8 +240,7 @@
 
         let regexMatchOpt pattern input =
             input
-            |> Option.map (regexMatch pattern)
-            |> Option.flatten
+            |> Option.bind (regexMatch pattern)
 
         let regexMatchGroup pattern group input =
             let res = Regex.Match(input,pattern)
@@ -252,8 +251,8 @@
 
         let regexMatchGroupOpt pattern group input =
             input
-            |> Option.map (regexMatchGroup group pattern)
-            |> Option.flatten
+            |> Option.bind (regexMatchGroup group pattern)
+            
 
 
     module AppCenter =

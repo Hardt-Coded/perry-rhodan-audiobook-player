@@ -169,7 +169,7 @@ let parseProductPageForDescription html =
             | Some a ->
                 a.Value() = "pricetag"
             )
-        |> Option.map( 
+        |> Option.bind( 
             fun idx ->
                 //get next entry
                 let nextIdx = idx + 1
@@ -180,7 +180,7 @@ let parseProductPageForDescription html =
                     let description = nextEntry.InnerText()
                     Some description
         )
-        |> Option.flatten
+        
     
     productDetail
 
@@ -191,12 +191,12 @@ let parseProductPageForImage html =
             .Html
             .Descendants ["img"]
         |> Seq.tryFind (fun i -> i.AttributeValue("id") = "imgzoom")
-        |> Option.map (
+        |> Option.bind (
             fun i -> 
                 let imgSrc = i.AttributeValue("src")
                 if imgSrc = "" then None else Some imgSrc
         )
-        |> Option.flatten
+        
     image
     
     
