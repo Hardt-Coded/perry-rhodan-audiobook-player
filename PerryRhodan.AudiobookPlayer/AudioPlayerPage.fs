@@ -12,13 +12,13 @@ open System.IO
 open System.Threading
 open System.Threading
 open Services
-
+open TimeSpanHelpers
+open Services.DependencyServices
+open Global
 
     
 
-    type PlayerState =
-        | Stopped        
-        | Playing
+    
 
     type Model = 
       { AudioBook:AudioBook 
@@ -28,7 +28,7 @@ open Services
         CurrentPositionMs: int option 
         CurrentDuration: TimeSpan option  
         CurrentDurationMs: int option
-        CurrentState : PlayerState
+        CurrentState : AudioPlayerState
         AudioFileList: (string * int) list 
         IsLoading: bool 
         CurrentPlayingStateUpdateTimer:Timer option 
@@ -53,6 +53,7 @@ open Services
         | OpenSleepTimerActionMenu
         | StartSleepTimer of TimeSpan option
         | DecreaseSleepTimer
+        | SetPlayerStateFromExtern of AudioPlayerState
         
         | ChangeBusyState of bool
         | DoNothing
@@ -64,16 +65,8 @@ open Services
 
     let audioPlayer = DependencyService.Get<DependencyServices.IAudioPlayer>()
 
-    let toTimeSpan (ms:int) =
-        TimeSpan.FromMilliseconds(ms |> float)
 
-    let fromTimeSpan (ts:TimeSpan) =
-        ts.TotalMilliseconds |> int
-    
-    let fromTimeSpanOpt (ts:TimeSpan option) =
-        match ts with
-        | None -> 0
-        | Some ts -> ts |> fromTimeSpan
+        
 
     
 
@@ -112,29 +105,40 @@ open Services
                     let (file,_) = model.AudioFileList.[model.CurrentAudioFileIndex]
                     let currentPosition =model.CurrentPosition |> fromTimeSpanOpt
 
-                    audioPlayer.OnCompletion <- Some (fun ()-> dispatch NextAudioFile)
-                    audioPlayer.OnNoisyHeadPhone <- Some (fun () -> dispatch Stop)
-                    audioPlayer.OnInfo <- Some (fun (p,d) -> 
-                        dispatch (UpdatePostion (p,d))
-                        let tsPos =  (p |> toTimeSpan)
-                        if tsPos.Seconds % 5 = 0 then
-                            dispatch (SaveCurrentPosition)
-                        )
+                    do! audioPlayer.RunService model.AudioBook file currentPosition
+                    match audioPlayer.GetRunningService() with
+                    | None ->
+                        return DoNothing
+                    | Some audioPlayer ->
+                        audioPlayer.OnCompletion <- Some (fun ()-> dispatch NextAudioFile)
+                        audioPlayer.OnNoisyHeadPhone <- Some (fun () -> dispatch Stop)
+                        audioPlayer.OnInfo <- Some (fun (p,d, s) -> 
+                            dispatch (UpdatePostion (p,d))
+                            dispatch (SetPlayerStateFromExtern s)
+                            let tsPos =  (p |> toTimeSpan)
+                            // sollte in den Service
+                            if tsPos.Seconds % 5 = 0 then
+                                dispatch (SaveCurrentPosition)
+                            )
 
-                    do! audioPlayer.PlayFile file currentPosition
+                        //do! audioPlayer.PlayFile file currentPosition
+                        //audioPlayer.StopService()
+                    
+                        audioPlayer.StartAudio()
 
-                    let timer = 
-                        new Timer(
-                            fun _ -> audioPlayer.GetInfo() |> Async.Start
-                            ,null,0,1000)
+                        let timer = 
+                            new Timer(
+                                fun _ -> audioPlayer.GetInfo() |> Async.Start
+                                ,null,0,1000)
 
                     
-                    return (PlayStarted timer)
+                        return (PlayStarted timer)
             }
         ) |> Cmd.ofAsyncMsgWithInternalDispatch
 
     let stopAudio model =
-        audioPlayer.Stop () |> ignore
+        //audioPlayer.Stop () |> ignore
+        audioPlayer.StopAudio ()
         // Unregister all delegates from the audio service
         audioPlayer.OnCompletion <- None
         audioPlayer.OnNoisyHeadPhone <- None
@@ -264,13 +268,21 @@ open Services
             model |> onStartSleepTimer sleepTime            
         | DecreaseSleepTimer ->
             model |> onUpdateSleepTimerMsg 
+        | SetPlayerStateFromExtern state ->
+            model |> onSetPlayerStateFromExtern state
             
         | ChangeBusyState state -> 
             model |> onChangeBusyState state
+
         | PlayStopped | DoNothing -> 
             model, Cmd.none, None
 
     
+    and onSetPlayerStateFromExtern state model =
+        { model with CurrentState = state }, Cmd.none, None
+        
+
+
     and onOpenSleepTimerActionMenu model =
         
         let openSleepTimerActionMenu () =            

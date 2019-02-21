@@ -20,3 +20,7 @@
         | RefreshAudiobooks
         | DownloadAudioBook
 
+    type AudioPlayerState =
+        | Playing
+        | Stopped
+

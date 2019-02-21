@@ -648,7 +648,7 @@ module App =
 type App () as app = 
     inherit Application ()
 
-    do AppCenter.Start("ios=(...);android=", typeof<Analytics>, typeof<Crashes>)
+    do AppCenter.Start("ios=(...);android=e806b20e-0e4c-4209-81c1-9ff48478f932", typeof<Analytics>, typeof<Crashes>)
     
     let runner =
         
@@ -673,8 +673,15 @@ type App () as app =
     //do runner.EnableLiveUpdate()
 #endif    
 
-    override __.OnSleep() = 
+    override __.OnSleep() =         
         base.OnSleep()
+        match AudioPlayerPage.audioPlayer.GetRunningService() with
+        | None ->
+            ()
+        | Some s ->
+            s.OnCompletion <- None
+            s.OnInfo <- None
+            s.OnNoisyHeadPhone <- None
         ()
 
     override __.OnResume() = 

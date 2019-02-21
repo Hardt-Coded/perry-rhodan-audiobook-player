@@ -41,7 +41,12 @@ type MainActivity() =
         Xamarin.Forms.Forms.Init (this, bundle)
         Xamarin.Forms.DependencyService.Register<AndroidDownloadFolder>()
         Xamarin.Forms.DependencyService.Register<AudioPlayer>()
+        Xamarin.Forms.DependencyService.Register<NotificationService>()
+        
+               
 
+
+        this |> createNotificationChannel
         
         Plugin.CurrentActivity.CrossCurrentActivity.Current.Init(this, bundle);
 

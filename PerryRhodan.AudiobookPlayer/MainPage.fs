@@ -150,6 +150,7 @@ open Services
         
         let loadLocalAudioBooks () =
             async {
+
                 let! audioBooks = FileAccess.loadAudioBooksStateFile ()
                 match audioBooks with
                 | Error e -> 

@@ -21,10 +21,12 @@ open Common
 
 module DependencyServices =
 
+    open Global
 
     type IAndroidDownloadFolder = 
         abstract member GetAndroidDownloadFolder:unit -> string 
 
+    
 
     type IAudioPlayer = 
 
@@ -35,13 +37,27 @@ module DependencyServices =
 
         abstract member OnCompletion: (unit -> unit) option with get,set
         abstract member OnNoisyHeadPhone: (unit -> unit) option with get,set
-        abstract member OnInfo: (int * int -> unit) option with get,set
+        abstract member OnInfo: (int * int * AudioPlayerState -> unit) option with get,set
 
         abstract member PlayFile:string -> int -> Async<unit>
         abstract member Stop:unit -> unit
         abstract member GotToPosition: int -> unit
         // triggers to get async position and duration via onInfo Handler
         abstract member GetInfo: unit -> Async<unit>
+
+        abstract member RunService: AudioBook -> string -> int -> Async<unit>
+        abstract member StopService: unit -> unit
+        abstract member GetRunningService: unit -> IAudioPlayer option
+
+        abstract member StartAudio: unit -> unit
+        abstract member StopAudio: unit -> unit
+
+
+
+    type INotificationService =
+        abstract member ShowNotification: string -> unit
+        abstract member OnSecondActivity: (string -> unit) option with get,set
+
 
 module Consts =
     
@@ -567,6 +583,33 @@ module SecureLoginStorage =
             with
             | _ as e -> return (Error (e.Message))
         }
+
+module Files =
+
+    let fromTimeSpan (ts:TimeSpan) =
+        ts.TotalMilliseconds |> int
+
+    let getMp3FileList folder =
+        async {
+            let! files = 
+                asyncFunc( 
+                    fun () ->  Directory.EnumerateFiles(folder, "*.mp3")
+                )
+            
+            let! res =
+                asyncFunc (fun () ->
+                    files 
+                    |> Seq.toList 
+                    |> List.map (
+                        fun i ->
+                            use tfile = TagLib.File.Create(i)
+                            (i,tfile.Properties.Duration |> fromTimeSpan)
+                    )
+                )
+
+            return res
+        }
+        
 
 
 

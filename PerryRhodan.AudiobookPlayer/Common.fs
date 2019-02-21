@@ -284,6 +284,19 @@
 
 
 
+    module TimeSpanHelpers =
+
+        let toTimeSpan (ms:int) =
+            TimeSpan.FromMilliseconds(ms |> float)
+
+        let fromTimeSpan (ts:TimeSpan) =
+            ts.TotalMilliseconds |> int
+        
+        let fromTimeSpanOpt (ts:TimeSpan option) =
+            ts
+            |> Option.defaultValue TimeSpan.Zero
+            |> fromTimeSpan
+
 
     module Texts =
 
