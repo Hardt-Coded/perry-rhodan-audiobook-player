@@ -19,6 +19,7 @@ module rec AudioPlayerService =
 
     open Microsoft.AppCenter.Crashes
     
+    
     open Services
 
     open Android.Util
@@ -55,6 +56,8 @@ module rec AudioPlayerService =
     let ACTION_MOVEFORWARD_PLAYER = "PerryRhodan.action.MOVE_FORWARD"
     let ACTION_MOVEBACKWARD_PLAYER = "PerryRhodan.action.MOVE_BACKWARD"
     let ACTION_SETPOSITION_PLAYER = "PerryRhodan.action.SET_POSITION"
+    let ACTION_JUMP_FORWARD_PLAYER = "PerryRhodan.action.JUMP_FORWARD"
+    let ACTION_JUMP_BACKWARD_PLAYER = "PerryRhodan.action.JUMP_BACKWARD"
     let ACTION_UPDATE_METADATA_PLAYER = "PerryRhodan.action.UPDATE_METADATA"
 
 
@@ -98,11 +101,6 @@ module rec AudioPlayerService =
                         let remoteIntent = new Intent(action);
                         context.StartService(remoteIntent) |> ignore
 
-                        
-
-
-
-
         member this.ComponentName = this.Class.Name;
 
                 
@@ -121,6 +119,7 @@ module rec AudioPlayerService =
         
         // other stuff
         let mutable noisyHeadPhoneReceiver = None
+        let mutable mediaActionReceiver = None
 
         //  delegates
         let mutable onInfo = None
@@ -138,6 +137,15 @@ module rec AudioPlayerService =
         let mutable mediaSessionCompat:MediaSession = null
         let mutable mediaControllerCompat:MediaController = null
 
+
+        let jumpDistance =
+            30000
+
+        let addToCurrentPos x =
+            currentAudioplayInfo
+            |> Option.map (fun i -> i.Position + x)
+            |> Option.defaultValue 0
+            
     
         let getIndexForFile file =
             currentMp3ListWithDuration |> List.findIndex (fun (name,_) -> name = file)
@@ -257,14 +265,7 @@ module rec AudioPlayerService =
                 updateNotification ()
             updateInfoRunning <- false
 
-        let waitUntilUpdateInfoReady () =
-            async {
-                while updateInfoRunning do
-                    do! Async.Sleep 10
-
-
-            }
-
+        
 
         let sendUpdate mediaplayer =
             let i = new Intent(NOTIFICATION_BROADCAST_ACTION);
@@ -275,7 +276,7 @@ module rec AudioPlayerService =
             ()
 
 
-        let playNextTrack () =
+        let playNextTrackWithPos pos =
             match currentAudioplayInfo with
             | None ->
                 ()
@@ -304,18 +305,22 @@ module rec AudioPlayerService =
                     ()
                 else
                     let (newFile,newDuration) = newIndex |> getFileFromIndex 
-                    let newState = {info with Filename = newFile; Duration = newDuration; Position = 0; CurrentTrackNumber = newIndex + 1}
+                    let newState = {info with Filename = newFile; Duration = newDuration; Position = pos; CurrentTrackNumber = newIndex + 1}
                     
                     currentAudioplayInfo <- Some newState
                     sendUpdate self.MediaPlayer                    
                     if info.State = Playing then
                         
                         self.StopBase ()
-                        self.PlayFile newFile 0 |> Async.RunSynchronously
+                        self.PlayFile newFile pos |> Async.RunSynchronously
                     ()
+        
+        let playNextTrack () =
+            playNextTrackWithPos 0
 
 
-        let playPreviousTrack () =
+
+        let playPreviousTrackWithPos pos =
             match currentAudioplayInfo with
             | None ->
                 ()
@@ -329,26 +334,50 @@ module rec AudioPlayerService =
 
                 // check if index okay in get file function
                 let (newFile,newDuration) = newIndex |> getFileFromIndex 
-                let newState = {info with Filename = newFile; Duration = newDuration; Position = 0; CurrentTrackNumber = newIndex + 1}
+                let newState = {info with Filename = newFile; Duration = newDuration; Position = pos; CurrentTrackNumber = newIndex + 1}
                 currentAudioplayInfo <- Some newState
                 sendUpdate self.MediaPlayer
 
                 if info.State = Playing then
                     self.StopBase ()
-                    self.PlayFile newFile 0 |> Async.RunSynchronously
+                    self.PlayFile newFile pos |> Async.RunSynchronously
                 ()
+
+
+        let playPreviousTrack () =
+            playPreviousTrackWithPos 0
 
 
         let seekToPos (mediaplayer:MediaPlayer) ms =
             match currentAudioplayInfo with
             | None ->
+                
                 ()
             | Some info ->
-                if info.State = Playing then
-                    mediaplayer.SeekTo(ms)
-                let newState = {info with Position = ms;}
-                currentAudioplayInfo <- Some newState
-                sendUpdate mediaplayer
+
+                let setPosOnCurrentTrack (apinfo:AudioPlayerInfo) pos =
+                    if apinfo.State = Playing then
+                        mediaplayer.SeekTo(pos)
+                    let newState = {apinfo with Position = pos;}
+                    currentAudioplayInfo <- Some newState
+                    sendUpdate mediaplayer
+                
+                // when your new pos is actually on the next track
+                if ms > info.Duration then
+                    let diff = ms - info.Duration
+                    playNextTrackWithPos diff
+                // when you new position is actually on the previous track
+                elif ms < 0 then
+                    let (file,durationPrevTrack) = getFileFromIndex (info.CurrentTrackNumber - 2)
+                    // are we already on the first track
+                    if file = info.Filename then 
+                        setPosOnCurrentTrack info 0
+                    else
+                        let posPrevTrack = durationPrevTrack + ms
+                        playPreviousTrackWithPos posPrevTrack
+                // no edge case                        
+                else
+                    setPosOnCurrentTrack info ms
 
         let mutable mediaPlayer:MediaPlayer = null
         let mutable playbackAttributes:AudioAttributes = null
@@ -393,7 +422,9 @@ module rec AudioPlayerService =
                     match onAfterPrepare with
                     | None -> ()
                     | Some cmd -> cmd()
-                    mediaPlayer.Start()                    
+                    mediaPlayer.Start()    
+                    updateNotification ()
+                    storeCurrentAudiobookState ()
             )  
 
             ()
@@ -418,6 +449,13 @@ module rec AudioPlayerService =
                 noisyHeadPhoneReceiver <- None
                 ()
 
+        let registerMediaActionReciever () =
+            ()
+
+
+        let unregisterMediaActionReciever () =
+            ()
+
 
         let createNotificationChannel () =
             if Build.VERSION.SdkInt < BuildVersionCodes.O then
@@ -438,6 +476,7 @@ module rec AudioPlayerService =
         /// ***************************
 
         let actionStartService (intent:Intent) =
+            registerMediaActionReciever () 
             let json = intent.GetStringExtra("abdata")
             let jsonList = intent.GetStringExtra("fileList")
 
@@ -469,7 +508,8 @@ module rec AudioPlayerService =
 
             Log.Debug(AudioPlayerService.TAG,"on Stop Service called") |> ignore
             self.StopForeground(true)
-            self.StopSelf()             
+            self.StopSelf()       
+            unregisterMediaActionReciever () 
             try
                 let notificationManager = self.GetSystemService(Android.Content.Context.NotificationService) :?> NotificationManager
                 notificationManager.Cancel(SERVICE_RUNNING_NOTIFICATION_ID)
@@ -560,16 +600,34 @@ module rec AudioPlayerService =
 
         let actionMoveBackward () =
             Log.Debug(AudioPlayerService.TAG,"move backward") |> ignore
-            if (mediaPlayer.CurrentPosition < 2000) then
-                playPreviousTrack ()
-            else
-                0 |> seekToPos mediaPlayer 
+            match currentAudioplayInfo with
+            | None -> 
+                Crashes.TrackError(exn("AudioPlayerService: moveBack without current audio play info"))
+                ()
+            | Some info -> 
+                if (info.Position < 2000) then
+                    playPreviousTrack ()
+                else
+                    0 |> seekToPos mediaPlayer 
                 
 
         let actionSetPosition (intent:Intent) =
             let newPos = intent.GetIntExtra("pos",0)
             Log.Debug(AudioPlayerService.TAG,sprintf "seek to %i ms" newPos) |> ignore
             newPos |> seekToPos mediaPlayer
+
+        
+        let actionJumpForward () =
+            let newPos = addToCurrentPos (jumpDistance)
+            Log.Debug(AudioPlayerService.TAG,sprintf "jump forward to %i ms" newPos) |> ignore
+            newPos |> seekToPos mediaPlayer
+
+
+        let actionJumpBackward () =            
+            let newPos = addToCurrentPos (jumpDistance * -1)
+            Log.Debug(AudioPlayerService.TAG,sprintf "jump backward to %i ms" newPos) |> ignore
+            newPos |> seekToPos mediaPlayer
+            
 
 
         let actionUpdateMetadata (intent:Intent) =
@@ -644,7 +702,7 @@ module rec AudioPlayerService =
 
         member this.PlayFile (file:string) position =
             async {
-                registerNoisyHeadPhoneReciever ()
+                registerNoisyHeadPhoneReciever ()                
                 // stop info sending until the playing is full ready                
                 mediaPlayer.Reset()
                 do! mediaPlayer.SetDataSourceAsync(file) |> Async.AwaitTask
@@ -652,8 +710,6 @@ module rec AudioPlayerService =
                     mediaPlayer.SeekTo(position)
                     updateInfo mediaPlayer
                     updateTimer <- Some (new System.Threading.Timer((fun _ -> updateInfo mediaPlayer),null,0,1000))
-                    updateNotification ()
-                    storeCurrentAudiobookState ()
                 )
                 mediaPlayer.PrepareAsync()
                 return ()
@@ -681,6 +737,7 @@ module rec AudioPlayerService =
 
         member this.RegisterForegroundService() =
             createNotificationChannel ()
+            
             let notify =
                 buildNotification ()
 
@@ -705,12 +762,12 @@ module rec AudioPlayerService =
 
         member this.BuildStartAudioAction () =
             let icon = AndroidDrawable.IcMediaPlay
-            let startAudioIntent = new Intent(this, this.GetType());
-            startAudioIntent.SetAction(ACTION_START_PLAYER) |> ignore
-            startAudioIntent.PutExtra("info","") |> ignore   
-            startAudioIntent.PutExtra("fileList","") |> ignore   
+            let intent = new Intent(this, this.GetType());
+            intent.SetAction(ACTION_START_PLAYER) |> ignore
+            intent.PutExtra("info","") |> ignore   
+            intent.PutExtra("fileList","") |> ignore   
             
-            let startAudioPendingIntent = PendingIntent.GetService(this, 0, startAudioIntent, PendingIntentFlags.UpdateCurrent)
+            let startAudioPendingIntent = PendingIntent.GetService(this, 0, intent, PendingIntentFlags.UpdateCurrent)
             
             let builder = 
                 new Notification.Action.Builder(icon, "", startAudioPendingIntent)
@@ -718,9 +775,9 @@ module rec AudioPlayerService =
 
         member this.BuildStopAudioAction () =
             let icon = AndroidDrawable.IcMediaPause
-            let stopAudioIntent = new Intent(this, this.GetType());
-            stopAudioIntent.SetAction(ACTION_STOP_PLAYER) |> ignore
-            let stopAudioPendingIntent = PendingIntent.GetService(this, 0, stopAudioIntent, PendingIntentFlags.UpdateCurrent)
+            let intent = new Intent(this, this.GetType());
+            intent.SetAction(ACTION_STOP_PLAYER) |> ignore
+            let stopAudioPendingIntent = PendingIntent.GetService(this, 0, intent, PendingIntentFlags.UpdateCurrent)
             
             let builder = 
                 new Notification.Action.Builder(icon, "", stopAudioPendingIntent)
@@ -729,9 +786,9 @@ module rec AudioPlayerService =
 
         member this.BuildForwardAudioAction () =
             let icon = AndroidDrawable.IcMediaFf
-            let stopAudioIntent = new Intent(this, this.GetType());
-            stopAudioIntent.SetAction(ACTION_MOVEFORWARD_PLAYER) |> ignore
-            let stopAudioPendingIntent = PendingIntent.GetService(this, 0, stopAudioIntent, PendingIntentFlags.UpdateCurrent)
+            let intent = new Intent(this, this.GetType());
+            intent.SetAction(ACTION_JUMP_FORWARD_PLAYER) |> ignore            
+            let stopAudioPendingIntent = PendingIntent.GetService(this, 0, intent, PendingIntentFlags.UpdateCurrent)
             
             let builder = 
                 new Notification.Action.Builder(icon, "", stopAudioPendingIntent)
@@ -740,9 +797,11 @@ module rec AudioPlayerService =
 
         member this.BuildBackwardAudioAction () =
             let icon = AndroidDrawable.IcMediaRew
-            let stopAudioIntent = new Intent(this, this.GetType());
-            stopAudioIntent.SetAction(ACTION_MOVEBACKWARD_PLAYER) |> ignore
-            let stopAudioPendingIntent = PendingIntent.GetService(this, 0, stopAudioIntent, PendingIntentFlags.UpdateCurrent)
+            let intent = new Intent(this, this.GetType());
+
+            // ACTION_SETPOSITION_PLAYER
+            intent.SetAction(ACTION_JUMP_BACKWARD_PLAYER) |> ignore                        
+            let stopAudioPendingIntent = PendingIntent.GetService(this, 0, intent, PendingIntentFlags.UpdateCurrent)
             
             let builder = 
                 new Notification.Action.Builder(icon, "", stopAudioPendingIntent)
@@ -751,9 +810,9 @@ module rec AudioPlayerService =
 
         member this.BuildStopServiceAction () =
             let icon = icon "settings_icon"
-            let startAudioIntent = new Intent(this, this.GetType());
-            startAudioIntent.SetAction(ACTION_STOP_SERVICE) |> ignore
-            let startAudioPendingIntent = PendingIntent.GetService(this, 0, startAudioIntent, PendingIntentFlags.UpdateCurrent)
+            let intent = new Intent(this, this.GetType());
+            intent.SetAction(ACTION_STOP_SERVICE) |> ignore
+            let startAudioPendingIntent = PendingIntent.GetService(this, 0, intent, PendingIntentFlags.UpdateCurrent)
             
             let builder = 
                 new Notification.Action.Builder(icon, "", startAudioPendingIntent)
@@ -790,6 +849,10 @@ module rec AudioPlayerService =
                 actionMoveBackward ()
             | x when x = ACTION_SETPOSITION_PLAYER ->
                 actionSetPosition intent
+            | x when x = ACTION_JUMP_FORWARD_PLAYER ->
+                actionJumpForward ()
+            | x when x = ACTION_JUMP_BACKWARD_PLAYER ->
+                actionJumpBackward ()
             | x when x = ACTION_UPDATE_METADATA_PLAYER ->
                 actionUpdateMetadata intent
 
@@ -961,6 +1024,23 @@ module rec AudioPlayerService =
                     //let setPositionPendingIntent = PendingIntent.GetService(Android.App.Application.Context, 0, setPositionAudioIntent, PendingIntentFlags.UpdateCurrent)
                     //setPositionPendingIntent.Send()
                     ()
+
+
+            member this.JumpForward () =
+                if isStarted then
+                    ACTION_JUMP_FORWARD_PLAYER 
+                    |> sendCommandToService typeof<AudioPlayerService> (
+                        fun intent -> ()
+                    )
+
+
+            member this.JumpBackward () =
+                if isStarted then
+                    ACTION_JUMP_BACKWARD_PLAYER 
+                    |> sendCommandToService typeof<AudioPlayerService> (
+                        fun intent -> ()
+                    )
+                // ACTION_JUMP_FORWARD_PLAYER
 
             member this.MoveForward () =
                 if isStarted then

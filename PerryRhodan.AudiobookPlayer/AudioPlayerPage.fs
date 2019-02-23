@@ -405,22 +405,16 @@ open Global
 
 
     and onPreviousAudioFileMsg model =
-        audioPlayer.MoveForward()
+        audioPlayer.MoveBackward()
         model, Cmd.none, None
 
     and onJumpForwardMsg model =
-        model.CurrentPositionMs
-        |> Option.map (fun pos -> audioPlayer.GotToPosition (pos + 30000))
-        |> ignore
-
+        audioPlayer.JumpForward ()
         model, Cmd.none, None
 
 
     and onJumpBackwardsMsg model =
-        model.CurrentPositionMs
-        |> Option.map (fun pos -> audioPlayer.GotToPosition (pos - 30000))
-        |> ignore
-
+        audioPlayer.JumpBackward ()
         model, Cmd.none, None
 
 

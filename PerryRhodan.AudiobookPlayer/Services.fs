@@ -50,6 +50,8 @@ module DependencyServices =
         abstract member MoveForward: unit -> unit
         abstract member MoveBackward: unit -> unit
         abstract member GotToPosition: int -> unit
+        abstract member JumpForward: unit -> unit
+        abstract member JumpBackward: unit -> unit
         abstract member UpdateMetaData: AudioBook -> unit
 
 
