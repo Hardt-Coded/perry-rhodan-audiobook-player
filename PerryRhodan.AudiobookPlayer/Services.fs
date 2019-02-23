@@ -30,27 +30,27 @@ module DependencyServices =
 
     type IAudioPlayer = 
 
-        //abstract member CurrentPosition: int with get
-        //abstract member CurrentDuration: int with get
-        abstract member LastPositionBeforeStop: int option with get
-        abstract member CurrentFile: string option with get
+        abstract member OnInfo: (AudioPlayerInfo -> unit) option with get,set
+        abstract member OnUpdateState: (AudioPlayerState -> unit) option with get,set
+        abstract member CurrentInfo: AudioPlayerInfo option with get
+        abstract member CurrentAudiobook: AudioBook option with get
 
-        abstract member OnCompletion: (unit -> unit) option with get,set
-        abstract member OnNoisyHeadPhone: (unit -> unit) option with get,set
-        abstract member OnInfo: (int * int * AudioPlayerState -> unit) option with get,set
+        abstract member IsStarted: bool with get
+        //// triggers to get async position and duration via onInfo Handler
+        //abstract member GetInfo: unit -> Async<unit>
+        
 
-        abstract member PlayFile:string -> int -> Async<unit>
-        abstract member Stop:unit -> unit
-        abstract member GotToPosition: int -> unit
-        // triggers to get async position and duration via onInfo Handler
-        abstract member GetInfo: unit -> Async<unit>
+        abstract member RunService: AudioBook -> (string * int) list -> Async<unit>
+        abstract member StopService: unit -> Async<unit>
+        //abstract member GetRunningService: unit -> IAudioPlayer option
 
-        abstract member RunService: AudioBook -> string -> int -> Async<unit>
-        abstract member StopService: unit -> unit
-        abstract member GetRunningService: unit -> IAudioPlayer option
-
-        abstract member StartAudio: unit -> unit
+        abstract member StartAudio: AudioPlayerInfo -> unit
         abstract member StopAudio: unit -> unit
+        abstract member TogglePlayPause: unit -> unit
+        abstract member MoveForward: unit -> unit
+        abstract member MoveBackward: unit -> unit
+        abstract member GotToPosition: int -> unit
+        abstract member UpdateMetaData: AudioBook -> unit
 
 
 
@@ -127,6 +127,39 @@ module FileAccess =
 
         }
 
+    let loadDownloadedAudioBooksStateFile () =
+        async {
+            try
+                initAppFolders ()
+                let! res = asyncFunc (fun () ->
+                    use db = new LiteDatabase(audioBooksStateDataFile, mapper)
+                    let audioBooksCol =
+                        db.GetCollection<AudioBook>("audiobooks")
+                    audioBooksCol.EnsureIndex(fun i -> i.State.Downloaded) |> ignore
+
+                    let audioBooks = 
+                        audioBooksCol
+                            .Find(fun x -> x.State.Downloaded)
+                            |> Seq.toArray
+                            |> Array.sortBy (fun i -> i.FullName)
+                            |> Array.Parallel.map (
+                                fun i ->
+                                    if obj.ReferenceEquals(i.State.LastTimeListend,null) then
+                                        let newMdl = {i.State with LastTimeListend = None }
+                                        { i with State = newMdl }
+                                    else
+                                        i
+                            )
+
+                    audioBooks
+                )
+
+                return res |> Ok
+            with
+            | _ as e -> return Error e.Message
+
+        }
+
     let insertNewAudioBooksInStateFile (audioBooks:AudioBook[]) =
         async {
             try
@@ -136,7 +169,8 @@ module FileAccess =
                     let audioBooksCol = 
                         db.GetCollection<AudioBook>("audiobooks")
                     
-                    audioBooksCol.InsertBulk(audioBooks)
+                    audioBooksCol.InsertBulk(audioBooks) |> ignore
+                    
                 )
 
                 return res |> Ok

@@ -141,7 +141,7 @@ module App =
 
         let isPlayerRunning = 
             model.AudioPlayerPageModel 
-            |> Option.map (fun i -> i.CurrentState = AudioPlayerPage.PlayerState.Playing)
+            |> Option.map (fun i -> i.CurrentState = Global.Playing)
             |> Option.defaultValue false
 
         if isPlayerRunning then
@@ -366,9 +366,9 @@ module App =
 
         | Some abModel ->
             if (abModel.AudioBook <> audioBook) then
-                if abModel.CurrentState = AudioPlayerPage.Playing then
+                if abModel.CurrentState = Global.Playing then
                     // stop audio player
-                    AudioPlayerPage.audioPlayer.Stop()
+                    AudioPlayerPage.audioPlayer.StopAudio()
                 brandNewPage()
             else
                 newPageModel, Cmd.none
@@ -648,7 +648,7 @@ module App =
 type App () as app = 
     inherit Application ()
 
-    do AppCenter.Start("ios=(...);android=e806b20e-0e4c-4209-81c1-9ff48478f932", typeof<Analytics>, typeof<Crashes>)
+    do AppCenter.Start(sprintf "ios=(...);android=%s" Global.appcenterAndroidId, typeof<Analytics>, typeof<Crashes>)
     
     let runner =
         
@@ -674,14 +674,7 @@ type App () as app =
 #endif    
 
     override __.OnSleep() =         
-        base.OnSleep()
-        match AudioPlayerPage.audioPlayer.GetRunningService() with
-        | None ->
-            ()
-        | Some s ->
-            s.OnCompletion <- None
-            s.OnInfo <- None
-            s.OnNoisyHeadPhone <- None
+        base.OnSleep()        
         ()
 
     override __.OnResume() = 
@@ -691,6 +684,10 @@ type App () as app =
     override this.OnStart() = 
         base.OnStart()
         ()
+
+    
+
+        
 
     
 

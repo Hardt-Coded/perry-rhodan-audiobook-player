@@ -151,7 +151,7 @@ open Services
         let loadLocalAudioBooks () =
             async {
 
-                let! audioBooks = FileAccess.loadAudioBooksStateFile ()
+                let! audioBooks = FileAccess.loadDownloadedAudioBooksStateFile ()
                 match audioBooks with
                 | Error e -> 
                     do! Common.Helpers.displayAlert(Translations.current.ErrorLoadingLocalAudiobook,e,"OK")

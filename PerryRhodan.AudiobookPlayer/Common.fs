@@ -175,12 +175,22 @@
 
         let ofAsyncMsgWithInternalDispatch (p: (Dispatch<'msg> -> Async<'msg>)) : Cmd<'msg> =
             [ fun dispatch -> async { let! msg = (p dispatch)  in dispatch msg } |> Async.StartImmediate ] 
+
+        let ofAsyncMsgOptionWithInternalDispatch (p: (Dispatch<'msg> -> Async<'msg option>)) : Cmd<'msg> =
+            [ fun dispatch -> async { let! msg = (p dispatch)  in match msg with None -> () | Some msg -> dispatch msg } |> Async.StartImmediate ]
+        
         
         let ofMultipleAsyncMsgWithInternalDispatch (p: (Dispatch<'msg> -> Async<#seq<'msg>>)) : Cmd<'msg> =
             [ fun dispatch -> async { let! msgs = (p dispatch) in msgs |> Seq.iter (fun msg -> dispatch msg) } |> Async.StartImmediate ] 
         
         let ofAsyncMsgOption (p: Async<'msg option>) : Cmd<'msg> =
             [ fun dispatch -> async { let! msg = p in match msg with None -> () | Some msg -> dispatch msg } |> Async.StartImmediate ]
+
+        let ofMultipleAsyncMsgs (p: Async<#seq<'msg>>) : Cmd<'msg> =
+            [ fun dispatch -> async { let! msgs = p in msgs |> Seq.iter (fun msg -> dispatch msg) } |> Async.StartImmediate ]
+
+        let ofMultipleAsyncMsgOptions (p: Async<#seq<'msg option>>) : Cmd<'msg> =
+            [ fun dispatch -> async { let! msgs = p in msgs |> Seq.iter (fun msg -> match msg with None -> () | Some msg -> dispatch msg) } |> Async.StartImmediate ]
 
         
         /// Message with specifiy item as fst of tuple

@@ -14,6 +14,9 @@ open Android.OS
 open Xamarin.Forms.Platform.Android
 open Services
 open AudioPlayerService
+open Microsoft.AppCenter
+open Microsoft.AppCenter.Crashes
+open Microsoft.AppCenter.Analytics
 
 
 type AndroidDownloadFolder() =
@@ -36,17 +39,13 @@ type MainActivity() =
         FormsAppCompatActivity.ToolbarResource <- Resources.Layout.Toolbar
         base.OnCreate (bundle)
 
+        AppCenter.Start(Global.appcenterAndroidId, typeof<Analytics>, typeof<Crashes>)
+
         Xamarin.Essentials.Platform.Init(this, bundle)
 
         Xamarin.Forms.Forms.Init (this, bundle)
         Xamarin.Forms.DependencyService.Register<AndroidDownloadFolder>()
         Xamarin.Forms.DependencyService.Register<AudioPlayer>()
-        Xamarin.Forms.DependencyService.Register<NotificationService>()
-        
-               
-
-
-        this |> createNotificationChannel
         
         Plugin.CurrentActivity.CrossCurrentActivity.Current.Init(this, bundle);
 
