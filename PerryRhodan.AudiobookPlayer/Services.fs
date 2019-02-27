@@ -352,8 +352,8 @@ module WebAccess =
             match cookies with
             | None -> return Ok [||]
             | Some cc ->
-    
-                match! getDownloadPage cc with
+                let! dPage = getDownloadPage cc
+                match dPage with
                 | Error e -> return Error e
                 | Ok html ->
                     let audioBooks =
