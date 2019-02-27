@@ -44,6 +44,9 @@
     <Reference Include="Fabulous.CustomControls, Version=0.32.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Fabulous.CustomControls.0.32.0\lib\netstandard2.0\Fabulous.CustomControls.dll</HintPath>
     </Reference>
+    <Reference Include="FSharp.Control.AsyncSeq, Version=2.0.21.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\FSharp.Control.AsyncSeq.2.0.21\lib\net45\FSharp.Control.AsyncSeq.dll</HintPath>
+    </Reference>
     <Reference Include="FSharp.Core, Version=4.5.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\FSharp.Core.4.5.4\lib\net45\FSharp.Core.dll</HintPath>
     </Reference>

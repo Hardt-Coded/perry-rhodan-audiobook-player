@@ -1,6 +1,6 @@
 ﻿module Global
 
-    let appcenterAndroidId = ""
+    let appcenterAndroidId = "e806b20e-0e4c-4209-81c1-9ff48478f932"
 
 
     type Language =
@@ -22,21 +22,7 @@
         | RefreshAudiobooks
         | DownloadAudioBook
 
-    type AudioPlayerState =
-        | Playing
-        | Stopped
+    
 
-    type AudioPlayerInfo =
-        { Filename: string
-          Position: int
-          Duration: int
-          CurrentTrackNumber: int
-          State: AudioPlayerState }
-        
-        static member Empty =
-            { Filename = ""
-              Position = 0
-              Duration = 0
-              CurrentTrackNumber = 0
-              State = Stopped }
+    
 

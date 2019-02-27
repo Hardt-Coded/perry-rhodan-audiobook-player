@@ -163,6 +163,9 @@
     <Reference Include="Fabulous.LiveUpdate">
       <HintPath>..\packages\Fabulous.LiveUpdate.0.32.0\lib\netstandard2.0\Fabulous.LiveUpdate.dll</HintPath>
     </Reference>
+    <Reference Include="FSharp.Control.AsyncSeq">
+      <HintPath>..\packages\FSharp.Control.AsyncSeq.2.0.21\lib\netstandard2.0\FSharp.Control.AsyncSeq.dll</HintPath>
+    </Reference>
     <Reference Include="FSharp.Core">
       <Private>True</Private>
     </Reference>

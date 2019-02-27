@@ -15,6 +15,7 @@ open Services
 open TimeSpanHelpers
 open Services.DependencyServices
 open Global
+open AudioPlayerState
 
     
 
@@ -30,8 +31,7 @@ open Global
         CurrentDurationMs: int option
         CurrentState : AudioPlayerState
         AudioFileList: (string * int) list 
-        IsLoading: bool 
-        CurrentPlayingStateUpdateTimer:Timer option 
+        IsLoading: bool         
         TrackPositionProcess: float
         ProgressbarValue: float         
         TimeUntilSleeps: TimeSpan option 
@@ -39,13 +39,14 @@ open Global
 
     type Msg = 
         | Play 
-        | PlayStarted of Timer
+        | PlayStarted
         | Stop
         | PlayStopped
         | NextAudioFile
         | PreviousAudioFile
         | JumpForward
         | JumpBackwards
+        | RestoreStateFormAudioService of AudioPlayerInfo
         | FileListLoaded of (string * int) list
         | UpdatePostion of position:int * duration:int
         | ProgressBarChanged of float
@@ -53,7 +54,7 @@ open Global
         | OpenSleepTimerActionMenu
         | StartSleepTimer of TimeSpan option
         | DecreaseSleepTimer
-        | SetPlayerStateFromExtern of AudioPlayerState
+        | SetPlayerStateFromExtern of AudioPlayerState.AudioPlayerState
         | UpdateTrackNumber of int
         
         | ChangeBusyState of bool
@@ -64,15 +65,14 @@ open Global
         | GotoBrowserPage
 
 
-    let audioPlayer = DependencyService.Get<DependencyServices.IAudioPlayer>()
+    let audioPlayer = DependencyService.Get<AudioPlayerState.IAudioPlayer>()
 
 
         
 
     
 
-
-    let loadFilesAsyncCmd (model:AudioBook) =
+    let loadFilesAsyncMsg (model:AudioBook) =
         async {
             match model.State.DownloadedFolder with
             | None -> return None
@@ -93,7 +93,10 @@ open Global
                         )
                     )
                 return Some (FileListLoaded (res |> List.sortBy (fun (f,_) -> f)))
-        } |> Cmd.ofAsyncMsgOption
+        }
+
+    let loadFilesAsyncCmd =
+         loadFilesAsyncMsg >> Cmd.ofAsyncMsgOption 
 
 
     let getTrackNumberFromFileName file model = 
@@ -114,29 +117,12 @@ open Global
                     else
                         let (file,_) = model.AudioFileList.[model.CurrentAudioFileIndex]
                         let currentPosition =model.CurrentPosition |> fromTimeSpanOpt
-
-                        let info = 
-                            { Filename = file
-                              Duration=model.CurrentDurationMs |> Option.defaultValue 0
-                              Position = currentPosition
-                              CurrentTrackNumber = model.CurrentAudioFileIndex + 1
-                              State = Stopped }
                         
-                        audioPlayer.StartAudio info
+                        audioPlayer.StartAudio file currentPosition
 
                         return DoNothing
             }
         ) |> Cmd.ofAsyncMsgWithInternalDispatch
-
-    let stopAudio model =
-            audioPlayer.StopAudio ()            
-
-            model.CurrentPlayingStateUpdateTimer
-            |> Option.bind (fun timer ->
-                timer.Dispose()
-                audioPlayer.CurrentInfo
-                |> Option.map (fun x -> x.Position)            
-            )
 
 
     let setAudioPositionRelative value model =
@@ -214,7 +200,6 @@ open Global
           CurrentState = Stopped
           AudioFileList = []
           IsLoading=false
-          CurrentPlayingStateUpdateTimer=None
           TrackPositionProcess=0.
           ProgressbarValue = 0. 
           TimeUntilSleeps = None
@@ -226,15 +211,19 @@ open Global
                 async {
                     //do! audioPlayer.StopService()
                     audioPlayer.StopAudio ()
-                    do! audioPlayer.RunService abMdl fileList
-                    
-                    // in case someone use play and stop on the audio service
-                    audioPlayer.OnUpdateState <- Some (fun s -> dispatch (SetPlayerStateFromExtern s))
-                    audioPlayer.OnInfo <- Some (fun info -> 
-                        dispatch (UpdatePostion (info.Position,info.Duration))                            
-                        dispatch (SetPlayerStateFromExtern info.State)                            
-                        dispatch (UpdateTrackNumber info.CurrentTrackNumber)
-                        )
+                    audioPlayer.RunService abMdl fileList
+
+
+                    let info = (fun info -> 
+                        async {
+                            dispatch (UpdatePostion (info.Position,info.Duration))                            
+                            dispatch (SetPlayerStateFromExtern info.State)                            
+                            dispatch (UpdateTrackNumber info.CurrentTrackNumber)
+                        }
+                    )   
+                     
+
+                    InformationDispatcher.audioPlayerStateInformationDispatcher.Post(InformationDispatcher.AddListener ("abPage",info))
                         
                     return Play
                 }
@@ -243,67 +232,57 @@ open Global
     let init audioBook = 
         let model = audioBook |> initModel
 
-        let setOnPlayIfNecessay =
+        let addAudioServiceInfoHandler =
             (fun dispatch ->
                 async {
-                    // in case someone use play and stop on the audio service
-                    if audioPlayer.OnUpdateState.IsNone then
-                        audioPlayer.OnUpdateState <- Some (fun s -> dispatch (SetPlayerStateFromExtern s))
-                    if audioPlayer.OnInfo.IsNone then
-                        audioPlayer.OnInfo <- Some (fun info -> 
-                            dispatch (UpdatePostion (info.Position,info.Duration))
-                            dispatch (SetPlayerStateFromExtern info.State)                                
-                            dispatch (UpdateTrackNumber info.CurrentTrackNumber)
-                            )
+                    let info =
+                        (fun info -> 
+                            async {
+                                dispatch (UpdatePostion (info.Position,info.Duration))
+                                dispatch (SetPlayerStateFromExtern info.State)                                
+                                dispatch (UpdateTrackNumber info.CurrentTrackNumber)
+                            
+                            }
+                        )
+                        
+                    InformationDispatcher.audioPlayerStateInformationDispatcher.Post(InformationDispatcher.AddListener ("abPage",info))
 
                     return DoNothing
                 }
-            )|> Cmd.ofAsyncMsgWithInternalDispatch
+            ) |> Cmd.ofAsyncMsgWithInternalDispatch
 
-        let serviceCommand,newModel =
-            // when no audio player service active, activate one
-            // if current audio player service has no audio book than stop and restart with current book
-            // if current audio player service audio book is the same as the current book, 
-            // get infos from the service an update the current model
-            // and if it's a new book, stop service and start with the new audio book
-            if not audioPlayer.IsStarted then
-                model.AudioBook |>loadFilesAsyncCmd, model
-            else
-                match audioPlayer.CurrentAudiobook with
+
+        let decideOnAudioPlayerStateCommand model =
+            async {
+                let! info = audioPlayer.GetCurrentState()
+                match info with
                 | None ->
                     
-                    model.AudioBook |>loadFilesAsyncCmd, model
-                | Some ab ->
-                        let isAudioBooktheSame = ab.FullName = model.AudioBook.FullName
-                        match isAudioBooktheSame,audioPlayer.CurrentInfo with
-                        | true, None ->
-                            Cmd.none, model
-                        | true, Some info ->
-                            let currentAudioFile = info.Filename
-                            
-                            // start to play, if the audio service is in current playing mode, than all item should update to there values
-                            model.AudioBook |> loadFilesAsyncCmd,
-                            { model with
-                                CurrentAudioFile = Some currentAudioFile
-                                CurrentAudioFileIndex = info.CurrentTrackNumber - 1
-                                CurrentDuration = Some (info.Duration |> toTimeSpan)
-                                CurrentPosition = Some (info.Position  |> toTimeSpan)
-                                CurrentDurationMs = Some info.Duration
-                                CurrentPositionMs = Some info.Position
-                                AudioBook = ab
-                            }
-                        | _, _ ->
-                            model.AudioBook |>loadFilesAsyncCmd, model
+                    return! model.AudioBook |> loadFilesAsyncMsg
+                | Some info ->
+                    match info.ServiceState with
+                    | Started ->
+                        return Some (RestoreStateFormAudioService info)
+                    | _ ->
+                        return! model.AudioBook |> loadFilesAsyncMsg
+            } |> Cmd.ofAsyncMsgOption
+
+        let cmds = 
+            Cmd.batch [
+                model |> decideOnAudioPlayerStateCommand
+                addAudioServiceInfoHandler
+                setBusyCmd
+            ]
                          
-        newModel, Cmd.batch [ serviceCommand;setOnPlayIfNecessay; setBusyCmd ]
+        model, cmds
 
 
     let rec update msg model =
         match msg with
         | Play -> 
             model |> onPlayMsg
-        | PlayStarted timer -> 
-            model |> onPlayStartedMsg timer          
+        | PlayStarted -> 
+            model |> onPlayStartedMsg          
         | Stop ->
             model |> onStopMsg
         | NextAudioFile -> 
@@ -314,6 +293,8 @@ open Global
             model |> onJumpForwardMsg            
         | JumpBackwards -> 
             model |> onJumpBackwardsMsg
+        | RestoreStateFormAudioService info ->
+            model |> onRestoreStateFormAudioService info
         | FileListLoaded fileList -> 
             model |> onFileListLoadedMsg fileList
         | UpdatePostion (position, duration) -> 
@@ -339,6 +320,19 @@ open Global
         | PlayStopped | DoNothing -> 
             model, Cmd.none, None
 
+
+    and onRestoreStateFormAudioService info model =
+        let newModel = 
+            { model with
+                CurrentAudioFile = Some info.Filename
+                CurrentAudioFileIndex = info.CurrentTrackNumber - 1
+                CurrentDuration = Some (info.Duration |> toTimeSpan)
+                CurrentPosition = Some (info.Position  |> toTimeSpan)
+                CurrentDurationMs = Some info.Duration
+                CurrentPositionMs = Some info.Position
+                AudioBook = info.AudioBook }
+
+        newModel, model.AudioBook |> loadFilesAsyncCmd, None
     
     and onUpdateTrackNumber num model =
         { model with CurrentAudioFileIndex = num - 1}, Cmd.none, None
@@ -383,19 +377,13 @@ open Global
         newModel, Cmd.batch [ playAudioCmd; newModel |> saveNewAudioBookStateCmd ], None
 
 
-    and onPlayStartedMsg timer model =
-        { model with CurrentPlayingStateUpdateTimer = Some timer; AudioPlayerBusy = false }, Cmd.none, None
+    and onPlayStartedMsg model =
+        { model with AudioPlayerBusy = false }, Cmd.none, None
 
 
     and onStopMsg model =
-        let lastPosition = 
-            model 
-            |> stopAudio
-            |> Option.map (toTimeSpan)
-        let newModel = 
-            { model with CurrentState = Stopped; CurrentPlayingStateUpdateTimer = None; CurrentPosition = lastPosition}
-            |> updateLastListendTimeInAudioBookState
-        newModel, newModel |> saveNewAudioBookStateCmd , None
+        audioPlayer.StopAudio()
+        model, Cmd.none , None
 
     
     and onNextAudioFileMsg model =
