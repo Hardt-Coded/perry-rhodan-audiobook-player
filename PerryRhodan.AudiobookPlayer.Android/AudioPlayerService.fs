@@ -1,6 +1,6 @@
 ﻿namespace PerryRhodan.AudiobookPlayer.Android
 
-module rec Mark3 =
+module rec AudioPlayerServiceImplementation =
 
     open System
     open Android.App

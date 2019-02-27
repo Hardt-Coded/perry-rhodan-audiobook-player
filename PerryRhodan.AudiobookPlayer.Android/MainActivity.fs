@@ -13,7 +13,6 @@ open Android.Media
 open Android.OS
 open Xamarin.Forms.Platform.Android
 open Services
-open AudioPlayerServiceAgent
 open Microsoft.AppCenter
 open Microsoft.AppCenter.Crashes
 open Microsoft.AppCenter.Analytics
@@ -45,7 +44,7 @@ type MainActivity() =
 
         Xamarin.Forms.Forms.Init (this, bundle)
         Xamarin.Forms.DependencyService.Register<AndroidDownloadFolder>()
-        Xamarin.Forms.DependencyService.Register<Mark3.DecpencyService.AudioPlayer>()
+        Xamarin.Forms.DependencyService.Register<AudioPlayerServiceImplementation.DecpencyService.AudioPlayer>()
         
         Plugin.CurrentActivity.CrossCurrentActivity.Current.Init(this, bundle);
 

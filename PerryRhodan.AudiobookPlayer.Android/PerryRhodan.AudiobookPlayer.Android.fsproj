@@ -127,7 +127,7 @@
     <AndroidResource Include="Resources\drawable\forward_icon.png" />
     <AndroidResource Include="Resources\drawable\backward_icon.png" />
     <AndroidResource Include="Resources\drawable\pr_small_icon.png" />
-    <Compile Include="Mark3.fs" />
+    <Compile Include="AudioPlayerService.fs" />
     <Compile Include="MainActivity.fs" />
     <Content Include="packages.config" />
   </ItemGroup>
