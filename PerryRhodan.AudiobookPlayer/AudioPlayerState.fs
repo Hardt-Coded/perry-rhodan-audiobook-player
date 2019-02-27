@@ -69,12 +69,12 @@
         | StartAudioPlayerExtern of filename:string * position: int
         | StopAudioPlayer of resumeOnAudioFocus:bool
         | TogglePlayPause
-        | MoveToNextTrack
+        | MoveToNextTrack of meantTrack:int
         | MoveToPreviousTrack
         | JumpForward 
         | JumpBackwards 
         | SetPosition of pos:int
-        | UpdatePositionExternal of pos:int
+        | UpdatePositionExternal of pos:int * meantTrack:int
         | SetCurrentAudioServiceStateToStarted
 
 
@@ -89,7 +89,7 @@
         abstract member StopAudioPlayer: AudioPlayerInfo -> AudioPlayerInfo
         abstract member MoveToNextTrack: AudioPlayerInfo -> Async<AudioPlayerInfo>
         abstract member MoveToPreviousTrack: AudioPlayerInfo -> Async<AudioPlayerInfo>
-        abstract member SetPosition: AudioPlayerInfo -> AudioPlayerInfo
+        abstract member SetPosition: AudioPlayerInfo -> Async<AudioPlayerInfo>
         abstract member OnUpdatePositionNumber: AudioPlayerInfo -> AudioPlayerInfo
         abstract member StateMailbox:MailboxProcessor<AudioPlayerCommand> with get
 
@@ -187,7 +187,7 @@
                     async {
                         try
                             let! command = inbox.Receive()
-
+                            System.Diagnostics.Debug.WriteLine(sprintf "command: %A" command)
                             match state.ServiceState with
                             | AudioPlayerServiceState.Stopped ->
                                 match command with
@@ -199,7 +199,7 @@
                                         }
                                         |> audioService.StartAudioService                                    
                                     let newState = {newState with ServiceState = Started }  
-                                    informationDispatcher.Post(InformationDispatcher.InfoDispatcherMsg.Dispatch newState)
+                                    //informationDispatcher.Post(InformationDispatcher.InfoDispatcherMsg.Dispatch newState)
                                     return! (loop newState)
 
                                 | GetCurrentState reply ->
@@ -213,7 +213,10 @@
 
                             | Started ->                                
                                 let! (newState) = processCommandsWhenStated command state
-                                informationDispatcher.Post(InformationDispatcher.InfoDispatcherMsg.Dispatch newState)
+
+                                // only notify when duration or track is an reasonable value
+                                if newState.CurrentTrackNumber > 0 && newState.Duration > 0 then
+                                    informationDispatcher.Post(InformationDispatcher.InfoDispatcherMsg.Dispatch newState)
                                 return! loop newState
                                 
 
@@ -253,8 +256,8 @@
                             | Stopped ->
                                 let! newState = state |> onStartPlayer state.Filename state.Position
                                 return (newState)                                  
-                        | MoveToNextTrack ->
-                            let! newState = state |> onMoveNextTrack 0
+                        | MoveToNextTrack meantTrack ->
+                            let! newState = state |> onMoveNextTrack 0 meantTrack
                             return (newState)
                         | MoveToPreviousTrack ->
                             let! newState =
@@ -272,8 +275,8 @@
                         | SetPosition pos ->
                             let! newState = state |> onSetPosition pos
                             return (newState)
-                        | UpdatePositionExternal pos ->
-                            let newState = state |> onUpdatePositionExternal pos
+                        | UpdatePositionExternal (pos,meantTrack) ->
+                            let newState = state |> onUpdatePositionExternal pos meantTrack
                             return (newState)
                         | SetCurrentAudioServiceStateToStarted ->
                             let newState = {state with ServiceState = Started }
@@ -285,12 +288,17 @@
                     }
 
 
-                and onUpdatePositionExternal pos state =
-                    let newState = {state with Position = pos }
-                    let secs = (pos |> Common.TimeSpanHelpers.toTimeSpan).Seconds
-                    if secs = 0 || secs = 5 then
-                        Helpers.storeCurrentAudiobookState newState
-                    audioService.OnUpdatePositionNumber newState    
+                and onUpdatePositionExternal pos meantTrack state =
+                    // ignore all set position commands, 
+                    // if the current track is not any more the track from the audio service
+                    if state.CurrentTrackNumber = meantTrack then
+                        let newState = {state with Position = pos }
+                        let secs = (pos |> Common.TimeSpanHelpers.toTimeSpan).Seconds
+                        if secs = 0 || secs = 5 then
+                            Helpers.storeCurrentAudiobookState newState
+                        audioService.OnUpdatePositionNumber newState
+                    else
+                        state
                     
 
 
@@ -338,29 +346,41 @@
                     
 
 
-                and onMoveNextTrack pos state =
+                and onMoveNextTrack pos meantTrack state =
                     async {
-                        let index =
-                            state.Filename
-                            |> Helpers.getIndexForFile state.Mp3FileList
+                        // ignore all move next messages, 
+                        // if the current track is not any more the track from the audio service
 
-                        let newIndex = index + 1
+                        if state.CurrentTrackNumber = meantTrack || meantTrack = -1 then
+                            let index =
+                                state.Filename
+                                |> Helpers.getIndexForFile state.Mp3FileList
+
+                            let newIndex = index + 1
                         
-                        if newIndex > (state.Mp3FileList.Length - 1) then
+                            if newIndex > (state.Mp3FileList.Length - 1) then
 
-                            // Let's stop the player
-                            let newState = state |> onStopPlayer false
+                                // Let's stop the player
+                                let newState =
+                                    if state.State = Playing then
+                                        state |> onStopPlayer false
+                                    else
+                                        state
 
-                            let newAb = {newState.AudioBook with State = {newState.AudioBook.State with LastTimeListend = Some System.DateTime.UtcNow; Completed = true } }
-                            let newState = {newState with AudioBook = newAb }
+                                let newAb = {newState.AudioBook with State = {newState.AudioBook.State with LastTimeListend = Some System.DateTime.UtcNow; Completed = true } }
+                                let newState = {newState with AudioBook = newAb }
 
-                            // ToTo store state on disk ?!
-                            return newState
+                                // ToTo store state on disk ?!
+                                return newState
+                            else
+                                let (newFile,newDuration) = newIndex |> Helpers.getFileFromIndex state.Mp3FileList
+                                let newState = {state with Filename = newFile; Duration = newDuration; Position = pos; CurrentTrackNumber = newIndex + 1}
+                                let! newState = newState |> audioService.MoveToNextTrack 
+                                return newState 
+                            
                         else
-                            let (newFile,newDuration) = newIndex |> Helpers.getFileFromIndex state.Mp3FileList
-                            let newState = {state with Filename = newFile; Duration = newDuration; Position = pos; CurrentTrackNumber = newIndex + 1}
-                            let! newState = newState |> audioService.MoveToNextTrack 
-                            return newState 
+                            return state
+                            
                     }
                     
 
@@ -372,7 +392,10 @@
                             |> Helpers.getIndexForFile state.Mp3FileList
 
                         let newIndex = 
-                            index - 1
+                            if index = 0 then
+                                0
+                            else
+                                index - 1
 
                         // check if index okay in get file function
                         let (newFile,newDuration) = newIndex |> Helpers.getFileFromIndex state.Mp3FileList
@@ -402,57 +425,31 @@
                 and onSetPosition pos state = 
                     async {
                         let setPosOnCurrentTrack pos (apinfo:AudioPlayerInfo) =
-                            async {
-                                return {apinfo with Position = pos}
-                            }
-                            
+                            { apinfo with Position = pos }
+                        
 
                         let! newState =
+                            match pos with
                             // when your new pos is actually on the next track
-                            if pos > state.Duration then
+                            | p when p > state.Duration ->
                                 let diff = pos - state.Duration
-                                state |> onMoveNextTrack diff
+                                (state |> onMoveNextTrack diff state.CurrentTrackNumber)
                             // when you new position is actually on the previous track
-                            elif pos < 0 then
+                            | p when p < 0 ->
                                 let (file,durationPrevTrack) = (state.CurrentTrackNumber - 2) |> Helpers.getFileFromIndex state.Mp3FileList
                                 // are we already on the first track
                                 if file = state.Filename then 
-                                    state |> setPosOnCurrentTrack 0
+                                    (state |> setPosOnCurrentTrack 0) |> async.Return
                                 else
+                                    // wenn track wechsel, dann min 5 sek abstand.
+                                    let pos = if pos > -5000 then -5000 else pos
                                     let posPrevTrack = durationPrevTrack + pos
                                     state |> onMovePreviousTrack posPrevTrack
-                            // no edge case                        
-                            else
-                                state |> setPosOnCurrentTrack pos
-                        
+                            | _ ->
+                               let newState = {state with Position = pos}
+                               newState |> audioService.SetPosition 
 
-                        // try to aggregate and process the jump and setpos messages without calling the 
-                        // underlying audio player implementation and only change the state and at the end
-                        // run the implemention
-                        let possibleOtherSetPosMessageResult =
-                            inbox.TryScan( 
-                                fun cmd ->                                    
-                                    match cmd with
-                                    | JumpForward ->
-                                        let jumpF = onJumpForward newState
-                                        Some (jumpF)
-                                    | JumpBackwards ->
-                                        let jumpB = onJumpBackward newState
-                                        Some jumpB
-                                    //| SetPosition pos ->  
-                                    //    let setPo = onSetPosition pos newState
-                                    //    Some setPo
-                                    | _ ->
-                                        None
-                                , 1000
-                            )
-                        let! res = possibleOtherSetPosMessageResult
-                        match res with
-                        | None ->
-                            return newState |> audioService.SetPosition
-                        | Some newState ->
-                            informationDispatcher.Post(InformationDispatcher.InfoDispatcherMsg.Dispatch newState)
-                            return newState
+                        return newState
                         
                     }
                     

@@ -80,6 +80,8 @@ module rec AudioPlayerServiceImplementation =
         let JUMP_BACKWARD_PLAYER = "PerryRhodan.action.JUMP_BACKWARD"
         let GET_CURRENT_STATE_PLAYER = "PerryRhodan.action.GET_CURRENT_STATE"
 
+        let POS_NOTIFICATION_BROADCAST_ACTION = "PerryRhodan.action.POS_BROADCAST"
+
 
     module Dependencies =
 
@@ -179,7 +181,8 @@ module rec AudioPlayerServiceImplementation =
 
 
         let private buildStartAudioAction () =
-            let icon = AndroidDrawable.IcMediaPlay
+            let icon = icon "play_small_icon"
+            //let icon = AndroidDrawable.IcMediaPlay
             let intent = new Intent(context, typeof<Services.AudioPlayerService>);
             intent.SetAction(START_PLAYER) |> ignore
             let startAudioPendingIntent = PendingIntent.GetService(context, 0, intent, PendingIntentFlags.UpdateCurrent)
@@ -189,7 +192,8 @@ module rec AudioPlayerServiceImplementation =
             builder.Build();
 
         let private buildStopAudioAction () =
-            let icon = AndroidDrawable.IcMediaPause
+            //let icon = AndroidDrawable.IcMediaPause
+            let icon = icon "pause_small_icon"
             let intent = new Intent(context, typeof<Services.AudioPlayerService>)
             intent.SetAction(STOP_PLAYER) |> ignore
             let stopAudioPendingIntent = PendingIntent.GetService(context, 0, intent, PendingIntentFlags.UpdateCurrent)
@@ -200,7 +204,8 @@ module rec AudioPlayerServiceImplementation =
             builder.Build();
 
         let private buildForwardAudioAction () =
-            let icon = AndroidDrawable.IcMediaFf
+            //let icon = AndroidDrawable.IcMediaFf
+            let icon = icon "forward_small_icon"
             let intent = new Intent(context, typeof<Services.AudioPlayerService>)
             intent.SetAction(JUMP_FORWARD_PLAYER) |> ignore            
             let stopAudioPendingIntent = PendingIntent.GetService(context, 0, intent, PendingIntentFlags.UpdateCurrent)
@@ -211,7 +216,8 @@ module rec AudioPlayerServiceImplementation =
             builder.Build();
 
         let private buildBackwardAudioAction () =
-            let icon = AndroidDrawable.IcMediaRew
+            //let icon = AndroidDrawable.IcMediaRew
+            let icon = icon "backward_small_icon"
             let intent = new Intent(context, typeof<Services.AudioPlayerService>)
 
             // ACTION_SETPOSITION_PLAYER
@@ -250,7 +256,7 @@ module rec AudioPlayerServiceImplementation =
 
         let buildNotification (mediaSession:MediaSession) info =            
             let context = Android.App.Application.Context
-            let icon = icon "pr_small_icon"
+            let icon = icon "einsa_small_icon"
             let title = info.AudioBook.FullName
                 
             
@@ -303,6 +309,20 @@ module rec AudioPlayerServiceImplementation =
 
 
     module Receivers =
+        open Android.App
+        open Android.OS
+        open Android.Media
+        open Android.Media.Session
+        open Android.Content
+        
+        open Android.Runtime
+        open Android.Views
+        
+
+        open Xamarin.Forms.Platform.Android      
+        open Android.Support.V4.Media.Session
+        open Android.Support.V4.Media
+        open Android.Support.V4.App
 
         type NoisyHeadPhoneReceiver() =
             inherit BroadcastReceiver()
@@ -318,6 +338,49 @@ module rec AudioPlayerServiceImplementation =
                     with
                     | ex ->
                         Crashes.TrackError(ex)
+
+
+        [<BroadcastReceiver>]
+        [<IntentFilter([| Intent.ActionMediaButton |])>]
+        type RemoteControlBroadcastReceiver() =
+            inherit BroadcastReceiver()
+                   
+                override this.OnReceive(context,intent) =
+                    if intent.Action <> Intent.ActionMediaButton then
+                        ()
+                    else
+                        let key = intent.GetParcelableExtra(Intent.ExtraKeyEvent) :?> KeyEvent
+                        if (key.Action <> KeyEventActions.Down) then
+                            ()
+                        else
+                            
+                            match key.KeyCode with
+                            | Keycode.Headsethook | Keycode.MediaPlayPause ->
+                                ServiceActions.TOGGLE_PLAYPAUSE
+                                |> Helpers.sendCommandToService typeof<Services.AudioPlayerService> [] []
+                                
+                            | Keycode.MediaPlay ->
+                                ServiceActions.START_PLAYER
+                                |> Helpers.sendCommandToService typeof<Services.AudioPlayerService> [] []
+                                
+                            | Keycode.MediaPause -> 
+                                ServiceActions.STOP_PLAYER
+                                |> Helpers.sendCommandToService typeof<Services.AudioPlayerService> [] []
+                                
+                            | Keycode.MediaStop -> 
+                                ServiceActions.STOP_PLAYER
+                                |> Helpers.sendCommandToService typeof<Services.AudioPlayerService> [] []
+                                
+                            | Keycode.MediaNext -> 
+                                ServiceActions.MOVEFORWARD_PLAYER
+                                |> Helpers.sendCommandToService typeof<Services.AudioPlayerService> [] []
+                                
+                            | Keycode.MediaPrevious ->
+                                ServiceActions.MOVEBACKWARD_PLAYER
+                                |> Helpers.sendCommandToService typeof<Services.AudioPlayerService> [] []
+                                
+
+            member this.ComponentName = this.Class.Name;
 
 
    
@@ -419,30 +482,51 @@ module rec AudioPlayerServiceImplementation =
             (onAfterPrepare:(unit->unit) option ref )  // muatble dependency or ref type some thing
             (updateTimer:System.Threading.Timer option ref )
             (updateTimerFunc:unit->unit)
+            (currentTrack:int ref)
             info =
                 async {
-                    let file = info.Filename
-                    let position = info.Position
-                    mediaPlayer.Reset()
-                    do! mediaPlayer.SetDataSourceAsync(file) |> Async.AwaitTask 
-                    onAfterPrepare := (Some (fun () -> 
-                        mediaPlayer.SeekTo(position)
+                    let tcs = System.Threading.Tasks.TaskCompletionSource<AudioPlayerInfo>() 
+                    let setTcsResult () =
+                        tcs.TrySetResult({info with Position = mediaPlayer.CurrentPosition}) |> ignore
+                    let onSeekCompleteHandler = 
+                        EventHandler(fun _ _ -> setTcsResult ())
 
-                        // set update timer only when it is not alread there
-                        match updateTimer.Value with
-                        | Some _ ->
-                            ()
-                        | None ->
-                            updateTimer := 
-                                Some (new System.Threading.Timer(
-                                        (
-                                            fun _ -> 
-                                                updateTimerFunc()
-                                        ),null,0,1000)
-                                )
-                    ))
-                    mediaPlayer.PrepareAsync()
-                    return info
+
+                    let newInfo ()=
+                        async {
+                            let file = info.Filename
+                            let position = info.Position
+                            mediaPlayer.Reset()
+                            do! mediaPlayer.SetDataSourceAsync(file) |> Async.AwaitTask 
+                            onAfterPrepare := (Some (fun () -> 
+                                mediaPlayer.SeekTo(position)
+
+                                // set update timer only when it is not alread there
+                                match updateTimer.Value with
+                                | Some _ ->
+                                    ()
+                                | None ->
+                                    updateTimer := 
+                                        Some (new System.Threading.Timer(
+                                                (
+                                                    fun _ -> 
+                                                        updateTimerFunc()
+                                                ),null,0,1000)
+                                        )
+                            ))
+                            mediaPlayer.SeekComplete.AddHandler(onSeekCompleteHandler)
+
+
+                            mediaPlayer.PrepareAsync()
+                            System.Threading.Tasks.Task.Delay(2000).ContinueWith(fun _ ->  setTcsResult ()) |> ignore
+                            return! tcs.Task |> Async.AwaitTask
+                        }
+
+                    let! newInfo = newInfo()
+
+                    mediaPlayer.SeekComplete.RemoveHandler(onSeekCompleteHandler)
+                    currentTrack := newInfo.CurrentTrackNumber                
+                    return newInfo
                 }
 
         let private updateInfo 
@@ -519,12 +603,54 @@ module rec AudioPlayerServiceImplementation =
         let private onSetPosition 
             (mediaPlayer:MediaPlayer)
             info =
-                match info.State with
-                | Playing ->
-                    mediaPlayer.SeekTo(info.Position)
-                | Stopped ->
-                    ()
-                info
+                async {
+                    let tcs = System.Threading.Tasks.TaskCompletionSource<AudioPlayerInfo>() 
+                    let setTcsResult () =
+                        // if you are succeeded to set the tcs result, restert mediaPlayer
+                        if tcs.TrySetResult({info with Position = mediaPlayer.CurrentPosition}) then
+                            mediaPlayer.Start()
+
+                    let onSeekCompleteHandler = 
+                        EventHandler(fun _ _ -> setTcsResult ())
+
+                    let! newState =
+                        match info.State with
+                        | Playing ->
+                            mediaPlayer.Pause()
+                            mediaPlayer.SeekComplete.AddHandler(onSeekCompleteHandler)                            
+                            mediaPlayer.SeekTo(info.Position)
+                            System.Threading.Tasks.Task.Delay(2000).ContinueWith(fun _ ->  setTcsResult ()) |> ignore
+                            tcs.Task |> Async.AwaitTask
+                        | Stopped ->                    
+                            info |> async.Return
+
+                    mediaPlayer.SeekComplete.RemoveHandler(onSeekCompleteHandler)
+                    
+
+                    return newState
+                } 
+
+        //let sendMediaPlayerPosNr
+        //    (stateMailbox:MailboxProcessor<AudioPlayerCommand>)
+        //    (handler:Handler)
+        //    (mediaPlayer:MediaPlayer) =
+        //        let i = new Intent(ServiceActions.POS_NOTIFICATION_BROADCAST_ACTION);
+        //        //Android.LocalBroadcastManager.GetInstance(Android.App.Application.Context).SendBroadcast(i) |> ignore
+        //        // arg sometimes not so ice with the Action-Stuff
+
+        //        let rec action = 
+        //            new System.Action(
+        //                fun () -> 
+        //                    if mediaPlayer.IsPlaying then
+        //                        stateMailbox.Post(UpdatePositionExternal (mediaPlayer.CurrentPosition,info.CurrentTrackNumber))
+        //                        handler.PostDelayed(action, 1000 |> int64) |> ignore
+        //            )
+                    
+        //        handler.Post(action) |> ignore
+                
+                
+            
+                
 
 
         type AudioServiceImplementation(service:Services.AudioPlayerService) as self =
@@ -539,14 +665,16 @@ module rec AudioPlayerServiceImplementation =
             let mutable mediaSession = Dependencies.createMediaSession ()
                 
             let mutable onAfterPrepare:(unit->unit) option ref  = ref None
+            let mutable currentTrack = ref 0
 
             let moveToNextTrackForMediaPlayer () =
-                stateMailbox.Post(MoveToNextTrack)
+                stateMailbox.Post(MoveToNextTrack currentTrack.Value)
 
             let mutable mediaPlayer:MediaPlayer = 
                 Dependencies.initMediaPlayer moveToNextTrackForMediaPlayer
             let mutable noisyHeadPhoneReceiver:Receivers.NoisyHeadPhoneReceiver option = None
             let mutable updateTimer:System.Threading.Timer option ref  = ref None
+            
 
             
 
@@ -572,10 +700,12 @@ module rec AudioPlayerServiceImplementation =
             // send new Postion from mediaPlayer to state
             let updateTimerFunc () =
                             
-                    // Send update position only when playing,                     
-                    // this avoids "position" hobbing with invalid or zero values, when the player is stopped
-                    if mediaPlayer.IsPlaying then
-                        stateMailbox.Post(UpdatePositionExternal mediaPlayer.CurrentPosition)
+                // Send update position only when playing,                     
+                // this avoids "position" hobbing with invalid or zero values, when the player is stopped
+                if mediaPlayer.IsPlaying then
+                    stateMailbox.Post(UpdatePositionExternal (mediaPlayer.CurrentPosition,currentTrack.Value))
+
+            
 
             let playFile =
                 playFile 
@@ -583,6 +713,7 @@ module rec AudioPlayerServiceImplementation =
                     onAfterPrepare
                     updateTimer                    
                     updateTimerFunc
+                    currentTrack
                     
                     
 
@@ -678,6 +809,8 @@ module rec AudioPlayerServiceImplementation =
 
             override this.OnCreate () =
                 instance <- Some self
+                let remoteControlReceiver = new Receivers.RemoteControlBroadcastReceiver()
+                self.RegisterReceiver(remoteControlReceiver, new IntentFilter(Intent.ActionMediaButton)) |> ignore
                 ()
 
             override this.OnStartCommand(intent,_,_) =
@@ -702,7 +835,7 @@ module rec AudioPlayerServiceImplementation =
                     | x when x = STOP_PLAYER ->
                         stateMailBox.Post(StopAudioPlayer false)
                     | x when x = MOVEFORWARD_PLAYER ->
-                        stateMailBox.Post(MoveToNextTrack)
+                        stateMailBox.Post(MoveToNextTrack -1)
                     | x when x = MOVEBACKWARD_PLAYER ->
                         stateMailBox.Post(MoveToPreviousTrack)
                     | x when x = SETPOSITION_PLAYER ->

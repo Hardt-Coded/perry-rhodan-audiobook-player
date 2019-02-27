@@ -27,13 +27,11 @@ type AndroidDownloadFolder() =
 
 
 
-
-
-
-[<Activity (Label = "Eins A Medien Audiobook Player", Icon = "@mipmap/ic_launcher", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = (ConfigChanges.ScreenSize ||| ConfigChanges.Orientation),ScreenOrientation = ScreenOrientation.Portrait)>]
+[<Activity (Label = "Eins A Medien Audiobook Player", Icon = "@mipmap/eins_a_launcher", Theme = "@style/MainTheme.Launcher", MainLauncher = true, ConfigurationChanges = (ConfigChanges.ScreenSize ||| ConfigChanges.Orientation),ScreenOrientation = ScreenOrientation.Portrait)>]
 type MainActivity() =
     inherit FormsAppCompatActivity()
     override this.OnCreate (bundle: Bundle) =
+        base.SetTheme(PerryRhodan.AudiobookPlayer.Android.Resources.Style.MainTheme)
         FormsAppCompatActivity.TabLayoutResource <- Resources.Layout.Tabbar
         FormsAppCompatActivity.ToolbarResource <- Resources.Layout.Toolbar
         base.OnCreate (bundle)

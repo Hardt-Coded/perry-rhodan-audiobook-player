@@ -142,27 +142,24 @@ module FileAccess =
                     let audioBooksCol =
                         db.GetCollection<AudioBook>("audiobooks")
 
-                    if (audioBooksCol.Count() > 0) then
-                        audioBooksCol.EnsureIndex(fun i -> i.State.Downloaded) |> ignore
+                    audioBooksCol.EnsureIndex(fun i -> i.State.Downloaded) |> ignore
 
                     
 
                     let audioBooks = 
-                        if audioBooksCol.Count() > 0 then
-                            audioBooksCol
-                                .Find(fun x -> x.State.Downloaded)
-                                |> Seq.toArray
-                                |> Array.sortBy (fun i -> i.FullName)
-                                |> Array.Parallel.map (
-                                    fun i ->
-                                        if obj.ReferenceEquals(i.State.LastTimeListend,null) then
-                                            let newMdl = {i.State with LastTimeListend = None }
-                                            { i with State = newMdl }
-                                        else
-                                            i
-                                )
-                        else
-                            [||]
+                        audioBooksCol
+                            .Find(fun x -> x.State.Downloaded)
+                            |> Seq.toArray
+                            |> Array.sortBy (fun i -> i.FullName)
+                            |> Array.Parallel.map (
+                                fun i ->
+                                    if obj.ReferenceEquals(i.State.LastTimeListend,null) then
+                                        let newMdl = {i.State with LastTimeListend = None }
+                                        { i with State = newMdl }
+                                    else
+                                        i
+                            )
+                        
 
                     audioBooks
                 )

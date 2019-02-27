@@ -259,10 +259,14 @@ open AudioPlayerState
                 | None ->
                     
                     return! model.AudioBook |> loadFilesAsyncMsg
-                | Some info ->
+                | Some info ->                    
                     match info.ServiceState with
                     | Started ->
-                        return Some (RestoreStateFormAudioService info)
+                        // if the same audio is active, restore else start a new one
+                        if info.AudioBook.FullName <> model.AudioBook.FullName then
+                            return! model.AudioBook |> loadFilesAsyncMsg
+                        else
+                            return Some (RestoreStateFormAudioService info)
                     | _ ->
                         return! model.AudioBook |> loadFilesAsyncMsg
             } |> Cmd.ofAsyncMsgOption
@@ -330,9 +334,10 @@ open AudioPlayerState
                 CurrentPosition = Some (info.Position  |> toTimeSpan)
                 CurrentDurationMs = Some info.Duration
                 CurrentPositionMs = Some info.Position
+                AudioFileList = info.Mp3FileList
                 AudioBook = info.AudioBook }
 
-        newModel, model.AudioBook |> loadFilesAsyncCmd, None
+        newModel, unsetBusyCmd, None
     
     and onUpdateTrackNumber num model =
         { model with CurrentAudioFileIndex = num - 1}, Cmd.none, None
