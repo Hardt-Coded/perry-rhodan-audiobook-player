@@ -260,12 +260,43 @@ module rec AudioPlayerServiceImplementation =
             let title = info.AudioBook.FullName
                 
             
-            mediaSession.Active <- true
+            
             mediaSession.SetFlags(MediaSessionFlags.HandlesMediaButtons||| MediaSessionFlags.HandlesTransportControls)
+
+            let metadataBuilder = new MediaMetadata.Builder();
+            metadataBuilder.PutString(MediaMetadata.MetadataKeyTitle, info.AudioBook.FullName) |> ignore
+
+            let albumPicFile = 
+                info.AudioBook.Thumbnail
+                |> Option.defaultValue "@drawable/AudioBookPlaceholder_Dark.png"
+
+            let albumPic = Android.Graphics.BitmapFactory.DecodeFile(albumPicFile)
+
+            metadataBuilder.PutBitmap(MediaMetadata.MetadataKeyAlbumArt,albumPic) |> ignore
+            
+            
+            mediaSession.SetMetadata(metadataBuilder.Build());
+            let stateBuilder = new PlaybackState.Builder();
+            stateBuilder.SetActions(PlaybackState.ActionPlay ||| PlaybackState.ActionPlayPause ||| PlaybackState.ActionPause ||| PlaybackState.ActionRewind ||| PlaybackState.ActionFastForward) |> ignore
+            
+            stateBuilder.SetState((if info.State = Stopped then PlaybackStateCode.Paused else PlaybackStateCode.Playing), PlaybackState.PlaybackPositionUnknown, 1.0f) |> ignore
+            
+            mediaSession.SetPlaybackState(stateBuilder.Build());
+            
+            
+            let mediaButtonReceiverComponentName = new ComponentName(Application.Context, Java.Lang.Class.FromType(typeof<Receivers.RemoteControlBroadcastReceiver>))
+            
+            let mediaButtonIntent = new Intent(Intent.ActionMediaButton);
+            mediaButtonIntent.SetComponent(mediaButtonReceiverComponentName) |> ignore
+            let mediaButtonReceiverPendingIntent = PendingIntent.GetBroadcast(Application.Context, 0, mediaButtonIntent, PendingIntentFlags.UpdateCurrent);
+            mediaSession.SetMediaButtonReceiver(mediaButtonReceiverPendingIntent)
+
+            mediaSession.Active <- true
+            
            
             let style = new Notification.MediaStyle();
             style.SetMediaSession(mediaSession.SessionToken) |> ignore
-
+            
             let currenInfoString = 
                 sprintf "%i - %s / %s"
                     info.CurrentTrackNumber
@@ -289,13 +320,10 @@ module rec AudioPlayerServiceImplementation =
                     .AddAction(buildBackwardAudioAction())
                     .AddAction(buildStartStopToggleAction info)
                     .AddAction(buildForwardAudioAction())
+                    
 
             try
-                let albumPicFile = 
-                    info.AudioBook.Thumbnail
-                    |> Option.defaultValue "@drawable/AudioBookPlaceholder_Dark.png"
-
-                let albumPic = Android.Graphics.BitmapFactory.DecodeFile(albumPicFile)
+                
                 notify.SetLargeIcon(albumPic) |> ignore
             with
             | _ -> ()

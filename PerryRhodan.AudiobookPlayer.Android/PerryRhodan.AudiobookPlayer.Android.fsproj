@@ -32,6 +32,10 @@
     <AndroidDesignerPreferredTheme>Theme.DeviceDefault.NoActionBar.Fullscreen</AndroidDesignerPreferredTheme>
     <AndroidDesignerPreferredDevice>Nexus 4</AndroidDesignerPreferredDevice>
   </PropertyGroup>
+  <PropertyGroup>
+    <AndroidDexTool>d8</AndroidDexTool>
+    <AndroidLinkTool>r8</AndroidLinkTool>
+  </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>portable</DebugType>
@@ -145,6 +149,24 @@
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="ExoPlayer">
+      <HintPath>..\packages\Xam.Plugins.Android.ExoPlayer.2.9.0\lib\monoandroid81\ExoPlayer.dll</HintPath>
+    </Reference>
+    <Reference Include="ExoPlayer.Core">
+      <HintPath>..\packages\Xam.Plugins.Android.ExoPlayer.Core.2.9.0\lib\monoandroid81\ExoPlayer.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="ExoPlayer.Dash">
+      <HintPath>..\packages\Xam.Plugins.Android.ExoPlayer.Dash.2.9.0\lib\monoandroid81\ExoPlayer.Dash.dll</HintPath>
+    </Reference>
+    <Reference Include="ExoPlayer.Hls">
+      <HintPath>..\packages\Xam.Plugins.Android.ExoPlayer.Hls.2.9.0\lib\monoandroid81\ExoPlayer.Hls.dll</HintPath>
+    </Reference>
+    <Reference Include="ExoPlayer.SmoothStreaming">
+      <HintPath>..\packages\Xam.Plugins.Android.ExoPlayer.SmoothStreaming.2.9.0\lib\monoandroid81\ExoPlayer.SmoothStreaming.dll</HintPath>
+    </Reference>
+    <Reference Include="ExoPlayer.UI">
+      <HintPath>..\packages\Xam.Plugins.Android.ExoPlayer.UI.2.9.0\lib\monoandroid81\ExoPlayer.UI.dll</HintPath>
+    </Reference>
     <Reference Include="Fabulous.Core">
       <HintPath>..\packages\Fabulous.Core.0.32.0\lib\netstandard2.0\Fabulous.Core.dll</HintPath>
     </Reference>
