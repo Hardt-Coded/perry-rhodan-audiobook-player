@@ -53,7 +53,7 @@ open AudioPlayer
         | SaveCurrentPosition //of AudioBook
         | OpenSleepTimerActionMenu
         | StartSleepTimer of TimeSpan option
-        | DecreaseSleepTimer
+        | UpdateSleepTimer of TimeSpan option        
         | SetPlayerStateFromExtern of AudioPlayer.AudioPlayerState
         | UpdateTrackNumber of int
         
@@ -219,6 +219,7 @@ open AudioPlayer
                             dispatch (UpdatePostion (info.Position,info.Duration))                            
                             dispatch (SetPlayerStateFromExtern info.State)                            
                             dispatch (UpdateTrackNumber info.CurrentTrackNumber)
+                            dispatch (UpdateSleepTimer info.TimeUntilSleep)
                         }
                     )   
                      
@@ -241,7 +242,7 @@ open AudioPlayer
                                 dispatch (UpdatePostion (info.Position,info.Duration))
                                 dispatch (SetPlayerStateFromExtern info.State)                                
                                 dispatch (UpdateTrackNumber info.CurrentTrackNumber)
-                            
+                                dispatch (UpdateSleepTimer info.TimeUntilSleep)
                             }
                         )
                         
@@ -308,11 +309,11 @@ open AudioPlayer
         | SaveCurrentPosition  ->
             model |> onSaveCurrentPosition     
         | OpenSleepTimerActionMenu ->
-            model |> onOpenSleepTimerActionMenu        
+            model |> onOpenSleepTimerActionMenu   
         | StartSleepTimer sleepTime ->
-            model |> onStartSleepTimer sleepTime            
-        | DecreaseSleepTimer ->
-            model |> onUpdateSleepTimerMsg 
+            model |> onSetSleepTime sleepTime
+        | UpdateSleepTimer sleepTime ->
+            model |> onUpdateSleepTimer sleepTime
         | SetPlayerStateFromExtern state ->
             model |> onSetPlayerStateFromExtern state
         | UpdateTrackNumber num ->
@@ -487,21 +488,6 @@ open AudioPlayer
         else
             model,Cmd.none, None
                 
-           
-        
-
-
-    and onUpdateSleepTimerMsg model =
-        match model.TimeUntilSleeps with
-        | None ->
-            model, Cmd.none, None
-        | Some t ->
-            let sleepTime = t.Subtract(TimeSpan.FromSeconds(1.))
-            if sleepTime <= TimeSpan.Zero then
-                {model with TimeUntilSleeps = None},Cmd.ofMsg Stop, None
-            else
-                let newModel = {model with TimeUntilSleeps = Some sleepTime}
-                newModel, newModel |> sleepTimerUpdateCmd, None
 
     
     and onSaveCurrentPosition model =
@@ -509,14 +495,14 @@ open AudioPlayer
         newModel, Cmd.none, None
 
 
-    and onStartSleepTimer sleepTime model =
-        let newModel = {model with TimeUntilSleeps = sleepTime}
-        match model.TimeUntilSleeps with
-        | None ->
-            
-            newModel, newModel |> sleepTimerUpdateCmd, None
-        | Some _ ->
-            newModel, Cmd.none, None
+    and onSetSleepTime sleepTime model =            
+        audioPlayer.SetSleepTimer sleepTime
+        model, Cmd.none, None
+
+
+    and onUpdateSleepTimer sleepTime model =
+        let newModel = {model with TimeUntilSleeps = sleepTime}        
+        newModel, Cmd.none, None
 
 
     and onChangeBusyState state model =
@@ -529,14 +515,20 @@ open AudioPlayer
         let title = model.AudioBook.FullName        
         
         let currentTrackString = 
-            let numCurrentTrack = model.CurrentAudioFileIndex + 1
-            let numAllTracks = model.AudioFileList.Length
-            sprintf "Track: %i %s %i" numCurrentTrack Translations.current.Of numAllTracks
+            if not model.IsLoading then
+                let numCurrentTrack = model.CurrentAudioFileIndex + 1
+                let numAllTracks = model.AudioFileList.Length
+                sprintf "Track: %i %s %i" numCurrentTrack Translations.current.Of numAllTracks
+            else
+                " ... "
 
         let currentTimeString = 
-            let currentPos = (model.CurrentPosition |> Option.defaultValue TimeSpan.Zero).ToString("hh\:mm\:ss")
-            let currentDuration = (model.CurrentDuration |> Option.defaultValue TimeSpan.Zero).ToString("hh\:mm\:ss")
-            sprintf "%s %s %s" currentPos Translations.current.Of currentDuration
+            if not model.IsLoading then
+                let currentPos = (model.CurrentPosition |> Option.defaultValue TimeSpan.Zero).ToString("hh\:mm\:ss")
+                let currentDuration = (model.CurrentDuration |> Option.defaultValue TimeSpan.Zero).ToString("hh\:mm\:ss")
+                sprintf "%s %s %s" currentPos Translations.current.Of currentDuration
+            else
+                " ... "
 
         View.ContentPage(
           title=Translations.current.AudioPlayerPage,useSafeArea=true,
@@ -595,6 +587,7 @@ open AudioPlayer
                                 yield (Controls.primaryColorSymbolLabelWithTapCommand (fun () -> dispatch Play) 60. false "\uf144").GridColumn(2).GridRow(0)
                             | Playing ->
                                 yield (Controls.primaryColorSymbolLabelWithTapCommand (fun () -> dispatch Stop) 60. false "\uf28b").GridColumn(2).GridRow(0)
+
                                 
                             
                             yield (Controls.primaryColorSymbolLabelWithTapCommand ((fun () -> dispatch JumpForward) |> runIfNotBusy) 30. true "\uf04e").GridColumn(3).GridRow(0)
@@ -659,11 +652,11 @@ open AudioPlayer
                     .GridColumn(1)
                     .With(horizontalOptions=LayoutOptions.Start, margin=Thickness(5.,0.,0.,0.))
                     
-
-                yield (Controls.primaryTextColorLabel 12. (sprintf "%i/%i" (model.CurrentAudioFileIndex + 1) model.AudioFileList.Length ))
-                    .GridColumn(2)
-                yield (Controls.primaryTextColorLabel 12. (sprintf "%s" currentPos))
-                    .GridColumn(3)
+                if not model.IsLoading then
+                    yield (Controls.primaryTextColorLabel 12. (sprintf "%i/%i" (model.CurrentAudioFileIndex + 1) model.AudioFileList.Length ))
+                        .GridColumn(2)
+                    yield (Controls.primaryTextColorLabel 12. (sprintf "%s" currentPos))
+                        .GridColumn(3)
                 match model.CurrentState with
                 | Stopped ->
                     yield (Controls.primaryColorSymbolLabelWithTapCommandRightAlign (fun () -> dispatch Play) 30. false "\uf144")

@@ -1,6 +1,7 @@
 ﻿module AudioPlayer
 
     open Domain
+    open System
     open FSharp.Control
 
     let jumpDistance = 30000
@@ -26,7 +27,8 @@
           Mp3FileList: Mp3FileList
           PlaybackDelayed: bool 
           ResumeOnAudioFocus: bool 
-          ServiceState: AudioPlayerServiceState }
+          ServiceState: AudioPlayerServiceState
+          TimeUntilSleep: TimeSpan option }
         
         static member Empty =
             { Filename = ""
@@ -38,7 +40,8 @@
               Mp3FileList = [] 
               PlaybackDelayed = false
               ResumeOnAudioFocus = false 
-              ServiceState = AudioPlayerServiceState.Stopped }
+              ServiceState = AudioPlayerServiceState.Stopped
+              TimeUntilSleep = None }
 
 
     type IAudioPlayer = 
@@ -54,6 +57,8 @@
         abstract member GotToPosition: int -> unit
         abstract member JumpForward: unit -> unit
         abstract member JumpBackward: unit -> unit
+
+        abstract member SetSleepTimer: TimeSpan option -> unit
 
         abstract member GetCurrentState: unit -> Async<AudioPlayerInfo option>
 
@@ -76,6 +81,8 @@
         | SetPosition of pos:int
         | UpdatePositionExternal of pos:int * meantTrack:int
         | SetCurrentAudioServiceStateToStarted
+        | StartSleepTimer of TimeSpan option
+        | DecreaseSleepTimer
 
 
         | GetCurrentState of AsyncReplyChannel<AudioPlayerInfo>
@@ -285,7 +292,53 @@
                         | GetCurrentState reply ->
                             reply.Reply(state)
                             return (state)
+                        | StartSleepTimer sleepTime ->
+                            let! newState = state |> onStartSleepTimer sleepTime
+                            return newState
+                        | DecreaseSleepTimer ->
+                            let! newState = state |> onDecreaseSleepTimer 
+                            return newState
+
                     }
+
+
+                and onStartSleepTimer sleepTime state =
+                    async {
+                        let newState = {state with TimeUntilSleep = sleepTime}
+                        match newState.TimeUntilSleep with
+                        | None ->
+                            return newState
+                        | Some _ ->                            
+                            do! Async.SwitchToNewThread()
+                            inbox.Post(DecreaseSleepTimer)
+                            return newState
+                    }
+                   
+                    
+                    
+
+
+                and onDecreaseSleepTimer state =
+                    async {
+                        do! Async.Sleep 1000
+                        match state.TimeUntilSleep with
+                        | None ->
+                            return state
+                        | Some t ->
+                            let sleepTime = t.Subtract(TimeSpan.FromSeconds(1.))
+                            if sleepTime <= TimeSpan.Zero then
+                                let newState = {state with TimeUntilSleep = None }
+                                inbox.Post(StopAudioPlayer false)
+                                return newState
+                                
+                            else
+                                let newState = {state with TimeUntilSleep = Some sleepTime}
+                                inbox.Post(DecreaseSleepTimer)
+                                return newState
+                                
+                    
+                    }
+                    
 
 
                 and onUpdatePositionExternal pos meantTrack state =

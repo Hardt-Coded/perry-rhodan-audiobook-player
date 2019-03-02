@@ -79,6 +79,7 @@ module rec AudioPlayerServiceImplementation =
         let JUMP_FORWARD_PLAYER = "PerryRhodan.action.JUMP_FORWARD"
         let JUMP_BACKWARD_PLAYER = "PerryRhodan.action.JUMP_BACKWARD"
         let GET_CURRENT_STATE_PLAYER = "PerryRhodan.action.GET_CURRENT_STATE"
+        let SET_SLEEP_TIMER_PLAYER = "PerryRhodan.action.SET_SLEEP_TIMER"
 
         let POS_NOTIFICATION_BROADCAST_ACTION = "PerryRhodan.action.POS_BROADCAST"
 
@@ -138,7 +139,6 @@ module rec AudioPlayerServiceImplementation =
             inherit MediaSession.Callback()
 
                 override this.OnMediaButtonEvent(mediaButtonIntent) =
-                    let action = mediaButtonIntent.Action
                     mediaButtonIntent |> MediaButtonStuff.onMediaButtonReceive
                     true
 
@@ -164,8 +164,8 @@ module rec AudioPlayerServiceImplementation =
 
             
             
-            let mediaController = mediaSession.Controller
-            let newMediaController = new MediaController(Android.App.Application.Context,mediaSession.SessionToken)
+            let _ = mediaSession.Controller
+            let _ = new MediaController(Android.App.Application.Context,mediaSession.SessionToken)
             
 
             mediaSession.Active <- true
@@ -178,9 +178,6 @@ module rec AudioPlayerServiceImplementation =
                 .SetWillPauseWhenDucked(true)
                 .SetOnAudioFocusChangeListener(audioFocusOnChange)                    
                 .Build()
-
-
-        
 
 
 
@@ -306,16 +303,36 @@ module rec AudioPlayerServiceImplementation =
             
             builder.Build();
 
-        let private buildStopServiceAction () =
-            let icon = icon "settings_icon"
+
+
+        let private buildNextAudioAction () =
+            //let icon = AndroidDrawable.IcMediaFf
+            let icon = icon "next_small_icon"
             let intent = new Intent(context, typeof<Services.AudioPlayerService>)
-            intent.SetAction(STOP_SERVICE) |> ignore
-            let startAudioPendingIntent = PendingIntent.GetService(context, 0, intent, PendingIntentFlags.UpdateCurrent)
+            intent.SetAction(MOVEFORWARD_PLAYER) |> ignore            
+            let stopAudioPendingIntent = PendingIntent.GetService(context, 0, intent, PendingIntentFlags.UpdateCurrent)
             
             let builder = 
-                new Notification.Action.Builder(icon, "", startAudioPendingIntent)
+                new Notification.Action.Builder(icon, "", stopAudioPendingIntent)
             
             builder.Build();
+
+        let private buildPreviousAudioAction () =
+            //let icon = AndroidDrawable.IcMediaRew
+            let icon = icon "prev_small_icon"
+            let intent = new Intent(context, typeof<Services.AudioPlayerService>)
+
+            // ACTION_SETPOSITION_PLAYER
+            intent.SetAction(MOVEBACKWARD_PLAYER) |> ignore                        
+            let stopAudioPendingIntent = PendingIntent.GetService(context, 0, intent, PendingIntentFlags.UpdateCurrent)
+            
+            let builder = 
+                new Notification.Action.Builder(icon, "", stopAudioPendingIntent)
+            
+            builder.Build();
+
+
+        
 
 
         let createNotificationChannel () =
@@ -363,6 +380,7 @@ module rec AudioPlayerServiceImplementation =
                     .PutBitmap(MediaMetadata.MetadataKeyDisplayIcon,albumPic)                                                                                                                                                                                       
                     .PutString(MediaMetadata.MetadataKeyDisplayTitle,info.AudioBook.FullName)
                     .PutString(MediaMetadata.MetadataKeyTitle,info.AudioBook.FullName)
+                    .PutBitmap(MediaMetadata.MetadataKeyArt, albumPic)
                     
                     
                     .PutString(MediaMetadata.MetadataKeyAlbum,info.AudioBook.FullName)
@@ -398,10 +416,13 @@ module rec AudioPlayerServiceImplementation =
                     .SetContentText(currenInfoString)
                     .SetSmallIcon(icon)                    
                     .SetContentIntent(buildIntentToShowMainActivity())
-                    .SetOngoing(true)                    
+                    .SetOngoing(true)  
+                    .AddAction(buildPreviousAudioAction())
                     .AddAction(buildBackwardAudioAction())
                     .AddAction(buildStartStopToggleAction info)
                     .AddAction(buildForwardAudioAction())
+                    .AddAction(buildNextAudioAction())
+                    .SetVisibility(NotificationVisibility.Public)
                     
 
             try
@@ -410,7 +431,7 @@ module rec AudioPlayerServiceImplementation =
             with
             | _ -> ()
 
-            style.SetShowActionsInCompactView(0, 1, 2) |> ignore
+            style.SetShowActionsInCompactView(1, 2, 3) |> ignore
             notify.Build()
 
         let updateNotification (mediaSession:MediaSession) info =
@@ -947,8 +968,18 @@ module rec AudioPlayerServiceImplementation =
                             this.SendBroadcast(intent)
                     | x when x = TOGGLE_PLAYPAUSE ->
                         stateMailBox.Post(TogglePlayPause)
+                    | x when x = SET_SLEEP_TIMER_PLAYER ->
+                        let time = intent.GetIntExtra("time",0)
+                        let time =
+                            if time = 0 then 
+                                None
+                            else
+                                Some (time |> Common.TimeSpanHelpers.toTimeSpan)
+                        stateMailBox.Post(StartSleepTimer time)
+
                     | _ ->
                         Crashes.TrackError(exn(sprintf "AudioPlayerService: unknown intent action. '%s'" intent.Action))
+
 
                     
 
@@ -1107,6 +1138,13 @@ module rec AudioPlayerServiceImplementation =
                         System.Threading.Tasks.Task.Delay(3000).ContinueWith( fun _ -> tcs.TrySetResult(None)) |> ignore
 
                         tcs.Task |> Async.AwaitTask
+                member this.SetSleepTimer timer =
+                    let time = timer |> Common.TimeSpanHelpers.fromTimeSpanOpt
+                    let input = [ ("time",time) ]
+                    ServiceActions.SET_SLEEP_TIMER_PLAYER
+                    |> Helpers.sendCommandToService typeof<AudioPlayerService> [] input
+
+
 
 
                 

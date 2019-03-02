@@ -188,19 +188,16 @@ open Services
         let lastTimeListendAudiobook = 
             match ab with
             | [||] | [|_|] ->
-                let hideOption =
-                    Services.SecureLoginStorage.getSecuredValue SettingsPage.hideLastListendSettingsKey |> Async.RunSynchronously
-                    |> Option.map (fun i -> if i="1" then true else false)
-                    |> Option.defaultValue false
-                if hideOption then
-                    None
-                else
-                    getLastListendAb ()
+                getLastListendAb ()
             | _ ->
                 getLastListendAb ()
             
 
-        let mapedAb = ab |> Array.Parallel.map (fun i -> AudioBookItem.initModel i)
+        let mapedAb = 
+            ab 
+            // filter last listend audio book out of the rest
+            |> Array.filter( fun i -> lastTimeListendAudiobook |> Option.map (fun l -> l.AudioBook.FullName <> i.FullName) |> Option.defaultValue true)
+            |> Array.Parallel.map (fun i -> AudioBookItem.initModel i)
         { model with Audiobooks = mapedAb; LastTimeListendAudioBook = lastTimeListendAudiobook }, unbusyCmd, None
     
     and onChangeBusyStateMsg state model =

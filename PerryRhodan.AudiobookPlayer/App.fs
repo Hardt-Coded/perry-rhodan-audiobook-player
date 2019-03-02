@@ -407,9 +407,12 @@ module App =
             // Reload AudioBooks when reach MainPage, it always at least one in the list
             let lastEntry = newPageStack |> List.last
             let cmd =
-                if lastEntry = MainPage then
+                match lastEntry with
+                | MainPage ->
                     (Cmd.ofMsg (MainPageMsg MainPage.Msg.LoadLocalAudiobooks))
-                else
+                | BrowserPage ->
+                    (Cmd.ofMsg (BrowserPageMsg BrowserPage.Msg.LoadLocalAudiobooks))
+                | _ ->
                     Cmd.none
 
             {model with PageStack = newPageStack; BacktapsOnMainSite = 0}, cmd

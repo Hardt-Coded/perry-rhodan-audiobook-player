@@ -436,9 +436,9 @@ module WebAccess =
                                 
                                     let fileSize = 
                                         (resp.Headers
-                                        |> HttpHelpers.getFileSizeFromHttpHeadersOrDefaultValue 0) / (1024 * 1024)
+                                        |> HttpHelpers.getFileSizeFromHttpHeadersOrDefaultValue 0)
                                 
-                                
+                                    
                                     use zipStream = new ZipInputStream(resp.ResponseStream)
 
                                     let mutable zipStreamFullLength = 0
@@ -451,21 +451,22 @@ module WebAccess =
                                                 | null ->
                                                     entryAvailable <- false
                                                 | entry -> 
-                                                    zipStreamFullLength <- zipStreamFullLength + (zipStream.Length |> int)
-                                                    yield (entry, zipStreamFullLength)
+                                                    //zipStreamFullLength <- zipStreamFullLength + (zipStream.Length |> int)
+                                                    yield (entry)
                                             
                                         }
 
                                     let buffer:byte[] = Array.zeroCreate (500*1024)
 
-                                    let copyStream (src:Stream) (dst:Stream) initProgress entrySize =
+                                    let copyStream (src:Stream) (dst:Stream) initProgress scale =
                                     
                                         let mutable copying = true
                                         let mutable progress = initProgress
                                         while copying do
                                             let bytesRead = src.Read(buffer,0,buffer.Length)
-                                            progress <- progress + bytesRead
-                                            updateProgress (progress / (1024 * 1024), entrySize / (1024 * 1024))
+                                            let toAdd = ((bytesRead |> float) * scale) |> int
+                                            progress <- progress + toAdd
+                                            updateProgress (progress / (1024 * 1024), fileSize / (1024 * 1024))
                                             if bytesRead > 0 then
                                                 dst.Write(buffer, 0, bytesRead)
                                             else
@@ -474,24 +475,26 @@ module WebAccess =
                                         progress
 
 
-                                    let processMp3File initProgress zipStreamLength (entry:ZipEntry) =
+                                    let processMp3File initProgress (entry:ZipEntry) =
+                                        let scale = (entry.CompressedSize |> float) / (entry.Size |> float)
                                         let name = Path.GetFileName(entry.Name)
                                         let extractFullPath = Path.Combine(unzipTargetFolder,name)
                                         if (File.Exists(extractFullPath)) then
                                             File.Delete(extractFullPath)
 
                                         use streamWriter = File.Create(extractFullPath)
-                                        let progress = copyStream zipStream streamWriter initProgress zipStreamLength
+                                        let progress = copyStream zipStream streamWriter initProgress scale
                                         streamWriter.Close()
                                         progress                    
 
 
-                                    let processPicFile initProgress entrySize =
+                                    let processPicFile initProgress (entry:ZipEntry) =
+                                        let scale = (entry.CompressedSize |> float) / (entry.Size |> float)
                                         let mutable progress = initProgress
                                         let imageFullName = Path.Combine(audioBookFolder,audiobook.FullName + ".jpg")
                                         if not (File.Exists(imageFullName)) then
                                             use streamWriter = File.Create(imageFullName)
-                                            progress <- copyStream zipStream streamWriter initProgress entrySize
+                                            progress <- copyStream zipStream streamWriter initProgress scale
                                             streamWriter.Close()                                        
 
                                         let thumbFullName = Path.Combine(audioBookFolder,audiobook.FullName + ".thumb.jpg")
@@ -515,18 +518,25 @@ module WebAccess =
                                     do! asyncFunc(fun () ->
                                         zipSeq
                                         |> Seq.iter (
-                                            fun (entry, streamLength) ->
+                                            fun (entry) ->
                                                 match entry with
                                                 | ZipHelpers.Mp3File ->
-                                                    globalProgress <- (entry |> processMp3File globalProgress streamLength)
+                                                    globalProgress <- (entry |> processMp3File globalProgress)
                                                 | ZipHelpers.PicFile ->
-                                                    globalProgress <- (processPicFile globalProgress streamLength)
+                                                    globalProgress <- (entry |> processPicFile globalProgress)
                                                 | _ -> ()
                                         )
                                     )
                                 
                                     zipStream.Close()
-                                    resp.ResponseStream.Close()       
+                                    resp.ResponseStream.Close()    
+                                    
+
+                                    globalProgress <- fileSize
+                                    updateProgress (globalProgress / (1024 * 1024), fileSize / (1024 * 1024))
+
+
+
                                     let imageFullName = Path.Combine(audioBookFolder,audiobook.FullName + ".jpg")
                                     let thumbFullName = Path.Combine(audioBookFolder,audiobook.FullName + ".thumb.jpg")
 

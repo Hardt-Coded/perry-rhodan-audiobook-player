@@ -20,7 +20,7 @@
     <Content Include="Images\prev_icon.png" />
     <Content Include="Images\pr_small_icon.png" />
     <Content Include="Images\settings_icon.png" />
-    <EmbeddedResource Include="Images\AudioBookPlaceholder.png" />
+    <Content Include="Images\AudioBookPlaceholder.png" />
     <None Include="repl_stuff.fsx" />
     <Compile Include="SampleData.fs" />
     <Compile Include="Common.fs" />

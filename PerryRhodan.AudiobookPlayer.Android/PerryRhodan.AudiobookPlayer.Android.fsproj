@@ -146,6 +146,8 @@
     <AndroidResource Include="Resources\drawable\eins_a_medien_logo.png" />
     <AndroidResource Include="Resources\drawable\launch_screen.xml" />
     <AndroidResource Include="Resources\drawable\einsa_small_icon.png" />
+    <AndroidResource Include="Resources\drawable\next_small_icon.png" />
+    <AndroidResource Include="Resources\drawable\prev_small_icon.png" />
     <Compile Include="AudioPlayerService.fs" />
     <Compile Include="MainActivity.fs" />
     <Content Include="packages.config" />
