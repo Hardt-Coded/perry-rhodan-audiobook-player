@@ -244,10 +244,10 @@ open Services
                         children = [ 
                               
                             yield dependsOn (model.Audiobooks) (fun _ (abItems) ->
-                                match abItems with
-                                | [||]  ->
+                                match abItems,model.LastTimeListendAudioBook with
+                                | [||], None  ->
                                     View.Label(text=Translations.current.NoAudiobooksOnDevice, fontSize=25., textColor=Consts.secondaryTextColor)
-                                | _ ->
+                                | _, _ ->
                                     View.ScrollView(horizontalOptions = LayoutOptions.Fill,
                                             verticalOptions = LayoutOptions.Fill,
                                             content = 

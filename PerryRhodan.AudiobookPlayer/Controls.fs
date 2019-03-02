@@ -108,7 +108,7 @@ let showDownloadProgress (f:int,t:int) =
                 heightRequest = 12.,
                 created = (
                     fun e ->
-                        e.ProgressColor <- Color.FromHex("FFAC63FF")
+                        e.ProgressColor <- Color.Green
                 )
             )
             View.Label(text=(sprintf "%i %%" ((factor * 100.0) |> int)),
@@ -140,32 +140,25 @@ let audioBookStateOverlay
         coldefs = [box "*"; box "*"; box "*"],
         rowdefs = [box "*"; box "*"; box "*"],
         children = [
-            if (isComplete) then
+
+            match isComplete,isInDownloadQueue, isLoading, isDownloaded with
+            | true,_,_,_ ->
                 yield listendCheckLabel.GridColumn(2).GridRow(2)
-            elif (isInDownloadQueue) then
+            | false,true,false,false ->
                 yield inDownloadQueueLabel.GridColumn(2).GridRow(2)
-            elif (not isDownloaded && not isComplete) then
+            | false,false,false,false ->
                 yield arrowDownLabel.GridColumn(2).GridRow(2)
-            elif (isDownloaded) then
+            | false,false,false,true ->
                 yield playerSymbolLabel.GridColumn(1).GridRow(1)
-
-            match progress with
-            | None -> ()
-            | Some progress ->
-                let f,t = progress
-                yield ((f,t) |> showDownloadProgress).GridColumnSpan(2).GridRow(2).GridColumn(0)
-
-            if (isLoading) then
-                yield View.Grid(
-                    backgroundColor = Color.FromHex "#A0000000",
-                    children = [
-                        View.ActivityIndicator(
-                            isRunning = true,
-                            color = Color.White,
-                            scale = 0.5
-                        )
-                    ]
-                ).GridColumnSpan(3).GridRowSpan(3).GridRow(0).GridColumn(0)
+            | false,_,true,false ->
+                match progress with
+                | None -> ()
+                | Some progress ->
+                    let f,t = progress
+                    yield ((f,t) |> showDownloadProgress).GridColumnSpan(3).GridRow(2).GridColumn(0)
+            | _ ->
+                ()
+           
             
         ]
         , gestureRecognizers = 
@@ -229,18 +222,24 @@ let renderAudiobookEntry
                     textColor = Consts.secondaryTextColor,
                     lineBreakMode = LineBreakMode.WordWrap
                     ).GridColumn(1).GridRow(0)
-                yield View.Label(text="\uf142",fontFamily = faFontFamilyName true,
-                    fontSize=35., 
-                    margin = Thickness(0., 0. ,20. ,0.),                    
+                yield View.Grid(
                     verticalOptions = LayoutOptions.Fill, 
-                    horizontalOptions = LayoutOptions.Fill, 
-                    verticalTextAlignment = TextAlignment.Center,
-                    horizontalTextAlignment = TextAlignment.Center,
-                    textColor = Consts.secondaryTextColor,
+                    horizontalOptions = LayoutOptions.Fill,
                     gestureRecognizers = [
                         View.TapGestureRecognizer(command = openActionMenuCmd)
+                    ],
+                    children = [
+                        View.Label(text="\uf142",fontFamily = faFontFamilyName true,
+                            fontSize=35., 
+                            margin = Thickness(10., 0. ,10. ,0.),                    
+                            verticalOptions = LayoutOptions.Fill, 
+                            horizontalOptions = LayoutOptions.Fill, 
+                            verticalTextAlignment = TextAlignment.Center,
+                            horizontalTextAlignment = TextAlignment.Center,
+                            textColor = Consts.secondaryTextColor
+                            )
                     ]
-                    ).GridColumn(2).GridRow(0)
+                ).GridColumn(2).GridRow(0)
 
         ]
         )
