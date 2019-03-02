@@ -28,7 +28,7 @@
     <Compile Include="Global.fs" />
     <Compile Include="Domain.fs" />
     <Compile Include="Services.fs" />
-    <Compile Include="AudioPlayerState.fs" />
+    <Compile Include="AudioPlayer.fs" />
     <Compile Include="Controls.fs" />
     <Compile Include="LoginPage.fs" />
     <Compile Include="AudioBookItem.fs" />

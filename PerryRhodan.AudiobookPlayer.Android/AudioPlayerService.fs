@@ -5,7 +5,7 @@ module rec AudioPlayerServiceImplementation =
     open System
     open Android.App
     open Android.OS
-    open AudioPlayerState
+    open AudioPlayer
     open Android.Content
 
     open Newtonsoft.Json
@@ -738,7 +738,7 @@ module rec AudioPlayerServiceImplementation =
 
         type AudioServiceImplementation(service:Services.AudioPlayerService) as self =
             let informationDispatcher =
-                AudioPlayerState.InformationDispatcher.audioPlayerStateInformationDispatcher
+                AudioPlayer.InformationDispatcher.audioPlayerStateInformationDispatcher
             
             let stateMailbox = 
                 audioPlayerStateMailbox
@@ -1039,7 +1039,7 @@ module rec AudioPlayerServiceImplementation =
                 Android.App.Application.Context.RegisterReceiver(currentStateReciever,new IntentFilter(ACTION_GET_CURRENT_STATE)) |> ignore
 
 
-            interface AudioPlayerState.IAudioPlayer with
+            interface AudioPlayer.IAudioPlayer with
 
                 member this.RunService audiobook mp3list =
                     let jsonAudioBook = audiobook |> Helpers.serialize

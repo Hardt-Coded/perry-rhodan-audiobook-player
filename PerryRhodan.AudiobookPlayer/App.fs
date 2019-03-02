@@ -141,7 +141,7 @@ module App =
 
         let isPlayerRunning = 
             model.AudioPlayerPageModel 
-            |> Option.map (fun i -> i.CurrentState = AudioPlayerState.Playing)
+            |> Option.map (fun i -> i.CurrentState = AudioPlayer.Playing)
             |> Option.defaultValue false
 
         if isPlayerRunning then
@@ -366,7 +366,7 @@ module App =
 
         | Some abModel ->
             if (abModel.AudioBook <> audioBook) then
-                if abModel.CurrentState = AudioPlayerState.Playing then
+                if abModel.CurrentState = AudioPlayer.Playing then
                     // stop audio player
                     AudioPlayerPage.audioPlayer.StopAudio()
                 brandNewPage()

@@ -15,7 +15,7 @@ open Services
 open TimeSpanHelpers
 open Services.DependencyServices
 open Global
-open AudioPlayerState
+open AudioPlayer
 
     
 
@@ -54,7 +54,7 @@ open AudioPlayerState
         | OpenSleepTimerActionMenu
         | StartSleepTimer of TimeSpan option
         | DecreaseSleepTimer
-        | SetPlayerStateFromExtern of AudioPlayerState.AudioPlayerState
+        | SetPlayerStateFromExtern of AudioPlayer.AudioPlayerState
         | UpdateTrackNumber of int
         
         | ChangeBusyState of bool
@@ -65,7 +65,7 @@ open AudioPlayerState
         | GotoBrowserPage
 
 
-    let audioPlayer = DependencyService.Get<AudioPlayerState.IAudioPlayer>()
+    let audioPlayer = DependencyService.Get<AudioPlayer.IAudioPlayer>()
 
 
         

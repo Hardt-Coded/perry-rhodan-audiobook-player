@@ -1,4 +1,4 @@
-﻿module AudioPlayerState
+﻿module AudioPlayer
 
     open Domain
     open FSharp.Control
