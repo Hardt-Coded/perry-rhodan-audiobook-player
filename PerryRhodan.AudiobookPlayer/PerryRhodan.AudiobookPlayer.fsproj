@@ -46,6 +46,7 @@
     <PackageReference Include="LiteDB" Version="4.1.4" />
     <PackageReference Include="Microsoft.AppCenter.Analytics" Version="1.13.0" />
     <PackageReference Include="Microsoft.AppCenter.Crashes" Version="1.13.0" />
+    <PackageReference Include="Microsoft.AppCenter.Push" Version="1.13.2" />
     <PackageReference Include="Plugin.Permissions" Version="3.0.0.12" />
     <PackageReference Include="SharpZipLib" Version="1.1.0" />
     <PackageReference Include="SixLabors.ImageSharp" Version="1.0.0-beta0005" />
