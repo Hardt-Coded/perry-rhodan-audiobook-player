@@ -36,7 +36,7 @@ open Services
         | UpdateAudioBookGlobal  of AudioBookItem.Model * string
 
     
-    let initModel = { Audiobooks = [||]; IsLoading = false; LastTimeListendAudioBook = None }
+    let initModel = { Audiobooks = [||]; IsLoading = true; LastTimeListendAudioBook = None }
 
     
     let init () = initModel, Cmd.ofMsg AskForAppPermission
@@ -240,27 +240,30 @@ open Services
                                                     backgroundColor = Consts.cardColor,
                                                     margin=0.).GridRow(2)
 
+                    
                     yield View.StackLayout(padding = 10., verticalOptions = LayoutOptions.Start,
                         children = [ 
-                              
-                            yield dependsOn (model.Audiobooks) (fun _ (abItems) ->
-                                match abItems,model.LastTimeListendAudioBook with
-                                | [||], None  ->
-                                    View.Label(text=Translations.current.NoAudiobooksOnDevice, fontSize=25., textColor=Consts.secondaryTextColor)
-                                | _, _ ->
-                                    View.ScrollView(horizontalOptions = LayoutOptions.Fill,
-                                            verticalOptions = LayoutOptions.Fill,
-                                            content = 
-                                                View.StackLayout(orientation=StackOrientation.Vertical,
-                                                    children= [
-                                                        for item in abItems do
-                                                            let audioBookItemDispatch =
-                                                                let d msg = AudioBooksItemMsg (item,msg)
-                                                                d >> dispatch
-                                                            yield AudioBookItem.view item audioBookItemDispatch 
-                                                    ]
-                                                )
-                                              )
+                            if not model.IsLoading then
+                                yield dependsOn (model.Audiobooks) (fun _ (abItems) ->
+                                    match abItems,model.LastTimeListendAudioBook with
+                                    | [||], None  ->
+                                        View.Label(text=Translations.current.NoAudiobooksOnDevice, fontSize=25., textColor=Consts.secondaryTextColor)
+                                    | [||], Some _  ->
+                                        View.Label(text="...", fontSize=25., textColor=Consts.secondaryTextColor)
+                                    | _, _ ->
+                                        View.ScrollView(horizontalOptions = LayoutOptions.Fill,
+                                                verticalOptions = LayoutOptions.Fill,
+                                                content = 
+                                                    View.StackLayout(orientation=StackOrientation.Vertical,
+                                                        children= [
+                                                            for item in abItems do
+                                                                let audioBookItemDispatch =
+                                                                    let d msg = AudioBooksItemMsg (item,msg)
+                                                                    d >> dispatch
+                                                                yield AudioBookItem.view item audioBookItemDispatch 
+                                                        ]
+                                                    )
+                                                    )
                                 
                                 )
                         ]).GridRow(3)
