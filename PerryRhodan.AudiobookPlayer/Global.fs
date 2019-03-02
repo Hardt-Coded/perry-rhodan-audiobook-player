@@ -1,6 +1,6 @@
 ﻿module Global
 
-    let appcenterAndroidId = "e806b20e-0e4c-4209-81c1-9ff48478f932"
+    let appcenterAndroidId = ""
 
 
     type Language =
