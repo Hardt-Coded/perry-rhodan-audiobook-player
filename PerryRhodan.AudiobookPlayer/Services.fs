@@ -21,27 +21,45 @@ open Common
 
 module DependencyServices =
 
+    open Global
 
     type IAndroidDownloadFolder = 
         abstract member GetAndroidDownloadFolder:unit -> string 
 
+    
 
-    type IAudioPlayer = 
+    //type IAudioPlayer = 
 
-        //abstract member CurrentPosition: int with get
-        //abstract member CurrentDuration: int with get
-        abstract member LastPositionBeforeStop: int option with get
-        abstract member CurrentFile: string option with get
+    //    abstract member OnInfo: (AudioPlayerInfo -> unit) option with get,set
+    //    abstract member OnUpdateState: (AudioPlayerState -> unit) option with get,set
+    //    abstract member CurrentInfo: AudioPlayerInfo option with get
+    //    abstract member CurrentAudiobook: AudioBook option with get
 
-        abstract member OnCompletion: (unit -> unit) option with get,set
-        abstract member OnNoisyHeadPhone: (unit -> unit) option with get,set
-        abstract member OnInfo: (int * int -> unit) option with get,set
+    //    abstract member IsStarted: bool with get
+    //    //// triggers to get async position and duration via onInfo Handler
+    //    //abstract member GetInfo: unit -> Async<unit>
+        
 
-        abstract member PlayFile:string -> int -> Async<unit>
-        abstract member Stop:unit -> unit
-        abstract member GotToPosition: int -> unit
-        // triggers to get async position and duration via onInfo Handler
-        abstract member GetInfo: unit -> Async<unit>
+    //    abstract member RunService: AudioBook -> (string * int) list -> Async<unit>
+    //    abstract member StopService: unit -> Async<unit>
+    //    //abstract member GetRunningService: unit -> IAudioPlayer option
+
+    //    abstract member StartAudio: AudioPlayerInfo -> unit
+    //    abstract member StopAudio: unit -> unit
+    //    abstract member TogglePlayPause: unit -> unit
+    //    abstract member MoveForward: unit -> unit
+    //    abstract member MoveBackward: unit -> unit
+    //    abstract member GotToPosition: int -> unit
+    //    abstract member JumpForward: unit -> unit
+    //    abstract member JumpBackward: unit -> unit
+    //    abstract member UpdateMetaData: AudioBook -> unit
+
+
+
+    type INotificationService =
+        abstract member ShowNotification: string -> unit
+        abstract member OnSecondActivity: (string -> unit) option with get,set
+
 
 module Consts =
     
@@ -111,6 +129,47 @@ module FileAccess =
 
         }
 
+    let loadDownloadedAudioBooksStateFile () =
+        async {
+            try
+                initAppFolders ()
+                let! res = asyncFunc (fun () ->
+                    use db = new LiteDatabase(audioBooksStateDataFile, mapper)
+
+                    
+                        
+
+                    let audioBooksCol =
+                        db.GetCollection<AudioBook>("audiobooks")
+
+                    audioBooksCol.EnsureIndex(fun i -> i.State.Downloaded) |> ignore
+
+                    
+
+                    let audioBooks = 
+                        audioBooksCol
+                            .Find(fun x -> x.State.Downloaded)
+                            |> Seq.toArray
+                            |> Array.sortBy (fun i -> i.FullName)
+                            |> Array.Parallel.map (
+                                fun i ->
+                                    if obj.ReferenceEquals(i.State.LastTimeListend,null) then
+                                        let newMdl = {i.State with LastTimeListend = None }
+                                        { i with State = newMdl }
+                                    else
+                                        i
+                            )
+                        
+
+                    audioBooks
+                )
+
+                return res |> Ok
+            with
+            | _ as e -> return Error e.Message
+
+        }
+
     let insertNewAudioBooksInStateFile (audioBooks:AudioBook[]) =
         async {
             try
@@ -119,8 +178,8 @@ module FileAccess =
                     use db = new LiteDatabase(audioBooksStateDataFile, mapper)
                     let audioBooksCol = 
                         db.GetCollection<AudioBook>("audiobooks")
-                    
-                    audioBooksCol.InsertBulk(audioBooks)
+
+                    audioBooksCol.InsertBulk(audioBooks) |> ignore                    
                 )
 
                 return res |> Ok
@@ -293,8 +352,8 @@ module WebAccess =
             match cookies with
             | None -> return Ok [||]
             | Some cc ->
-    
-                match! getDownloadPage cc with
+                let! dPage = getDownloadPage cc
+                match dPage with
                 | Error e -> return Error e
                 | Ok html ->
                     let audioBooks =
@@ -356,8 +415,9 @@ module WebAccess =
                     
                     match audiobook.DownloadUrl with
                     | None -> return Error (Other Translations.current.NoDownloadUrlFoundError)
-                    | Some abDownloadUrl ->        
-                        match! (abDownloadUrl |> getDownloadUrl cookies) with
+                    | Some abDownloadUrl ->    
+                        let! downloadUrl = (abDownloadUrl |> getDownloadUrl cookies)
+                        match downloadUrl with
                         | Error e -> 
                             return Error e
 
@@ -376,9 +436,9 @@ module WebAccess =
                                 
                                     let fileSize = 
                                         (resp.Headers
-                                        |> HttpHelpers.getFileSizeFromHttpHeadersOrDefaultValue 0) / (1024 * 1024)
+                                        |> HttpHelpers.getFileSizeFromHttpHeadersOrDefaultValue 0)
                                 
-                                
+                                    
                                     use zipStream = new ZipInputStream(resp.ResponseStream)
 
                                     let mutable zipStreamFullLength = 0
@@ -391,21 +451,22 @@ module WebAccess =
                                                 | null ->
                                                     entryAvailable <- false
                                                 | entry -> 
-                                                    zipStreamFullLength <- zipStreamFullLength + (zipStream.Length |> int)
-                                                    yield (entry, zipStreamFullLength)
+                                                    //zipStreamFullLength <- zipStreamFullLength + (zipStream.Length |> int)
+                                                    yield (entry)
                                             
                                         }
 
                                     let buffer:byte[] = Array.zeroCreate (500*1024)
 
-                                    let copyStream (src:Stream) (dst:Stream) initProgress entrySize =
+                                    let copyStream (src:Stream) (dst:Stream) initProgress scale =
                                     
                                         let mutable copying = true
                                         let mutable progress = initProgress
                                         while copying do
                                             let bytesRead = src.Read(buffer,0,buffer.Length)
-                                            progress <- progress + bytesRead
-                                            updateProgress (progress / (1024 * 1024), entrySize / (1024 * 1024))
+                                            let toAdd = ((bytesRead |> float) * scale) |> int
+                                            progress <- progress + toAdd
+                                            updateProgress (progress / (1024 * 1024), fileSize / (1024 * 1024))
                                             if bytesRead > 0 then
                                                 dst.Write(buffer, 0, bytesRead)
                                             else
@@ -414,24 +475,26 @@ module WebAccess =
                                         progress
 
 
-                                    let processMp3File initProgress zipStreamLength (entry:ZipEntry) =
+                                    let processMp3File initProgress (entry:ZipEntry) =
+                                        let scale = (entry.CompressedSize |> float) / (entry.Size |> float)
                                         let name = Path.GetFileName(entry.Name)
                                         let extractFullPath = Path.Combine(unzipTargetFolder,name)
                                         if (File.Exists(extractFullPath)) then
                                             File.Delete(extractFullPath)
 
                                         use streamWriter = File.Create(extractFullPath)
-                                        let progress = copyStream zipStream streamWriter initProgress zipStreamLength
+                                        let progress = copyStream zipStream streamWriter initProgress scale
                                         streamWriter.Close()
                                         progress                    
 
 
-                                    let processPicFile initProgress entrySize =
+                                    let processPicFile initProgress (entry:ZipEntry) =
+                                        let scale = (entry.CompressedSize |> float) / (entry.Size |> float)
                                         let mutable progress = initProgress
                                         let imageFullName = Path.Combine(audioBookFolder,audiobook.FullName + ".jpg")
                                         if not (File.Exists(imageFullName)) then
                                             use streamWriter = File.Create(imageFullName)
-                                            progress <- copyStream zipStream streamWriter initProgress entrySize
+                                            progress <- copyStream zipStream streamWriter initProgress scale
                                             streamWriter.Close()                                        
 
                                         let thumbFullName = Path.Combine(audioBookFolder,audiobook.FullName + ".thumb.jpg")
@@ -455,18 +518,25 @@ module WebAccess =
                                     do! asyncFunc(fun () ->
                                         zipSeq
                                         |> Seq.iter (
-                                            fun (entry, streamLength) ->
+                                            fun (entry) ->
                                                 match entry with
                                                 | ZipHelpers.Mp3File ->
-                                                    globalProgress <- (entry |> processMp3File globalProgress streamLength)
+                                                    globalProgress <- (entry |> processMp3File globalProgress)
                                                 | ZipHelpers.PicFile ->
-                                                    globalProgress <- (processPicFile globalProgress streamLength)
+                                                    globalProgress <- (entry |> processPicFile globalProgress)
                                                 | _ -> ()
                                         )
                                     )
                                 
                                     zipStream.Close()
-                                    resp.ResponseStream.Close()       
+                                    resp.ResponseStream.Close()    
+                                    
+
+                                    globalProgress <- fileSize
+                                    updateProgress (globalProgress / (1024 * 1024), fileSize / (1024 * 1024))
+
+
+
                                     let imageFullName = Path.Combine(audioBookFolder,audiobook.FullName + ".jpg")
                                     let thumbFullName = Path.Combine(audioBookFolder,audiobook.FullName + ".thumb.jpg")
 
@@ -567,6 +637,33 @@ module SecureLoginStorage =
             with
             | _ as e -> return (Error (e.Message))
         }
+
+module Files =
+
+    let fromTimeSpan (ts:TimeSpan) =
+        ts.TotalMilliseconds |> int
+
+    let getMp3FileList folder =
+        async {
+            let! files = 
+                asyncFunc( 
+                    fun () ->  Directory.EnumerateFiles(folder, "*.mp3")
+                )
+            
+            let! res =
+                asyncFunc (fun () ->
+                    files 
+                    |> Seq.toList 
+                    |> List.map (
+                        fun i ->
+                            use tfile = TagLib.File.Create(i)
+                            (i,tfile.Properties.Duration |> fromTimeSpan)
+                    )
+                )
+
+            return res
+        }
+        
 
 
 

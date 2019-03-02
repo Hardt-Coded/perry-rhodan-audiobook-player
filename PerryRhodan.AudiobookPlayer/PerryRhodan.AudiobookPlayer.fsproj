@@ -9,11 +9,18 @@
     <Compile Include="LiteDbExtensions\Json.fs" />
     <Compile Include="LiteDbExtensions\Bson.fs" />
     <Compile Include="LiteDbExtensions\FSharpBsonMapper.fs" />
+    <Content Include="Images\backward_icon.png" />
     <Content Include="Images\browse_icon.png" />
+    <Content Include="Images\forward_icon.png" />
     <Content Include="Images\home_icon.png" />
     <Content Include="Images\AudioBookPlaceholder_Dark.png" />
+    <Content Include="Images\next_icon.png" />
+    <Content Include="Images\pause_icon.png" />
+    <Content Include="Images\play_icon.png" />
+    <Content Include="Images\prev_icon.png" />
+    <Content Include="Images\pr_small_icon.png" />
     <Content Include="Images\settings_icon.png" />
-    <EmbeddedResource Include="Images\AudioBookPlaceholder.png" />
+    <Content Include="Images\AudioBookPlaceholder.png" />
     <None Include="repl_stuff.fsx" />
     <Compile Include="SampleData.fs" />
     <Compile Include="Common.fs" />
@@ -21,6 +28,7 @@
     <Compile Include="Global.fs" />
     <Compile Include="Domain.fs" />
     <Compile Include="Services.fs" />
+    <Compile Include="AudioPlayer.fs" />
     <Compile Include="Controls.fs" />
     <Compile Include="LoginPage.fs" />
     <Compile Include="AudioBookItem.fs" />
@@ -33,16 +41,19 @@
     <Compile Include="App.fs" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="FSharp.Control.AsyncSeq" Version="2.0.21" />
     <PackageReference Include="FSharp.Data" Version="3.0.0" />
     <PackageReference Include="LiteDB" Version="4.1.4" />
     <PackageReference Include="Microsoft.AppCenter.Analytics" Version="1.13.0" />
     <PackageReference Include="Microsoft.AppCenter.Crashes" Version="1.13.0" />
+    <PackageReference Include="Microsoft.AppCenter.Push" Version="1.13.2" />
     <PackageReference Include="Plugin.Permissions" Version="3.0.0.12" />
     <PackageReference Include="SharpZipLib" Version="1.1.0" />
     <PackageReference Include="SixLabors.ImageSharp" Version="1.0.0-beta0005" />
     <PackageReference Include="System.IO.Compression.ZipFile" Version="4.3.0" />
+    <PackageReference Include="System.Memory" Version="4.5.2" />
     <PackageReference Include="taglib-sharp-netstandard2.0" Version="2.1.0" />
-    <PackageReference Include="Xamarin.Forms" Version="3.5.0.129452" />
+    <PackageReference Include="Xamarin.Forms" Version="3.5.0.169047" />
     <PackageReference Include="Xamarin.Essentials" Version="1.0.1" />
     <PackageReference Include="Fabulous.Core" Version="0.32.0" />
     <PackageReference Include="Fabulous.LiveUpdate" Version="0.32.0" />

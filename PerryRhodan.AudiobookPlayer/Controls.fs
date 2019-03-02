@@ -97,17 +97,33 @@ let playerSymbolLabel =
         horizontalTextAlignment = TextAlignment.Center
         )
 
-let showDownloadProgress (f,t) =
-    View.Label(text=(sprintf "%i / %i" f t),
-        fontFamily=faFontFamilyName true,
-        fontSize=12.,
-        margin=3.,
-        textColor=Consts.primaryTextColor,
-        verticalOptions = LayoutOptions.Fill, 
-        horizontalOptions = LayoutOptions.Fill, 
-        verticalTextAlignment = TextAlignment.End,
-        horizontalTextAlignment = TextAlignment.Center
-        )
+let showDownloadProgress (f:int,t:int) =
+    let factor = (f |> float) / (t |> float)
+    View.Grid(
+        children = [
+            View.ProgressBar(
+                progress = (factor),
+                verticalOptions = LayoutOptions.End, 
+                horizontalOptions = LayoutOptions.Fill,
+                heightRequest = 12.,
+                created = (
+                    fun e ->
+                        e.ProgressColor <- Color.FromHex("FFAC63FF")
+                )
+            )
+            View.Label(text=(sprintf "%i %%" ((factor * 100.0) |> int)),
+                //fontFamily=faFontFamilyName true,
+                fontSize=11.,
+                margin=3.,
+                textColor=Consts.primaryTextColor,
+                verticalOptions = LayoutOptions.Fill, 
+                horizontalOptions = LayoutOptions.Fill, 
+                verticalTextAlignment = TextAlignment.End,
+                horizontalTextAlignment = TextAlignment.Center
+                )    
+        ]
+    )
+    
 
 
 
@@ -133,8 +149,10 @@ let audioBookStateOverlay
             elif (isDownloaded) then
                 yield playerSymbolLabel.GridColumn(1).GridRow(1)
 
-            if progress.IsSome then
-                let f,t = progress.Value
+            match progress with
+            | None -> ()
+            | Some progress ->
+                let f,t = progress
                 yield ((f,t) |> showDownloadProgress).GridColumnSpan(2).GridRow(2).GridColumn(0)
 
             if (isLoading) then

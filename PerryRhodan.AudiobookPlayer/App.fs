@@ -141,7 +141,7 @@ module App =
 
         let isPlayerRunning = 
             model.AudioPlayerPageModel 
-            |> Option.map (fun i -> i.CurrentState = AudioPlayerPage.PlayerState.Playing)
+            |> Option.map (fun i -> i.CurrentState = AudioPlayer.Playing)
             |> Option.defaultValue false
 
         if isPlayerRunning then
@@ -366,9 +366,9 @@ module App =
 
         | Some abModel ->
             if (abModel.AudioBook <> audioBook) then
-                if abModel.CurrentState = AudioPlayerPage.Playing then
+                if abModel.CurrentState = AudioPlayer.Playing then
                     // stop audio player
-                    AudioPlayerPage.audioPlayer.Stop()
+                    AudioPlayerPage.audioPlayer.StopAudio()
                 brandNewPage()
             else
                 newPageModel, Cmd.none
@@ -407,9 +407,12 @@ module App =
             // Reload AudioBooks when reach MainPage, it always at least one in the list
             let lastEntry = newPageStack |> List.last
             let cmd =
-                if lastEntry = MainPage then
+                match lastEntry with
+                | MainPage ->
                     (Cmd.ofMsg (MainPageMsg MainPage.Msg.LoadLocalAudiobooks))
-                else
+                | BrowserPage ->
+                    (Cmd.ofMsg (BrowserPageMsg BrowserPage.Msg.LoadLocalAudiobooks))
+                | _ ->
                     Cmd.none
 
             {model with PageStack = newPageStack; BacktapsOnMainSite = 0}, cmd
@@ -648,7 +651,7 @@ module App =
 type App () as app = 
     inherit Application ()
 
-    do AppCenter.Start("ios=(...);android=", typeof<Analytics>, typeof<Crashes>)
+    do AppCenter.Start(sprintf "ios=(...);android=%s" Global.appcenterAndroidId, typeof<Analytics>, typeof<Crashes>)
     
     let runner =
         
@@ -673,8 +676,8 @@ type App () as app =
     //do runner.EnableLiveUpdate()
 #endif    
 
-    override __.OnSleep() = 
-        base.OnSleep()
+    override __.OnSleep() =         
+        base.OnSleep()        
         ()
 
     override __.OnResume() = 
@@ -684,6 +687,10 @@ type App () as app =
     override this.OnStart() = 
         base.OnStart()
         ()
+
+    
+
+        
 
     
 

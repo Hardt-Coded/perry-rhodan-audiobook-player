@@ -90,13 +90,13 @@
                                             command=(fun ()-> dispatch (if model.DataProtectionStuff then HideDataProtectionStuff else ShowDataProtectionStuff))
                                         )
 
-                                        yield View.StackLayout(orientation=StackOrientation.Horizontal,
-                                            horizontalOptions = LayoutOptions.Center,
-                                            children =[
-                                                Controls.secondaryTextColorLabel 18. Translations.current.HideLastListendWhenOnlyOneAudioBookOnDevice
-                                                View.Switch(isToggled = model.HideLastListendWhenOnlyOneAudioBookOnDevice, toggled = (fun on -> dispatch (ToggleHideLastListend on.Value)), horizontalOptions = LayoutOptions.Center)
-                                            ]
-                                        )
+                                        //yield View.StackLayout(orientation=StackOrientation.Horizontal,
+                                        //    horizontalOptions = LayoutOptions.Center,
+                                        //    children =[
+                                        //        Controls.secondaryTextColorLabel 18. Translations.current.HideLastListendWhenOnlyOneAudioBookOnDevice
+                                        //        View.Switch(isToggled = model.HideLastListendWhenOnlyOneAudioBookOnDevice, toggled = (fun on -> dispatch (ToggleHideLastListend on.Value)), horizontalOptions = LayoutOptions.Center)
+                                        //    ]
+                                        //)
 
                                         if (model.DataProtectionStuff) then
                                             let viewSource = UrlWebViewSource(Url="http://hardt-solutions.com/PrivacyPolicies/EinsAMedienAudiobookPlayer.html")
