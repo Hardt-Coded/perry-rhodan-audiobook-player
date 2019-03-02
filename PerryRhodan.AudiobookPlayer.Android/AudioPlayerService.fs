@@ -83,10 +83,65 @@ module rec AudioPlayerServiceImplementation =
         let POS_NOTIFICATION_BROADCAST_ACTION = "PerryRhodan.action.POS_BROADCAST"
 
 
+    module MediaButtonStuff =
+
+        open Android.Views
+
+        let onMediaButtonReceive (intent:Intent) =
+            if intent.Action <> Intent.ActionMediaButton then
+                ()
+            else
+                let key = intent.GetParcelableExtra(Intent.ExtraKeyEvent) :?> KeyEvent
+                if (key.Action <> KeyEventActions.Down) then
+                    ()
+                else
+                    
+                    match key.KeyCode with
+                    | Keycode.Headsethook | Keycode.MediaPlayPause ->
+                        ServiceActions.TOGGLE_PLAYPAUSE
+                        |> Helpers.sendCommandToService typeof<Services.AudioPlayerService> [] []
+                        
+                    | Keycode.MediaPlay ->
+                        ServiceActions.START_PLAYER
+                        |> Helpers.sendCommandToService typeof<Services.AudioPlayerService> [] []
+                        
+                    | Keycode.MediaPause -> 
+                        ServiceActions.STOP_PLAYER
+                        |> Helpers.sendCommandToService typeof<Services.AudioPlayerService> [] []
+                        
+                    | Keycode.MediaStop -> 
+                        ServiceActions.STOP_PLAYER
+                        |> Helpers.sendCommandToService typeof<Services.AudioPlayerService> [] []
+                        
+                    | Keycode.MediaNext -> 
+                        ServiceActions.MOVEFORWARD_PLAYER
+                        |> Helpers.sendCommandToService typeof<Services.AudioPlayerService> [] []
+                        
+                    | Keycode.MediaPrevious ->
+                        ServiceActions.MOVEBACKWARD_PLAYER
+                        |> Helpers.sendCommandToService typeof<Services.AudioPlayerService> [] []
+                    | Keycode.MediaFastForward  |Keycode.MediaStepForward -> 
+                        ServiceActions.JUMP_FORWARD_PLAYER
+                        |> Helpers.sendCommandToService typeof<Services.AudioPlayerService> [] []
+                    | Keycode.MediaRewind | Keycode.MediaStepBackward ->
+                        ServiceActions.JUMP_BACKWARD_PLAYER
+                        |> Helpers.sendCommandToService typeof<Services.AudioPlayerService> [] []
+
+
     module Dependencies =
 
         open Android.Media
         open Android.Media.Session
+
+
+        type MediaSessionCallback() =
+            inherit MediaSession.Callback()
+
+                override this.OnMediaButtonEvent(mediaButtonIntent) =
+                    let action = mediaButtonIntent.Action
+                    mediaButtonIntent |> MediaButtonStuff.onMediaButtonReceive
+                    true
+
 
         let notificationManager = 
             Android.App.Application.Context.GetSystemService(Android.Content.Context.NotificationService) :?> NotificationManager
@@ -94,9 +149,27 @@ module rec AudioPlayerServiceImplementation =
         let audioManager = 
             Android.App.Application.Context.GetSystemService(Android.Content.Context.AudioService) :?> AudioManager
 
-        let createMediaSession () =
-            let session = new MediaSession(Android.App.Application.Context, "PerryRhodanAudioBookPlayer")
-            session       
+        let createMediaSession 
+            (context:Context)
+            (mediaSessionCallback:MediaSessionCallback)    =
+            let mediaSession = new MediaSession(Android.App.Application.Context, "PerryRhodanAudioBookPlayer")
+            mediaSession.SetFlags(MediaSessionFlags.HandlesMediaButtons ||| MediaSessionFlags.HandlesTransportControls)
+            mediaSession.SetCallback(mediaSessionCallback)
+            let mediaButtonIntent = new Intent(Intent.ActionMediaButton);
+            let componentName = new ComponentName(Android.App.Application.Context.PackageName, (new Receivers.RemoteControlBroadcastReceiver()).ComponentName)
+            mediaButtonIntent.SetComponent(componentName) |> ignore
+            
+            let mediaButtonReceiverPendingIntent = PendingIntent.GetBroadcast(Android.App.Application.Context, 0, mediaButtonIntent, PendingIntentFlags());
+            mediaSession.SetMediaButtonReceiver(mediaButtonReceiverPendingIntent)
+
+            
+            
+            let mediaController = mediaSession.Controller
+            let newMediaController = new MediaController(Android.App.Application.Context,mediaSession.SessionToken)
+            
+
+            mediaSession.Active <- true
+            mediaSession       
 
         let audioFocusRequest audioFocusOnChange = 
             (new AudioFocusRequestClass.Builder(AudioFocus.Gain))
@@ -105,6 +178,10 @@ module rec AudioPlayerServiceImplementation =
                 .SetWillPauseWhenDucked(true)
                 .SetOnAudioFocusChangeListener(audioFocusOnChange)                    
                 .Build()
+
+
+        
+
 
 
         let playbackAttributes =
@@ -258,42 +335,47 @@ module rec AudioPlayerServiceImplementation =
             let context = Android.App.Application.Context
             let icon = icon "einsa_small_icon"
             let title = info.AudioBook.FullName
-                
             
+            let stateBuilder = new PlaybackState.Builder();
+
+            let stateAction =
+                match info.State with
+                | Playing ->
+                    PlaybackState.ActionPlayPause ||| PlaybackState.ActionPause ||| PlaybackState.ActionStop ||| PlaybackState.ActionSkipToNext ||| PlaybackState.ActionSkipToPrevious
+                | Stopped ->
+                    PlaybackState.ActionPlayPause ||| PlaybackState.ActionPlay ||| PlaybackState.ActionSkipToNext ||| PlaybackState.ActionSkipToPrevious
+
+
+            stateBuilder.SetActions(stateAction) |> ignore            
+            stateBuilder.SetState((if info.State = Stopped then PlaybackStateCode.Stopped else PlaybackStateCode.Playing), PlaybackState.PlaybackPositionUnknown, 1.0f) |> ignore
             
-            mediaSession.SetFlags(MediaSessionFlags.HandlesMediaButtons||| MediaSessionFlags.HandlesTransportControls)
-
-            let metadataBuilder = new MediaMetadata.Builder();
-            metadataBuilder.PutString(MediaMetadata.MetadataKeyTitle, info.AudioBook.FullName) |> ignore
-
+            mediaSession.SetPlaybackState(stateBuilder.Build());
+            
             let albumPicFile = 
                 info.AudioBook.Thumbnail
                 |> Option.defaultValue "@drawable/AudioBookPlaceholder_Dark.png"
 
             let albumPic = Android.Graphics.BitmapFactory.DecodeFile(albumPicFile)
 
-            metadataBuilder.PutBitmap(MediaMetadata.MetadataKeyAlbumArt,albumPic) |> ignore
-            
-            
-            mediaSession.SetMetadata(metadataBuilder.Build());
-            let stateBuilder = new PlaybackState.Builder();
-            stateBuilder.SetActions(PlaybackState.ActionPlay ||| PlaybackState.ActionPlayPause ||| PlaybackState.ActionPause ||| PlaybackState.ActionRewind ||| PlaybackState.ActionFastForward) |> ignore
-            
-            stateBuilder.SetState((if info.State = Stopped then PlaybackStateCode.Paused else PlaybackStateCode.Playing), PlaybackState.PlaybackPositionUnknown, 1.0f) |> ignore
-            
-            mediaSession.SetPlaybackState(stateBuilder.Build());
-            
-            
-            let mediaButtonReceiverComponentName = new ComponentName(Application.Context, Java.Lang.Class.FromType(typeof<Receivers.RemoteControlBroadcastReceiver>))
-            
-            let mediaButtonIntent = new Intent(Intent.ActionMediaButton);
-            mediaButtonIntent.SetComponent(mediaButtonReceiverComponentName) |> ignore
-            let mediaButtonReceiverPendingIntent = PendingIntent.GetBroadcast(Application.Context, 0, mediaButtonIntent, PendingIntentFlags.UpdateCurrent);
-            mediaSession.SetMediaButtonReceiver(mediaButtonReceiverPendingIntent)
+            let mediaMetaData =
+                (new MediaMetadata.Builder())
+                    .PutBitmap(MediaMetadata.MetadataKeyAlbumArt,albumPic)                                                                                                                               
+                    .PutBitmap(MediaMetadata.MetadataKeyDisplayIcon,albumPic)                                                                                                                                                                                       
+                    .PutString(MediaMetadata.MetadataKeyDisplayTitle,info.AudioBook.FullName)
+                    .PutString(MediaMetadata.MetadataKeyTitle,info.AudioBook.FullName)
+                    
+                    
+                    .PutString(MediaMetadata.MetadataKeyAlbum,info.AudioBook.FullName)
+                    .PutLong(MediaMetadata.MetadataKeyTrackNumber,info.CurrentTrackNumber |> int64)  
+                    .PutLong(MediaMetadata.MetadataKeyNumTracks,info.Mp3FileList.Length |> int64)  
+                    .PutLong(MediaMetadata.MetadataKeyDuration,info.Mp3FileList.Length |> int64) 
+          
+                    
+                    .Build();
 
-            mediaSession.Active <- true
+            mediaSession.SetMetadata(mediaMetaData)
             
-           
+
             let style = new Notification.MediaStyle();
             style.SetMediaSession(mediaSession.SessionToken) |> ignore
             
@@ -374,38 +456,8 @@ module rec AudioPlayerServiceImplementation =
             inherit BroadcastReceiver()
                    
                 override this.OnReceive(context,intent) =
-                    if intent.Action <> Intent.ActionMediaButton then
-                        ()
-                    else
-                        let key = intent.GetParcelableExtra(Intent.ExtraKeyEvent) :?> KeyEvent
-                        if (key.Action <> KeyEventActions.Down) then
-                            ()
-                        else
-                            
-                            match key.KeyCode with
-                            | Keycode.Headsethook | Keycode.MediaPlayPause ->
-                                ServiceActions.TOGGLE_PLAYPAUSE
-                                |> Helpers.sendCommandToService typeof<Services.AudioPlayerService> [] []
-                                
-                            | Keycode.MediaPlay ->
-                                ServiceActions.START_PLAYER
-                                |> Helpers.sendCommandToService typeof<Services.AudioPlayerService> [] []
-                                
-                            | Keycode.MediaPause -> 
-                                ServiceActions.STOP_PLAYER
-                                |> Helpers.sendCommandToService typeof<Services.AudioPlayerService> [] []
-                                
-                            | Keycode.MediaStop -> 
-                                ServiceActions.STOP_PLAYER
-                                |> Helpers.sendCommandToService typeof<Services.AudioPlayerService> [] []
-                                
-                            | Keycode.MediaNext -> 
-                                ServiceActions.MOVEFORWARD_PLAYER
-                                |> Helpers.sendCommandToService typeof<Services.AudioPlayerService> [] []
-                                
-                            | Keycode.MediaPrevious ->
-                                ServiceActions.MOVEBACKWARD_PLAYER
-                                |> Helpers.sendCommandToService typeof<Services.AudioPlayerService> [] []
+                    intent |> MediaButtonStuff.onMediaButtonReceive
+                    ()
                                 
 
             member this.ComponentName = this.Class.Name;
@@ -428,6 +480,9 @@ module rec AudioPlayerServiceImplementation =
             (informationDispatcher:MailboxProcessor<InformationDispatcher.InfoDispatcherMsg>)
             (updateInfo: AudioPlayerInfo -> Async<unit>)
             info =
+
+                mediaSession.Active <- true
+
                 match info.ServiceState with
                 | AudioPlayerServiceState.Stopped ->
                     Notification.createNotificationChannel ()
@@ -689,8 +744,13 @@ module rec AudioPlayerServiceImplementation =
                 audioPlayerStateMailbox
                     self
                     informationDispatcher
+
+            let mediaSessionCallback = new Dependencies.MediaSessionCallback()
             
-            let mutable mediaSession = Dependencies.createMediaSession ()
+            let mutable mediaSession = 
+                Dependencies.createMediaSession 
+                    service
+                    mediaSessionCallback
                 
             let mutable onAfterPrepare:(unit->unit) option ref  = ref None
             let mutable currentTrack = ref 0
@@ -749,7 +809,11 @@ module rec AudioPlayerServiceImplementation =
             interface IAudioServiceImplementation with
 
                 member this.StartAudioService info =
-                    mediaSession <- Dependencies.createMediaSession ()
+                    //mediaSession.Release()
+                    //mediaSession.
+                    //mediaSession.Dispose()
+                    //mediaSession <- Dependencies.createMediaSession mediaSessionCallback
+                    
                     onStartAudioService
                         service
                         mediaPlayer
@@ -811,7 +875,7 @@ module rec AudioPlayerServiceImplementation =
 
         [<Service>]
         type AudioPlayerService() as self =
-            inherit Service()
+            inherit Android.Service.Media.MediaBrowserService()
 
             static let mutable instance = None
 
@@ -836,9 +900,7 @@ module rec AudioPlayerServiceImplementation =
             
 
             override this.OnCreate () =
-                instance <- Some self
-                let remoteControlReceiver = new Receivers.RemoteControlBroadcastReceiver()
-                self.RegisterReceiver(remoteControlReceiver, new IntentFilter(Intent.ActionMediaButton)) |> ignore
+                instance <- Some self                
                 ()
 
             override this.OnStartCommand(intent,_,_) =
@@ -883,17 +945,28 @@ module rec AudioPlayerServiceImplementation =
                             let intent = new Intent(DecpencyService.ACTION_GET_CURRENT_STATE)
                             intent.PutExtra("currentstate",stateJson) |> ignore
                             this.SendBroadcast(intent)
-
+                    | x when x = TOGGLE_PLAYPAUSE ->
+                        stateMailBox.Post(TogglePlayPause)
+                    | _ ->
+                        Crashes.TrackError(exn(sprintf "AudioPlayerService: unknown intent action. '%s'" intent.Action))
 
                     
 
                     StartCommandResult.Sticky
 
             override this.OnBind _ =
+                
                 null
+
+
+            override this.OnLoadChildren(parentId,result) =
+                result.SendResult(null)
 
             override this.OnDestroy() =                
                 ()
+
+            override this.OnGetRoot(clientPackageName,clientUi,rootHints) =
+                null
 
             member this.ComponentName = this.Class.Name;
 

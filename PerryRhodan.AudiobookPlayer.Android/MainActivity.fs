@@ -55,5 +55,16 @@ type MainActivity() =
 
         base.OnRequestPermissionsResult(requestCode, permissions, grantResults)
 
+ 
+ 
+
+ module LinkerStuff =
+ // Linker build errors
+ // force to use
+     open Android.Support.V7.Widget
+
+     let ignoreFitWindowStuff = new FitWindowsFrameLayout(Application.Context)
+     let ignoreFitOther = new ContentFrameLayout(Application.Context)
+
 
 
