@@ -1,5 +1,7 @@
 ﻿module Global
 
+    let appcenterAndroidId = ""
+
 
     type Language =
         | English
@@ -19,4 +21,8 @@
     type LoginRequestCameFrom =
         | RefreshAudiobooks
         | DownloadAudioBook
+
+    
+
+    
 

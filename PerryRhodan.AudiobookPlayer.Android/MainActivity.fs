@@ -13,7 +13,9 @@ open Android.Media
 open Android.OS
 open Xamarin.Forms.Platform.Android
 open Services
-open AudioPlayerService
+open Microsoft.AppCenter
+open Microsoft.AppCenter.Crashes
+open Microsoft.AppCenter.Analytics
 
 
 type AndroidDownloadFolder() =
@@ -25,23 +27,22 @@ type AndroidDownloadFolder() =
 
 
 
-
-
-
-[<Activity (Label = "Eins A Medien Audiobook Player", Icon = "@mipmap/ic_launcher", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = (ConfigChanges.ScreenSize ||| ConfigChanges.Orientation),ScreenOrientation = ScreenOrientation.Portrait)>]
+[<Activity (Label = "Eins A Medien Audiobook Player", Icon = "@mipmap/eins_a_launcher", Theme = "@style/MainTheme.Launcher", MainLauncher = true, ConfigurationChanges = (ConfigChanges.ScreenSize ||| ConfigChanges.Orientation),ScreenOrientation = ScreenOrientation.Portrait)>]
 type MainActivity() =
     inherit FormsAppCompatActivity()
     override this.OnCreate (bundle: Bundle) =
+        base.SetTheme(PerryRhodan.AudiobookPlayer.Android.Resources.Style.MainTheme)
         FormsAppCompatActivity.TabLayoutResource <- Resources.Layout.Tabbar
         FormsAppCompatActivity.ToolbarResource <- Resources.Layout.Toolbar
         base.OnCreate (bundle)
+
+        AppCenter.Start(Global.appcenterAndroidId, typeof<Analytics>, typeof<Crashes>)
 
         Xamarin.Essentials.Platform.Init(this, bundle)
 
         Xamarin.Forms.Forms.Init (this, bundle)
         Xamarin.Forms.DependencyService.Register<AndroidDownloadFolder>()
-        Xamarin.Forms.DependencyService.Register<AudioPlayer>()
-
+        Xamarin.Forms.DependencyService.Register<AudioPlayerServiceImplementation.DecpencyService.AudioPlayer>()
         
         Plugin.CurrentActivity.CrossCurrentActivity.Current.Init(this, bundle);
 
@@ -53,6 +54,17 @@ type MainActivity() =
         Plugin.Permissions.PermissionsImplementation.Current.OnRequestPermissionsResult(requestCode, permissions, grantResults)
 
         base.OnRequestPermissionsResult(requestCode, permissions, grantResults)
+
+ 
+ 
+
+ module LinkerStuff =
+ // Linker build errors
+ // force to use
+     open Android.Support.V7.Widget
+
+     let ignoreFitWindowStuff = new FitWindowsFrameLayout(Application.Context)
+     let ignoreFitOther = new ContentFrameLayout(Application.Context)
 
 
 
