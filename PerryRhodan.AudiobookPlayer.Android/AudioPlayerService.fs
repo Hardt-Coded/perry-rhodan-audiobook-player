@@ -906,18 +906,21 @@ module rec AudioPlayerServiceImplementation =
             interface AudioManager.IOnAudioFocusChangeListener with
                 member ___.OnAudioFocusChange(focusChange:AudioFocus) =
                     
-                    let state = stateMailBox.PostAndReply((fun rc -> GetCurrentState rc),2000)
-
-                    match focusChange with
-                    | AudioFocus.Gain ->
-                        if (state.PlaybackDelayed || state.ResumeOnAudioFocus) then                                    
-                            stateMailBox.Post(StartAudioPlayer)                                    
-                    | AudioFocus.Loss ->
-                        stateMailBox.Post(StopAudioPlayer true)
-                    | AudioFocus.LossTransient | AudioFocus.LossTransientCanDuck->
-                        stateMailBox.Post(StopAudioPlayer false)
-                    | _ ->
-                        () 
+                    let state = stateMailBox.TryPostAndReply((fun rc -> GetCurrentState rc),5000)
+                    match state with
+                    | None ->
+                        ()
+                    | Some state ->
+                        match focusChange with
+                        | AudioFocus.Gain ->
+                            if (state.PlaybackDelayed || state.ResumeOnAudioFocus) then                                    
+                                stateMailBox.Post(StartAudioPlayer)                                    
+                        | AudioFocus.Loss ->
+                            stateMailBox.Post(StopAudioPlayer true)
+                        | AudioFocus.LossTransient | AudioFocus.LossTransientCanDuck->
+                            stateMailBox.Post(StopAudioPlayer false)
+                        | _ ->
+                            () 
             
 
             override this.OnCreate () =
