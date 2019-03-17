@@ -84,7 +84,8 @@
         | StartSleepTimer of TimeSpan option
         | DecreaseSleepTimer
 
-
+        | QuitAudioPlayer
+               
         | GetCurrentState of AsyncReplyChannel<AudioPlayerInfo>
 
 
@@ -182,7 +183,7 @@
                     loop []
             )
 
-    
+    open Common.MailboxExtensions
 
     let audioPlayerStateMailbox         
         (audioService:IAudioServiceImplementation)
@@ -293,51 +294,51 @@
                             reply.Reply(state)
                             return (state)
                         | StartSleepTimer sleepTime ->
-                            let! newState = state |> onStartSleepTimer sleepTime
+                            let newState = state |> onStartSleepTimer sleepTime
                             return newState
                         | DecreaseSleepTimer ->
-                            let! newState = state |> onDecreaseSleepTimer 
+                            let newState = state |> onDecreaseSleepTimer 
                             return newState
+                        | QuitAudioPlayer ->
+                            state |> onQuitAudioPlayer
+                            return state
 
                     }
+
+
+                and onQuitAudioPlayer state =
+                    Helpers.storeCurrentAudiobookState state
+                    System.Diagnostics.Process.GetCurrentProcess().CloseMainWindow() |> ignore
 
 
                 and onStartSleepTimer sleepTime state =
-                    async {
-                        let newState = {state with TimeUntilSleep = sleepTime}
-                        match newState.TimeUntilSleep with
-                        | None ->
-                            return newState
-                        | Some _ ->                            
-                            do! Async.SwitchToNewThread()
-                            inbox.Post(DecreaseSleepTimer)
-                            return newState
-                    }
+                    let newState = {state with TimeUntilSleep = sleepTime}
+                    match newState.TimeUntilSleep with
+                    | None ->
+                        newState
+                    | Some _ ->                            
+                        inbox |> PostWithDelay DecreaseSleepTimer 1000
+                        newState
                    
-                    
-                    
-
 
                 and onDecreaseSleepTimer state =
-                    async {
-                        do! Async.Sleep 1000
-                        match state.TimeUntilSleep with
-                        | None ->
-                            return state
-                        | Some t ->
-                            let sleepTime = t.Subtract(TimeSpan.FromSeconds(1.))
-                            if sleepTime <= TimeSpan.Zero then
-                                let newState = {state with TimeUntilSleep = None }
-                                inbox.Post(StopAudioPlayer false)
-                                return newState
+                    match state.TimeUntilSleep with
+                    | None ->
+                        state
+                    | Some t ->
+                        let sleepTime = t.Subtract(TimeSpan.FromSeconds(1.))
+                        if sleepTime <= TimeSpan.Zero then
+                            let newState = {state with TimeUntilSleep = None }
+                            inbox.Post(StopAudioPlayer false)
+                            newState
                                 
-                            else
-                                let newState = {state with TimeUntilSleep = Some sleepTime}
-                                inbox.Post(DecreaseSleepTimer)
-                                return newState
+                        else
+                            let newState = {state with TimeUntilSleep = Some sleepTime}
+                            inbox |> PostWithDelay DecreaseSleepTimer 1000
+                            newState
                                 
                     
-                    }
+                    
                     
 
 

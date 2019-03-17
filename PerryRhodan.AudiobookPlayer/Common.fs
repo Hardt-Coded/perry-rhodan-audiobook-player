@@ -308,46 +308,14 @@
             |> fromTimeSpan
 
 
-    module Texts =
+    module MailboxExtensions =
 
-        let dataProtectionText = 
-            """
-Impress/Impressum
-            
-Developer/Entwickler:
-            
-Hardt IT-Solutions Daniel Hardt
-Weinbergring 39a
-55268 Nieder-Olm
-            
-Source-Code:
-https://github.com/DieselMeister/perry-rhodan-audiobook-player
-            
-            
-            
-            
-Data Protection Information
-            
-1. The app doesn't collect any personal information of it's user. 
-Only if the app crashes, the error message and additional source code information and your name of phone model will be send to "appcenter.ms" to allow us fix errors.
-2. To use the app, you need an account of the Eins A Medien GmbH (einsamedien.de)
-3. The app stores, if you want, your login information encrypted on your phone. (Android SecureStorage)
-4. If you download the app from the google play store, please be aware of the data protection information of google inc.
-5. The function of the app is traceable because it's open source. I would love, if you contribute. (look on github.com)
-6. I didn't belong to the Eins A Medien GmbH. But I am a huge Perry Rhodan Fan.
-            
-German:
-            
-Datenschutzerklärung
-            
-1. Die App sammelt keine persönlichen Informationen Ihrer Benutzer.
-Ausgenommen die App stürzt ab, dann werden Fehlermeldung sowie zusätzliche Quellcodeinformationen, sowie das Modell des Telefons an "appcenter.ms" gesendet, damit ich Fehler korrigieren kann.
-2. Damit die App funktioniert, benötigen Sie ein Konto bei der Eins A Medien GmbH (einsamedien.de)
-3. Die App speichert, sofern Sie wollen, Ihren Login verschlüsselt auf Ihrem Telefon. (Android SecureStorage)
-4. Wenn Sie die App beim Google PlayStore runtergeladen haben, beachten Sie die dortigen Datenschutzbestimmungen von Google Inc.
-5. Die Funktionen der App sind nachvollziehbar, weil diese Open Source ist. Ich würde mich freuen, wenn Ihr euch beteiligt. (schaut auf github.com)
-6. Ich gehöre nicht zur Eins A Medien GmbH. Aber ich bin ein großer Fan von Perry Rhodan.
-            """
+        let PostWithDelay msg ms (mailbox:MailboxProcessor<_>) =
+            let post () = 
+                async {
+                    do! Async.Sleep ms
+                    mailbox.Post(msg)
+                }
+            post() |> Async.StartImmediate
 
-
-    
+       

@@ -39,7 +39,15 @@ open Services
     let initModel = { Audiobooks = [||]; IsLoading = true; LastTimeListendAudioBook = None }
 
     
-    let init () = initModel, Cmd.ofMsg AskForAppPermission
+    let init () = 
+        let cmd =
+            match Device.RuntimePlatform with
+            | Device.Android | Device.iOS ->
+                Cmd.ofMsg AskForAppPermission
+            | _ ->
+                Cmd.ofMsg LoadLocalAudiobooks
+                
+        initModel, cmd
 
 
     let rec update msg model =

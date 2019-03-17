@@ -80,6 +80,7 @@ module rec AudioPlayerServiceImplementation =
         let JUMP_BACKWARD_PLAYER = "PerryRhodan.action.JUMP_BACKWARD"
         let GET_CURRENT_STATE_PLAYER = "PerryRhodan.action.GET_CURRENT_STATE"
         let SET_SLEEP_TIMER_PLAYER = "PerryRhodan.action.SET_SLEEP_TIMER"
+        let QUIT_PLAYER = "PerryRhodan.action.QUIT"
 
         let POS_NOTIFICATION_BROADCAST_ACTION = "PerryRhodan.action.POS_BROADCAST"
 
@@ -253,6 +254,16 @@ module rec AudioPlayerServiceImplementation =
             
                 
 
+        
+        let private buildQuitPlayerAction() =
+            let icon = AndroidDrawable.IcMenuCloseClearCancel            
+            let intent = new Intent(context, typeof<Services.AudioPlayerService>);
+            intent.SetAction(QUIT_PLAYER) |> ignore
+            let startAudioPendingIntent = PendingIntent.GetService(context, 0, intent, PendingIntentFlags.UpdateCurrent)
+            
+            let builder = 
+                new Notification.Action.Builder(icon, "", startAudioPendingIntent)
+            builder.Build();
 
         let private buildStartAudioAction () =
             let icon = icon "play_small_icon"
@@ -422,6 +433,7 @@ module rec AudioPlayerServiceImplementation =
                     .AddAction(buildStartStopToggleAction info)
                     .AddAction(buildForwardAudioAction())
                     .AddAction(buildNextAudioAction())
+                    .AddAction(buildQuitPlayerAction())
                     .SetVisibility(NotificationVisibility.Public)
                     
 
@@ -734,27 +746,6 @@ module rec AudioPlayerServiceImplementation =
                     return newState
                 } 
 
-        //let sendMediaPlayerPosNr
-        //    (stateMailbox:MailboxProcessor<AudioPlayerCommand>)
-        //    (handler:Handler)
-        //    (mediaPlayer:MediaPlayer) =
-        //        let i = new Intent(ServiceActions.POS_NOTIFICATION_BROADCAST_ACTION);
-        //        //Android.LocalBroadcastManager.GetInstance(Android.App.Application.Context).SendBroadcast(i) |> ignore
-        //        // arg sometimes not so ice with the Action-Stuff
-
-        //        let rec action = 
-        //            new System.Action(
-        //                fun () -> 
-        //                    if mediaPlayer.IsPlaying then
-        //                        stateMailbox.Post(UpdatePositionExternal (mediaPlayer.CurrentPosition,info.CurrentTrackNumber))
-        //                        handler.PostDelayed(action, 1000 |> int64) |> ignore
-        //            )
-                    
-        //        handler.Post(action) |> ignore
-                
-                
-            
-                
 
 
         type AudioServiceImplementation(service:Services.AudioPlayerService) as self =
@@ -830,10 +821,6 @@ module rec AudioPlayerServiceImplementation =
             interface IAudioServiceImplementation with
 
                 member this.StartAudioService info =
-                    //mediaSession.Release()
-                    //mediaSession.
-                    //mediaSession.Dispose()
-                    //mediaSession <- Dependencies.createMediaSession mediaSessionCallback
                     
                     onStartAudioService
                         service
@@ -928,7 +915,8 @@ module rec AudioPlayerServiceImplementation =
                 ()
 
             override this.OnStartCommand(intent,_,_) =
-                if intent.Action = null || intent.Action = "" then
+                // it's possible that an intent is actually null
+                if intent = null || intent.Action = null || intent.Action = "" then
                     StartCommandResult.Sticky
                 else
                        
@@ -979,14 +967,13 @@ module rec AudioPlayerServiceImplementation =
                             else
                                 Some (time |> Common.TimeSpanHelpers.toTimeSpan)
                         stateMailBox.Post(StartSleepTimer time)
-
+                    | x when x = QUIT_PLAYER ->
+                        stateMailBox.Post(QuitAudioPlayer)
                     | _ ->
                         Crashes.TrackError(exn(sprintf "AudioPlayerService: unknown intent action. '%s'" intent.Action))
 
-
-                    
-
                     StartCommandResult.Sticky
+
 
             override this.OnBind _ =
                 
