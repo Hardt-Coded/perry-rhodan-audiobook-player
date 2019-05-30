@@ -200,7 +200,7 @@
                     | Some cc ->
                         let updateProgress (a,b) = dispatch (Msg.UpdateDownloadProgress (audiobookItemModel,(Some (a,b))))
                         
-                        let! res = audiobookItemModel.AudioBook |> WebAccess.downloadAudiobook cc updateProgress
+                        let! res = audiobookItemModel.AudioBook |> WebAccess.Downloader.downloadAudiobook cc updateProgress
                         match res with
                         | Error e ->
                             match e with
