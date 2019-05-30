@@ -1,7 +1,7 @@
 ﻿#r "netstandard"
 #r "System.Xml.Linq"
-#r @"C:\Users\Dieselmeister\.nuget\packages\fsharp.data\3.0.0\lib\netstandard2.0\FSharp.Data.dll"
-//#r @"C:\Users\ich\.nuget\packages\fsharp.data\3..\lib\netstandard2.\FSharp.Data.dll"
+//#r @"C:\Users\Dieselmeister\.nuget\packages\fsharp.data\3.0.0\lib\netstandard2.0\FSharp.Data.dll"
+#r @"C:\Users\Daniel\.nuget\packages\fsharp.data\3.0.0\lib\netstandard2.0\FSharp.Data.dll"
 
 open FSharp.Data
 open System
@@ -41,7 +41,7 @@ ntalpilot (Download) (<a href=\"/index.php?id=16&productID=34857\">ansehen</a>) 
 
 
 
-type DownloadSite = HtmlProvider< htmlSample >
+//type DownloadSite = HtmlProvider< htmlSample >
 
 
 let regexMatch pattern input =
@@ -74,7 +74,7 @@ open System.IO
 let tst = 
     use fs = new FileStream(@"D:\temp\perryRhodanApp\mega.txt",FileMode.Open)
 
-    DownloadSite.Load(fs).Html.Descendants("div")
+    HtmlDocument.Load(fs).Descendants("div")
     //DownloadSite.Parse(htmlData).Html.Descendants("div")
     |> Seq.toArray 
     |> Array.filter (fun i -> i.AttributeValue("id") = "downloads")
@@ -207,14 +207,13 @@ Perry Rhodan spürt der Allianz bis zum Rand der Milchstraße nach, wo er auf ei
 
 """
 
-type ProductSite = HtmlProvider< productSiteHtml >
+//type ProductSite = HtmlProvider< productSiteHtml >
 
 let ps () = 
     
     let paragraphs =
-        ProductSite
-            .Parse(productSiteHtml)            
-            .Html
+        HtmlDocument
+            .Parse(productSiteHtml)                        
             .Descendants ["p"]
         |> Seq.toList
     

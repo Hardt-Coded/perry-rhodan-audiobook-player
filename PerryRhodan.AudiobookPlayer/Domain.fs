@@ -55,11 +55,11 @@ type AudioBookListType =
 
 let downloadNameRegex = Regex(@"([A-Za-z .-]*)(\d*)(:| - )([\w\säöüÄÖÜ.:!\-]*[\(\)Teil \d]*)(.*)(( - Multitrack \/ Onetrack)|( - Multitrack)|( - Onetrack))")
 
-type DownloadSite = HtmlProvider< SampleData.htmlSample >
+//type DownloadSite = HtmlProvider< SampleData.htmlSample >
 
 
-let parseDownloadData htmlData =
-    DownloadSite.Parse(htmlData).Html.Descendants("div")
+let parseDownloadData htmlData =    
+    HtmlDocument.Parse(htmlData).Descendants("div")
     |> Seq.toArray 
     |> Array.filter (fun i -> i.AttributeValue("id") = "downloads")
     |> Array.tryHead
@@ -150,13 +150,12 @@ let synchronizeAudiobooks (local:AudioBook[]) (online:AudioBook[]) =
     Array.concat [|local; differences|] 
 
 
-type ProductSite = HtmlProvider< SampleData.productSiteHtml >
+//type ProductSite = HtmlProvider< SampleData.productSiteHtml >
 
 let parseProductPageForDescription html =
     let paragraphs =
-        ProductSite
-            .Parse(html)            
-            .Html
+        HtmlDocument
+            .Parse(html)                        
             .Descendants ["p"]
         |> Seq.toList
     
@@ -186,9 +185,8 @@ let parseProductPageForDescription html =
 
 let parseProductPageForImage html =
     let image =
-        ProductSite
-            .Parse(html)            
-            .Html
+        HtmlDocument
+            .Parse(html)                        
             .Descendants ["img"]
         |> Seq.tryFind (fun i -> i.AttributeValue("id") = "imgzoom")
         |> Option.bind (
