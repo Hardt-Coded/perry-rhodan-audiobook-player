@@ -35,7 +35,9 @@ open AudioPlayer
         TrackPositionProcess: float
         ProgressbarValue: float         
         TimeUntilSleeps: TimeSpan option 
-        AudioPlayerBusy:bool }
+        AudioPlayerBusy:bool 
+        HasPlayedBeforeDragSlider:bool
+        SliderIsDraged:bool }
 
     type Msg = 
         | Play 
@@ -57,6 +59,9 @@ open AudioPlayer
         | SetPlayerStateFromExtern of AudioPlayer.AudioPlayerState
         | UpdateTrackNumber of int
         
+        | SliderDragStarted
+        | SliderDragFinished
+
         | ChangeBusyState of bool
         | DoNothing
 
@@ -203,7 +208,9 @@ open AudioPlayer
           TrackPositionProcess=0.
           ProgressbarValue = 0. 
           TimeUntilSleeps = None
-          AudioPlayerBusy = false }
+          AudioPlayerBusy = false 
+          HasPlayedBeforeDragSlider = false
+          SliderIsDraged = false }
 
 
     let startAudioPlayerService abMdl fileList =
@@ -325,6 +332,22 @@ open AudioPlayer
         | PlayStopped | DoNothing -> 
             model, Cmd.none, None
 
+        | SliderDragStarted ->
+            let isPlaying = model.CurrentState = AudioPlayerState.Playing
+            let newModel = { model with HasPlayedBeforeDragSlider = isPlaying; SliderIsDraged = true  }
+            newModel, Cmd.ofMsg Stop, None
+        | SliderDragFinished ->
+            let cmd = 
+                if model.HasPlayedBeforeDragSlider then
+                    Cmd.ofMsg Play
+                else
+                    Cmd.none
+            let newModel = { model with HasPlayedBeforeDragSlider = false; SliderIsDraged = false }
+            match model.CurrentPositionMs with
+            | None -> ()
+            | Some newPos -> 
+                setAudioPositionAbsolute newPos
+            newModel, cmd, None
 
     and onRestoreStateFormAudioService info model =
         let newModel = 
@@ -471,12 +494,13 @@ open AudioPlayer
 
 
     and onProgressBarChangedMsg e model =
-        let min = model.TrackPositionProcess - 0.3
-        let max = model.TrackPositionProcess + 0.3
-        if (e < min || e > max ) then
+        //let min = model.TrackPositionProcess - 0.3
+        //let max = model.TrackPositionProcess + 0.3
+        //if (e < min || e > max ) then
+        if model.SliderIsDraged then
             if model.CurrentDurationMs.IsSome then
                 let newPos = ((model.CurrentDurationMs.Value |> float) * e) |> int
-                setAudioPositionAbsolute  newPos
+                
                 let newModel =
                     {model with 
                         CurrentPosition = Some (newPos |> toTimeSpan)
@@ -597,8 +621,15 @@ open AudioPlayer
                                     value=model.TrackPositionProcess,
                                     minimumMaximum = (0.,1.),
                                     //minimum = 0., maximum = 1., 
-                                    horizontalOptions = LayoutOptions.Fill,
-                                    valueChanged= (fun e -> dispatch (ProgressBarChanged e.NewValue))
+                                    horizontalOptions = LayoutOptions.Fill,                                    
+                                    valueChanged= (fun e -> dispatch (ProgressBarChanged e.NewValue)),
+                                    //dragStarted=(fun () -> dispatch SliderDragStarted),
+                                    //dragCompleted=(fun () -> dispatch SliderDragFinished),
+                                    created = (fun slider ->
+                                        slider.DragStarted.Add(fun _ -> dispatch SliderDragStarted)
+                                        slider.DragCompleted.Add(fun _ -> dispatch SliderDragFinished)
+                                    )
+                                    
                                   )).GridColumnSpan(5).GridRow(1)
 
                         ]).GridRow(2)
