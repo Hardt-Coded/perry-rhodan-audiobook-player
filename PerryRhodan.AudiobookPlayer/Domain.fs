@@ -53,9 +53,65 @@ type AudioBookListType =
 
 
 
-let downloadNameRegex = Regex(@"([A-Za-z .-]*)(\d*)(:| - )([\w\säöüÄÖÜ.:!\-]*[\(\)Teil \d]*)(.*)(( - Multitrack \/ Onetrack)|( - Multitrack)|( - Onetrack))")
+[<AutoOpen>]
+module Helpers =
 
-//type DownloadSite = HtmlProvider< SampleData.htmlSample >
+    let downloadNameRegex = Regex(@"([A-Za-z .-]*)(\d*)(:| - )([\w\säöüÄÖÜ.:!\-]*[\(\)Teil \d]*)(.*)(( - Multitrack \/ Onetrack)|( - Multitrack)|( - Onetrack))")
+
+    let getKey innerText =
+        if not (downloadNameRegex.IsMatch(innerText)) then "Other"
+        else
+            let matchTitle = downloadNameRegex.Match(innerText)
+            matchTitle.Groups.[1].Value.Replace("Nr.", "").Trim()
+
+
+    let tryGetEpisodenNumber innerText =
+        if not (downloadNameRegex.IsMatch(innerText)) then None
+        else
+            let epNumRes = Int32.TryParse(downloadNameRegex.Match(innerText).Groups.[2].Value)
+            match epNumRes with
+            | true, x -> Some x
+            | _ -> None
+
+
+    let getEpisodenTitle innerText =
+        if not (downloadNameRegex.IsMatch(innerText)) then innerText.Trim()
+        else 
+            let ept = downloadNameRegex.Match(innerText).Groups.[4].Value.Trim()
+            ept.Substring(0,(ept.Length-2)).ToString().Trim().Replace(":"," -")
+
+
+    let tryGetLinkForMultiDownload (i:HtmlNode) =
+        i.Descendants["a"]
+        |> Seq.filter (fun i ->  i.Attribute("href").Value().ToLower().Contains("productfiletypeid=2"))
+        |> Seq.map (fun i -> i.Attribute("href").Value())
+        |> Seq.tryHead
+
+
+    let tryGetProductionPage (i:HtmlNode) =
+        i.Descendants["a"]
+        |> Seq.filter (fun i -> i.InnerText() = "ansehen")
+        |> Seq.map (fun i -> i.Attribute("href").Value())
+        |> Seq.tryHead
+
+
+    let buildFullName episodeNumber key episodeTitle =
+        match episodeNumber with
+        | None -> sprintf "%s - %s" key episodeTitle
+        | Some no -> sprintf "%s %i - %s" key no episodeTitle
+
+
+    let tryParseInt str =
+        let (is,v) = Int32.TryParse(str)
+        if is then Some v else None
+
+    let tryGetProductId linkProductSite =
+        linkProductSite
+        |> RegExHelper.regexMatchGroupOpt 2 "(productID=)(\d*)"
+        |> Option.bind (tryParseInt)
+        
+        
+
 
 
 let parseDownloadData htmlData =    
@@ -68,7 +124,13 @@ let parseDownloadData htmlData =
         fun i -> 
             i.Descendants("li") 
             |> Seq.filter (fun i -> not (i.InnerText().Contains("Impressum"))) 
-            |> Seq.filter (fun i -> i.Descendants("a") |> Seq.exists (fun i -> i.TryGetAttribute("href") |> Option.map(fun m -> m.Value().Contains("butler.php?action=audio")) |> Option.defaultValue false) )
+            |> Seq.filter (fun i -> 
+                i.Descendants("a") 
+                |> Seq.exists (fun i -> 
+                    i.TryGetAttribute("href") 
+                    |> Option.map(fun m -> m.Value().Contains("butler.php?action=audio")) 
+                    |> Option.defaultValue false) 
+                )
             |> Seq.toArray
     )
     |> Option.defaultValue ([||])
@@ -76,51 +138,18 @@ let parseDownloadData htmlData =
         fun i ->
             let innerText = i.InnerText()
             //   little title work
-            let key =
-                if not (downloadNameRegex.IsMatch(innerText)) then "Other"
-                else
-                    let matchTitle = downloadNameRegex.Match(innerText)
-                    matchTitle.Groups.[1].Value.Replace("Nr.", "").Trim()
-
-
-            let episodeNumber = 
-                if not (downloadNameRegex.IsMatch(innerText)) then None
-                else
-                    let epNumRes = Int32.TryParse(downloadNameRegex.Match(innerText).Groups.[2].Value)
-                    match epNumRes with
-                    | true, x -> Some x
-                    | _ -> None
-            let episodeTitle = 
-                if not (downloadNameRegex.IsMatch(innerText)) then innerText.Trim()
-                else 
-                    let ept = downloadNameRegex.Match(innerText).Groups.[4].Value.Trim()
-                    ept.Substring(0,(ept.Length-2)).ToString().Trim().Replace(":"," -")
-
-            let linkForMultiDownload = 
-                i.Descendants["a"]
-                |> Seq.filter (fun i ->  i.Attribute("href").Value().ToLower().Contains("productfiletypeid=2"))
-                |> Seq.map (fun i -> i.Attribute("href").Value())
-                |> Seq.tryHead
-
-            let linkProductSite = 
-                i.Descendants["a"]
-                |> Seq.filter (fun i -> i.InnerText() = "ansehen")
-                |> Seq.map (fun i -> i.Attribute("href").Value())
-                |> Seq.tryHead
-
-            let fullName =
-                match episodeNumber with
-                | None -> sprintf "%s - %s" key episodeTitle
-                | Some no -> sprintf "%s %i - %s" key no episodeTitle
-
-            let (hasProdId,productId) = 
-                linkProductSite
-                |> RegExHelper.regexMatchGroupOpt 2 "(productID=)(\d*)"
-                |> Option.defaultValue "-1"
-                |> Int32.TryParse
-
+            let key = innerText |> getKey
+            let episodeNumber = innerText |> tryGetEpisodenNumber                
+            let episodeTitle = innerText |> getEpisodenTitle
+            let linkForMultiDownload = i |> tryGetLinkForMultiDownload
+            let linkProductSite = i |> tryGetProductionPage
+            let fullName = buildFullName episodeNumber key episodeTitle
+            let productId = 
+                linkProductSite 
+                |> tryGetProductId
+                |> Option.defaultValue -1
                         
-            {   Id = if hasProdId then productId else -1
+            {   Id = productId
                 FullName = fullName 
                 EpisodeNo = episodeNumber
                 EpisodenTitel = episodeTitle
