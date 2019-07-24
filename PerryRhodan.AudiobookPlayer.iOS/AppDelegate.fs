@@ -6,7 +6,6 @@ open UIKit
 open Foundation
 open Xamarin.Forms
 open Xamarin.Forms.Platform.iOS
-open Plugin.DownloadManager
 
 [<Register ("AppDelegate")>]
 type AppDelegate () =
@@ -17,10 +16,6 @@ type AppDelegate () =
         let appcore = new PerryRhodan.AudiobookPlayer.App()
         this.LoadApplication (appcore)
         base.FinishedLaunching(app, options)
-
-    override this.HandleEventsForBackgroundUrl (application:UIApplication,sessionIdentifier:string,completionHandler:Action)
-        
-        ()
 
 module Main =
     [<EntryPoint>]

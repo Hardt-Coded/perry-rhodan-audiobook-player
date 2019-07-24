@@ -1,9 +1,9 @@
 ﻿module AudioBookItem
 
     open Domain
-    open Fabulous.Core
+    open Fabulous
+    open Fabulous.XamarinForms
     open Common
-    open Fabulous.DynamicViews
     open Xamarin.Forms
     open Services
     open Global

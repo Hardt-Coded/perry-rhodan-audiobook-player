@@ -1,11 +1,11 @@
 ﻿module Common
 
     open System
-    open Fabulous.DynamicViews
     open Xamarin.Forms
     open System.IO
     open System.Threading.Tasks
-    open Fabulous.Core
+    open Fabulous
+    open Fabulous.XamarinForms
     
 
     type ComError =
@@ -91,7 +91,6 @@
         open Microsoft.AppCenter.Analytics
         open Microsoft.AppCenter.Crashes
         open Fabulous
-        open Fabulous.Core
         
         let displayAlert(title, message, cancel) =
             let tsc = TaskCompletionSource()
@@ -171,7 +170,7 @@
             
 
     module Cmd =
-        open Fabulous.Core
+        open Fabulous
 
         let ofAsyncMsgWithInternalDispatch (p: (Dispatch<'msg> -> Async<'msg>)) : Cmd<'msg> =
             [ fun dispatch -> async { let! msg = (p dispatch)  in dispatch msg } |> Async.StartImmediate ] 
@@ -194,7 +193,7 @@
 
         
         /// Message with specifiy item as fst of tuple
-        let map2 (item:'item) (f: 'item * 'a -> 'msg) (cmd: Fabulous.Core.Cmd<'a>) : Fabulous.Core.Cmd<'msg> =
+        let map2 (item:'item) (f: 'item * 'a -> 'msg) (cmd: Fabulous.Cmd<'a>) : Fabulous.Cmd<'msg> =
             cmd 
             |> List.map (
                 fun g ->

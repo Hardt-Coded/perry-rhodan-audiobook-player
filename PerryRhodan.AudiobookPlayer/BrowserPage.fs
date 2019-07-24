@@ -1,15 +1,14 @@
 ﻿module BrowserPage
 
 open Fabulous
-open Fabulous.Core
-open Fabulous.DynamicViews
+open Fabulous
+open Fabulous.XamarinForms
 open Xamarin.Forms
 open System.Net
 open System.IO
 open Domain
 open Common
 open System.Text.RegularExpressions
-open Fabulous.DynamicViews
 open Services
 open Global
 

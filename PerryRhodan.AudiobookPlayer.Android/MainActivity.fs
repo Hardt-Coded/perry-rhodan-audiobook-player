@@ -1,4 +1,5 @@
 ﻿// Copyright 2018 Fabulous contributors. See LICENSE.md for license.
+
 namespace PerryRhodan.AudiobookPlayer.Android
 
 open System
@@ -16,6 +17,93 @@ open Services
 open Microsoft.AppCenter
 open Microsoft.AppCenter.Crashes
 open Microsoft.AppCenter.Analytics
+open Android.Support.Design.Widget
+open Xamarin.Forms.Platform.Android
+
+
+
+
+
+type MyShellBottomNavViewAppearanceTracker(context,item) =
+    inherit ShellBottomNavViewAppearanceTracker(context,item)
+
+    let makeColorStateList () =
+        let states = [|
+            [| -Android.Resource.Attribute.StateEnabled |]
+            [| Android.Resource.Attribute.StateChecked |]
+            [| |]
+        |]
+    
+        let disabledInt =         
+            Android.Graphics.Color.Gray.ToArgb()
+    
+        let checkedInt = 
+            Common.Consts.primaryTextColor.ToAndroid().ToArgb()
+    
+        let defaultColor =
+            Common.Consts.secondaryTextColor.ToAndroid().ToArgb()
+            
+
+        let colors = [| disabledInt; checkedInt; defaultColor |]
+    
+        new Res.ColorStateList(states, colors);
+
+    override this.SetAppearance(bottomView, appearance) =
+        base.SetAppearance(bottomView,appearance)
+        use colorStateList = makeColorStateList()
+        bottomView.ItemTextColor <- colorStateList
+        bottomView.ItemIconTintList <- colorStateList
+        
+
+//type CustomShellItemRenderer(context) =
+//    inherit ShellItemRenderer(context)
+
+//    let states =
+//        [|
+//            [| Android.Resource.Attribute.StateActive |]
+//            [| Android.Resource.Attribute.StatePressed |]
+//            [| -Android.Resource.Attribute.StateActive |]
+//            [| -Android.Resource.Attribute.StatePressed |]
+//        |]
+    
+    
+    
+//    let colors:int array =
+//        [|
+//            Android.Resource.Color.White
+//            Android.Resource.Color.HoloBlueLight
+//            Android.Resource.Color.DarkerGray
+//            Android.Resource.Color.White
+//        |] 
+
+//    let mutable ol:View = null
+
+//    member this.OL = ol
+
+//    override this.OnCreateView(inflater, container, savedInstanceState) =
+//        let outerLayout = base.OnCreateView(inflater, container, savedInstanceState);  
+//        ol <- outerLayout
+//        let bottomView = outerLayout.FindViewById<BottomNavigationView>(Xamarin.Forms.Platform.Android.Resource.Id.bottomtab_tabbar )
+//        //let navigationArea = outerLayout.FindViewById<FrameLayout>(Xamarin.Forms.Platform.Android.Resource.Id.bottomtab_navarea)
+//        bottomView.SetBackgroundColor(Android.Graphics.Color.Rgb(0x21,0x21,0x21))
+//        let colorList = new Res.ColorStateList(states,colors)
+//        bottomView.ItemTextColor <- colorList
+//        bottomView.ItemIconTintList <- colorList
+//        outerLayout
+
+type CustomShellRenderer (context) =
+    inherit ShellRenderer(context) 
+
+    //override this.CreateShellItemRenderer(item) =
+    //    let ctx = this :> IShellContext
+    //    let renderer = new CustomShellItemRenderer(ctx)  
+    //    renderer :> IShellItemRenderer
+
+    override this.CreateBottomNavViewAppearanceTracker(item) =
+        let sctx = this :> IShellContext
+        new MyShellBottomNavViewAppearanceTracker(sctx,item) :> IShellBottomNavViewAppearanceTracker
+    
+
 
 
 type AndroidDownloadFolder() =

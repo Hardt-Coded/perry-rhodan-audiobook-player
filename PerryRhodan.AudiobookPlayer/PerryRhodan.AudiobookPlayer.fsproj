@@ -41,24 +41,25 @@
     <Compile Include="App.fs" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Fabulous" Version="0.41.0" />
+    <PackageReference Include="Fabulous.XamarinForms" Version="0.41.0" />
     <PackageReference Include="FSharp.Control.AsyncSeq" Version="2.0.21" />
     <PackageReference Include="FSharp.Data" Version="3.0.0" />
     <PackageReference Include="LiteDB" Version="4.1.4" />
-    <PackageReference Include="Microsoft.AppCenter.Analytics" Version="1.13.0" />
-    <PackageReference Include="Microsoft.AppCenter.Crashes" Version="1.13.0" />
-    <PackageReference Include="Microsoft.AppCenter.Push" Version="1.13.2" />
+    <PackageReference Include="Microsoft.AppCenter.Analytics" Version="2.1.1" />
+    <PackageReference Include="Microsoft.AppCenter.Crashes" Version="2.1.1" />
+    <PackageReference Include="Microsoft.AppCenter.Push" Version="2.1.1" />
     <PackageReference Include="Plugin.Permissions" Version="3.0.0.12" />
     <PackageReference Include="SharpZipLib" Version="1.1.0" />
     <PackageReference Include="SixLabors.ImageSharp" Version="1.0.0-beta0005" />
     <PackageReference Include="System.IO.Compression.ZipFile" Version="4.3.0" />
     <PackageReference Include="System.Memory" Version="4.5.2" />
     <PackageReference Include="taglib-sharp-netstandard2.0" Version="2.1.0" />
-    <PackageReference Include="Xamarin.Forms" Version="4.0.0.425677" />
-    <PackageReference Include="Xamarin.Essentials" Version="1.1.0" />
-    <PackageReference Include="Fabulous.Core" Version="0.35.0" />
-    <PackageReference Include="Fabulous.LiveUpdate" Version="0.35.0" />
+    <PackageReference Include="Xamarin.Forms" Version="4.1.0.581479" />
+    <PackageReference Include="Xamarin.Essentials" Version="1.2.0" />
+    <PackageReference Include="Fabulous.LiveUpdate" Version="0.41.0" />
     <PackageReference Include="FSharp.Core" Version="4.5.2" />
-    <PackageReference Update="FSharp.Core" Version="4.5.4" /> <!-- workaround for VSMac bug https://github.com/mono/monodevelop/pull/5137 --> 
+    <PackageReference Update="FSharp.Core" Version="4.6.2" /> <!-- workaround for VSMac bug https://github.com/mono/monodevelop/pull/5137 --> 
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
   </ItemGroup>
 </Project>
