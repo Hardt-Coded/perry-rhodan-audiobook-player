@@ -1,8 +1,7 @@
 ﻿module Controls
 
 open Fabulous
-open Fabulous.Core
-open Fabulous.DynamicViews
+open Fabulous.XamarinForms
 open Xamarin.Forms
 open Xamarin
 open Domain
@@ -322,7 +321,7 @@ let primaryColorSymbolLabelWithTapCommandRightAlign command size solid text =
 
 let contentPage content isBusy title =
     View.ContentPage(
-        title=title,useSafeArea=true,
+        title=title,
         backgroundColor = Consts.backgroundColor,
         isBusy = isBusy,
         content = content
@@ -330,7 +329,7 @@ let contentPage content isBusy title =
 
 let contentPageWithBottomOverlay (bottomOverlay:ViewElement option) (content:ViewElement) isBusy title =
     View.ContentPage(
-        title=title,useSafeArea=true,
+        title=title,
         backgroundColor = Consts.backgroundColor,
         isBusy = isBusy,
         content = 

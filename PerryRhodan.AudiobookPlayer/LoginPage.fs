@@ -1,8 +1,7 @@
 ﻿module LoginPage
 
 open Fabulous
-open Fabulous.Core
-open Fabulous.DynamicViews
+open Fabulous.XamarinForms
 open Xamarin.Forms
 open Xamarin
 open System.Net

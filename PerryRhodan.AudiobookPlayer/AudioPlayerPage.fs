@@ -1,8 +1,7 @@
 ﻿module AudioPlayerPage
 
 open Fabulous
-open Fabulous.Core
-open Fabulous.DynamicViews
+open Fabulous.XamarinForms
 open Xamarin.Forms
 open Common
 open Domain

@@ -2,8 +2,8 @@
 
 
     open Xamarin.Forms
-    open Fabulous.DynamicViews
-    open Fabulous.Core
+    open Fabulous
+    open Fabulous.XamarinForms
     open Common
 
 

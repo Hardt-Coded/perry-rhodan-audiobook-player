@@ -3,8 +3,7 @@
 open System.Globalization
 open System.Resources
 open Fabulous
-open Fabulous.Core
-open Fabulous.DynamicViews
+open Fabulous.XamarinForms
 open Xamarin.Forms
 open Domain
 open Plugin.Permissions.Abstractions

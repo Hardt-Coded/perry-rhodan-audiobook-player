@@ -2,8 +2,6 @@
 namespace PerryRhodan.AudiobookPlayer
 
 open System.Diagnostics
-open Fabulous.Core
-open Fabulous.DynamicViews
 open Xamarin.Forms
 open Plugin.Permissions.Abstractions
 open Common
@@ -11,12 +9,15 @@ open Domain
 open Microsoft.AppCenter
 open Microsoft.AppCenter.Crashes
 open Microsoft.AppCenter.Analytics
+open Fabulous
+open Fabulous.XamarinForms
+open System
 
 
 module App = 
     open Xamarin.Essentials
     open System.Net
-    open Fabulous.DynamicViews
+    //open Fabulous.DynamicViews
     open Global
     
 
@@ -26,10 +27,10 @@ module App =
       { IsNav:bool
         MainPageModel:MainPage.Model
         LoginPageModel:LoginPage.Model option
-        BrowserPageModel:BrowserPage.Model option
+        BrowserPageModel:BrowserPage.Model
         AudioPlayerPageModel:AudioPlayerPage.Model option
         AudioBookDetailPageModel:AudioBookDetailPage.Model option
-        SettingsPageModel:SettingsPage.Model option
+        SettingsPageModel:SettingsPage.Model
         
         AppLanguage:Language
         CurrentPage: Pages
@@ -61,13 +62,42 @@ module App =
         | QuitApplication
         
 
+    let routeToShellNavigationState (route:string) =
+        ShellNavigationState.op_Implicit route
+
+    let createShellContent title route icon content =
+        View.ShellContent(
+            title=title,
+            route=route,
+            icon=icon,
+            content=content,
+            shellBackgroundColor=Consts.backgroundColor,
+            shellForegroundColor=Consts.primaryTextColor
+        )
+
+        
+    let shellRef = ViewRef<Shell>()
+
+    let gotoPage routeName =
+        async {
+            match shellRef.TryValue with
+            | Some sr ->
+                let pageThere = sr.Items |> Seq.exists (fun i -> i.Route = routeName)
+                if Device.RuntimePlatform = Device.iOS || not pageThere then
+                    do! Async.Sleep 1000 
+                do! sr.GoToAsync(sprintf "//%s" routeName |> routeToShellNavigationState,true) |> Async.AwaitTask
+            | None ->
+                ()
+        } |> Async.StartImmediate
+
+
     let initModel = { IsNav = false
                       MainPageModel = MainPage.initModel
                       LoginPageModel = None
-                      BrowserPageModel = None
+                      BrowserPageModel = BrowserPage.initModel
                       AudioPlayerPageModel = None 
                       AudioBookDetailPageModel = None 
-                      SettingsPageModel = None 
+                      SettingsPageModel = SettingsPage.initModel true 
                       AppLanguage = English
                       CurrentPage = MainPage
                       NavIsVisible = false 
@@ -242,16 +272,10 @@ module App =
         
 
     and onProcessBrowserPageMsg msg model =
-        match model.BrowserPageModel with
-        | Some browserPageModel ->
-            let m,cmd,externalMsg = BrowserPage.update msg browserPageModel
-
-            let externalCmds =
-                externalMsg |> browserExternalMsgToCommand
-
-            {model with BrowserPageModel = Some m}, Cmd.batch [(Cmd.map BrowserPageMsg cmd); externalCmds ]
-
-        | None -> model, Cmd.none
+        let m,cmd,externalMsg = BrowserPage.update msg model.BrowserPageModel
+        let externalCmds =
+            externalMsg |> browserExternalMsgToCommand
+        {model with BrowserPageModel = m}, Cmd.batch [(Cmd.map BrowserPageMsg cmd); externalCmds ]
 
 
     and onProcessAudioPlayerMsg msg model =
@@ -303,18 +327,11 @@ module App =
             | None -> Cmd.none
             | Some excmd -> 
                 Cmd.none  
-
-        match model.SettingsPageModel with
-        | Some settingsPageModel ->
-            let m,cmd,externalMsg = SettingsPage.update msg settingsPageModel
-
-            let externalCmds = 
-                externalMsg |> settingsPageExternalMsgToCommand
-
-            {model with SettingsPageModel = Some m}, Cmd.batch [(Cmd.map SettingsPageMsg cmd); externalCmds]
-
-        | None -> model, Cmd.none
-
+        
+        let m,cmd,externalMsg = SettingsPage.update msg model.SettingsPageModel
+        let externalCmds = 
+            externalMsg |> settingsPageExternalMsgToCommand
+        {model with SettingsPageModel = m}, Cmd.batch [(Cmd.map SettingsPageMsg cmd); externalCmds]
 
 
     and addPageToPageStack page model =
@@ -330,28 +347,25 @@ module App =
 
     
     and onGotoMainPageMsg model =
-        let newModel = model |> addPageToPageStack MainPage
-        {newModel with CurrentPage = MainPage}, Cmd.batch [ (Cmd.ofMsg (MainPageMsg MainPage.Msg.LoadLocalAudiobooks)) ]
+        match shellRef.TryValue with
+        | Some sr ->
+            sr.GoToAsync("mainpage" |> routeToShellNavigationState) |> Async.AwaitTask |> Async.RunSynchronously
+        | None ->
+            ()
+        model, Cmd.none
 
 
     and onGotoLoginPageMsg cameFrom model =
         let newPageModel = model |> addPageToPageStack LoginPage
         let m,cmd = LoginPage.init cameFrom
+        gotoPage "loginpage"
         {newPageModel with CurrentPage = LoginPage; LoginPageModel = Some m},Cmd.batch [ (Cmd.map LoginPageMsg cmd) ]
         
 
 
     and onGotoBrowserPageMsg model =
-        let newPageModel = model |> addPageToPageStack BrowserPage
-        match model.BrowserPageModel with
-        | None ->
-            let m,cmd, externalMsg = BrowserPage.init ()
-            let externalCmds =
-                externalMsg |> browserExternalMsgToCommand
-
-            {newPageModel with CurrentPage = BrowserPage; BrowserPageModel = Some m}, Cmd.batch [(Cmd.map BrowserPageMsg cmd); externalCmds ]
-        | Some _  -> 
-            {newPageModel with CurrentPage = BrowserPage}, Cmd.none
+        gotoPage "browsepage"
+        model,Cmd.none
 
 
     and onGotoAudioPageMsg audioBook model =
@@ -359,9 +373,13 @@ module App =
         let brandNewPage () = 
             let m,cmd = AudioPlayerPage.init audioBook
             {newPageModel with CurrentPage = AudioPlayerPage; AudioPlayerPageModel = Some m}, Cmd.batch [ (Cmd.map AudioPlayerPageMsg cmd) ]
+        
+
+        gotoPage "playerpage"
 
         match model.AudioPlayerPageModel with
         | None ->
+            
             brandNewPage()
 
         | Some abModel ->
@@ -375,25 +393,24 @@ module App =
 
 
     and onGotoPermissionDeniedMsg model =
-        let newPageModel = model |> addPageToPageStack PermissionDeniedPage
-
-        {newPageModel with CurrentPage = PermissionDeniedPage}, Cmd.none
+        gotoPage "permissiondeniedpage"
+        model, Cmd.none
 
 
     and onGotoSettingsPageMsg model =
-        let newPageModel = model |> addPageToPageStack SettingsPage
-        let model,cmd,externalCmd = SettingsPage.init true
-        {newPageModel with SettingsPageModel = Some model; CurrentPage = SettingsPage}, (Cmd.map SettingsPageMsg cmd)
+        gotoPage "settingspage"
+        {model with CurrentPage = SettingsPage}, Cmd.none
 
 
     and onOpenAudioBookDetailPage audiobook model =
         let newPageModel = model |> addPageToPageStack AudioBookDetailPage
         let m,cmd = AudioBookDetailPage.init audiobook
+        gotoPage "detailpage"
         { newPageModel with CurrentPage = AudioBookDetailPage; AudioBookDetailPageModel = Some m }, Cmd.batch [ (Cmd.map AudioBookDetailPageMsg cmd) ]
 
     and onCloseAudioBookDetailPage model =
-        let newPageStack = model.PageStack |> List.filter (fun i -> i <> AudioBookDetailPage)
-        {model with PageStack = newPageStack }, Cmd.none
+        gotoPage "mainpage"
+        model, Cmd.none
 
     and onNavigationPoppedMsg page model =
         if page = MainPage then
@@ -419,12 +436,9 @@ module App =
 
 
     and onSetBrowserPageCookieContainerAfterSucceedLoginMsg cc cameFrom model =
-        match model.BrowserPageModel with 
-        | None -> model, Cmd.none
-        | Some bm ->
     
-        let downloadQueueModel = {bm.DownloadQueueModel with CurrentSessionCookieContainer = Some cc}
-        let browserPageModel = {bm with CurrentSessionCookieContainer = Some cc; DownloadQueueModel = downloadQueueModel}
+        let downloadQueueModel = {model.BrowserPageModel.DownloadQueueModel with CurrentSessionCookieContainer = Some cc}
+        let browserPageModel = {model.BrowserPageModel with CurrentSessionCookieContainer = Some cc; DownloadQueueModel = downloadQueueModel}
         let cmd = 
             Cmd.batch [
                 match cameFrom with
@@ -435,7 +449,7 @@ module App =
             ]
 
         
-        { model with BrowserPageModel = Some browserPageModel}, cmd
+        { model with BrowserPageModel = browserPageModel}, cmd
 
 
     let view (model: Model) dispatch =
@@ -466,26 +480,6 @@ module App =
                     (MainPage.view mdl (mainPageDispatch))
                     model.MainPageModel.IsLoading
                     Translations.current.MainPage)
-                        .ToolbarItems([
-                            View.ToolbarItem(
-                                text=Translations.current.Quit,
-                                command = (fun () -> dispatch QuitApplication)
-                            )
-
-                            View.ToolbarItem(
-                                icon="browse_icon.png",
-                                command=(fun ()-> dispatch GotoBrowserPage
-                            ))
-
-                            View.ToolbarItem(
-                                icon="settings_icon.png",
-                                command=(fun ()-> dispatch GotoSettingsPage
-                            ))
-                                
-                        ])
-                    .HasNavigationBar(true)
-                    .HasBackButton(false)
-                
             )
 
         // you can do an explict match or an Option map
@@ -494,32 +488,17 @@ module App =
                 mdl
                 |> Option.map (
                     fun m -> 
-                        (LoginPage.view m (LoginPageMsg >> dispatch))
-                            .HasNavigationBar(false)
-                            .HasBackButton(true)
+                        (LoginPage.view m (LoginPageMsg >> dispatch))                           
                 )
             )
 
         let browserPage =
             dependsOn (model.BrowserPageModel, model.AudioPlayerPageModel) (fun _ (mdl, abMdl) ->
-                mdl
-                |> Option.map(
-                    fun m ->
-                        (Controls.contentPageWithBottomOverlay 
-                            (audioPlayerOverlay abMdl)
-                            (BrowserPage.view m (BrowserPageMsg >> dispatch))
-                            (model.BrowserPageModel |> Option.map (fun bm -> bm.IsLoading) |> Option.defaultValue false)
-                            Translations.current.BrowserPage)
-                            .ToolbarItems([
-                                View.ToolbarItem(
-                                    icon="home_icon.png",
-                                    command=(fun ()-> dispatch (NavigationPopped BrowserPage)))
-                                    ])
-                            .HasNavigationBar(true)
-                            .HasBackButton(true)
-                            
-                            
-                )
+                (Controls.contentPageWithBottomOverlay 
+                    (audioPlayerOverlay abMdl)
+                    (BrowserPage.view mdl (BrowserPageMsg >> dispatch))
+                    mdl.IsLoading
+                    Translations.current.BrowserPage)
             )
             
         
@@ -529,17 +508,6 @@ module App =
                 |> Option.map (
                     fun m ->
                         (AudioPlayerPage.view m (AudioPlayerPageMsg >> dispatch))
-                            .ToolbarItems([
-                                View.ToolbarItem(
-                                    icon="home_icon.png",
-                                    command=(fun ()-> dispatch GotoMainPage))
-                                View.ToolbarItem(
-                                    icon="browse_icon.png",
-                                    command=(fun ()-> dispatch GotoBrowserPage))
-                                    ])
-                            .HasNavigationBar(true)
-                            .HasBackButton(true)
-                            
                 )
             )
 
@@ -549,42 +517,12 @@ module App =
                 |> Option.map (
                     fun m ->
                         (AudioBookDetailPage.view m (AudioBookDetailPageMsg >> dispatch))
-                            .ToolbarItems([
-                                View.ToolbarItem(
-                                    icon="home_icon.png",
-                                    command=(fun ()-> dispatch GotoMainPage))
-                                View.ToolbarItem(
-                                    icon="browse_icon.png",
-                                    command=(fun ()-> dispatch GotoBrowserPage))
-                                    
-                                View.ToolbarItem(
-                                    text="Close",
-                                    command=(fun ()-> dispatch CloseAudioBookDetailPage))
-                                    ])
-                            .HasNavigationBar(true)
-                            .HasBackButton(true)
-                            
                 )
             )
 
         let settingsPage =
             dependsOn model.SettingsPageModel (fun _ mdl ->
-                mdl
-                |> Option.map (
-                    fun m ->
-                        (SettingsPage.view m (SettingsPageMsg >> dispatch))
-                            .ToolbarItems([
-                                View.ToolbarItem(
-                                    icon="home_icon.png",
-                                    command=(fun ()-> dispatch GotoMainPage))
-                                View.ToolbarItem(
-                                    icon="browse_icon.png",
-                                    command=(fun ()-> dispatch GotoBrowserPage))                                    
-                                ])
-                            .HasNavigationBar(true)
-                            .HasBackButton(true)
-                            
-                )
+                (SettingsPage.view mdl (SettingsPageMsg >> dispatch))
             )
         
 
@@ -612,37 +550,119 @@ module App =
                     ()
             apply
 
-        View.NavigationPage(barBackgroundColor = Consts.appBarColor,
-            barTextColor=Consts.primaryTextColor,           
-            popped = (dispatchNavPopped dispatch),
-            pages = [
-                for page in model.PageStack do
-                    match page with
-                    | MainPage -> 
-                        yield mainPage  
-                    | LoginPage ->
-                        if loginPage.IsSome then
-                            yield loginPage.Value
-                    | BrowserPage ->
-                        if browserPage.IsSome then
-                            yield browserPage.Value
-                    | AudioPlayerPage ->
-                        if audioPlayerPage.IsSome then
-                            yield audioPlayerPage.Value
-                    | AudioBookDetailPage ->
-                        if audioBookDetailPage.IsSome then
-                            yield audioBookDetailPage.Value
-                    |SettingsPage ->
-                        if settingsPage.IsSome then
-                            yield settingsPage.Value
-                    | PermissionDeniedPage ->
-                        yield View.ContentPage(
-                            title=Translations.current.PermissionDeniedPage,useSafeArea=true,
-                            content = View.Label(text=Translations.current.PermissionError, horizontalOptions = LayoutOptions.Center, widthRequest=200., horizontalTextAlignment=TextAlignment.Center,fontSize=20.)
-                        )
+        let popNav () =
+            async { 
+                let! x = shellRef.Value.Navigation.PopAsync(true) |> Async.AwaitTask
+                return ()
+            } |> Async.StartImmediate
 
+        View.Shell(
+            ref = shellRef,     
+            flyoutBehavior=FlyoutBehavior.Disabled,
+            title= "Eins A Medien",
+            shellForegroundColor=Color.White,
+            shellBackButtonBehavior=
+                View.BackButtonBehavior(
+                    command=popNav,isEnabled = true
+                ),
+            created=(fun e ->
+                //let action = Action(fun _ -> popNav ())
+                //Shell.SetBackButtonBehavior(e,new BackButtonBehavior(Command=Command(action)))
+                ()
+            ),
+            items=[
+                
+                yield View.TabBar(
+                    shellUnselectedColor = Consts.secondaryTextColor,
+                    shellTabBarBackgroundColor=Consts.cardColor,
+                    items=[
+                        createShellContent "Start" "mainpage" "home_icon.png" mainPage
+                        createShellContent "Browse" "browsepage" "browse_icon.png" browserPage
+                        createShellContent "Start" "settingspage" "settings_icon.png" settingsPage
+                    ]
+                    
+                )
+                yield View.ShellSection(
+                    items= [
+                        match loginPage with
+                        | Some lp ->
+                            yield createShellContent "Login" "loginpage" "" lp
+                        | None -> ()
+
+                        match audioPlayerPage with
+                        | Some ap ->
+                            yield createShellContent "Player" "playerpage" "" ap
+                        | None -> ()
+
+                        match audioBookDetailPage with
+                        | Some abdp ->
+                            yield createShellContent "Detail" "detailpage" "" abdp
+                        | None -> ()
+
+                        let pmdPage = 
+                            View.ContentPage(
+                                title=Translations.current.PermissionDeniedPage,useSafeArea=true,
+                                content = View.Label(text=Translations.current.PermissionError, horizontalOptions = LayoutOptions.Center, widthRequest=200., horizontalTextAlignment=TextAlignment.Center,fontSize=20.)
+                            )
+                        yield createShellContent "Permissionenied" "permissiondeniedpage" "" pmdPage    
+                    ]
+                )
+                
+                
             ]
+                //View.TabBar(
+                    
+                //    items=[
+                        
+                //        //View.ShellContent(
+                //        //    title="MainPage",
+                //        //    route="MainPage",
+                //        //    icon="home_icon.png",
+                //        //    //content=View.ContentPage(content=View.Label(text="Meh"))
+                //        //    content=mainPage
+                //        //) 
+                //        //View.ShellContent(
+                //        //    title="BrowsePage",
+                //        //    route="BrowserPage",
+                //        //    icon="browse_icon.png",
+                //        //    content=(browserPage |> Option.defaultValue mainPage)
+                //        //) 
+                //    ]
+                //)
+                
+            // ]
         )
+        //View.NavigationPage(barBackgroundColor = Consts.appBarColor,
+        //    barTextColor=Consts.primaryTextColor,           
+        //    popped = (dispatchNavPopped dispatch),
+        //    pages = [
+        //        for page in model.PageStack do
+        //            match page with
+        //            | MainPage -> 
+        //                yield mainPage  
+        //            | LoginPage ->
+        //                if loginPage.IsSome then
+        //                    yield loginPage.Value
+        //            | BrowserPage ->
+        //                if browserPage.IsSome then
+        //                    yield browserPage.Value
+        //            | AudioPlayerPage ->
+        //                if audioPlayerPage.IsSome then
+        //                    yield audioPlayerPage.Value
+        //            | AudioBookDetailPage ->
+        //                if audioBookDetailPage.IsSome then
+        //                    yield audioBookDetailPage.Value
+        //            |SettingsPage ->
+        //                if settingsPage.IsSome then
+        //                    yield settingsPage.Value
+        //            | PermissionDeniedPage ->
+        //                yield View.ContentPage(
+        //                    title=Translations.current.PermissionDeniedPage,useSafeArea=true,
+        //                    content = View.Label(text=Translations.current.PermissionError, horizontalOptions = LayoutOptions.Center, widthRequest=200., horizontalTextAlignment=TextAlignment.Center,fontSize=20.)
+        //                )
+
+        //    ]
+        //)
 
 
 
@@ -667,7 +687,9 @@ type App () as app =
                     "OK") |> Async.RunSynchronously
         )
         |> Common.AppCenter.withAppCenterTrace
-        |> Program.runWithDynamicView app
+        |> XamarinFormsProgram.run app
+
+    
 
 #if DEBUG
     // Uncomment this line to enable live update in debug mode. 
