@@ -36,6 +36,7 @@ open Global
     type ExternalMsg = 
         | GotoForwardToBrowsing of Map<string,string> * LoginRequestCameFrom
 
+
     let initModel cameFrom = { Username = ""; Password = ""; LoginFailed = false; RememberLogin = false; IsLoading = false; CameFrom = cameFrom }
 
 
@@ -113,6 +114,7 @@ open Global
             model |> onShowErrorMessageMsg e
         | DoNothing -> 
             model,  Cmd.none, None
+     
     
     and onTryLoginMsg model =
         match model.Username,model.Password with
@@ -165,6 +167,7 @@ open Global
         View.ContentPage(
           title=Translations.current.LoginPage,useSafeArea=true,
           backgroundColor = Consts.backgroundColor,
+          tag="loginpage",
           content = View.Grid(
                 children = [
                     yield View.StackLayout(padding = 10., 
@@ -206,6 +209,7 @@ open Global
                             )
                                 
                             yield View.Button(text = Translations.current.Login, command = (fun () -> dispatch TryLogin), horizontalOptions = LayoutOptions.Center)
+                            //yield View.Button(text = "Abbrechen", command = (fun () -> dispatch Cancel), horizontalOptions = LayoutOptions.Center)
                             if model.LoginFailed then
                                 yield View.Label(text=Translations.current.LoginFailed, textColor = Color.Red, horizontalOptions = LayoutOptions.Center, widthRequest=200., horizontalTextAlignment=TextAlignment.Center,fontSize=20.)
 

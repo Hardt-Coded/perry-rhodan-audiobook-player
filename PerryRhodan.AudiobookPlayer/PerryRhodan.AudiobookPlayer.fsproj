@@ -38,6 +38,7 @@
     <Compile Include="AudioBookDetail.fs" />
     <Compile Include="SettingsPage.fs" />
     <Compile Include="MainPage.fs" />
+    <Compile Include="ModalHelpers.fs" />
     <Compile Include="App.fs" />
   </ItemGroup>
   <ItemGroup>
