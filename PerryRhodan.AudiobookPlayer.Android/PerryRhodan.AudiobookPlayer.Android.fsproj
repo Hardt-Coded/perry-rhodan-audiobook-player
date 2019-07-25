@@ -178,6 +178,7 @@
     <AndroidResource Include="Resources\drawable\prev_small_icon.png" />
     <AndroidResource Include="Resources\drawable\settings_icon.png" />
     <AndroidResource Include="Resources\drawable\app_icon.png" />
+    <AndroidResource Include="Resources\drawable\player_icon.png" />
     <None Include="..\PerryRhodan.AudiobookPlayer.Android_\Resources\mipmap-hdpi\eins_a_launcher.png" />
   </ItemGroup>
   <ItemGroup>

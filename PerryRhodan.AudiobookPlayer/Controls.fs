@@ -332,6 +332,7 @@ let contentPageWithBottomOverlay (bottomOverlay:ViewElement option) (content:Vie
         title=title,
         backgroundColor = Consts.backgroundColor,
         isBusy = isBusy,
+
         content = 
             View.Grid(rowdefs = [box "*"; box "auto"],
                 rowSpacing = 0.,

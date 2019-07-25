@@ -69,7 +69,10 @@
 
           HideLastListendWhenOnlyOneAudioBookOnDevice:string
           
-
+          TabBarStartLabel:string
+          TabBarBrowserLabel:string
+          TabBarOptionsLabel:string
+          TabBarPlayerLabel:string
 
         }
 
@@ -137,6 +140,11 @@
                 HideDataProtection="Hide Data Protection and Privacy Information"
 
                 HideLastListendWhenOnlyOneAudioBookOnDevice="Hide the last listend audiobook area when only on audiobook is on your device"
+
+                TabBarStartLabel="Start"
+                TabBarBrowserLabel="Browser"
+                TabBarOptionsLabel="Options"
+                TabBarPlayerLabel="Player"
             }
 
     
@@ -203,6 +211,11 @@
                 HideDataProtection="Datenschutzbestimmungen verstecken"
 
                 HideLastListendWhenOnlyOneAudioBookOnDevice="Verstecke 'Zuletzt gehörtes Hörbuch' wenn nur eins auf dem Gerät ist."
+
+                TabBarStartLabel="Start"
+                TabBarBrowserLabel="Browser"
+                TabBarOptionsLabel="Optionen"
+                TabBarPlayerLabel="Player"
             }
 
 

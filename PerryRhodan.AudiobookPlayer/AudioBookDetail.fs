@@ -14,13 +14,10 @@
 
     type Msg =
         | SetAudioBookDetails of string option * string option
-        
-        | Close
         | ShowErrorMessage of string
         | ChangeBusyState of bool
 
-    type ExternalMsg =
-        | CloseAudioBookDetailPage
+   
     
     let initModel audiobook = 
         { AudioBook = audiobook
@@ -57,15 +54,10 @@
         match msg with
         | SetAudioBookDetails (description,image) ->
             {model with Image = image; Description = description }, Cmd.ofMsg (ChangeBusyState false), None
-        | Close -> 
-            model |> onCloseMsg
         | ShowErrorMessage e ->
             model |> onShowErrorMessageMsg e
         | ChangeBusyState state -> 
             model |> onChangeBusyStateMsg state
-
-    and onCloseMsg model =
-        model, Cmd.none, Some CloseAudioBookDetailPage
 
 
     and onShowErrorMessageMsg e model =
@@ -80,7 +72,7 @@
     
     let view model dispatch =
         View.ContentPage(
-            title=Translations.current.AudioBookDetailPage,useSafeArea=true,
+            title=Translations.current.AudioBookDetailPage,
             backgroundColor = Consts.backgroundColor,
             content = View.Grid(
                 children = [
@@ -107,8 +99,6 @@
                                                 textColor=Common.Consts.secondaryTextColor,
                                                 margin=Thickness(10.,10.,10.,10.)
                                                 )
-                                                
-                                        yield View.Button(text=Translations.current.Close,command= (fun ()-> dispatch Close))
                                     ]
                                 )
                         )
