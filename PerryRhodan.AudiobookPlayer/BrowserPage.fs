@@ -16,7 +16,7 @@ open Global
     type ListState = {
         GroupName:string
         ListType: AudioBookListType option
-        DisplayedAudioBooks: AudioBookItem.Model []
+        DisplayedAudioBooks: string []
         SelectedGroups:string []
     }
 
@@ -25,7 +25,7 @@ open Global
         AudioBooks : NameGroupedAudioBooks option
         SelectedGroups:string []
         SelectedGroupItems: AudioBookListType option
-        DisplayedAudioBooks: AudioBookItem.Model []
+        DisplayedAudioBooks: string[]
         LastSelectedGroup: string option
         IsLoading:bool 
         CurrentDownloadProgress: (int * int) option
@@ -51,6 +51,7 @@ open Global
 
     type Msg = 
         | LoadLocalAudiobooks
+        | RefreshLocalAudiobooks
         | LoadOnlineAudiobooks 
         | InitAudiobooks of NameGroupedAudioBooks
         //| ShowAudiobooks of AudioBookListType
@@ -64,6 +65,8 @@ open Global
         | DownloadQueueMsg of DownloadQueue.Msg
         | UpdateAudioBookItemList of AudioBookItem.Model
         | StartDownloadQueue
+
+        | UpdateAudioBook
 
 
         //| UpdateDownloadPrograss of (int * int) option
@@ -95,15 +98,12 @@ open Global
 
     let loadLocalAudioBooks () =
         async {
-            let! audioBooks = FileAccess.loadAudioBooksStateFile ()
+            let! audioBooks = DataBase.loadAudioBooksStateFile ()
             match audioBooks with
-            | Error e -> return (ShowErrorMessage e)
-            | Ok ab -> 
-                match ab with
-                | [||] -> return DoNothing
-                | _ ->     
-                    let result = ab |> Domain.Filters.nameFilter
-                    return (InitAudiobooks result)
+            | [||] -> return DoNothing
+            | _ ->     
+                let result = audioBooks |> Domain.Filters.nameFilter
+                return (InitAudiobooks result)
         } |> Cmd.ofAsyncMsg
     
 
@@ -120,10 +120,14 @@ open Global
         match msg with
         | LoadLocalAudiobooks ->
             model |> onLoadLocalAudiobooksMsg
+        | RefreshLocalAudiobooks ->
+            model |> onRefreshLocalAudioBooksMsg
         | LoadOnlineAudiobooks ->
             model |> onLoadOnlineAudiobooksMsg
         | InitAudiobooks ab ->
             model |> onInitAudiobooksMsg ab
+        | UpdateAudioBook ->
+            model, Cmd.none, None
         //| ShowAudiobooks ab ->
         //    model |> onShowAudiobooksMsg ab
         | AddSelectGroup group ->
@@ -148,7 +152,67 @@ open Global
             model |> onDoNothingMsg            
 
     and onLoadLocalAudiobooksMsg model =
-        model, Cmd.batch [(loadLocalAudioBooks ()); busyCmd], None
+        model, Cmd.batch [(loadLocalAudioBooks ())], None
+
+
+    and onRefreshLocalAudioBooksMsg model =
+        let refreshedAb = 
+            DataBase.loadAudioBooksStateFile () 
+            |> Async.RunSynchronously
+            |> Domain.Filters.nameFilter
+
+        let newStateLists = 
+            model.ListStates
+            |> List.map (fun state ->
+                let newGroupAb =
+                    match state.SelectedGroups with
+                    | [||] -> 
+                        (GroupList refreshedAb)
+                    | _ ->                
+                        ((GroupList refreshedAb) |> Filters.groupsFilter state.SelectedGroups)
+                
+                match newGroupAb with
+                | GroupList _ ->
+                    let newStateItem =
+                        {
+                            GroupName=state.GroupName
+                            ListType = Some newGroupAb
+                            DisplayedAudioBooks = [||]
+                            SelectedGroups = state.SelectedGroups
+                        }
+                        
+                    newStateItem
+
+                | AudioBookList (_,items) ->
+                    //let dab = 
+                    //    items 
+                    //    |> Array.map (fun i -> 
+                    //        let (model,_,_) = AudioBookItem.init (i)
+                    //        model
+                    //    )
+                    //    // synchronize with download queue items!
+                    //    |> Array.map (
+                    //        fun i ->
+                    //            let queueItem = 
+                    //                model.DownloadQueueModel.DownloadQueue 
+                    //                |> List.tryFind (fun q -> q.AudioBook.FullName = i.AudioBook.FullName)
+                    //            match queueItem with
+                    //            | None -> i
+                    //            | Some qi -> qi
+                    //    )
+                    let newStateItem =
+                        {
+                            GroupName=state.GroupName
+                            ListType = Some newGroupAb
+                            DisplayedAudioBooks = items |> Array.map (fun i -> i.FullName)
+                            SelectedGroups = state.SelectedGroups
+                        }
+                    newStateItem
+                    )    
+                
+            
+        {model with ListStates = newStateLists}, Cmd.none, None
+            
     
 
     and onLoadOnlineAudiobooksMsg model =
@@ -185,8 +249,17 @@ open Global
                     match model.AudioBooks with
                     | None -> 
                         // if your files is empty, than sync with the folders
-                        let localFileSynced = FileAccess.syncPossibleDownloadFolder ab
-                        let! saveRes = localFileSynced |> FileAccess.insertNewAudioBooksInStateFile
+                        let localFileSynced = DataBase.syncPossibleDownloadFolder ab
+                        let! saveRes = localFileSynced |> DataBase.insertNewAudioBooksInStateFile
+
+                        // and add audio boot items
+                        localFileSynced 
+                        |> Array.Parallel.map (fun i -> 
+                            let model,_ ,_ = AudioBookItem.init i
+                            model
+                        ) 
+                        |> AudioBookItemProcessor.insertAudiobookItems
+
                         match saveRes with
                         | Error e ->
                             return (ShowErrorMessage e)
@@ -202,20 +275,17 @@ open Global
                         | [||] ->
                             return DoNothing
                         | _ ->
-                            let! saveRes = synchedAb |> FileAccess.insertNewAudioBooksInStateFile 
+                            let! saveRes = synchedAb |> DataBase.insertNewAudioBooksInStateFile 
                             match saveRes with
                             | Error e ->
                                 return (ShowErrorMessage e)
                             | Ok _ ->                            
-                                let! audioBooks = FileAccess.loadAudioBooksStateFile ()
+                                let! audioBooks = DataBase.loadAudioBooksStateFile ()
                                 match audioBooks with
-                                | Error e -> return (ShowErrorMessage e)
-                                | Ok ab -> 
-                                    match ab with
-                                    | [||] -> return DoNothing
-                                    | _ ->     
-                                        let result = ab |> Domain.Filters.nameFilter                                
-                                        return (InitAudiobooks result)
+                                | [||] -> return DoNothing
+                                | _ ->     
+                                    let result = audioBooks |> Domain.Filters.nameFilter                                
+                                    return (InitAudiobooks result)
             } |> Cmd.ofAsyncMsg        
         
         
@@ -286,27 +356,11 @@ open Global
                 {newModel with ListStates = newStateList}, Cmd.none, None
 
             | AudioBookList (_,items) ->
-                let dab = 
-                    items 
-                    |> Array.map (fun i -> 
-                        let (model,_,_) = AudioBookItem.init (i)
-                        model
-                    )
-                    // synchronize with download queue items!
-                    |> Array.map (
-                        fun i ->
-                            let queueItem = 
-                                newModel.DownloadQueueModel.DownloadQueue 
-                                |> List.tryFind (fun q -> q.AudioBook.FullName = i.AudioBook.FullName)
-                            match queueItem with
-                            | None -> i
-                            | Some qi -> qi
-                    )
                 let newStateItem =
                     {
                         GroupName=group
                         ListType = Some ab
-                        DisplayedAudioBooks = dab
+                        DisplayedAudioBooks = items |> Array.map (fun i -> i.FullName)
                         SelectedGroups = newModel.SelectedGroups
                     }
                 let newStateList = newModel.ListStates |> updateItemListState  newStateItem
@@ -368,12 +422,18 @@ open Global
                     Cmd.none, Some (OpenAudioBookPlayer ab)
                 | AudioBookItem.ExternalMsg.OpenAudioBookDetail ab ->
                     Cmd.none, Some (OpenAudioBookDetail ab)
+        
+        AudioBookItemProcessor.updateAudiobookItem newModel
+        //let newStateLists = 
+        //    model.ListStates
+        //    |> List.map (fun state ->
+        //        let newDab = 
+        //            state.DisplayedAudioBooks
+        //            |> Array.map (fun i -> if i.AudioBook.FullName = abModel.AudioBook.FullName then newModel else i)    
+        //        {state with DisplayedAudioBooks = newDab }
+        //    )
 
-        let newDab = 
-            model.DisplayedAudioBooks 
-            |> Array.map (fun i -> if i = abModel then newModel else i)
-
-        {model with DisplayedAudioBooks = newDab}, Cmd.batch [(Cmd.map2 newModel AudioBooksItemMsg cmd); externalCmds ], mainPageMsg
+        model, Cmd.batch [(Cmd.map2 newModel AudioBooksItemMsg cmd); externalCmds ], mainPageMsg
     
     
     and onProcessDownloadQueueMsg msg model =
@@ -396,10 +456,8 @@ open Global
     
     
     and onUpdateAudioBookItemListMsg abModel model =
-        let newDab = 
-            model.DisplayedAudioBooks 
-            |> Array.map (fun i -> if i.AudioBook.FullName = abModel.AudioBook.FullName then abModel else i)
-        {model with DisplayedAudioBooks = newDab}, Cmd.none, None
+        AudioBookItemProcessor.updateAudiobookItem abModel
+        model, Cmd.none, None
     
     
     and onStartDownloadQueueMsg model =
@@ -409,7 +467,7 @@ open Global
     and onDoNothingMsg model =
         model, unbusyCmd, None
 
-
+    
 
     let private pushPage dispatch (sr:ContentPage) closeEventMsg (page:ViewElement) =
         let p = page.Create() :?> Page    
@@ -418,8 +476,10 @@ open Global
     
     let private tryFindPage (sr:ContentPage) title =
         sr.Navigation.NavigationStack |> Seq.filter (fun e -> e<>null) |> Seq.tryFind (fun i -> i.Title = title)
-    
-    let private pushOrUpdatePage dispatch closeMessage pageTitle (pageRef:ViewRef<ContentPage>) page =
+
+    let prevPageMap = new System.Collections.Generic.Dictionary<string, ViewElement>()
+   
+    let private pushOrUpdatePage dispatch closeMessage pageTitle suppressUpdate (pageRef:ViewRef<ContentPage>) page =
         pageRef.TryValue
         |> Option.map (fun sr ->
             let hasLoginPageInStack =
@@ -428,11 +488,28 @@ open Global
             | None ->
                 // creates a new page and push it to the modal stack
                 page |> pushPage dispatch sr (closeMessage pageTitle)
+                prevPageMap.Add(pageTitle,page)
                 ()
             | Some pushedPage -> 
-                // this uses the new view Element and through model updated Page 
-                // and updates the current viewed from the shel modal stack :) nice!
-                page.Update(pushedPage)
+                if suppressUpdate then
+                    ()
+                else
+                    // this uses the new view Element and through model updated Page 
+                    // and updates the current viewed from the shel modal stack :) nice!
+                    let (hasPrev,prevPage) = prevPageMap.TryGetValue(pageTitle)
+                    match hasPrev with
+                    | false ->
+                        page.Update(pushedPage)
+                        prevPageMap.Add(pageTitle,page)
+                    | true ->
+                        //prevPage.UpdateIncremental(page,pushedPage)
+                        page.UpdateIncremental(prevPage,pushedPage)
+                        if (prevPageMap.ContainsKey(pageTitle)) then
+                            prevPageMap.[pageTitle] <- page
+                        else
+                            prevPageMap.Add(pageTitle,page)
+
+                    ()
         )
         |> ignore
 
@@ -510,7 +587,8 @@ open Global
                                     content = 
                                         View.StackLayout(orientation=StackOrientation.Vertical,
                                             children= [
-                                                for item in model.DisplayedAudioBooks do
+                                                let abItems = AudioBookItemProcessor.getAudioBookItems model.DisplayedAudioBooks |> Async.RunSynchronously
+                                                for item in abItems do
                                                     let audioBookItemDispatch =
                                                         let d msg = AudioBooksItemMsg (item,msg)
                                                         d >> dispatch
@@ -548,8 +626,11 @@ open Global
         
         // new nav page
         dependsOn model.ListStates (fun _ listStates ->
-            listStates
-            |> List.iter (fun i ->
+
+            
+
+            listStates            
+            |> List.iteri (fun idx i ->
                 let subRef = ViewRef<ContentPage>()
                 // for a nav page remove all selected groups, every nav page stand alone
                 let newModel = { 
@@ -560,7 +641,9 @@ open Global
                         DisplayedAudioBooks = i.DisplayedAudioBooks
                 }
                 let cp = Controls.contentPageWithBottomOverlay subRef None (browseView newModel dispatch) false i.GroupName
-                pushOrUpdatePage dispatch RemoveLastSelectGroup i.GroupName pageRef cp
+
+                let suppressEntry = listStates.Length = (idx + 1) |> not
+                pushOrUpdatePage dispatch RemoveLastSelectGroup i.GroupName suppressEntry pageRef cp
                 ()
             )
         )

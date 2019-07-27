@@ -47,11 +47,14 @@
     <Reference Include="FSharp.Control.AsyncSeq, Version=2.0.21.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\FSharp.Control.AsyncSeq.2.0.21\lib\net45\FSharp.Control.AsyncSeq.dll</HintPath>
     </Reference>
-    <Reference Include="FSharp.Core, Version=4.5.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\FSharp.Core.4.5.4\lib\net45\FSharp.Core.dll</HintPath>
+    <Reference Include="FSharp.Core, Version=4.6.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\FSharp.Core.4.6.2\lib\net45\FSharp.Core.dll</HintPath>
     </Reference>
     <Reference Include="FSharp.Data, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\FSharp.Data.3.0.0\lib\net45\FSharp.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="FSharpx.Async, Version=1.14.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\FSharpx.Async.1.14.1\lib\net452\FSharpx.Async.dll</HintPath>
     </Reference>
     <Reference Include="ICSharpCode.SharpZipLib, Version=1.1.0.145, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpZipLib.1.1.0\lib\net45\ICSharpCode.SharpZipLib.dll</HintPath>

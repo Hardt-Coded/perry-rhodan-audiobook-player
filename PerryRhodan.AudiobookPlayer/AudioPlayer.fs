@@ -134,7 +134,7 @@
         let storeCurrentAudiobookState info =
             let abPos = { Filename = info.Filename; Position = info.Position |> Common.TimeSpanHelpers.toTimeSpan }
             let newAb = {info.AudioBook with State = {info.AudioBook.State with CurrentPosition = Some abPos; LastTimeListend = Some System.DateTime.UtcNow } }
-            let res = (Services.FileAccess.updateAudioBookInStateFile newAb) |> Async.RunSynchronously
+            let res = (Services.DataBase.updateAudioBookInStateFile newAb) |> Async.RunSynchronously
             match res with
             | Error e ->
                 Microsoft.AppCenter.Crashes.Crashes.TrackError(exn("narf pos nicht gespeichert! Msg:" + e))
@@ -348,7 +348,7 @@
                     if state.CurrentTrackNumber = meantTrack then
                         let newState = {state with Position = pos }
                         let secs = (pos |> Common.TimeSpanHelpers.toTimeSpan).Seconds
-                        if secs = 0 || secs = 5 then
+                        if secs = 0 || secs % 5 = 0 then
                             Helpers.storeCurrentAudiobookState newState
                         audioService.OnUpdatePositionNumber newState
                     else

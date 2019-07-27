@@ -188,6 +188,9 @@
     <Reference Include="FSharp.Data">
       <HintPath>..\packages\FSharp.Data.3.0.0\lib\netstandard2.0\FSharp.Data.dll</HintPath>
     </Reference>
+    <Reference Include="FSharpx.Async">
+      <HintPath>..\packages\FSharpx.Async.1.14.1\lib\netstandard2.0\FSharpx.Async.dll</HintPath>
+    </Reference>
     <Reference Include="ICSharpCode.SharpZipLib">
       <HintPath>..\packages\SharpZipLib.1.1.0\lib\netstandard2.0\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
