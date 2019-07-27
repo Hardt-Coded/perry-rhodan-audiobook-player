@@ -316,23 +316,31 @@ let primaryColorSymbolLabelWithTapCommandRightAlign command size solid text =
         ]
         )
 
-   
-    
 
-let contentPage content isBusy title =
+let contentPageWithBottomOverlay (pageRef:ViewRef<ContentPage>) (bottomOverlay:ViewElement option) (content:ViewElement) isBusy title =
     View.ContentPage(
         title=title,
         backgroundColor = Consts.backgroundColor,
         isBusy = isBusy,
-        content = content
+        ref=pageRef,
+        content = 
+            View.Grid(rowdefs = [box "*"; box "auto"],
+                rowSpacing = 0.,
+                children = [
+                    yield content.GridRow(0)
+                    if bottomOverlay.IsSome then
+                        yield bottomOverlay.Value.GridRow(1)
+                ]
+        )
     )
 
-let contentPageWithBottomOverlay (bottomOverlay:ViewElement option) (content:ViewElement) isBusy title =
+
+let contentPageWithBottomOverlayW (pageRef:ViewRef<ContentPage>) (bottomOverlay:ViewElement option) (content:ViewElement) isBusy title =
     View.ContentPage(
         title=title,
         backgroundColor = Consts.backgroundColor,
         isBusy = isBusy,
-
+        ref=pageRef,
         content = 
             View.Grid(rowdefs = [box "*"; box "auto"],
                 rowSpacing = 0.,

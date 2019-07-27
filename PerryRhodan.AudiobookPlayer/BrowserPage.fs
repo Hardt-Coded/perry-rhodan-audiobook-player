@@ -13,8 +13,15 @@ open Services
 open Global
 
 
-    type Model = 
-      { CurrentSessionCookieContainer:Map<string,string> option
+    type ListState = {
+        GroupName:string
+        ListType: AudioBookListType option
+        DisplayedAudioBooks: AudioBookItem.Model []
+        SelectedGroups:string []
+    }
+
+    type Model = {
+        CurrentSessionCookieContainer:Map<string,string> option
         AudioBooks : NameGroupedAudioBooks option
         SelectedGroups:string []
         SelectedGroupItems: AudioBookListType option
@@ -22,15 +29,33 @@ open Global
         LastSelectedGroup: string option
         IsLoading:bool 
         CurrentDownloadProgress: (int * int) option
-        DownloadQueueModel: DownloadQueue.Model }
+        DownloadQueueModel: DownloadQueue.Model 
+        ListStates:ListState list
+    }
+
+    let updateItemListState item list =
+        if (list |> List.exists (fun i -> i.GroupName = item.GroupName)) then
+            // update
+            list
+            |> List.map (fun i ->
+                if i.GroupName = item.GroupName then
+                    item
+                else
+                    i
+            )
+        else
+            // add
+            list @ [item]
+        
+
 
     type Msg = 
         | LoadLocalAudiobooks
         | LoadOnlineAudiobooks 
         | InitAudiobooks of NameGroupedAudioBooks
-        | ShowAudiobooks of AudioBookListType
+        //| ShowAudiobooks of AudioBookListType
         | AddSelectGroup of string
-        | RemoveLastSelectGroup
+        | RemoveLastSelectGroup of string
         | ShowErrorMessage of string
         | ChangeBusyState of bool
         | GoToLoginPage of LoginRequestCameFrom
@@ -50,17 +75,22 @@ open Global
         | OpenAudioBookPlayer of AudioBook 
         | OpenAudioBookDetail of AudioBook
         | UpdateAudioBookGlobal  of AudioBookItem.Model *  string
-        
 
-    let initModel = { AudioBooks = None
-                      CurrentSessionCookieContainer = None
-                      IsLoading = false
-                      SelectedGroups = [||]
-                      DisplayedAudioBooks = [||]
-                      SelectedGroupItems = None
-                      LastSelectedGroup = None
-                      CurrentDownloadProgress = None 
-                      DownloadQueueModel = DownloadQueue.initModel None }
+
+    let pageRef = ViewRef<ContentPage>()
+
+    let initModel = {
+        AudioBooks = None
+        CurrentSessionCookieContainer = None
+        IsLoading = false
+        SelectedGroups = [||]
+        DisplayedAudioBooks = [||]
+        SelectedGroupItems = None
+        LastSelectedGroup = None
+        CurrentDownloadProgress = None 
+        DownloadQueueModel = DownloadQueue.initModel None 
+        ListStates = []
+    }
 
 
     let loadLocalAudioBooks () =
@@ -94,12 +124,12 @@ open Global
             model |> onLoadOnlineAudiobooksMsg
         | InitAudiobooks ab ->
             model |> onInitAudiobooksMsg ab
-        | ShowAudiobooks ab ->
-            model |> onShowAudiobooksMsg ab
+        //| ShowAudiobooks ab ->
+        //    model |> onShowAudiobooksMsg ab
         | AddSelectGroup group ->
             model |> onAddSelectGroupMsg group
-        | RemoveLastSelectGroup ->
-            model |> onRemoveLastSelectGroupMsg            
+        | RemoveLastSelectGroup groupName ->
+            model |> onRemoveLastSelectGroupMsg groupName           
         | ShowErrorMessage e ->
             model |> onShowErrorMessageMsg e
         | ChangeBusyState state -> 
@@ -197,29 +227,64 @@ open Global
             model, Cmd.batch [loadAudioBooksCmd; busyCmd], None
 
 
-    and filterAudiobooksByGroups model =        
-        match model.AudioBooks with
-        | None -> Cmd.ofMsg DoNothing
-        | Some a -> 
-            match model.SelectedGroups with
-            | [||] -> 
-                Cmd.ofMsg (ShowAudiobooks (GroupList a))
-            | _ ->                
-                let filtered =(GroupList a) |> Filters.groupsFilter model.SelectedGroups
-                Cmd.ofMsg (ShowAudiobooks filtered)
+    //and filterAudiobooksByGroups model =        
+    //    match model.AudioBooks with
+    //    | None -> Cmd.ofMsg DoNothing
+    //    | Some a -> 
+    //        match model.SelectedGroups with
+    //        | [||] -> 
+    //            Cmd.ofMsg (ShowAudiobooks (GroupList a))
+    //        | _ ->                
+    //            let filtered =(GroupList a) |> Filters.groupsFilter model.SelectedGroups
+    //            Cmd.ofMsg (ShowAudiobooks filtered)
 
 
     and onInitAudiobooksMsg ab model =
-        let newModel = { model with AudioBooks = Some ab }       
-        let showAudiobooksCmd = newModel |> filterAudiobooksByGroups
-        newModel, Cmd.batch [ showAudiobooksCmd; unbusyCmd], None
+        let newModel = { model with AudioBooks = Some ab }
+        { newModel with 
+            SelectedGroupItems = Some (GroupList ab)
+            DisplayedAudioBooks = [||]
+        }, Cmd.batch [ unbusyCmd ], None
     
-    
-    and onShowAudiobooksMsg ab model =
-        let newModel = 
+ 
+
+    and onAddSelectGroupMsg group model =
+        let newGroups = [|group|] |> Array.append model.SelectedGroups
+        let newModel = {
+            model with 
+                SelectedGroups = newGroups
+                //LastSelectedGroup = Some group
+        }
+        // filter audio books
+        let filteredAb =
+            match newModel.AudioBooks with
+            | None -> 
+                None
+            | Some a -> 
+                match newModel.SelectedGroups with
+                | [||] -> 
+                    Some (GroupList a)
+                | _ ->                
+                    Some ((GroupList a) |> Filters.groupsFilter newModel.SelectedGroups)
+
+        match filteredAb with
+        | None ->
+            {newModel with SelectedGroupItems = None}, Cmd.none, None
+
+        | Some ab ->
             match ab with
             | GroupList _ ->
-                {model with SelectedGroupItems = Some ab; DisplayedAudioBooks = [||]}
+                let newStateItem =
+                    {
+                        GroupName=group
+                        ListType = Some ab
+                        DisplayedAudioBooks = [||]
+                        SelectedGroups = newModel.SelectedGroups
+                    }
+                    
+                let newStateList = newModel.ListStates |> updateItemListState  newStateItem
+                {newModel with ListStates = newStateList}, Cmd.none, None
+
             | AudioBookList (_,items) ->
                 let dab = 
                     items 
@@ -227,40 +292,46 @@ open Global
                         let (model,_,_) = AudioBookItem.init (i)
                         model
                     )
-                {model with SelectedGroupItems = Some ab; DisplayedAudioBooks = dab}
-        // sync display Audiobooks with dowbnload queue
-        let syncDab =
-            newModel.DisplayedAudioBooks 
-            |> Array.map (
-                fun i ->
-                    let queueItem = 
-                        model.DownloadQueueModel.DownloadQueue 
-                        |> List.tryFind (fun q -> q.AudioBook.FullName = i.AudioBook.FullName)
-                    match queueItem with
-                    | None -> i
-                    | Some qi -> qi
-            )
-        let newModel = {newModel with DisplayedAudioBooks = syncDab }
-        let cmd = if model.DownloadQueueModel.DownloadQueue.Length > 0 then Cmd.ofMsg StartDownloadQueue else Cmd.none                
-        newModel, Cmd.batch [ unbusyCmd; cmd ], None
+                    // synchronize with download queue items!
+                    |> Array.map (
+                        fun i ->
+                            let queueItem = 
+                                newModel.DownloadQueueModel.DownloadQueue 
+                                |> List.tryFind (fun q -> q.AudioBook.FullName = i.AudioBook.FullName)
+                            match queueItem with
+                            | None -> i
+                            | Some qi -> qi
+                    )
+                let newStateItem =
+                    {
+                        GroupName=group
+                        ListType = Some ab
+                        DisplayedAudioBooks = dab
+                        SelectedGroups = newModel.SelectedGroups
+                    }
+                let newStateList = newModel.ListStates |> updateItemListState  newStateItem
+                {newModel with ListStates = newStateList}, Cmd.none, None
+                    
+
+        
 
 
-    and onAddSelectGroupMsg group model =
-        let newGroups = [|group|] |> Array.append model.SelectedGroups
-        let newModel = {model with SelectedGroups = newGroups; LastSelectedGroup = Some group}
-        let showAudiobooksCmd = newModel |> filterAudiobooksByGroups            
-        newModel, showAudiobooksCmd, None
+    and onRemoveLastSelectGroupMsg groupname model =
+        // remove entry from state list
+        let newStateList =
+            model.ListStates |> List.filter (fun i->i.GroupName <> groupname)
+            
 
+        let last = newStateList |> List.tryLast
+        // restore last state
+        { model 
+            with 
+                //LastSelectedGroup = last |> Option.map (fun i -> i.GroupName)
+                SelectedGroups = last |> Option.map (fun i -> i.SelectedGroups) |> Option.defaultValue [||]
+                ListStates = newStateList 
 
-    and onRemoveLastSelectGroupMsg model =
-        let (newGroups,lastSelectedGroup) = 
-            match model.SelectedGroups with
-            | [||] -> [||], None
-            | [|_|] -> [||], None
-            | x -> x.[.. x.Length-2], Some x.[x.Length - 2]
-        let newModel = {model with SelectedGroups = newGroups; LastSelectedGroup = lastSelectedGroup}
-        let showAudiobooksCmd = newModel |> filterAudiobooksByGroups            
-        newModel, showAudiobooksCmd, None
+        },Cmd.none,None
+        
 
 
     and onShowErrorMessageMsg e model =
@@ -339,8 +410,35 @@ open Global
         model, unbusyCmd, None
 
 
+
+    let private pushPage dispatch (sr:ContentPage) closeEventMsg (page:ViewElement) =
+        let p = page.Create() :?> Page    
+        p.Disappearing.Add(fun e-> dispatch closeEventMsg)
+        sr.Navigation.PushAsync(p) |> Async.AwaitTask |> Async.StartImmediate
     
-    let view (model: Model) dispatch =
+    let private tryFindPage (sr:ContentPage) title =
+        sr.Navigation.NavigationStack |> Seq.filter (fun e -> e<>null) |> Seq.tryFind (fun i -> i.Title = title)
+    
+    let private pushOrUpdatePage dispatch closeMessage pageTitle (pageRef:ViewRef<ContentPage>) page =
+        pageRef.TryValue
+        |> Option.map (fun sr ->
+            let hasLoginPageInStack =
+                tryFindPage sr pageTitle //
+            match hasLoginPageInStack with
+            | None ->
+                // creates a new page and push it to the modal stack
+                page |> pushPage dispatch sr (closeMessage pageTitle)
+                ()
+            | Some pushedPage -> 
+                // this uses the new view Element and through model updated Page 
+                // and updates the current viewed from the shel modal stack :) nice!
+                page.Update(pushedPage)
+        )
+        |> ignore
+
+
+    
+    let rec browseView (model: Model) dispatch =
         View.Grid(
             rowdefs= [box "auto"; box "*"; box "auto"; box "auto"],
             verticalOptions = LayoutOptions.Fill,
@@ -353,8 +451,10 @@ open Global
 
                 yield View.Label(text=browseTitle, fontAttributes = FontAttributes.Bold,
                                     fontSize = 25.,
-                                    horizontalOptions = LayoutOptions.Fill,
-                                    horizontalTextAlignment = TextAlignment.Center,
+                                    verticalOptions=LayoutOptions.Fill,
+                                    horizontalOptions=LayoutOptions.Fill,
+                                    horizontalTextAlignment=TextAlignment.Center,
+                                    verticalTextAlignment=TextAlignment.Center,
                                     textColor = Consts.primaryTextColor,
                                     backgroundColor = Consts.cardColor,
                                     margin=0.).GridRow(0)
@@ -362,8 +462,9 @@ open Global
                 yield View.StackLayout(padding = 10., verticalOptions = LayoutOptions.Start,
                     children = [ 
                         
-                        
-                        yield View.Button(text=Translations.current.LoadYourAudioBooks, command = (fun () -> dispatch LoadOnlineAudiobooks))
+                        // show refresh button only on category selection
+                        if (model.LastSelectedGroup.IsNone) then
+                            yield View.Button(text=Translations.current.LoadYourAudioBooks, command = (fun () -> dispatch LoadOnlineAudiobooks))
                             
                         match model.SelectedGroupItems with
                         | None ->
@@ -380,6 +481,7 @@ open Global
                                     content = 
                                         View.StackLayout(orientation=StackOrientation.Vertical,
                                             verticalOptions = LayoutOptions.Fill,
+                                            
                                             children= [
                                                 match groups with
                                                 | [||] -> yield Controls.secondaryTextColorLabel 20. Translations.current.LoadYourAudioBooksHint
@@ -390,6 +492,8 @@ open Global
                                                                 , margin = 2.
                                                                 , fontSize = 20.
                                                                 , textColor = Consts.secondaryTextColor
+                                                                , horizontalOptions = LayoutOptions.Fill
+                                                                , horizontalTextAlignment= if (model.LastSelectedGroup.IsNone) then TextAlignment.Start else TextAlignment.Center
                                                                 , verticalOptions = LayoutOptions.Fill
                                                                 , verticalTextAlignment = TextAlignment.Center                                                                        
                                                                 , gestureRecognizers = [View.TapGestureRecognizer(command = (fun () -> dispatch (AddSelectGroup item)))]
@@ -421,8 +525,8 @@ open Global
                     .GridRow(1)
 
 
-                if (model.SelectedGroups.Length > 0) then
-                    yield View.Button(text = Translations.current.Back,command = (fun ()-> dispatch RemoveLastSelectGroup)).GridRow(2)
+                //if (model.SelectedGroups.Length > 0) then
+                //    yield View.Button(text = Translations.current.Back,command = (fun ()-> dispatch RemoveLastSelectGroup)).GridRow(2)
                 
                 let downloadQueueDispatch =
                     DownloadQueueMsg >> dispatch
@@ -437,6 +541,33 @@ open Global
 
                     
             ]
+        )
+
+
+    let view (model:Model) dispatch =
+        
+        // new nav page
+        dependsOn model.ListStates (fun _ listStates ->
+            listStates
+            |> List.iter (fun i ->
+                let subRef = ViewRef<ContentPage>()
+                // for a nav page remove all selected groups, every nav page stand alone
+                let newModel = { 
+                    model with 
+                        ListStates= []
+                        LastSelectedGroup = Some i.GroupName
+                        SelectedGroupItems = i.ListType
+                        DisplayedAudioBooks = i.DisplayedAudioBooks
+                }
+                let cp = Controls.contentPageWithBottomOverlay subRef None (browseView newModel dispatch) false i.GroupName
+                pushOrUpdatePage dispatch RemoveLastSelectGroup i.GroupName pageRef cp
+                ()
+            )
+        )
+        
+
+        dependsOn model (fun _ m ->
+            browseView m dispatch
         )
                 
             
