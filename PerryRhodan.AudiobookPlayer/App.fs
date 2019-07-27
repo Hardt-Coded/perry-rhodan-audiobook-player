@@ -484,7 +484,8 @@ module App =
 
         let mainPage = 
             dependsOn (model.MainPageModel, model.AudioPlayerPageModel) (fun _ (mdl, abMdl)->
-                (Controls.contentPageWithBottomOverlay 
+                (Controls.contentPageWithBottomOverlay
+                    AudioPlayerPage.pageRef
                     (audioPlayerOverlay abMdl)
                     (MainPage.view mdl (mainPageDispatch))
                     model.MainPageModel.IsLoading
@@ -509,13 +510,14 @@ module App =
             
 
         let browserPage =
-            dependsOn (model.BrowserPageModel, model.AudioPlayerPageModel) (fun _ (mdl, abMdl) ->
-                (Controls.contentPageWithBottomOverlay 
-                    (audioPlayerOverlay abMdl)
-                    (BrowserPage.view mdl (BrowserPageMsg >> dispatch))
-                    mdl.IsLoading
-                    Translations.current.BrowserPage)
-            )
+            let newView =
+                (BrowserPage.view model.BrowserPageModel (BrowserPageMsg >> dispatch))
+            (Controls.contentPageWithBottomOverlay 
+                BrowserPage.pageRef
+                (audioPlayerOverlay model.AudioPlayerPageModel)
+                newView
+                model.BrowserPageModel.IsLoading
+                Translations.current.BrowserPage)
             
         
         let audioPlayerPage =
@@ -558,87 +560,9 @@ module App =
                     ]
                     
                 )
-                //yield View.ShellSection(
-                //    items= [
-                //        match loginPage with
-                //        | Some lp ->
-                //            yield createShellContent "Login" "loginpage" "" lp
-                //        | None -> ()
-
-                //        match audioPlayerPage with
-                //        | Some ap ->
-                //            yield createShellContent "Player" "playerpage" "" ap
-                //        | None -> ()
-
-                //        match audioBookDetailPage with
-                //        | Some abdp ->
-                //            yield createShellContent "Detail" "detailpage" "" abdp
-                //        | None -> ()
-
-                //        let pmdPage = 
-                //            View.ContentPage(
-                //                title=Translations.current.PermissionDeniedPage,useSafeArea=true,
-                //                content = View.Label(text=Translations.current.PermissionError, horizontalOptions = LayoutOptions.Center, widthRequest=200., horizontalTextAlignment=TextAlignment.Center,fontSize=20.)
-                //            )
-                //        yield createShellContent "Permissionenied" "permissiondeniedpage" "" pmdPage    
-                //    ]
-                //)
             ]
         )
-                //View.TabBar(
-                    
-                //    items=[
-                        
-                //        //View.ShellContent(
-                //        //    title="MainPage",
-                //        //    route="MainPage",
-                //        //    icon="home_icon.png",
-                //        //    //content=View.ContentPage(content=View.Label(text="Meh"))
-                //        //    content=mainPage
-                //        //) 
-                //        //View.ShellContent(
-                //        //    title="BrowsePage",
-                //        //    route="BrowserPage",
-                //        //    icon="browse_icon.png",
-                //        //    content=(browserPage |> Option.defaultValue mainPage)
-                //        //) 
-                //    ]
-                //)
                 
-            // ]
-        //)
-        //View.NavigationPage(barBackgroundColor = Consts.appBarColor,
-        //    barTextColor=Consts.primaryTextColor,           
-        //    popped = (dispatchNavPopped dispatch),
-        //    pages = [
-        //        for page in model.PageStack do
-        //            match page with
-        //            | MainPage -> 
-        //                yield mainPage  
-        //            | LoginPage ->
-        //                if loginPage.IsSome then
-        //                    yield loginPage.Value
-        //            | BrowserPage ->
-        //                if browserPage.IsSome then
-        //                    yield browserPage.Value
-        //            | AudioPlayerPage ->
-        //                if audioPlayerPage.IsSome then
-        //                    yield audioPlayerPage.Value
-        //            | AudioBookDetailPage ->
-        //                if audioBookDetailPage.IsSome then
-        //                    yield audioBookDetailPage.Value
-        //            |SettingsPage ->
-        //                if settingsPage.IsSome then
-        //                    yield settingsPage.Value
-        //            | PermissionDeniedPage ->
-        //                yield View.ContentPage(
-        //                    title=Translations.current.PermissionDeniedPage,useSafeArea=true,
-        //                    content = View.Label(text=Translations.current.PermissionError, horizontalOptions = LayoutOptions.Center, widthRequest=200., horizontalTextAlignment=TextAlignment.Center,fontSize=20.)
-        //                )
-
-        //    ]
-        //)
-
 
 
     let program = Program.mkProgram init update view

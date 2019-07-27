@@ -125,7 +125,7 @@ type MainActivity() =
         base.OnCreate (bundle)
 
         AppCenter.Start(Global.appcenterAndroidId, typeof<Analytics>, typeof<Crashes>)
-
+        
         Xamarin.Essentials.Platform.Init(this, bundle)
 
         Xamarin.Forms.Forms.Init (this, bundle)

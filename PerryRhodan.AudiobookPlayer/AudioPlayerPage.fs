@@ -71,9 +71,8 @@ open AudioPlayer
 
     let audioPlayer = DependencyService.Get<AudioPlayer.IAudioPlayer>()
 
-
+    let pageRef = ViewRef<ContentPage>()
         
-
     
 
     let loadFilesAsyncMsg (model:AudioBook) =
