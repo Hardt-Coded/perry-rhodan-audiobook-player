@@ -317,4 +317,10 @@
                 }
             post() |> Async.StartImmediate
 
+
+    module PatternMatchHelpers =
+
+        let (|StringContains|_|) str (input:string) =
+            if (input.Contains(str)) then Some () else None
+
        

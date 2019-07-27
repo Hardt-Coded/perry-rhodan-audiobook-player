@@ -12,6 +12,8 @@ open Microsoft.AppCenter.Analytics
 open Fabulous
 open Fabulous.XamarinForms
 open System
+open System.IO
+open Common.PatternMatchHelpers
 
 
 module App = 
@@ -20,7 +22,10 @@ module App =
     //open Fabulous.DynamicViews
     open Global
     
-
+    let mainPageRoute = "mainpage"
+    let browserPageRoute = "browserpage"
+    let settingsPageRoute = "settingspage"
+    let playerPageRoute = "playerpage"
 
     
     type Model = 
@@ -36,7 +41,8 @@ module App =
         CurrentPage: Pages
         NavIsVisible:bool 
         PageStack: Pages list
-        BacktapsOnMainSite:int }
+        BacktapsOnMainSite:int 
+        HasAudioItemTrigger:bool }
 
     type Msg = 
         | MainPageMsg of MainPage.Msg 
@@ -134,6 +140,7 @@ module App =
             NavIsVisible = false 
             PageStack = [ MainPage]
             BacktapsOnMainSite = 0 
+            HasAudioItemTrigger = false
         }
         
         let cmds =
@@ -269,7 +276,7 @@ module App =
         let m,cmd, externalMsg = MainPage.update msg model.MainPageModel        
         let externalCmds =
             externalMsg |> mainPageExternalMsgToCommand        
-        {model with MainPageModel = m}, Cmd.batch [(Cmd.map MainPageMsg cmd); externalCmds ]
+        {model with MainPageModel = m; HasAudioItemTrigger = true}, Cmd.batch [(Cmd.map MainPageMsg cmd); externalCmds ]
 
 
     and onProcessLoginPageMsg msg model =
@@ -399,7 +406,7 @@ module App =
 
 
     and onGotoBrowserPageMsg model =
-        gotoPage "browsepage"
+        gotoPage browserPageRoute
         model,Cmd.none
 
 
@@ -409,7 +416,7 @@ module App =
             let m,cmd = AudioPlayerPage.init audioBook
             {newPageModel with CurrentPage = AudioPlayerPage; AudioPlayerPageModel = Some m}, Cmd.batch [ (Cmd.map AudioPlayerPageMsg cmd) ]
 
-        gotoPage "playerpage"
+        gotoPage playerPageRoute
 
         match model.AudioPlayerPageModel with
         | None ->
@@ -430,7 +437,7 @@ module App =
 
 
     and onGotoSettingsPageMsg model =
-        gotoPage "settingspage"
+        gotoPage settingsPageRoute
         {model with CurrentPage = SettingsPage}, Cmd.none
 
 
@@ -462,6 +469,14 @@ module App =
 
 
     let view (model: Model) dispatch =
+
+
+        if (not model.HasAudioItemTrigger) then
+            AudioBookItemProcessor.onAbItemUpdated.Add(fun i ->
+                dispatch (MainPageMsg (MainPage.Msg.UpdateAudioBook i))
+                dispatch (BrowserPageMsg (BrowserPage.Msg.UpdateAudioBook))
+            )
+
         // it's the same as  (MainPageMsg >> dispatch)
         // I had to do this, to get m head around this
         let mainPageDispatch mainMsg =
@@ -541,6 +556,19 @@ module App =
             flyoutBehavior=FlyoutBehavior.Disabled,
             title= "Eins A Medien",
             shellForegroundColor=Color.White,
+            navigating=(fun e ->
+                
+                //match e.Target.Location.ToString() with
+                //| StringContains mainPageRoute ->
+                //    dispatch (MainPageMsg MainPage.Msg.LoadLocalAudiobooks)
+                //| StringContains browserPageRoute ->
+                //    dispatch (BrowserPageMsg BrowserPage.Msg.RefreshLocalAudiobooks)
+                //| _ ->
+                //    ()
+
+                ()
+                // LoadLocalAudiobooks
+            ),
             // makenav bar invisible
             created=(fun e -> Shell.SetNavBarIsVisible(e,false)),
             items=[
@@ -549,12 +577,12 @@ module App =
                     shellUnselectedColor = Consts.secondaryTextColor,
                     shellTabBarBackgroundColor=Consts.cardColor,
                     items=[
-                        yield createShellSection Translations.current.TabBarStartLabel "mainpage" "home_icon.png" mainPage
-                        yield createShellSection Translations.current.TabBarBrowserLabel "browsepage" "browse_icon.png" browserPage
-                        yield createShellSection Translations.current.TabBarOptionsLabel "settingspage" "settings_icon.png" settingsPage
+                        yield createShellSection Translations.current.TabBarStartLabel mainPageRoute "home_icon.png" mainPage
+                        yield createShellSection Translations.current.TabBarBrowserLabel browserPageRoute "browse_icon.png" browserPage
+                        yield createShellSection Translations.current.TabBarOptionsLabel settingsPageRoute "settings_icon.png" settingsPage
                         match audioPlayerPage with
                         | Some ap ->
-                            yield createShellSection Translations.current.TabBarPlayerLabel "playerpage" "player_icon.png" ap
+                            yield createShellSection Translations.current.TabBarPlayerLabel playerPageRoute "player_icon.png" ap
                         | None ->
                             ()
                     ]
@@ -570,7 +598,29 @@ module App =
 type App () as app = 
     inherit Application ()
 
-    do AppCenter.Start(sprintf "ios=(...);android=%s" Global.appcenterAndroidId, typeof<Analytics>, typeof<Crashes>)
+    do 
+        AppCenter.Start(sprintf "ios=(...);android=%s" Global.appcenterAndroidId, typeof<Analytics>, typeof<Crashes>)
+        // Display Error when somthing is with the storage processor
+        Services.DataBase.storageProcessorOnError.Add(fun e ->
+            async {
+                let message = sprintf "Es ist ein Fehler mit der Datenbank aufgetreten. (%s). Das Programm wird jetzt beendet. Versuchen Sie es noch einmal oder melden Sie sich bin Support." e.Message
+                do! Common.Helpers.displayAlert(Translations.current.Error,message, "OK") 
+                try
+                    Process.GetCurrentProcess().CloseMainWindow() |> ignore
+                with
+                | _ as ex ->
+                    Crashes.TrackError ex
+                return ()
+            } |> Async.StartImmediate
+        )
+
+        AudioBookItemProcessor.abItemOnError.Add(fun e ->
+            async {
+                let message = sprintf "(%s)" e.Message
+                do! Common.Helpers.displayAlert(Translations.current.Error,message, "OK") 
+                return ()
+            } |> Async.StartImmediate
+        )
     
     let runner =
         
@@ -583,7 +633,7 @@ type App () as app =
                 let baseException = exn.GetBaseException()
                 Common.Helpers.displayAlert(Translations.current.Error,
                     (sprintf "%s / %s" s baseException.Message),
-                    "OK") |> Async.RunSynchronously
+                    "OK") |> Async.StartImmediate
         )
         |> Common.AppCenter.withAppCenterTrace
         |> XamarinFormsProgram.run app

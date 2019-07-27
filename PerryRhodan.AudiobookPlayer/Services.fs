@@ -15,6 +15,7 @@ open System.Threading.Tasks
 open SixLabors.ImageSharp
 open SixLabors.ImageSharp.Processing
 open ICSharpCode.SharpZipLib.Zip
+
 open Common
 
 
@@ -83,14 +84,20 @@ module Consts =
 
 
 
-module FileAccess =
+module DataBase =
 
     open Consts
     open LiteDB
     open LiteDB.FSharp
+    open FSharpx.Control.AsyncExtensions
     
 
-    let mapper = FSharpBsonMapper()    
+    let mapper = FSharpBsonMapper()
+
+    type StorageMsg =
+        | UpdateAudioBook of AudioBook * AsyncReplyChannel<Result<unit,string>>
+        | InsertAudioBooks of AudioBook [] * AsyncReplyChannel<Result<unit,string>>
+        | GetAudioBooks of AsyncReplyChannel<AudioBook[]>
 
 
     let initAppFolders () =
@@ -98,111 +105,141 @@ module FileAccess =
             Directory.CreateDirectory(currentLocalDataFolder) |> ignore
         if not (Directory.Exists(stateFileFolder)) then
             Directory.CreateDirectory(stateFileFolder) |> ignore
+
+
+    let private insertNewAudioBooksDb (audioBooks:AudioBook[]) =
+        try
+            use db = new LiteDatabase(audioBooksStateDataFile, mapper)
+            let audioBooksCol = 
+                db.GetCollection<AudioBook>("audiobooks")
+
+            audioBooksCol.InsertBulk(audioBooks) |> ignore                    
+            Ok ()
+        with
+        | _ as e -> Error e.Message
+
+
+
+    let private updateAudioBookDb (audioBook:AudioBook) =
+            use db = new LiteDatabase(audioBooksStateDataFile, mapper)
+            let audioBooks = db.GetCollection<AudioBook>("audiobooks")
+
+            if audioBooks.Update(audioBook)
+            then (Ok ())
+            else (Error Translations.current.ErrorDbWriteAccess)
+
+
+    let private loadAudioBooksFromDb () =
+        initAppFolders ()
+                
+        use db = new LiteDatabase(audioBooksStateDataFile, mapper)
+        let audioBooks = 
+            db.GetCollection<AudioBook>("audiobooks")
+                .FindAll()                             
+                |> Seq.toArray
+                |> Array.sortBy (fun i -> i.FullName)
+                |> Array.Parallel.map (
+                    fun i ->
+                        if obj.ReferenceEquals(i.State.LastTimeListend,null) then
+                            let newMdl = {i.State with LastTimeListend = None }
+                            { i with State = newMdl }
+                        else
+                            i
+                )
+
+        audioBooks
+
+
+    let storageProcessorErrorEvent = Event<exn>()
+
+    let storageProcessorOnError = storageProcessorErrorEvent.Publish
+
+    let private storageProcessor = 
+        MailboxProcessor<StorageMsg>.Start(
+            fun inbox ->
+                try
+                    // init stuff
+                    initAppFolders ()
+                    // read audiobooks on start from db
+                    let audioBooks =
+                        loadAudioBooksFromDb ()
+                
+                    let rec loop state =
+                        async {
+                            let! msg = inbox.Receive()
+                            match msg with
+                            | UpdateAudioBook (audiobook,replyChannel) ->
+                                let dbRes = updateAudioBookDb audiobook
+                                match dbRes with
+                                | Ok _ ->
+                                    let newState =
+                                        state
+                                        |> Array.Parallel.map (fun i ->
+                                            if i.FullName = audiobook.FullName then
+                                                audiobook
+                                            else
+                                                i
+                                        )
+                                    replyChannel.Reply(Ok ())
+                                    return! (loop newState)
+                                | Error e ->
+                                    replyChannel.Reply(Error e)
+                                    return! (loop state)
+
+                            | InsertAudioBooks (audiobooks,replyChannel) ->
+                                let dbRes = insertNewAudioBooksDb audiobooks
+                                match dbRes with
+                                | Ok _ ->
+                                    let newState =
+                                        state |> Array.append audiobooks
+
+                                    replyChannel.Reply(Ok ())
+                                    return! (loop newState)
+                                | Error e ->
+                                    replyChannel.Reply(Error e)
+                                    return! (loop state)
+
+                            | GetAudioBooks replyChannel ->
+                                replyChannel.Reply(state |> Array.sortBy (fun i -> i.FullName))
+                                return! (loop state)
+
+                            return! (loop state)
+                                    
+                        }
+                    
+                    loop audioBooks
+                with
+                | _ as ex ->
+                    storageProcessorErrorEvent.Trigger(ex)
+                    failwith "machine down!"
+                    
+        )
+
+
     
     
     let loadAudioBooksStateFile () =
-        async {
-            try
-                initAppFolders ()
-                let! res = asyncFunc (fun () ->
-                    use db = new LiteDatabase(audioBooksStateDataFile, mapper)
-                    let audioBooks = 
-                        db.GetCollection<AudioBook>("audiobooks")
-                            .FindAll()                             
-                            |> Seq.toArray
-                            |> Array.sortBy (fun i -> i.FullName)
-                            |> Array.Parallel.map (
-                                fun i ->
-                                    if obj.ReferenceEquals(i.State.LastTimeListend,null) then
-                                        let newMdl = {i.State with LastTimeListend = None }
-                                        { i with State = newMdl }
-                                    else
-                                        i
-                            )
-
-                    audioBooks
-                )
-
-                return res |> Ok
-            with
-            | _ as e -> return Error e.Message
-
-        }
+        storageProcessor.PostAndAsyncReply(GetAudioBooks)
+    
 
     let loadDownloadedAudioBooksStateFile () =
-        async {
-            try
-                initAppFolders ()
-                let! res = asyncFunc (fun () ->
-                    use db = new LiteDatabase(audioBooksStateDataFile, mapper)
-
-                    
-                        
-
-                    let audioBooksCol =
-                        db.GetCollection<AudioBook>("audiobooks")
-
-                    audioBooksCol.EnsureIndex(fun i -> i.State.Downloaded) |> ignore
-
-                    
-
-                    let audioBooks = 
-                        audioBooksCol
-                            .Find(fun x -> x.State.Downloaded)
-                            |> Seq.toArray
-                            |> Array.sortBy (fun i -> i.FullName)
-                            |> Array.Parallel.map (
-                                fun i ->
-                                    if obj.ReferenceEquals(i.State.LastTimeListend,null) then
-                                        let newMdl = {i.State with LastTimeListend = None }
-                                        { i with State = newMdl }
-                                    else
-                                        i
-                            )
-                        
-
-                    audioBooks
-                )
-
-                return res |> Ok
-            with
-            | _ as e -> return Error e.Message
-
-        }
+        storageProcessor.PostAndAsyncReply(GetAudioBooks)        
+        |> Async.map (fun res ->
+            res |> Array.filter (fun i -> i.State.Downloaded)
+        )
+        
+        
 
     let insertNewAudioBooksInStateFile (audioBooks:AudioBook[]) =
-        async {
-            try
-            
-                let! res = asyncFunc (fun () ->
-                    use db = new LiteDatabase(audioBooksStateDataFile, mapper)
-                    let audioBooksCol = 
-                        db.GetCollection<AudioBook>("audiobooks")
-
-                    audioBooksCol.InsertBulk(audioBooks) |> ignore                    
-                )
-
-                return res |> Ok
-            with
-            | _ as e -> return Error e.Message
-
-        }
+        let msg replyChannel = 
+            InsertAudioBooks (audioBooks,replyChannel)
+        storageProcessor.PostAndAsyncReply(msg)
 
 
     let updateAudioBookInStateFile (audioBook:AudioBook) =
-        async {
-
-            let! res = asyncFunc (fun () ->
-                use db = new LiteDatabase(audioBooksStateDataFile, mapper)
-                let audioBooks = db.GetCollection<AudioBook>("audiobooks")
-                audioBooks.Update(audioBook)
-            )
-
-            if res 
-            then return (Ok ())
-            else return (Error Translations.current.ErrorDbWriteAccess)
-            
-        }
+        let msg replyChannel = 
+            UpdateAudioBook (audioBook,replyChannel)
+        storageProcessor.PostAndAsyncReply(msg)
 
 
     let removeAudiobook audiobook = 
@@ -264,7 +301,7 @@ module FileAccess =
 module WebAccess =
 
     open Consts
-    open FileAccess
+    open DataBase
     open System.Net
     open System.Net.Sockets
     open Microsoft.AppCenter.Crashes
@@ -435,7 +472,7 @@ module WebAccess =
 
 
         let private copyStream (src:Stream) (dst:Stream) =
-            let buffer:byte[] = Array.zeroCreate (500*1024)
+            let buffer:byte[] = Array.zeroCreate (1024*1024)
             let dowloadStreamSeq =
                 seq {
                     let mutable copying = true

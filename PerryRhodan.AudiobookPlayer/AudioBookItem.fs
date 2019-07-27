@@ -57,7 +57,7 @@
     
     let updateAudiobookInStateFile model =
         async {
-            let! res = model.AudioBook |> FileAccess.updateAudioBookInStateFile            
+            let! res = model.AudioBook |> DataBase.updateAudioBookInStateFile            
             match res with
             | Error e ->
                 Common.Helpers.displayAlert(Translations.current.Error,e,"OK") |> Async.StartImmediate
@@ -142,7 +142,7 @@
     and onDeleteAudioBookMsg model =
         let newState = {model.AudioBook.State with Downloaded = false; DownloadedFolder = None}
         let newAudioBook = {model.AudioBook with State = newState; }
-        match FileAccess.removeAudiobook model.AudioBook with
+        match DataBase.removeAudiobook model.AudioBook with
         | Error e ->
             Common.Helpers.displayAlert(Translations.current.ErrorRemoveAudioBook,e,"OK") |> Async.StartImmediate
             model,Cmd.none,None
