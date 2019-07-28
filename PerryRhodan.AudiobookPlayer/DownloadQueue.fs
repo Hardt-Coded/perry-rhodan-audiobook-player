@@ -115,6 +115,9 @@
             match model.State with
             | Idle -> Cmd.ofMsg StartProcessing, Some (UpdateAudioBook newAbModel)                
             | Downloading | Paused -> Cmd.none, None
+
+        AudioBookItemProcessor.updateAudiobookItem newAbModel
+
         newModel, cmd, exCmd
     
     and onRemoveItemFromQueueMsg abModel model =        
@@ -125,8 +128,10 @@
             match model.State with
             | Idle -> Cmd.ofMsg StartProcessing                    
             | Downloading | Paused -> Cmd.none
+
+        AudioBookItemProcessor.updateAudiobookItem newAbModel
             
-        newModel, cmd, Some (UpdateAudioBook newAbModel)
+        newModel, cmd, None //Some (UpdateAudioBook newAbModel)
         
     
     and onDownloadCompleteMsg abModel mp3Path imageFullName thumbnail model =
@@ -145,7 +150,7 @@
         let (processedItem,newQueue) = model.DownloadQueue |> Helpers.getTailHead
         match processedItem with
         | None ->
-            model, Cmd.none, None
+            {model with State = Idle}, Cmd.none, None
         | Some processedItem ->
             let newAudioBookState = {abModel.AudioBook.State with Downloaded = true; DownloadedFolder = Some mp3Path}
             let newAudioBook = {abModel.AudioBook with State = newAudioBookState; Picture = imageFullName; Thumbnail = thumbnail}             
@@ -154,7 +159,8 @@
             let newModel = {model with DownloadQueue = newQueue; State = Idle}
 
             let updateStateCmd = newAudioBook |> updateAudiobookInStateFile
-            newModel, Cmd.batch [Cmd.ofMsg StartProcessing; Helpers.setGlobalBusyCmd; updateStateCmd], Some (UpdateAudioBook newProcessedItem)
+            AudioBookItemProcessor.updateAudiobookItem newProcessedItem
+            newModel, Cmd.batch [Cmd.ofMsg StartProcessing; Helpers.setGlobalBusyCmd; updateStateCmd], None //Some (UpdateAudioBook newProcessedItem)
 
     
     and onDownloadFailedMsg abModel model =
@@ -167,7 +173,8 @@
             let newItem = {processedItem with IsDownloading = false; QueuedToDownload = true}
             let newQueue = tailQueue @ [newItem]
             let newModel = {model with DownloadQueue = newQueue; State = Idle}
-            newModel, Cmd.ofMsg StartProcessing, Some (UpdateAudioBook newItem)
+            AudioBookItemProcessor.updateAudiobookItem newItem
+            newModel, Cmd.ofMsg StartProcessing, None //Some (UpdateAudioBook newItem)
     
 
     and onDeactivateLoadingMsg abModel model =
@@ -283,7 +290,8 @@
             model.DownloadQueue
             |> List.map (fun i -> if i.AudioBook.FullName = abModel.AudioBook.FullName then newAbModel else i)
         let newModel = {model with DownloadQueue = newQueue}
-        newModel, Cmd.none, Some (ExternalMsg.UpdateDownloadProgress (newAbModel,progress))
+        AudioBookItemProcessor.updateAudiobookItem newAbModel
+        newModel, Cmd.none, None //Some (ExternalMsg.UpdateDownloadProgress (newAbModel,progress))
 
     
     and onChangeGlobalBusyStateMsg state model =
@@ -312,15 +320,15 @@
                             for (idx,item) in model.DownloadQueue |> List.indexed do
                                 let (cmd,isRed) =
                                     if (idx > 0) then
-                                        (fun () -> dispatch (OpenActionMenu item)), true
+                                        (fun () -> dispatch (OpenActionMenu item)), false
                                     else
-                                        (fun () -> ()), false
+                                        (fun () -> ()), true
                                 
                                 let item = 
                                     if isRed then
-                                        (Controls.primaryColorSymbolLabelWithTapCommand cmd 35. true "\uf019").TextColor(Color.Red)
+                                        (Controls.primaryColorSymbolLabelWithTapCommand cmd 25. true "\uf019").TextColor(Color.Red)
                                     else
-                                        Controls.primaryColorSymbolLabelWithTapCommand cmd 35. true "\uf019"
+                                        Controls.primaryColorSymbolLabelWithTapCommand cmd 25. true "\uf019"
 
                                 yield item
                         ]

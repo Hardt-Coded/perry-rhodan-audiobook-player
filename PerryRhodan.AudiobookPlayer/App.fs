@@ -468,15 +468,23 @@ module App =
         { model with BrowserPageModel = browserPageModel; LoginPageModel = None}, cmd
 
 
-    let view (model: Model) dispatch =
 
-
-        if (not model.HasAudioItemTrigger) then
+    let subscription model =
+        Cmd.ofSub (fun dispatch ->
             AudioBookItemProcessor.onAbItemUpdated.Add(fun i ->
                 dispatch (MainPageMsg (MainPage.Msg.UpdateAudioBook i))
                 dispatch (BrowserPageMsg (BrowserPage.Msg.UpdateAudioBook))
             )
+            // when updating an audio book, that update the underlying audio book in the Item
+            Services.DataBase.storageProcessorOnAudiobookUpdated.Add(fun i ->
+                AudioBookItemProcessor.updateUnderlyingAudioBookInItem i
+            )
+        )
 
+        
+
+
+    let view (model: Model) dispatch =
         // it's the same as  (MainPageMsg >> dispatch)
         // I had to do this, to get m head around this
         let mainPageDispatch mainMsg =
@@ -577,12 +585,12 @@ module App =
                     shellUnselectedColor = Consts.secondaryTextColor,
                     shellTabBarBackgroundColor=Consts.cardColor,
                     items=[
-                        yield createShellSection Translations.current.TabBarStartLabel mainPageRoute "home_icon.png" mainPage
-                        yield createShellSection Translations.current.TabBarBrowserLabel browserPageRoute "browse_icon.png" browserPage
-                        yield createShellSection Translations.current.TabBarOptionsLabel settingsPageRoute "settings_icon.png" settingsPage
+                        yield createShellContent Translations.current.TabBarStartLabel mainPageRoute "home_icon.png" mainPage
+                        yield createShellContent Translations.current.TabBarBrowserLabel browserPageRoute "browse_icon.png" browserPage
+                        yield createShellContent Translations.current.TabBarOptionsLabel settingsPageRoute "settings_icon.png" settingsPage
                         match audioPlayerPage with
                         | Some ap ->
-                            yield createShellSection Translations.current.TabBarPlayerLabel playerPageRoute "player_icon.png" ap
+                            yield createShellContent Translations.current.TabBarPlayerLabel playerPageRoute "player_icon.png" ap
                         | None ->
                             ()
                     ]
@@ -595,7 +603,7 @@ module App =
 
     let program = Program.mkProgram init update view
 
-type App () as app = 
+type MainApp () as app = 
     inherit Application ()
 
     do 
@@ -623,11 +631,11 @@ type App () as app =
         )
     
     let runner =
-        
         App.program
 //#if DEBUG
 //        |> Program.withConsoleTrace
 //#endif   
+        |> Program.withSubscription App.subscription
         |> Program.withErrorHandler(
             fun (s,exn)-> 
                 let baseException = exn.GetBaseException()

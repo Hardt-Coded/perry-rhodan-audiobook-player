@@ -352,6 +352,47 @@ let contentPageWithBottomOverlayW (pageRef:ViewRef<ContentPage>) (bottomOverlay:
         )
     )
 
+
+
+let navPageWithBottomOverlay (pageRef:ViewRef<NavigationPage>) (bottomOverlay:ViewElement option) (content:ViewElement) isBusy title =
+    View.NavigationPage(
+        title=title,
+        backgroundColor = Consts.backgroundColor,
+        isBusy = isBusy,        
+        ref=pageRef,        
+        pages=[
+            View.ContentPage(
+                title=title,
+                backgroundColor = Consts.backgroundColor,
+                isBusy = isBusy,                
+                content = 
+                    View.Grid(rowdefs = [box "*"; box "auto"],
+                        rowSpacing = 0.,
+                        children = [
+                            yield content.GridRow(0)
+                            if bottomOverlay.IsSome then
+                                yield bottomOverlay.Value.GridRow(1)
+                        ]
+                )
+            )
+        ]
+    )
+
+
+
+
+type MyContentPage (cp:ContentPage, onBackButton) as self =
+    inherit ContentPage() 
+
+    do  
+        self.Title <- cp.Title
+        self.BackgroundColor <- cp.BackgroundColor
+        self.IsBusy <- cp.IsBusy
+        self.Content <- cp.Content
+
+    override this.OnBackButtonPressed()=
+        onBackButton()
+
    
 
     
