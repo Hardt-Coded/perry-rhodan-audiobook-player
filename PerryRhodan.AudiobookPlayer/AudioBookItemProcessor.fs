@@ -124,6 +124,15 @@ let updateAudiobookItem item =
 let insertAudiobookItems items =
     abItemProcessor.Post(InsertAudioBooks items)
 
+let insertAudiobooks items =
+    let items = 
+        items
+        |> Array.map (fun i ->
+            let mdl,_,_ = AudioBookItem.init i
+            mdl
+        )
+    abItemProcessor.Post(InsertAudioBooks items)
+
 
 let updateUnderlyingAudioBookInItem audiobook =
     abItemProcessor.Post(UpdateAudioBook audiobook)

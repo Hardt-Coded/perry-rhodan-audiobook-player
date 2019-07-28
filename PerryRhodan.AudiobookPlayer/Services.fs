@@ -158,6 +158,10 @@ module DataBase =
     
     let storageProcessorOnAudiobookUpdated = storageProcessorAudioBookUpdatedEvent.Publish
 
+    let private storageProcessorAudioBookAdded = Event<AudioBook[]>()
+    
+    let storageProcessorOnAudiobookAdded = storageProcessorAudioBookAdded.Publish
+
     let private storageProcessor = 
         MailboxProcessor<StorageMsg>.Start(
             fun inbox ->
@@ -198,6 +202,7 @@ module DataBase =
                                     let newState =
                                         state |> Array.append audiobooks
 
+                                    storageProcessorAudioBookAdded.Trigger(audiobooks)
                                     replyChannel.Reply(Ok ())
                                     return! (loop newState)
                                 | Error e ->
