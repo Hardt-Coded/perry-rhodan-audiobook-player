@@ -485,6 +485,9 @@ open Global
 
     
     module PushModalHelper =
+
+        let private prevPageMap = new System.Collections.Generic.Dictionary<string, ViewElement>()
+
         let private pushPage dispatch (sr:ContentPage) closeEventMsg (page:ViewElement) =
         
             let p = page.Create() :?> ContentPage
@@ -496,6 +499,8 @@ open Global
                 let item = shell.CurrentItem
                 if item.CurrentItem.Title = Translations.current.TabBarBrowserLabel then
                     dispatch closeEventMsg
+                    if prevPageMap.ContainsKey(p.Title) then
+                        prevPageMap.Remove(p.Title) |> ignore
             )
 
             sr.Navigation.PushAsync(p) |> Async.AwaitTask |> Async.StartImmediate
@@ -503,7 +508,7 @@ open Global
         let private tryFindPage (sr:ContentPage) title =
             sr.Navigation.NavigationStack |> Seq.filter (fun e -> e<>null) |> Seq.tryFind (fun i -> i.Title = title)
 
-        let private prevPageMap = new System.Collections.Generic.Dictionary<string, ViewElement>()
+        
    
         let pushOrUpdatePage dispatch closeMessage pageTitle suppressUpdate (pageRef:ViewRef<ContentPage>) page =
             pageRef.TryValue
@@ -526,7 +531,10 @@ open Global
                         match hasPrev with
                         | false ->
                             page.Update(pushedPage)
-                            prevPageMap.Add(pageTitle,page)
+                            if (prevPageMap.ContainsKey(pageTitle)) then
+                                prevPageMap.[pageTitle] <- page
+                            else
+                                prevPageMap.Add(pageTitle,page)
                         | true ->
                             //prevPage.UpdateIncremental(page,pushedPage)
                             page.UpdateIncremental(prevPage,pushedPage)
