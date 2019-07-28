@@ -476,8 +476,11 @@ module App =
                 dispatch (BrowserPageMsg (BrowserPage.Msg.UpdateAudioBook))
             )
             // when updating an audio book, that update the underlying audio book in the Item
-            Services.DataBase.storageProcessorOnAudiobookUpdated.Add(fun i ->
-                AudioBookItemProcessor.updateUnderlyingAudioBookInItem i
+            Services.DataBase.storageProcessorOnAudiobookUpdated.Add(fun item ->
+                AudioBookItemProcessor.updateUnderlyingAudioBookInItem item
+            )
+            Services.DataBase.storageProcessorOnAudiobookAdded.Add(fun items ->
+                AudioBookItemProcessor.insertAudiobooks items
             )
         )
 
