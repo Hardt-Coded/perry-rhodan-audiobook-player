@@ -1,18 +1,22 @@
 ﻿module AudioBookItemProcessor
 
+open Domain
 
-type Msg =
+
+type private Msg =
     | GetAudioBookItem of (string * AsyncReplyChannel<AudioBookItem.Model>)
     | GetAudioBookItems of (string[] * AsyncReplyChannel<AudioBookItem.Model[]>)
+    | GetDownloadingAndDownloadedAudioBookItems of AsyncReplyChannel<AudioBookItem.Model[]>
     | InsertAudioBooks of AudioBookItem.Model []
     | UpdateAudioBookItem of AudioBookItem.Model
+    | UpdateAudioBook of AudioBook
     
 
-let abItemErrorEvent = Event<exn>()
+let private abItemErrorEvent = Event<exn>()
 
 let abItemOnError = abItemErrorEvent.Publish
 
-let abItemUpdatedEvent = Event<AudioBookItem.Model>()
+let private abItemUpdatedEvent = Event<AudioBookItem.Model>()
 
 let onAbItemUpdated = abItemUpdatedEvent.Publish
 
@@ -48,6 +52,13 @@ let private abItemProcessor =
                             replyChannel.Reply(items)
                             return! (loop state)
 
+                        | GetDownloadingAndDownloadedAudioBookItems replyChannel ->
+                            let items =
+                                state 
+                                |> Array.filter (fun i -> i.IsDownloading || i.AudioBook.State.Downloaded || i.QueuedToDownload)
+                            replyChannel.Reply(items)
+                            return! (loop state)
+
                         | UpdateAudioBookItem item ->
                             let newState =
                                 state 
@@ -58,6 +69,21 @@ let private abItemProcessor =
                                         i
                                 )
                             abItemUpdatedEvent.Trigger(item)        
+                            return! (loop newState)
+
+                        | UpdateAudioBook ab ->
+                            let abItem =
+                                state |> Array.find (fun i -> i.AudioBook.FullName = ab.FullName)
+                            let newAbItem = {abItem with AudioBook = ab }
+                            let newState =
+                                state 
+                                |> Array.Parallel.map (fun i -> 
+                                    if i.AudioBook.FullName = newAbItem.AudioBook.FullName then
+                                        newAbItem
+                                    else
+                                        i
+                                )
+                            abItemUpdatedEvent.Trigger(newAbItem)        
                             return! (loop newState)
 
                         | InsertAudioBooks audioBooks ->
@@ -88,6 +114,8 @@ let getAudioBookItems fullname =
         GetAudioBookItems (fullname,replyChannel)
     abItemProcessor.PostAndAsyncReply(msg)
 
+let getDownloadingAndDownloadedAudioBookItems () =
+    abItemProcessor.PostAndAsyncReply(GetDownloadingAndDownloadedAudioBookItems)
 
 let updateAudiobookItem item =
     abItemProcessor.Post(UpdateAudioBookItem item)
@@ -95,4 +123,8 @@ let updateAudiobookItem item =
 
 let insertAudiobookItems items =
     abItemProcessor.Post(InsertAudioBooks items)
+
+
+let updateUnderlyingAudioBookInItem audiobook =
+    abItemProcessor.Post(UpdateAudioBook audiobook)
 

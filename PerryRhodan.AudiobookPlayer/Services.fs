@@ -150,9 +150,13 @@ module DataBase =
         audioBooks
 
 
-    let storageProcessorErrorEvent = Event<exn>()
+    let private storageProcessorErrorEvent = Event<exn>()
 
     let storageProcessorOnError = storageProcessorErrorEvent.Publish
+
+    let private storageProcessorAudioBookUpdatedEvent = Event<AudioBook>()
+    
+    let storageProcessorOnAudiobookUpdated = storageProcessorAudioBookUpdatedEvent.Publish
 
     let private storageProcessor = 
         MailboxProcessor<StorageMsg>.Start(
@@ -180,6 +184,7 @@ module DataBase =
                                             else
                                                 i
                                         )
+                                    storageProcessorAudioBookUpdatedEvent.Trigger(audiobook)
                                     replyChannel.Reply(Ok ())
                                     return! (loop newState)
                                 | Error e ->

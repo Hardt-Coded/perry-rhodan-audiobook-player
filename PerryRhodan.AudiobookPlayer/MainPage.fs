@@ -1,6 +1,6 @@
 ﻿module MainPage
 
-open System.Globalization
+open System
 open System.Resources
 open Fabulous
 open Fabulous.XamarinForms
@@ -12,10 +12,13 @@ open Services
 
     
 
-    type Model = 
-      { Audiobooks: string[]
+    type Model = { 
+        Audiobooks: string[]
         LastTimeListendAudioBook: string option
-        IsLoading:bool }
+        IsLoading:bool
+        // this value is to ensure, that the view function is call, when we trigger the audio item events externally
+        DummyUpdateValue:Guid
+    }
 
     type Msg = 
         | AskForAppPermission
@@ -35,7 +38,7 @@ open Services
         | UpdateAudioBookGlobal  of AudioBookItem.Model * string
 
     
-    let initModel = { Audiobooks = [||] ; IsLoading = true; LastTimeListendAudioBook = None }
+    let initModel = { Audiobooks = [||] ; IsLoading = true; LastTimeListendAudioBook = None; DummyUpdateValue = Guid.NewGuid() }
 
     
     let init () = 
@@ -86,28 +89,12 @@ open Services
 
 
     and onUpdateAudioBookMsg ab model =
-        //let newAudioBooks =
-        //    model.Audiobooks
-        //    |> Array.map (
-        //        fun (i:AudioBookItem.Model) ->
-        //            if (i.AudioBook.FullName = ab.AudioBook.FullName) then
-        //                ab
-        //            else
-        //                i
-        //    )
-        //    |> Array.filter (fun i -> i.AudioBook.State.Downloaded)
+        let allDownloadedAndDownloadingItems =
+            AudioBookItemProcessor.getDownloadingAndDownloadedAudioBookItems ()
+            |> Async.RunSynchronously
+            |> Array.map (fun i -> i.AudioBook)
 
-        //let newLastListend =
-        //    model.LastTimeListendAudioBook
-        //    |> Option.map (fun i ->
-        //        if (i.AudioBook.FullName = ab.AudioBook.FullName) then
-        //            ab
-        //        else
-        //            i
-        //    )
-
-        //{ model with Audiobooks = newAudioBooks; LastTimeListendAudioBook = newLastListend }, Cmd.none, None
-        model, Cmd.none, None
+        {model with DummyUpdateValue=Guid.NewGuid()}, Cmd.ofMsg (LocalAudioBooksLoaded allDownloadedAndDownloadingItems), None
     
     
     and onAskForAppPermissionMsg model =
@@ -144,9 +131,7 @@ open Services
                     Cmd.none, Some (OpenAudioBookDetail ab)
 
         AudioBookItemProcessor.updateAudiobookItem newModel
-        //let newDab = 
-        //    model.Audiobooks 
-        //    |> Array.map (fun i -> if i = abModel then newModel else i)
+        
 
         model, Cmd.batch [(Cmd.map2 newModel AudioBooksItemMsg cmd); externalCmds ], mainPageMsg
 
@@ -212,72 +197,72 @@ open Services
 
 
     let view (model: Model) dispatch =
-            View.Grid(
-                rowdefs= [box "auto"; box "auto"; box "auto"; box "*"],
-                rowSpacing = 0.,
-                verticalOptions = LayoutOptions.Fill,
-                children = [
+        View.Grid(
+            rowdefs= [box "auto"; box "auto"; box "auto"; box "*"],
+            rowSpacing = 0.,
+            verticalOptions = LayoutOptions.Fill,
+            children = [
 
-                    match model.LastTimeListendAudioBook with
-                    | None ->()
-                    | Some labItem ->
+                match model.LastTimeListendAudioBook with
+                | None ->()
+                | Some labItem ->
 
-                        let abItem = AudioBookItemProcessor.getAudioBookItem labItem |> Async.RunSynchronously
+                    let abItem = AudioBookItemProcessor.getAudioBookItem labItem |> Async.RunSynchronously
 
-                        yield View.Label(text=Translations.current.LastListendAudioBookTitle, fontAttributes = FontAttributes.Bold,
-                            fontSize = 25.,
-                            horizontalOptions = LayoutOptions.Fill,
-                            horizontalTextAlignment = TextAlignment.Center,
-                            textColor = Consts.primaryTextColor,
-                            backgroundColor = Consts.cardColor,
-                            margin=0.).GridRow(0)
+                    yield View.Label(text=Translations.current.LastListendAudioBookTitle, fontAttributes = FontAttributes.Bold,
+                        fontSize = 25.,
+                        horizontalOptions = LayoutOptions.Fill,
+                        horizontalTextAlignment = TextAlignment.Center,
+                        textColor = Consts.primaryTextColor,
+                        backgroundColor = Consts.cardColor,
+                        margin=0.).GridRow(0)
 
-                        let audioBookItemDispatch =
-                            let d msg = AudioBooksItemMsg (abItem,msg)
-                            d >> dispatch
+                    let audioBookItemDispatch =
+                        let d msg = AudioBooksItemMsg (abItem,msg)
+                        d >> dispatch
 
-                        yield (AudioBookItem.view abItem audioBookItemDispatch).Margin(10.).GridRow(1)
+                    yield (AudioBookItem.view abItem audioBookItemDispatch).Margin(10.).GridRow(1)
 
-                    yield View.Label(text=Translations.current.AudiobookOnDevice, fontAttributes = FontAttributes.Bold,
-                                                    fontSize = 25.,
-                                                    horizontalOptions = LayoutOptions.Fill,
-                                                    horizontalTextAlignment = TextAlignment.Center,
-                                                    textColor = Consts.primaryTextColor,
-                                                    backgroundColor = Consts.cardColor,
-                                                    margin=0.).GridRow(2)
+                yield View.Label(text=Translations.current.AudiobookOnDevice, fontAttributes = FontAttributes.Bold,
+                                                fontSize = 25.,
+                                                horizontalOptions = LayoutOptions.Fill,
+                                                horizontalTextAlignment = TextAlignment.Center,
+                                                textColor = Consts.primaryTextColor,
+                                                backgroundColor = Consts.cardColor,
+                                                margin=0.).GridRow(2)
 
                     
-                    yield View.StackLayout(padding = 10., verticalOptions = LayoutOptions.Start,
-                        children = [ 
-                            if not model.IsLoading then
-                                //yield dependsOn (model.Audiobooks) (fun _ (abItems) ->
-                                match model.Audiobooks,model.LastTimeListendAudioBook with
-                                | [||], None  ->
-                                    yield View.Label(text=Translations.current.NoAudiobooksOnDevice, fontSize=25., textColor=Consts.secondaryTextColor)
-                                | [||], Some _  ->
-                                    yield View.Label(text="...", fontSize=25., textColor=Consts.secondaryTextColor)
-                                | _, _ ->
-                                    yield View.ScrollView(horizontalOptions = LayoutOptions.Fill,
-                                            verticalOptions = LayoutOptions.Fill,
-                                            content = 
-                                                View.StackLayout(orientation=StackOrientation.Vertical,
-                                                    children= [
-                                                        let abItems = AudioBookItemProcessor.getAudioBookItems model.Audiobooks |> Async.RunSynchronously
-                                                        for item in abItems do
-                                                            let audioBookItemDispatch =
-                                                                let d msg = AudioBooksItemMsg (item,msg)
-                                                                d >> dispatch
-                                                            yield AudioBookItem.view item audioBookItemDispatch 
-                                                    ]
-                                                )
-                                                )
+                yield View.StackLayout(padding = 10., verticalOptions = LayoutOptions.Start,
+                    children = [ 
+                        if not model.IsLoading then
+                            //yield dependsOn (model.Audiobooks) (fun _ (abItems) ->
+                            match model.Audiobooks,model.LastTimeListendAudioBook with
+                            | [||], None  ->
+                                yield View.Label(text=Translations.current.NoAudiobooksOnDevice, fontSize=25., textColor=Consts.secondaryTextColor)
+                            | [||], Some _  ->
+                                yield View.Label(text="...", fontSize=25., textColor=Consts.secondaryTextColor)
+                            | _, _ ->
+                                yield View.ScrollView(horizontalOptions = LayoutOptions.Fill,
+                                        verticalOptions = LayoutOptions.Fill,
+                                        content = 
+                                            View.StackLayout(orientation=StackOrientation.Vertical,
+                                                children= [
+                                                    let abItems = AudioBookItemProcessor.getAudioBookItems model.Audiobooks |> Async.RunSynchronously
+                                                    for item in abItems do
+                                                        let audioBookItemDispatch =
+                                                            let d msg = AudioBooksItemMsg (item,msg)
+                                                            d >> dispatch
+                                                        yield AudioBookItem.view item audioBookItemDispatch 
+                                                ]
+                                            )
+                                            )
                                 
-                                //)
-                        ]).GridRow(3)
+                            //)
+                    ]).GridRow(3)
 
 
-                    if model.IsLoading then 
-                        yield Common.createBusyLayer().GridRowSpan(4)
-                ]
-                )
+                if model.IsLoading then 
+                    yield Common.createBusyLayer().GridRowSpan(4)
+            ]
+            )
     

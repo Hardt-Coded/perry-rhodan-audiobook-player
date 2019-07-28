@@ -134,7 +134,7 @@ type MainActivity() =
         
         Plugin.CurrentActivity.CrossCurrentActivity.Current.Init(this, bundle);
 
-        let appcore  = new PerryRhodan.AudiobookPlayer.App()
+        let appcore  = new PerryRhodan.AudiobookPlayer.MainApp()
         this.LoadApplication (appcore)
     
     override this.OnRequestPermissionsResult(requestCode: int, permissions: string[], [<GeneratedEnum>] grantResults: Android.Content.PM.Permission[]) =

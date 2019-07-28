@@ -4,11 +4,11 @@ open Fabulous
 open Fabulous
 open Fabulous.XamarinForms
 open Xamarin.Forms
+open System
 open System.Net
 open System.IO
 open Domain
 open Common
-open System.Text.RegularExpressions
 open Services
 open Global
 
@@ -18,6 +18,8 @@ open Global
         ListType: AudioBookListType option
         DisplayedAudioBooks: string []
         SelectedGroups:string []
+        // this value is to ensure, that the view function is call, when we trigger the audio item events externally
+        DummyUpdateValue:Guid
     }
 
     type Model = {
@@ -92,7 +94,7 @@ open Global
         LastSelectedGroup = None
         CurrentDownloadProgress = None 
         DownloadQueueModel = DownloadQueue.initModel None 
-        ListStates = []
+        ListStates = []        
     }
 
 
@@ -116,7 +118,7 @@ open Global
     let init () = initModel, Cmd.batch [(loadLocalAudioBooks ()); busyCmd], None
 
 
-    let rec update msg model =
+    let rec update msg (model:Model) =
         match msg with
         | LoadLocalAudiobooks ->
             model |> onLoadLocalAudiobooksMsg
@@ -127,7 +129,16 @@ open Global
         | InitAudiobooks ab ->
             model |> onInitAudiobooksMsg ab
         | UpdateAudioBook ->
-            model, Cmd.none, None
+            // updates the dummy value to ensure that he view function is called to update the audio items
+            let newListeState =
+                model.ListStates
+                |> List.map (fun i -> 
+                    if i.DisplayedAudioBooks.Length>0 then
+                        { i with DummyUpdateValue = Guid.NewGuid() }
+                    else
+                        i
+                )
+            {model with ListStates = newListeState}, Cmd.none, None
         //| ShowAudiobooks ab ->
         //    model |> onShowAudiobooksMsg ab
         | AddSelectGroup group ->
@@ -179,6 +190,7 @@ open Global
                             ListType = Some newGroupAb
                             DisplayedAudioBooks = [||]
                             SelectedGroups = state.SelectedGroups
+                            DummyUpdateValue=Guid.NewGuid()
                         }
                         
                     newStateItem
@@ -206,6 +218,7 @@ open Global
                             ListType = Some newGroupAb
                             DisplayedAudioBooks = items |> Array.map (fun i -> i.FullName)
                             SelectedGroups = state.SelectedGroups
+                            DummyUpdateValue=Guid.NewGuid()
                         }
                     newStateItem
                     )    
@@ -350,6 +363,8 @@ open Global
                         ListType = Some ab
                         DisplayedAudioBooks = [||]
                         SelectedGroups = newModel.SelectedGroups
+                        DummyUpdateValue=Guid.NewGuid()
+
                     }
                     
                 let newStateList = newModel.ListStates |> updateItemListState  newStateItem
@@ -362,6 +377,7 @@ open Global
                         ListType = Some ab
                         DisplayedAudioBooks = items |> Array.map (fun i -> i.FullName)
                         SelectedGroups = newModel.SelectedGroups
+                        DummyUpdateValue=Guid.NewGuid()
                     }
                 let newStateList = newModel.ListStates |> updateItemListState  newStateItem
                 {newModel with ListStates = newStateList}, Cmd.none, None
@@ -468,51 +484,60 @@ open Global
         model, unbusyCmd, None
 
     
+    module PushModalHelper =
+        let private pushPage dispatch (sr:ContentPage) closeEventMsg (page:ViewElement) =
+        
+            let p = page.Create() :?> ContentPage
+            // a littlebit hacky, but trigger change of the model
+            // which knows about every site, only when the shell is currently on the browser page
+            // the disappearing event will also triggert, when you hcange the side with the tab button in the bottom
+            p.Disappearing.Add(fun e -> 
+                let shell = Shell.Current
+                let item = shell.CurrentItem
+                if item.CurrentItem.Title = Translations.current.TabBarBrowserLabel then
+                    dispatch closeEventMsg
+            )
 
-    let private pushPage dispatch (sr:ContentPage) closeEventMsg (page:ViewElement) =
-        let p = page.Create() :?> Page    
-        p.Disappearing.Add(fun e-> dispatch closeEventMsg)
-        sr.Navigation.PushAsync(p) |> Async.AwaitTask |> Async.StartImmediate
+            sr.Navigation.PushAsync(p) |> Async.AwaitTask |> Async.StartImmediate
     
-    let private tryFindPage (sr:ContentPage) title =
-        sr.Navigation.NavigationStack |> Seq.filter (fun e -> e<>null) |> Seq.tryFind (fun i -> i.Title = title)
+        let private tryFindPage (sr:ContentPage) title =
+            sr.Navigation.NavigationStack |> Seq.filter (fun e -> e<>null) |> Seq.tryFind (fun i -> i.Title = title)
 
-    let prevPageMap = new System.Collections.Generic.Dictionary<string, ViewElement>()
+        let private prevPageMap = new System.Collections.Generic.Dictionary<string, ViewElement>()
    
-    let private pushOrUpdatePage dispatch closeMessage pageTitle suppressUpdate (pageRef:ViewRef<ContentPage>) page =
-        pageRef.TryValue
-        |> Option.map (fun sr ->
-            let hasLoginPageInStack =
-                tryFindPage sr pageTitle //
-            match hasLoginPageInStack with
-            | None ->
-                // creates a new page and push it to the modal stack
-                page |> pushPage dispatch sr (closeMessage pageTitle)
-                prevPageMap.Add(pageTitle,page)
-                ()
-            | Some pushedPage -> 
-                if suppressUpdate then
+        let pushOrUpdatePage dispatch closeMessage pageTitle suppressUpdate (pageRef:ViewRef<ContentPage>) page =
+            pageRef.TryValue
+            |> Option.map (fun sr ->
+                let hasLoginPageInStack =
+                    tryFindPage sr pageTitle //
+                match hasLoginPageInStack with
+                | None ->
+                    // creates a new page and push it to the modal stack
+                    page |> pushPage dispatch sr (closeMessage pageTitle)
+                    prevPageMap.Add(pageTitle,page)
                     ()
-                else
-                    // this uses the new view Element and through model updated Page 
-                    // and updates the current viewed from the shel modal stack :) nice!
-                    let (hasPrev,prevPage) = prevPageMap.TryGetValue(pageTitle)
-                    match hasPrev with
-                    | false ->
-                        page.Update(pushedPage)
-                        prevPageMap.Add(pageTitle,page)
-                    | true ->
-                        //prevPage.UpdateIncremental(page,pushedPage)
-                        page.UpdateIncremental(prevPage,pushedPage)
-                        if (prevPageMap.ContainsKey(pageTitle)) then
-                            prevPageMap.[pageTitle] <- page
-                        else
+                | Some pushedPage -> 
+                    if suppressUpdate then
+                        ()
+                    else
+                        // this uses the new view Element and through model updated Page 
+                        // and updates the current viewed from the shel modal stack :) nice!
+                        let (hasPrev,prevPage) = prevPageMap.TryGetValue(pageTitle)
+                        match hasPrev with
+                        | false ->
+                            page.Update(pushedPage)
                             prevPageMap.Add(pageTitle,page)
+                        | true ->
+                            //prevPage.UpdateIncremental(page,pushedPage)
+                            page.UpdateIncremental(prevPage,pushedPage)
+                            if (prevPageMap.ContainsKey(pageTitle)) then
+                                prevPageMap.[pageTitle] <- page
+                            else
+                                prevPageMap.Add(pageTitle,page)
 
-                    ()
-        )
-        |> ignore
-
+                        ()
+            )
+            |> ignore
 
     
     let rec browseView (model: Model) dispatch =
@@ -643,7 +668,7 @@ open Global
                 let cp = Controls.contentPageWithBottomOverlay subRef None (browseView newModel dispatch) false i.GroupName
 
                 let suppressEntry = listStates.Length = (idx + 1) |> not
-                pushOrUpdatePage dispatch RemoveLastSelectGroup i.GroupName suppressEntry pageRef cp
+                PushModalHelper.pushOrUpdatePage dispatch RemoveLastSelectGroup i.GroupName suppressEntry pageRef cp
                 ()
             )
         )
