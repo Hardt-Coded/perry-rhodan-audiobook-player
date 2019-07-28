@@ -68,6 +68,7 @@ let private abItemProcessor =
                                     else
                                         i
                                 )
+
                             abItemUpdatedEvent.Trigger(item)        
                             return! (loop newState)
 
@@ -83,12 +84,15 @@ let private abItemProcessor =
                                     else
                                         i
                                 )
+
                             abItemUpdatedEvent.Trigger(newAbItem)        
                             return! (loop newState)
 
                         | InsertAudioBooks audioBooks ->
                             let newState =
-                                state |> Array.append audioBooks
+                                state 
+                                |> Array.append audioBooks
+                                |> Array.sortBy (fun i-> i.AudioBook.FullName)
                                 
                             return! (loop newState)
                     }
