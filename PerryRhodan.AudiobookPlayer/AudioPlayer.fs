@@ -184,6 +184,7 @@
             )
 
     open Common.MailboxExtensions
+    open Common
 
     let audioPlayerStateMailbox         
         (audioService:IAudioServiceImplementation)
@@ -254,12 +255,12 @@
                             let! newState = state |> onStartPlayer filename pos
                             return newState
                         | StopAudioPlayer resumeOnAudioFocus ->
-                            let newState = state |> onStopPlayer resumeOnAudioFocus
+                            let! newState = state |> onStopPlayer resumeOnAudioFocus
                             return newState
                         | TogglePlayPause ->
                             match state.State with
                             | Playing ->
-                                let newState = state |> onStopPlayer false
+                                let! newState = state |> onStopPlayer false
                                 return newState
                             | Stopped ->
                                 let! newState = state |> onStartPlayer state.Filename state.Position
@@ -372,13 +373,30 @@
 
 
                 and onStopPlayer resumeOnAudioFocus state =
+                    async {
                         let newState = 
                             { state with
                                 ResumeOnAudioFocus = resumeOnAudioFocus
                                 PlaybackDelayed = false }
                             |> audioService.StopAudioPlayer
 
-                        { newState with State = Stopped }
+                        // update audio book state
+                        let newAb = { 
+                            newState.AudioBook with
+                                State = {
+                                    state.AudioBook.State with
+                                        CurrentPosition = Some {
+                                            Filename = newState.Filename
+                                            Position = newState.Position |> TimeSpanHelpers.toTimeSpan
+                                        }
+                                        LastTimeListend = Some DateTime.Now
+                                }
+                        }
+                        let! _ = Services.DataBase.updateAudioBookInStateFile newAb
+
+
+                        return { newState with State = Stopped }
+                    }
 
 
                 and onStartPlayer filename pos state =
@@ -415,17 +433,25 @@
                             if newIndex > (state.Mp3FileList.Length - 1) then
 
                                 // Let's stop the player
-                                let newState =
+                                let! newState =
                                     if state.State = Playing then
                                         state |> onStopPlayer false
                                     else
-                                        state
+                                        state |> async.Return
 
                                 let newAb = {
                                     newState.AudioBook 
                                         with State = {
                                             newState.AudioBook.State 
-                                                with LastTimeListend = Some System.DateTime.UtcNow; Completed = true } }
+                                                with 
+                                                    LastTimeListend = Some System.DateTime.UtcNow
+                                                    Completed = true
+                                                    CurrentPosition = Some {
+                                                        Filename = newState.Filename
+                                                        Position = newState.Position |> TimeSpanHelpers.toTimeSpan
+                                                    }
+                                        } 
+                                }
                                 let newState = {newState with AudioBook = newAb }
                                 // store the new state on disk, but ignore if it's not working
                                 let! _ = Services.DataBase.updateAudioBookInStateFile newAb
@@ -433,7 +459,26 @@
                                 return newState
                             else
                                 let (newFile,newDuration) = newIndex |> Helpers.getFileFromIndex state.Mp3FileList
-                                let newState = {state with Filename = newFile; Duration = newDuration; Position = pos; CurrentTrackNumber = newIndex + 1}
+                                let newState = {
+                                    state with 
+                                        Filename = newFile
+                                        Duration = newDuration
+                                        Position = pos
+                                        CurrentTrackNumber = newIndex + 1
+                                }
+                                let newAb = { 
+                                    newState.AudioBook with
+                                        State = {
+                                            state.AudioBook.State with
+                                                CurrentPosition = Some {
+                                                    Filename = newState.Filename
+                                                    Position = newState.Position |> TimeSpanHelpers.toTimeSpan
+                                                }    
+                                        }
+                                }
+                                // store the new state when changing the track on disk, but ignore if it's not working
+                                let! _ = Services.DataBase.updateAudioBookInStateFile newAb
+
                                 let! newState = newState |> audioService.MoveToNextTrack 
                                 return newState 
                             
