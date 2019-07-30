@@ -126,6 +126,17 @@ module App =
         let mainPageModel, mainPageMsg = MainPage.init ()
         let browserPageModel, browserPageMsg, _ = BrowserPage.init ()
         let settingsPageModel, settingsPageMsg, _ = SettingsPage.init true
+
+        // check if audio player is current available, if so, init AudioPlayer as well
+        let checkAudioPlayerRunningCmds =
+            async {
+                let audioPlayer = DependencyService.Get<AudioPlayer.IAudioPlayer>()
+                let! info = audioPlayer.GetCurrentState();
+                return info
+                    |> Option.map (fun state -> 
+                        GotoAudioPlayerPage state.AudioBook
+                    )
+            } |> Cmd.ofAsyncMsgOption
         
         let initModel = { 
             IsNav = false
@@ -148,6 +159,7 @@ module App =
                 (Cmd.map MainPageMsg mainPageMsg)
                 (Cmd.map BrowserPageMsg browserPageMsg)
                 (Cmd.map SettingsPageMsg settingsPageMsg)
+                checkAudioPlayerRunningCmds
             ]
 
         initModel, cmds
@@ -374,18 +386,6 @@ module App =
         {model with SettingsPageModel = m}, Cmd.batch [(Cmd.map SettingsPageMsg cmd); externalCmds]
 
 
-    and addPageToPageStack page model =
-        let hasItem = model.PageStack |> List.tryFind (fun i -> i = page)
-        match hasItem with
-        | None ->
-            {model with PageStack = model.PageStack @ [page]}
-        | Some _ ->
-            let pageStackWithoutNewPage = 
-                model.PageStack 
-                |> List.filter (fun i -> i <> page)
-            {model with PageStack = pageStackWithoutNewPage @ [page]}
-
-    
     and onGotoMainPageMsg model =
         match shellRef.TryValue with
         | Some sr ->
@@ -396,9 +396,8 @@ module App =
 
 
     and onGotoLoginPageMsg cameFrom model =
-        let newPageModel = model |> addPageToPageStack LoginPage
         let m,cmd = LoginPage.init cameFrom
-        {newPageModel with LoginPageModel = Some m},Cmd.batch [ (Cmd.map LoginPageMsg cmd) ]
+        {model with LoginPageModel = Some m},Cmd.batch [ (Cmd.map LoginPageMsg cmd) ]
         
 
     and onLoginClosed model =
@@ -411,11 +410,10 @@ module App =
 
 
     and onGotoAudioPageMsg audioBook model =
-        let newPageModel = model |> addPageToPageStack AudioPlayerPage
         let brandNewPage () = 
             let m,cmd = AudioPlayerPage.init audioBook
-            {newPageModel with CurrentPage = AudioPlayerPage; AudioPlayerPageModel = Some m}, Cmd.batch [ (Cmd.map AudioPlayerPageMsg cmd) ]
-
+            {model with CurrentPage = AudioPlayerPage; AudioPlayerPageModel = Some m}, Cmd.batch [ (Cmd.map AudioPlayerPageMsg cmd) ]
+        
         gotoPage playerPageRoute
 
         match model.AudioPlayerPageModel with
@@ -428,7 +426,7 @@ module App =
                     AudioPlayerPage.audioPlayer.StopAudio()
                 brandNewPage()
             else
-                newPageModel, Cmd.none
+                model, Cmd.none
 
 
     and onGotoPermissionDeniedMsg model =
@@ -442,9 +440,8 @@ module App =
 
 
     and onOpenAudioBookDetailPage audiobook model =
-        let newPageModel = model |> addPageToPageStack AudioBookDetailPage
         let m,cmd = AudioBookDetailPage.init audiobook        
-        { newPageModel with AudioBookDetailPageModel = Some m }, Cmd.batch [ (Cmd.map AudioBookDetailPageMsg cmd) ]
+        { model with AudioBookDetailPageModel = Some m }, Cmd.batch [ (Cmd.map AudioBookDetailPageMsg cmd) ]
 
     and onCloseAudioBookDetailPage model =
         {model with AudioBookDetailPageModel = None }, Cmd.none
