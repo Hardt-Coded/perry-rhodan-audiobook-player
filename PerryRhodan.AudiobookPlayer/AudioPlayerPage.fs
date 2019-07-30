@@ -14,6 +14,7 @@ open Services
 open TimeSpanHelpers
 open Services.DependencyServices
 open Global
+
 open AudioPlayer
 
     
@@ -108,7 +109,7 @@ open AudioPlayer
         |> Option.map (fun i -> i + 1)
         |> Option.defaultValue 1
 
-    let playAudio model =
+    let playAudio rewindInSec model =
         (fun (dispatch:Dispatch<Msg>) -> 
             async {
                 if model.CurrentState = Playing then
@@ -118,9 +119,10 @@ open AudioPlayer
                         return DoNothing
                     else
                         let (file,_) = model.AudioFileList.[model.CurrentAudioFileIndex]
-                        let currentPosition =model.CurrentPosition |> fromTimeSpanOpt
+                        let currentPosition = model.CurrentPosition |> fromTimeSpanOpt
+                        let rewindInMs = rewindInSec * 1000
                         
-                        audioPlayer.StartAudio file currentPosition
+                        audioPlayer.StartAudio file (currentPosition - rewindInMs)
 
                         return DoNothing
             }
@@ -286,6 +288,8 @@ open AudioPlayer
         model, cmds
 
 
+    open FSharpx.Control
+
     let rec update msg model =
         match msg with
         | Play -> 
@@ -384,6 +388,8 @@ open AudioPlayer
                     yield ("60 min",(fun () -> StartSleepTimer (Some (TimeSpan.FromMinutes(60.) ))) ())
                     yield ("75 min",(fun () -> StartSleepTimer (Some (TimeSpan.FromMinutes(75.) ))) ())
                     yield ("90 min",(fun () -> StartSleepTimer (Some (TimeSpan.FromMinutes(90.) ))) ())
+                    yield ("105 min",(fun () -> StartSleepTimer (Some (TimeSpan.FromMinutes(105.) ))) ())
+                    yield ("120 min",(fun () -> StartSleepTimer (Some (TimeSpan.FromMinutes(120.) ))) ())
                         
                 |]
                 return! Helpers.displayActionSheet (Some Translations.current.Select_Sleep_Timer) (Some Translations.current.Cancel) buttons
@@ -392,8 +398,37 @@ open AudioPlayer
         model, (openSleepTimerActionMenu ()), None
     
     
+
     and onPlayMsg model = 
-        let playAudioCmd = model |> playAudio
+
+        // determinate Rewind
+        let rewindInSec =
+            async {
+                match model.AudioBook.State.LastTimeListend with
+                | None ->
+                    return 0
+                | Some lastTimeListend ->
+                    let minutesSinceLastListend =
+                        (DateTime.Now.Subtract(lastTimeListend)).TotalMinutes
+                    let secondsSinceLastListend =
+                        (DateTime.Now.Subtract(lastTimeListend)).TotalSeconds
+
+                    if (secondsSinceLastListend <= 30.0) then
+                        return 0
+                    else
+                        let! longTimeMinutes = 
+                            Services.SystemSettings.getLongPeriodBeginsAfterInMinutes ()
+                            |> Async.map float
+                        if (minutesSinceLastListend >= longTimeMinutes) then
+                            return! Services.SystemSettings.getRewindWhenStartAfterLongPeriodInSec ()
+                        else
+                            return! Services.SystemSettings.getRewindWhenStartAfterShortPeriodInSec ()
+            } |> Async.RunSynchronously
+            
+        
+
+
+        let playAudioCmd = model |> playAudio rewindInSec
         
         let newModel = 
             {model with CurrentState = Playing}

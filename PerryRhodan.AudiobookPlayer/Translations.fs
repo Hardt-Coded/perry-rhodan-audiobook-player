@@ -74,6 +74,10 @@
           TabBarOptionsLabel:string
           TabBarPlayerLabel:string
 
+          RewindWhenStartAfterShortPeriodInSec:string
+          RewindWhenStartAfterLongPeriodInSec:string
+          LongPeriodBeginsAfterInMinutes:string
+
         }
 
 
@@ -145,6 +149,10 @@
                 TabBarBrowserLabel="Browser"
                 TabBarOptionsLabel="Options"
                 TabBarPlayerLabel="Player"
+
+                RewindWhenStartAfterShortPeriodInSec="Rewind After Short Break:"
+                RewindWhenStartAfterLongPeriodInSec="Rewind After Long Break:"
+                LongPeriodBeginsAfterInMinutes="What Means \"Long Break\":"
             }
 
     
@@ -216,6 +224,10 @@
                 TabBarBrowserLabel="Browser"
                 TabBarOptionsLabel="Optionen"
                 TabBarPlayerLabel="Player"
+
+                RewindWhenStartAfterShortPeriodInSec="Zurückspringen nach kurzer Pause:"
+                RewindWhenStartAfterLongPeriodInSec="Zurückspringen nach langer Pause:"
+                LongPeriodBeginsAfterInMinutes="Was ist eine \"lange Pause:\""
             }
 
 

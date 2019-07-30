@@ -236,6 +236,21 @@
             if (fileSizeFound) then contentLength else defaultValue
 
 
+    module StringHelpers =
+
+        let optToInt defaultValue optStr =
+            optStr
+            |> Option.map (fun v ->
+                let (isInt,value) = Int32.TryParse(v)
+                match isInt with
+                | true ->
+                    value
+                | false ->
+                    defaultValue
+            )
+            |> Option.defaultValue defaultValue
+
+
     module RegExHelper =
 
         open System.Text.RegularExpressions

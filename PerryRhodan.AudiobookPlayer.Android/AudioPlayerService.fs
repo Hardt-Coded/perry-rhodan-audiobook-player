@@ -78,6 +78,7 @@ module rec AudioPlayerServiceImplementation =
         let SETPOSITION_PLAYER = "PerryRhodan.action.SET_POSITION"
         let JUMP_FORWARD_PLAYER = "PerryRhodan.action.JUMP_FORWARD"
         let JUMP_BACKWARD_PLAYER = "PerryRhodan.action.JUMP_BACKWARD"
+        let JUMP_BACKWARD_PLAYER_SEC = "PerryRhodan.action.JUMP_BACKWARD_SEC"
         let GET_CURRENT_STATE_PLAYER = "PerryRhodan.action.GET_CURRENT_STATE"
         let SET_SLEEP_TIMER_PLAYER = "PerryRhodan.action.SET_SLEEP_TIMER"
         let QUIT_PLAYER = "PerryRhodan.action.QUIT"
@@ -947,6 +948,9 @@ module rec AudioPlayerServiceImplementation =
                         stateMailBox.Post(JumpForward)
                     | x when x = JUMP_BACKWARD_PLAYER ->
                         stateMailBox.Post(JumpBackwards)
+                    | x when x = JUMP_BACKWARD_PLAYER_SEC ->
+                        let sec = intent.GetIntExtra("sec",0)
+                        stateMailBox.Post(JumpBackwardsSec sec)
                     | x when x = GET_CURRENT_STATE_PLAYER ->
                         // get current state and send it to the current state broad caster
                         let state = stateMailBox.TryPostAndReply((fun rc -> GetCurrentState rc),2000)
@@ -1104,6 +1108,10 @@ module rec AudioPlayerServiceImplementation =
                     |> Helpers.sendCommandToService typeof<AudioPlayerService> [] []
                 member this.JumpBackward () =
                     ServiceActions.JUMP_BACKWARD_PLAYER
+                    |> Helpers.sendCommandToService typeof<AudioPlayerService> [] []
+                member this.JumpBackward sec =
+                    let input = [ ("sec",sec) ]
+                    ServiceActions.JUMP_BACKWARD_PLAYER_SEC
                     |> Helpers.sendCommandToService typeof<AudioPlayerService> [] []
                 member this.GetCurrentState() =
                     if not started then
