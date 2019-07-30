@@ -707,12 +707,8 @@ module WebAccess =
                 
         }
 
-module SecureLoginStorage =
 
-    let private secStoreUsernameKey = "perryRhodanAudioBookUsername"
-    let private secStorePasswordKey = "perryRhodanAudioBookPassword"
-    let private secStoreRememberLoginKey = "perryRhodanAudioBookRememberLogin"
-
+module SecureStorageHelper =
     let getSecuredValue key =
         async {
             let! value =  SecureStorage.GetAsync(key) |> Async.AwaitTask
@@ -723,6 +719,14 @@ module SecureLoginStorage =
         async {
             do! SecureStorage.SetAsync(key,value) |> Async.AwaitTask            
         }
+
+
+module SecureLoginStorage =
+    open SecureStorageHelper
+
+    let private secStoreUsernameKey = "perryRhodanAudioBookUsername"
+    let private secStorePasswordKey = "perryRhodanAudioBookPassword"
+    let private secStoreRememberLoginKey = "perryRhodanAudioBookRememberLogin"
 
     let saveLoginCredentials username password rememberLogin =
         async {
@@ -771,6 +775,53 @@ module Files =
 
             return res
         }
+
+
+module SystemSettings =
+    open SecureStorageHelper
+    open FSharpx.Control
+    open Common.StringHelpers
+
+    let defaultRewindWhenStartAfterShortPeriodInSec = 5
+    let defaultRewindWhenStartAfterLongPeriodInSec = 30
+    let defaultLongPeriodBeginsAfterInMinutes = 60
+
+    let private keyRewindWhenStartAfterShortPeriodInSec = "PerryRhodanAudioBookRewindWhenStartAfterShortPeriodInSec"
+    let private keykeyRewindWhenStartAfterLongPeriodInSec ="PerryRhodanAudioBookRewindWhenStartAfterLongPeriodInSec"
+    let private keyLongPeriodBeginsAfterInMinutes ="PerryRhodanAudioBookLongPeriodBeginsAfterInMinutes"
+
+    let getRewindWhenStartAfterShortPeriodInSec () =
+        keyRewindWhenStartAfterShortPeriodInSec 
+        |> getSecuredValue
+        |> Async.map (fun result ->
+            result |> optToInt defaultRewindWhenStartAfterShortPeriodInSec
+        )
+
+
+    let getRewindWhenStartAfterLongPeriodInSec () =
+        keykeyRewindWhenStartAfterLongPeriodInSec 
+        |> getSecuredValue
+        |> Async.map (fun result ->
+            result |> optToInt defaultRewindWhenStartAfterLongPeriodInSec
+        )
+
+
+    let getLongPeriodBeginsAfterInMinutes () =
+        keyLongPeriodBeginsAfterInMinutes 
+        |> getSecuredValue
+        |> Async.map (fun result ->
+            result |> optToInt defaultLongPeriodBeginsAfterInMinutes
+        )
+
+    let setRewindWhenStartAfterShortPeriodInSec (value:int) =
+        keyRewindWhenStartAfterShortPeriodInSec |> setSecuredValue (value.ToString())
+
+    let setRewindWhenStartAfterLongPeriodInSec (value:int) =
+        keykeyRewindWhenStartAfterLongPeriodInSec |> setSecuredValue (value.ToString())
+
+    let setLongPeriodBeginsAfterInMinutes (value:int) =
+        keyLongPeriodBeginsAfterInMinutes |> setSecuredValue (value.ToString())
+
         
 
 

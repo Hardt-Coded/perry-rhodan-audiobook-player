@@ -57,6 +57,7 @@
         abstract member GotToPosition: int -> unit
         abstract member JumpForward: unit -> unit
         abstract member JumpBackward: unit -> unit
+        abstract member JumpBackward: int -> unit
 
         abstract member SetSleepTimer: TimeSpan option -> unit
 
@@ -78,6 +79,7 @@
         | MoveToPreviousTrack
         | JumpForward 
         | JumpBackwards 
+        | JumpBackwardsSec of int 
         | SetPosition of pos:int
         | UpdatePositionExternal of pos:int * meantTrack:int
         | SetCurrentAudioServiceStateToStarted
@@ -281,6 +283,9 @@
                         | JumpBackwards ->
                             let! newState = state |> onJumpBackward
                             return (newState)
+                        | JumpBackwardsSec sec->
+                            let! newState = state |> onJumpBackwardSec sec
+                            return (newState)
                         | SetPosition pos ->
                             let! newState = state |> onSetPosition pos
                             return (newState)
@@ -402,7 +407,23 @@
                 and onStartPlayer filename pos state =
                     async {
                         let index = filename |> Helpers.getIndexForFile state.Mp3FileList
+                        // recalc pos and maybe file when pos below zero (for jumpback on press play
+                        let (filename,pos) =
+                            if (pos < 0) then
+                                let (newFileName,durationPrevTrack) = (index - 1) |> Helpers.getFileFromIndex state.Mp3FileList
+                                // are we already on the first track
+                                if newFileName = filename then 
+                                    filename,0
+                                else
+                                    // wenn track wechsel, dann min 5 sek abstand.
+                                    let pos = if pos > -5000 then -5000 else pos
+                                    newFileName,durationPrevTrack + pos
+                            else
+                                filename,pos
+
+                        let index = filename |> Helpers.getIndexForFile state.Mp3FileList
                         let (_,duration) = index |> Helpers.getFileFromIndex state.Mp3FileList
+
                         let newState =
                             { state with
                                 Filename = filename
@@ -519,8 +540,12 @@
 
 
                 and onJumpBackward state =
+                    onJumpBackwardSec jumpDistance state
+
+
+                and onJumpBackwardSec sec state =
                     async {
-                        let newPos = state.Position - jumpDistance 
+                        let newPos = state.Position - (sec * 1000)
                         return! state |> onSetPosition newPos
                     }
                     

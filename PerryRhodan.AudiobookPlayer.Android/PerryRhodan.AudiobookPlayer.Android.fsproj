@@ -122,6 +122,7 @@
     <Compile Include="Properties\AssemblyInfo.fs" />
     <Compile Include="AudioPlayerService.fs" />
     <Compile Include="MainActivity.fs" />
+    <Compile Include="CustomRenderes.fs" />
     <Compile Include="assemblyAttributes.fs" />
     <None Include="packages.config" />
     <Content Include="launcher_screen.xml" />
