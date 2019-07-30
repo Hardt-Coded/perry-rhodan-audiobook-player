@@ -99,7 +99,7 @@
                                         //)
 
                                         if (model.DataProtectionStuff) then
-                                            let viewSource = UrlWebViewSource(Url="http://hardt-solutions.com/PrivacyPolicies/EinsAMedienAudiobookPlayer.html")
+                                            let viewSource = UrlWebViewSource(Url="https://hardt-solutions.com/PrivacyPolicies/EinsAMedienAudiobookPlayer.html")
 
                                             yield View.WebView(source=viewSource,
                                                 horizontalOptions=LayoutOptions.FillAndExpand,
