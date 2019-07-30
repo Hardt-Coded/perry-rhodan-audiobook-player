@@ -421,9 +421,14 @@
                                     else
                                         state
 
-                                let newAb = {newState.AudioBook with State = {newState.AudioBook.State with LastTimeListend = Some System.DateTime.UtcNow; Completed = true } }
+                                let newAb = {
+                                    newState.AudioBook 
+                                        with State = {
+                                            newState.AudioBook.State 
+                                                with LastTimeListend = Some System.DateTime.UtcNow; Completed = true } }
                                 let newState = {newState with AudioBook = newAb }
-
+                                // store the new state on disk, but ignore if it's not working
+                                let! _ = Services.DataBase.updateAudioBookInStateFile newAb
                                 // ToTo store state on disk ?!
                                 return newState
                             else

@@ -447,6 +447,7 @@ open AudioPlayer
                 CurrentDurationMs = Some currentDurationMs
                 CurrentAudioFile = Some fn
                 CurrentAudioFileIndex = 0
+                CurrentPosition = None
             }, cmd, None
 
         match model.AudioBook.State.CurrentPosition with
@@ -496,16 +497,16 @@ open AudioPlayer
         //let max = model.TrackPositionProcess + 0.3
         //if (e < min || e > max ) then
         if model.SliderIsDraged then
-            if model.CurrentDurationMs.IsSome then
-                let newPos = ((model.CurrentDurationMs.Value |> float) * e) |> int
-                
+            match model.CurrentDurationMs with
+            | Some currentMs ->
+                let newPos = ((currentMs |> float) * e) |> int
                 let newModel =
                     {model with 
                         CurrentPosition = Some (newPos |> toTimeSpan)
                         CurrentPositionMs = Some newPos                        
                     }
                 {newModel with ProgressbarValue = e}, Cmd.none, None
-            else
+            | None ->
                 model,Cmd.none, None
         else
             model,Cmd.none, None
