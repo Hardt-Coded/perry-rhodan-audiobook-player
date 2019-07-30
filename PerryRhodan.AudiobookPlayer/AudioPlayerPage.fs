@@ -111,7 +111,6 @@ open AudioPlayer
     let playAudio model =
         (fun (dispatch:Dispatch<Msg>) -> 
             async {
-                //let audioPlayer = DependencyService.Get<Services.IAudioPlayer>()
                 if model.CurrentState = Playing then
                     return DoNothing
                 else
