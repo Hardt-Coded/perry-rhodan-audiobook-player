@@ -444,7 +444,8 @@ open AudioPlayer
 
     and onStopMsg model =
         audioPlayer.StopAudio()
-        model, Cmd.none , None
+        let currentAudioBook = AudioBookItemProcessor.getAudioBookItem model.AudioBook.FullName |> Async.RunSynchronously
+        {model with AudioBook =currentAudioBook.AudioBook} , Cmd.none , None
 
     
     and onNextAudioFileMsg model =
