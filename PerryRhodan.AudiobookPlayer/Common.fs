@@ -338,4 +338,64 @@
         let (|StringContains|_|) str (input:string) =
             if (input.Contains(str)) then Some () else None
 
+
+
+    module ModalBaseHelpers =
+        
+        let private pushModalPage dispatch (sr:Shell) closeEventMsg (page:ViewElement) =
+            let p = page.Create() :?> Page    
+            p.Disappearing.Add(fun e-> dispatch closeEventMsg)
+            sr.Navigation.PushModalAsync(p) |> Async.AwaitTask |> Async.StartImmediate
+        
+        let private tryFindModal (sr:Shell) title =
+            sr.Navigation.ModalStack |> Seq.tryFind (fun i -> i.Title = title)
+        
+        let pushOrUpdateModal dispatch closeMessage pageTitle (shellRef:ViewRef<Shell>) page =
+            shellRef.TryValue
+            |> Option.map (fun sr ->
+                let hasLoginPageInStack =
+                    tryFindModal sr pageTitle //
+                match hasLoginPageInStack with
+                | None ->
+                    // creates a new page and push it to the modal stack
+                    page |> pushModalPage dispatch sr closeMessage 
+                    ()
+                | Some pushedPage -> 
+                    // this uses the new view Element and through model updated Page 
+                    // and updates the current viewed from the shel modal stack :) nice!
+                    page.Update(pushedPage)
+            )
+            |> ignore
+
+
+        let closeCurrentModal (shellRef:ViewRef<Shell>) =
+            shellRef.TryValue
+            |> Option.map (fun sr ->
+                async {
+                    let! _ = sr.Navigation.PopModalAsync(true) |> Async.AwaitTask
+                    return ()
+                } |> Async.StartImmediate
+            ) |> ignore
+
+
+    module FontSizeHelper =
+
+
+        let bodyLabel = Device.GetNamedSize(NamedSize.Body,typeof<Label>)
+        let captionLabel = Device.GetNamedSize(NamedSize.Caption,typeof<Label>)
+        let defaultLabel = Device.GetNamedSize(NamedSize.Default,typeof<Label>)
+        let headerLabel = Device.GetNamedSize(NamedSize.Header,typeof<Label>)
+        let largeLabel = Device.GetNamedSize(NamedSize.Large,typeof<Label>)
+        let mediumLabel = Device.GetNamedSize(NamedSize.Medium,typeof<Label>)
+        
+        let smallLabel = Device.GetNamedSize(NamedSize.Small,typeof<Label>)
+        let microLabel = Device.GetNamedSize(NamedSize.Micro,typeof<Label>)
+        let titleLabel = Device.GetNamedSize(NamedSize.Title,typeof<Label>)
+        let subtitleLabel = Device.GetNamedSize(NamedSize.Subtitle,typeof<Label>)
+
+
+        let largePicker = Device.GetNamedSize(NamedSize.Large,typeof<Picker>)
+        
+        
+
        

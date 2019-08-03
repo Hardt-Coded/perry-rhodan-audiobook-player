@@ -37,6 +37,7 @@
     <Compile Include="BrowserPage.fs" />
     <Compile Include="AudioPlayerPage.fs" />
     <Compile Include="AudioBookDetail.fs" />
+    <Compile Include="NumberPickerModal.fs" />
     <Compile Include="SettingsPage.fs" />
     <Compile Include="MainPage.fs" />
     <Compile Include="ModalHelpers.fs" />

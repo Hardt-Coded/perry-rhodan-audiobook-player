@@ -77,6 +77,15 @@
           RewindWhenStartAfterShortPeriodInSec:string
           RewindWhenStartAfterLongPeriodInSec:string
           LongPeriodBeginsAfterInMinutes:string
+          JumpDistance:string
+
+          SelectRewindWhenStartAfterShortPeriodInSec:string
+          SelectRewindWhenStartAfterLongPeriodInSec:string
+          SelectLongPeriodBeginsAfterInMinutes:string
+          SelectJumpDistance:string
+
+          Seconds:string
+          Minutes:string
 
         }
 
@@ -153,6 +162,15 @@
                 RewindWhenStartAfterShortPeriodInSec="Rewind After Short Break:"
                 RewindWhenStartAfterLongPeriodInSec="Rewind After Long Break:"
                 LongPeriodBeginsAfterInMinutes="What Means \"Long Break\":"
+                JumpDistance="Player Jump Distance"
+
+                Seconds="seconds"
+                Minutes="minutes"
+
+                SelectRewindWhenStartAfterShortPeriodInSec="Select how many seconds to rewind after a short break:"
+                SelectRewindWhenStartAfterLongPeriodInSec="Select how many seconds to rewind after a long break:"
+                SelectLongPeriodBeginsAfterInMinutes="Select how long is a \"long Break\" in Minutes:"
+                SelectJumpDistance="Select how many seconds should the player jump forward or backward:"
             }
 
     
@@ -228,6 +246,18 @@
                 RewindWhenStartAfterShortPeriodInSec="Zurückspringen nach kurzer Pause:"
                 RewindWhenStartAfterLongPeriodInSec="Zurückspringen nach langer Pause:"
                 LongPeriodBeginsAfterInMinutes="Was ist eine \"lange Pause:\""
+                JumpDistance="Player Sprungweite"
+
+                SelectRewindWhenStartAfterShortPeriodInSec="Wieviel Sekunden soll das Hörbuch nach einer kurzen Pause zurückspringen?"
+                SelectRewindWhenStartAfterLongPeriodInSec="Wieviel Sekunden soll das Hörbuch nach einer langen Pause zurückspringen?"
+                SelectLongPeriodBeginsAfterInMinutes="Wie lang ist eine \"lange Pause\" in Minuten?"
+                SelectJumpDistance="Um wieviel Sekunden soll der Player vorwärts oder rückwärts springen?"
+
+
+                Seconds="Sekunden"
+                Minutes="Minuten"
+
+
             }
 
 

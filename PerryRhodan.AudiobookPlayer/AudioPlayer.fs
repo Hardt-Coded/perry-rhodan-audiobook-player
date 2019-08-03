@@ -4,7 +4,6 @@
     open System
     open FSharp.Control
 
-    let jumpDistance = 30000
 
     type AudioPlayerServiceState =
         | Stopped        
@@ -187,6 +186,7 @@
 
     open Common.MailboxExtensions
     open Common
+    open FSharpx.Control.AsyncExtensions
 
     let audioPlayerStateMailbox         
         (audioService:IAudioServiceImplementation)
@@ -197,6 +197,8 @@
                 let rec loop state =
                     async {
                         try
+                            
+
                             let! command = inbox.Receive()
                             System.Diagnostics.Debug.WriteLine(sprintf "command: %A" command)
                             match state.ServiceState with
@@ -278,13 +280,15 @@
                                     state |> onMovePreviousTrack 0
                             return (newState)
                         | JumpForward ->
-                            let! newState = state |> onJumpForward
+                            let! jumpDistance = Services.SystemSettings.getJumpDistance()
+                            let! newState = state |> onJumpForward jumpDistance
                             return (newState)
                         | JumpBackwards ->
-                            let! newState = state |> onJumpBackward
+                            let! jumpDistance = Services.SystemSettings.getJumpDistance()
+                            let! newState = state |> onJumpBackward jumpDistance
                             return (newState)
                         | JumpBackwardsSec sec->
-                            let! newState = state |> onJumpBackwardSec sec
+                            let! newState = state |> onJumpBackwardTime (sec * 1000)
                             return (newState)
                         | SetPosition pos ->
                             let! newState = state |> onSetPosition pos
@@ -400,26 +404,45 @@
                         let! _ = Services.DataBase.updateAudioBookInStateFile newAb
 
 
-                        return { newState with State = Stopped }
+                        return { newState with State = Stopped; AudioBook = newAb }
                     }
+
+                
+                and recalcFileAndPos filename pos mp3List =
+                    let index = filename |> Helpers.getIndexForFile mp3List
+
+                    let rec getFileAndPos filename pos =
+                        if pos >= 0 then
+                            let (_,currentDuration) = index |> Helpers.getFileFromIndex mp3List
+                            if pos > currentDuration then
+                                // try next track
+                                let (newFileName,durationNextTrack) = (index + 1) |> Helpers.getFileFromIndex mp3List
+                                if filename = newFileName then
+                                    // we are at the end of the audio book
+                                    filename,durationNextTrack
+                                else
+                                    let newPos = pos - durationNextTrack
+                                    getFileAndPos newFileName newPos
+                            else
+                                // this is the one
+                                filename,pos
+                        else
+                            
+                            let (newFileName,durationPrevTrack) = (index - 1) |> Helpers.getFileFromIndex mp3List
+                            // we are on the first track
+                            if (filename = newFileName) then
+                                filename, 0
+                            else
+                                let newPos = pos + durationPrevTrack
+                                getFileAndPos newFileName newPos
+
+                    getFileAndPos filename pos
 
 
                 and onStartPlayer filename pos state =
                     async {
-                        let index = filename |> Helpers.getIndexForFile state.Mp3FileList
                         // recalc pos and maybe file when pos below zero (for jumpback on press play
-                        let (filename,pos) =
-                            if (pos < 0) then
-                                let (newFileName,durationPrevTrack) = (index - 1) |> Helpers.getFileFromIndex state.Mp3FileList
-                                // are we already on the first track
-                                if newFileName = filename then 
-                                    filename,0
-                                else
-                                    // wenn track wechsel, dann min 5 sek abstand.
-                                    let pos = if pos > -5000 then -5000 else pos
-                                    newFileName,durationPrevTrack + pos
-                            else
-                                filename,pos
+                        let (filename,pos) = recalcFileAndPos filename pos state.Mp3FileList
 
                         let index = filename |> Helpers.getIndexForFile state.Mp3FileList
                         let (_,duration) = index |> Helpers.getFileFromIndex state.Mp3FileList
@@ -531,7 +554,7 @@
                     
 
 
-                and onJumpForward state =
+                and onJumpForward jumpDistance state =
                     async {
                         let newPos = state.Position + jumpDistance                            
                         return! state |> onSetPosition newPos
@@ -539,13 +562,13 @@
                     
 
 
-                and onJumpBackward state =
-                    onJumpBackwardSec jumpDistance state
+                and onJumpBackward jumpDistance state =
+                    onJumpBackwardTime jumpDistance state
 
 
-                and onJumpBackwardSec sec state =
+                and onJumpBackwardTime ms state =
                     async {
-                        let newPos = state.Position - (sec * 1000)
+                        let newPos = state.Position - ms
                         return! state |> onSetPosition newPos
                     }
                     
@@ -565,15 +588,25 @@
                                 (state |> onMoveNextTrack diff state.CurrentTrackNumber)
                             // when you new position is actually on the previous track
                             | p when p < 0 ->
-                                let (file,durationPrevTrack) = (state.CurrentTrackNumber - 2) |> Helpers.getFileFromIndex state.Mp3FileList
-                                // are we already on the first track
-                                if file = state.Filename then 
-                                    (state |> setPosOnCurrentTrack 0) |> async.Return
-                                else
-                                    // wenn track wechsel, dann min 5 sek abstand.
-                                    let pos = if pos > -5000 then -5000 else pos
-                                    let posPrevTrack = durationPrevTrack + pos
-                                    state |> onMovePreviousTrack posPrevTrack
+                                // recalc pos and maybe file when pos below zero (for jumpback on press play
+                                
+                                let (filename,pos) = recalcFileAndPos state.Filename pos state.Mp3FileList
+                                let newState = 
+                                    state |> onStopPlayer false
+                                    |> Async.bind (fun res ->
+                                        res |> onStartPlayer filename pos
+                                    )
+                                newState
+                                //let newState = newState |> onStartPlayer filename pos
+                                //let (file,durationPrevTrack) = (state.CurrentTrackNumber - 2) |> Helpers.getFileFromIndex state.Mp3FileList
+                                //// are we already on the first track
+                                //if file = state.Filename then 
+                                //    (state |> setPosOnCurrentTrack 0) |> async.Return
+                                //else
+                                //    // wenn track wechsel, dann min 5 sek abstand.
+                                //    let pos = if pos > -5000 then -5000 else pos
+                                //    let posPrevTrack = durationPrevTrack + pos
+                                //    state |> onMovePreviousTrack posPrevTrack
                             | _ ->
                                let newState = {state with Position = pos}
                                newState |> audioService.SetPosition 

@@ -785,10 +785,12 @@ module SystemSettings =
     let defaultRewindWhenStartAfterShortPeriodInSec = 5
     let defaultRewindWhenStartAfterLongPeriodInSec = 30
     let defaultLongPeriodBeginsAfterInMinutes = 60
+    let defaultAudioJumpDistance = 30000
 
     let private keyRewindWhenStartAfterShortPeriodInSec = "PerryRhodanAudioBookRewindWhenStartAfterShortPeriodInSec"
     let private keykeyRewindWhenStartAfterLongPeriodInSec ="PerryRhodanAudioBookRewindWhenStartAfterLongPeriodInSec"
     let private keyLongPeriodBeginsAfterInMinutes ="PerryRhodanAudioBookLongPeriodBeginsAfterInMinutes"
+    let private keyAudioJumpDistance = "PerryRhodanAudioBookAudioJumpDistance"
 
     let getRewindWhenStartAfterShortPeriodInSec () =
         keyRewindWhenStartAfterShortPeriodInSec 
@@ -813,14 +815,29 @@ module SystemSettings =
             result |> optToInt defaultLongPeriodBeginsAfterInMinutes
         )
 
+    
+    let getJumpDistance () =
+        keyAudioJumpDistance 
+        |> getSecuredValue
+        |> Async.map (fun result ->
+            result |> optToInt defaultAudioJumpDistance
+        )
+
+
     let setRewindWhenStartAfterShortPeriodInSec (value:int) =
         keyRewindWhenStartAfterShortPeriodInSec |> setSecuredValue (value.ToString())
+
 
     let setRewindWhenStartAfterLongPeriodInSec (value:int) =
         keykeyRewindWhenStartAfterLongPeriodInSec |> setSecuredValue (value.ToString())
 
+
     let setLongPeriodBeginsAfterInMinutes (value:int) =
         keyLongPeriodBeginsAfterInMinutes |> setSecuredValue (value.ToString())
+
+
+    let setJumpDistance (value:int) =
+        keyAudioJumpDistance |> setSecuredValue (value.ToString())
 
         
 
