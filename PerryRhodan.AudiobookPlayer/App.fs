@@ -125,7 +125,7 @@ module App =
     let init () = 
         let mainPageModel, mainPageMsg = MainPage.init ()
         let browserPageModel, browserPageMsg, _ = BrowserPage.init ()
-        let settingsPageModel, settingsPageMsg, _ = SettingsPage.init true
+        let settingsPageModel, settingsPageMsg, _ = SettingsPage.init shellRef true
 
         // check if audio player is current available, if so, init AudioPlayer as well
         let checkAudioPlayerRunningCmds =
@@ -554,9 +554,7 @@ module App =
 
         
         let settingsPage =
-            dependsOn model.SettingsPageModel (fun _ mdl ->
-                (SettingsPage.view mdl (SettingsPageMsg >> dispatch))
-            )
+            (SettingsPage.view model.SettingsPageModel (SettingsPageMsg >> dispatch))
         
 
         View.Shell(

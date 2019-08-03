@@ -219,6 +219,9 @@
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Mono.Android" />
+    <Reference Include="NAudio">
+      <HintPath>..\packages\NAudio.1.9.0\lib\netstandard2.0\NAudio.dll</HintPath>
+    </Reference>
     <Reference Include="Plugin.CurrentActivity">
       <HintPath>..\packages\Plugin.CurrentActivity.2.1.0.2\lib\monoandroid44\Plugin.CurrentActivity.dll</HintPath>
     </Reference>
