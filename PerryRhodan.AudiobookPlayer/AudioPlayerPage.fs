@@ -690,7 +690,8 @@ open AudioPlayer
 
     let viewSmall openPlayerPageCommand (model: Model) dispatch =
         View.Grid(
-            coldefs=[box "auto"; box "*"; box "auto"; box "auto"; box "auto"],
+            coldefs=["auto"; "*"; "auto"; "auto"; "auto"],
+            rowdefs=["auto"; 2.0],
             backgroundColor=Consts.cardColor,
             gestureRecognizers = [
                 View.TapGestureRecognizer(command=openPlayerPageCommand)
@@ -733,6 +734,10 @@ open AudioPlayer
                         .GridColumn(4)
                         .GridRow(0)
                         .With(margin=Thickness(5.,3.,5.,3.))
+
+                yield View.BoxView(color=Consts.backgroundColor,horizontalOptions=LayoutOptions.Fill)
+                    .GridRow(1)
+                    .GridColumnSpan(5)
 
             ]
         )
