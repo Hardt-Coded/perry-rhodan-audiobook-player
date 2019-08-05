@@ -10,7 +10,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>PerryRhodan.AudiobookPlayer.Android</RootNamespace>
     <AssemblyName>PerryRhodan.AudiobookPlayer.Android</AssemblyName>
-    <TargetFrameworkVersion>v8.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v9.0</TargetFrameworkVersion>
     <TemplateGuid>{c9e5eea5-ca05-42a1-839b-61506e0a37df}</TemplateGuid>
     <AndroidApplication>True</AndroidApplication>
     <AndroidResgenFile>Resources\Resource.designer.cs</AndroidResgenFile>
