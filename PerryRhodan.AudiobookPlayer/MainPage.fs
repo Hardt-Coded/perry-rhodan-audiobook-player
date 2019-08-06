@@ -21,8 +21,6 @@ open Services
     }
 
     type Msg = 
-        | AskForAppPermission
-        | PermissionDenied
         | LoadLocalAudiobooks
         | LocalAudioBooksLoaded of AudioBook []
         | AudioBooksItemMsg of AudioBookItem.Model * AudioBookItem.Msg
@@ -32,7 +30,6 @@ open Services
         | DoNothing
 
     type ExternalMsg =
-        | GotoPermissionDeniedPage
         | OpenAudioBookPlayer of AudioBook
         | OpenAudioBookDetail of AudioBook
         | UpdateAudioBookGlobal  of AudioBookItem.Model * string
@@ -47,12 +44,8 @@ open Services
 
     let rec update msg model =
         match msg with
-        | AskForAppPermission ->
-            model |> onAskForAppPermissionMsg
         | AudioBooksItemMsg (abModel, msg) ->
             model |> onProcessAudioBookItemMsg abModel msg
-        | PermissionDenied ->
-            model |> onPermissionDeniedMsg
         | LoadLocalAudiobooks -> 
             model |> onLoadAudioBooksMsg
         | LocalAudioBooksLoaded ab ->
@@ -89,16 +82,6 @@ open Services
         {model with DummyUpdateValue=Guid.NewGuid()}, Cmd.ofMsg (LocalAudioBooksLoaded allDownloadedAndDownloadingItems), None
     
     
-    and onAskForAppPermissionMsg model =
-        let ask = 
-            async { 
-                let! res = Common.Helpers.askPermissionAsync Permission.Storage
-                if res then return LoadLocalAudiobooks 
-                else return PermissionDenied
-            } |> Cmd.ofAsyncMsg
-        
-        model, ask, None
-    
     
     and onProcessAudioBookItemMsg abModel msg model =
         let newModel, cmd, externalMsg = AudioBookItem.update msg abModel
@@ -127,11 +110,6 @@ open Services
 
         model, Cmd.batch [(Cmd.map2 newModel AudioBooksItemMsg cmd); externalCmds ], mainPageMsg
 
-    
-
-    and onPermissionDeniedMsg model =
-        model, Cmd.none, Some GotoPermissionDeniedPage
-    
 
     and onLoadAudioBooksMsg model =
         

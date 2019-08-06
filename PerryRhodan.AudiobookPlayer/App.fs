@@ -316,9 +316,7 @@ module App =
                 match externalMsg with
                 | None -> Cmd.none
                 | Some excmd -> 
-                    match excmd with
-                    | MainPage.ExternalMsg.GotoPermissionDeniedPage ->
-                        Cmd.ofMsg GotoPermissionDeniedPage
+                    match excmd with                   
                     | MainPage.ExternalMsg.OpenAudioBookPlayer ab ->
                         Cmd.ofMsg (GotoAudioPlayerPage ab)
                     | MainPage.ExternalMsg.UpdateAudioBookGlobal (ab,cameFrom) ->
