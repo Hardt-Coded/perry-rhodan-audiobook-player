@@ -60,6 +60,17 @@ module rec AudioPlayerServiceImplementation =
             let pendingIntent = PendingIntent.GetService(Android.App.Application.Context, 0, intent, PendingIntentFlags.UpdateCurrent)
             pendingIntent.Send()
 
+        let inline sendCommandToServiceFloat (servicetype:System.Type) (additionalFloat:(string * float32) list) command  =
+            let intent = new Intent(Android.App.Application.Context,servicetype)
+            intent.SetAction(command) |> ignore
+            additionalFloat
+            |> List.iter (
+                fun (k,v) -> intent.PutExtra(k,v) |> ignore
+            )
+            //additional intent
+            let pendingIntent = PendingIntent.GetService(Android.App.Application.Context, 0, intent, PendingIntentFlags.UpdateCurrent)
+            pendingIntent.Send()
+
 
         let icon name = 
             typeof<Resources.Drawable>.GetField(name).GetValue(null) :?> int
@@ -82,6 +93,7 @@ module rec AudioPlayerServiceImplementation =
         let GET_CURRENT_STATE_PLAYER = "PerryRhodan.action.GET_CURRENT_STATE"
         let SET_SLEEP_TIMER_PLAYER = "PerryRhodan.action.SET_SLEEP_TIMER"
         let QUIT_PLAYER = "PerryRhodan.action.QUIT"
+        let SET_PLAYBACKSPEED = "PerryRhodan.action.SetPlaybackSpeed"
 
         let POS_NOTIFICATION_BROADCAST_ACTION = "PerryRhodan.action.POS_BROADCAST"
 
@@ -616,8 +628,15 @@ module rec AudioPlayerServiceImplementation =
                             mediaPlayer.Reset()
                             do! mediaPlayer.SetDataSourceAsync(file) |> Async.AwaitTask 
                             onAfterPrepare := (Some (fun () -> 
-                                mediaPlayer.SeekTo(position)
+                                let playbackParams =
+                                    (new PlaybackParams())
+                                        .SetSpeed(info.PlaybackSpeed |> float32)
+                                        .SetPitch(1.0f)
 
+                                mediaPlayer.PlaybackParams <- playbackParams
+                                mediaPlayer.SetVolume(1.0f,1.0f)
+                                mediaPlayer.SeekTo(position)
+                                
                                 // set update timer only when it is not alread there
                                 match updateTimer.Value with
                                 | Some _ ->
@@ -633,7 +652,7 @@ module rec AudioPlayerServiceImplementation =
                             ))
                             mediaPlayer.SeekComplete.AddHandler(onSeekCompleteHandler)
 
-
+                            
                             mediaPlayer.PrepareAsync()
                             System.Threading.Tasks.Task.Delay(2000).ContinueWith(fun _ ->  setTcsResult ()) |> ignore
                             return! tcs.Task |> Async.AwaitTask
@@ -718,6 +737,7 @@ module rec AudioPlayerServiceImplementation =
             
 
         let private onSetPosition 
+            
             (mediaPlayer:MediaPlayer)
             info =
                 async {
@@ -746,6 +766,26 @@ module rec AudioPlayerServiceImplementation =
 
                     return newState
                 } 
+
+
+        let private onSetPlaybackSpeed
+            (mediaPlayer:MediaPlayer)
+            (stopAudioPlayer:unit -> unit)
+            (startAudioPlayer:AudioPlayerInfo -> Async<AudioPlayerInfo>)
+            info =
+                async {
+                    match info.State with
+                    | Playing ->
+                        stopAudioPlayer()
+                        let! newInfo = startAudioPlayer(info)
+                        return newInfo
+                    |_ ->
+                        return info
+                }
+                
+                    
+                    
+            
 
 
 
@@ -868,6 +908,13 @@ module rec AudioPlayerServiceImplementation =
                         mediaPlayer
                         info
 
+                member this.SetPlaybackSpeed info =
+                    onSetPlaybackSpeed
+                        mediaPlayer
+                        internalMediaPlayerStop
+                        playFile
+                        info
+
                 member this.OnUpdatePositionNumber info =
                     info
 
@@ -894,19 +941,31 @@ module rec AudioPlayerServiceImplementation =
             interface AudioManager.IOnAudioFocusChangeListener with
                 member ___.OnAudioFocusChange(focusChange:AudioFocus) =
                     
+                    Microsoft.AppCenter.Analytics.Analytics.TrackEvent(
+                        "audio focus changed", 
+                        [("focusChangeValue",focusChange.ToString())] |> dict
+                    )
+
                     let state = stateMailBox.TryPostAndReply((fun rc -> GetCurrentState rc),5000)
                     match state with
                     | None ->
+                        Microsoft.AppCenter.Analytics.Analytics.TrackEvent(
+                            "audio focus changed: no state found"
+                        )
                         ()
                     | Some state ->
+                        Microsoft.AppCenter.Analytics.Analytics.TrackEvent(
+                            "audio focus changed: state found", 
+                            [("focusChangeValue",focusChange.ToString()); ("state",sprintf "%A" state)] |> dict
+                        )    
                         match focusChange with
                         | AudioFocus.Gain ->
                             if (state.PlaybackDelayed || state.ResumeOnAudioFocus) then                                    
                                 stateMailBox.Post(StartAudioPlayer)                                    
                         | AudioFocus.Loss ->
-                            stateMailBox.Post(StopAudioPlayer true)
-                        | AudioFocus.LossTransient | AudioFocus.LossTransientCanDuck->
                             stateMailBox.Post(StopAudioPlayer false)
+                        | AudioFocus.LossTransient | AudioFocus.LossTransientCanDuck->
+                            stateMailBox.Post(StopAudioPlayer true)
                         | _ ->
                             () 
             
@@ -973,6 +1032,10 @@ module rec AudioPlayerServiceImplementation =
                         stateMailBox.Post(StartSleepTimer time)
                     | x when x = QUIT_PLAYER ->
                         stateMailBox.Post(QuitAudioPlayer)
+
+                    | x when x = SET_PLAYBACKSPEED ->
+                        let speed = intent.GetFloatExtra("speed",1.0f) |> float
+                        stateMailBox.Post(SetPlaybackSpeed speed)
                     | _ ->
                         Crashes.TrackError(exn(sprintf "AudioPlayerService: unknown intent action. '%s'" intent.Action))
 
@@ -1141,6 +1204,11 @@ module rec AudioPlayerServiceImplementation =
                     let input = [ ("time",time) ]
                     ServiceActions.SET_SLEEP_TIMER_PLAYER
                     |> Helpers.sendCommandToService typeof<AudioPlayerService> [] input
+
+                member this.SetPlaybackSpeed speed =
+                    let input = [ ("speed", speed |> float32)]
+                    ServiceActions.SET_PLAYBACKSPEED
+                    |> Helpers.sendCommandToServiceFloat typeof<AudioPlayerService> input
 
 
 
