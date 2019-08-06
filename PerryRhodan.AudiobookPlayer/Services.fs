@@ -17,6 +17,8 @@ open SixLabors.ImageSharp.Processing
 open ICSharpCode.SharpZipLib.Zip
 
 open Common
+open Plugin.Permissions.Abstractions
+
 
 
 
@@ -162,66 +164,71 @@ module DataBase =
     
     let storageProcessorOnAudiobookAdded = storageProcessorAudioBookAdded.Publish
 
+    // lazy evaluation, to avoid try loading data without permission
     let private storageProcessor = 
+        lazy 
         MailboxProcessor<StorageMsg>.Start(
             fun inbox ->
-                try
-                    // init stuff
-                    initAppFolders ()
-                    // read audiobooks on start from db
-                    let audioBooks =
-                        loadAudioBooksFromDb ()
-                
-                    let rec loop state =
-                        async {
-                            let! msg = inbox.Receive()
-                            match msg with
-                            | UpdateAudioBook (audiobook,replyChannel) ->
-                                let dbRes = updateAudioBookDb audiobook
-                                match dbRes with
-                                | Ok _ ->
-                                    let newState =
-                                        state
-                                        |> Array.Parallel.map (fun i ->
-                                            if i.FullName = audiobook.FullName then
-                                                audiobook
-                                            else
-                                                i
-                                        )
-                                    storageProcessorAudioBookUpdatedEvent.Trigger(audiobook)
-                                    replyChannel.Reply(Ok ())
-                                    return! (loop newState)
-                                | Error e ->
-                                    replyChannel.Reply(Error e)
-                                    return! (loop state)
+                async {
+                    try
+                        // init stuff
+                        initAppFolders ()
 
-                            | InsertAudioBooks (audiobooks,replyChannel) ->
-                                let dbRes = insertNewAudioBooksDb audiobooks
-                                match dbRes with
-                                | Ok _ ->
-                                    let newState =
-                                        state |> Array.append audiobooks
-
-                                    storageProcessorAudioBookAdded.Trigger(audiobooks)
-                                    replyChannel.Reply(Ok ())
-                                    return! (loop newState)
-                                | Error e ->
-                                    replyChannel.Reply(Error e)
-                                    return! (loop state)
-
-                            | GetAudioBooks replyChannel ->
-                                replyChannel.Reply(state |> Array.sortBy (fun i -> i.FullName))
-                                return! (loop state)
-
-                            return! (loop state)
-                                    
-                        }
+                        let audioBooks =
+                            loadAudioBooksFromDb ()
                     
-                    loop audioBooks
-                with
-                | _ as ex ->
-                    storageProcessorErrorEvent.Trigger(ex)
-                    failwith "machine down!"
+                        let rec loop state =
+                            async {
+                                let! msg = inbox.Receive()
+                                match msg with
+                                | UpdateAudioBook (audiobook,replyChannel) ->
+                                    let dbRes = updateAudioBookDb audiobook
+                                    match dbRes with
+                                    | Ok _ ->
+                                        let newState =
+                                            state
+                                            |> Array.Parallel.map (fun i ->
+                                                if i.FullName = audiobook.FullName then
+                                                    audiobook
+                                                else
+                                                    i
+                                            )
+                                        storageProcessorAudioBookUpdatedEvent.Trigger(audiobook)
+                                        replyChannel.Reply(Ok ())
+                                        return! (loop newState)
+                                    | Error e ->
+                                        replyChannel.Reply(Error e)
+                                        return! (loop state)
+
+                                | InsertAudioBooks (audiobooks,replyChannel) ->
+                                    let dbRes = insertNewAudioBooksDb audiobooks
+                                    match dbRes with
+                                    | Ok _ ->
+                                        let newState =
+                                            state |> Array.append audiobooks
+
+                                        storageProcessorAudioBookAdded.Trigger(audiobooks)
+                                        replyChannel.Reply(Ok ())
+                                        return! (loop newState)
+                                    | Error e ->
+                                        replyChannel.Reply(Error e)
+                                        return! (loop state)
+
+                                | GetAudioBooks replyChannel ->
+                                    replyChannel.Reply(state |> Array.sortBy (fun i -> i.FullName))
+                                    return! (loop state)
+
+                                return! (loop state)
+                                        
+                            }
+                        
+                        return! (loop audioBooks)
+                    with
+                    | _ as ex ->
+                        storageProcessorErrorEvent.Trigger(ex)
+                        failwith "machine down!"
+                }
+                
                     
         )
 
@@ -229,11 +236,11 @@ module DataBase =
     
     
     let loadAudioBooksStateFile () =
-        storageProcessor.PostAndAsyncReply(GetAudioBooks)
+        storageProcessor.Force().PostAndAsyncReply(GetAudioBooks)
     
 
     let loadDownloadedAudioBooksStateFile () =
-        storageProcessor.PostAndAsyncReply(GetAudioBooks)        
+        storageProcessor.Force().PostAndAsyncReply(GetAudioBooks)        
         |> Async.map (fun res ->
             res |> Array.filter (fun i -> i.State.Downloaded)
         )
@@ -243,13 +250,13 @@ module DataBase =
     let insertNewAudioBooksInStateFile (audioBooks:AudioBook[]) =
         let msg replyChannel = 
             InsertAudioBooks (audioBooks,replyChannel)
-        storageProcessor.PostAndAsyncReply(msg)
+        storageProcessor.Force().PostAndAsyncReply(msg)
 
 
     let updateAudioBookInStateFile (audioBook:AudioBook) =
         let msg replyChannel = 
             UpdateAudioBook (audioBook,replyChannel)
-        storageProcessor.PostAndAsyncReply(msg)
+        storageProcessor.Force().PostAndAsyncReply(msg)
 
 
     let removeAudiobook audiobook = 

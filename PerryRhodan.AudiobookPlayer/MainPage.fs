@@ -42,15 +42,7 @@ open Services
 
     
     let init () = 
-        
-        let cmd =
-            match Device.RuntimePlatform with
-            | Device.Android | Device.iOS ->
-                Cmd.ofMsg AskForAppPermission
-            | _ ->
-                Cmd.ofMsg LoadLocalAudiobooks
-                
-        initModel, cmd
+        initModel, Cmd.ofMsg LoadLocalAudiobooks
 
 
     let rec update msg model =
