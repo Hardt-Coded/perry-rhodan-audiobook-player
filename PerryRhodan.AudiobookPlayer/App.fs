@@ -1,5 +1,4 @@
-﻿// Copyright 2018 Fabulous contributors. See LICENSE.md for license.
-namespace PerryRhodan.AudiobookPlayer
+﻿namespace PerryRhodan.AudiobookPlayer
 
 open System.Diagnostics
 open Xamarin.Forms
@@ -11,10 +10,6 @@ open Microsoft.AppCenter.Crashes
 open Microsoft.AppCenter.Analytics
 open Fabulous
 open Fabulous.XamarinForms
-open System
-open System.IO
-open Common.PatternMatchHelpers
-
 
 module App = 
     open Xamarin.Essentials
@@ -28,23 +23,29 @@ module App =
     let playerPageRoute = "playerpage"
 
     
-    type Model = 
-      { IsNav:bool
-        MainPageModel:MainPage.Model
+    
+
+    type Model = { 
+        IsNav:bool
+        MainPageModel:MainPage.Model option
         LoginPageModel:LoginPage.Model option
-        BrowserPageModel:BrowserPage.Model
+        BrowserPageModel:BrowserPage.Model  option
         AudioPlayerPageModel:AudioPlayerPage.Model option
         AudioBookDetailPageModel:AudioBookDetailPage.Model option
-        SettingsPageModel:SettingsPage.Model
+        SettingsPageModel:SettingsPage.Model option
         
         AppLanguage:Language
         CurrentPage: Pages
         NavIsVisible:bool 
         PageStack: Pages list
         BacktapsOnMainSite:int 
-        HasAudioItemTrigger:bool }
+        HasAudioItemTrigger:bool 
+        StoragePermissionDenied:bool
+    }
 
     type Msg = 
+        | Init
+        | AskForAppPermission
         | MainPageMsg of MainPage.Msg 
         | LoginPageMsg of LoginPage.Msg 
         | BrowserPageMsg of BrowserPage.Msg 
@@ -123,50 +124,41 @@ module App =
 
 
     let init () = 
-        let mainPageModel, mainPageMsg = MainPage.init ()
-        let browserPageModel, browserPageMsg, _ = BrowserPage.init ()
-        let settingsPageModel, settingsPageMsg, _ = SettingsPage.init shellRef true
-
-        // check if audio player is current available, if so, init AudioPlayer as well
-        let checkAudioPlayerRunningCmds =
-            async {
-                let audioPlayer = DependencyService.Get<AudioPlayer.IAudioPlayer>()
-                let! info = audioPlayer.GetCurrentState();
-                return info
-                    |> Option.map (fun state -> 
-                        GotoAudioPlayerPage state.AudioBook
-                    )
-            } |> Cmd.ofAsyncMsgOption
-        
         let initModel = { 
             IsNav = false
-            MainPageModel = mainPageModel
+            MainPageModel = None
             LoginPageModel = None
-            BrowserPageModel = browserPageModel
+            BrowserPageModel = None
             AudioPlayerPageModel = None 
             AudioBookDetailPageModel = None 
-            SettingsPageModel = settingsPageModel 
+            SettingsPageModel = None 
             AppLanguage = English
             CurrentPage = MainPage
             NavIsVisible = false 
             PageStack = [ MainPage]
             BacktapsOnMainSite = 0 
             HasAudioItemTrigger = false
+            StoragePermissionDenied = false
         }
-        
-        let cmds =
-            Cmd.batch [ 
-                (Cmd.map MainPageMsg mainPageMsg)
-                (Cmd.map BrowserPageMsg browserPageMsg)
-                (Cmd.map SettingsPageMsg settingsPageMsg)
-                checkAudioPlayerRunningCmds
-            ]
 
-        initModel, cmds
+        let cmd =
+            match Device.RuntimePlatform with
+            | Device.Android | Device.iOS ->
+                Cmd.ofMsg AskForAppPermission
+            | _ ->
+                Cmd.ofMsg Init
+
+        
+
+        initModel, cmd
 
 
     let rec update msg model =
         match msg with
+        | Init ->
+            model |> onInitMsg
+        | AskForAppPermission ->
+            model |> onAskForAppPermissionMsg
         | MainPageMsg msg ->
             model |> onProcessMainPageMsg msg
         | LoginPageMsg msg ->
@@ -207,6 +199,52 @@ module App =
             model |> onUpdateAudioBookMsg ab cameFrom
         | QuitApplication ->
             model |> onQuitApplication
+
+
+    and onInitMsg model =
+        let mainPageModel, mainPageMsg = MainPage.init ()
+        let browserPageModel, browserPageMsg, _ = BrowserPage.init ()
+        let settingsPageModel, settingsPageMsg, _ = SettingsPage.init shellRef true
+
+        // check if audio player is current available, if so, init AudioPlayer as well
+        let checkAudioPlayerRunningCmds =
+            async {
+                let audioPlayer = DependencyService.Get<AudioPlayer.IAudioPlayer>()
+                let! info = audioPlayer.GetCurrentState();
+                return info
+                    |> Option.map (fun state -> 
+                        GotoAudioPlayerPage state.AudioBook
+                    )
+            } |> Cmd.ofAsyncMsgOption
+        
+        let initModel = { 
+            model with
+                MainPageModel = Some mainPageModel
+                BrowserPageModel = Some browserPageModel
+                SettingsPageModel = Some settingsPageModel 
+        }
+        
+        let cmds =
+            Cmd.batch [ 
+                (Cmd.map MainPageMsg mainPageMsg)
+                (Cmd.map BrowserPageMsg browserPageMsg)
+                (Cmd.map SettingsPageMsg settingsPageMsg)
+                checkAudioPlayerRunningCmds
+            ]
+
+        initModel, cmds
+
+
+    and onAskForAppPermissionMsg model =
+        let ask = 
+            async { 
+                let! res = Common.Helpers.askPermissionAsync Permission.Storage
+                if res then return Init 
+                else return GotoPermissionDeniedPage
+            } |> Cmd.ofAsyncMsg
+        
+        model, ask
+
     
     and onQuitApplication model =
 
@@ -270,25 +308,28 @@ module App =
             
     
     and onProcessMainPageMsg msg model =
+        match model.MainPageModel with
+        | None ->
+            model,Cmd.none
+        | Some mdl ->
+            let mainPageExternalMsgToCommand externalMsg =
+                match externalMsg with
+                | None -> Cmd.none
+                | Some excmd -> 
+                    match excmd with
+                    | MainPage.ExternalMsg.GotoPermissionDeniedPage ->
+                        Cmd.ofMsg GotoPermissionDeniedPage
+                    | MainPage.ExternalMsg.OpenAudioBookPlayer ab ->
+                        Cmd.ofMsg (GotoAudioPlayerPage ab)
+                    | MainPage.ExternalMsg.UpdateAudioBookGlobal (ab,cameFrom) ->
+                        Cmd.ofMsg (UpdateAudioBook (ab, cameFrom))
+                    | MainPage.ExternalMsg.OpenAudioBookDetail ab ->
+                        Cmd.ofMsg (OpenAudioBookDetailPage ab)
 
-        let mainPageExternalMsgToCommand externalMsg =
-            match externalMsg with
-            | None -> Cmd.none
-            | Some excmd -> 
-                match excmd with
-                | MainPage.ExternalMsg.GotoPermissionDeniedPage ->
-                    Cmd.ofMsg GotoPermissionDeniedPage
-                | MainPage.ExternalMsg.OpenAudioBookPlayer ab ->
-                    Cmd.ofMsg (GotoAudioPlayerPage ab)
-                | MainPage.ExternalMsg.UpdateAudioBookGlobal (ab,cameFrom) ->
-                    Cmd.ofMsg (UpdateAudioBook (ab, cameFrom))
-                | MainPage.ExternalMsg.OpenAudioBookDetail ab ->
-                    Cmd.ofMsg (OpenAudioBookDetailPage ab)
-
-        let m,cmd, externalMsg = MainPage.update msg model.MainPageModel        
-        let externalCmds =
-            externalMsg |> mainPageExternalMsgToCommand        
-        {model with MainPageModel = m; HasAudioItemTrigger = true}, Cmd.batch [(Cmd.map MainPageMsg cmd); externalCmds ]
+            let m,cmd, externalMsg = MainPage.update msg mdl     
+            let externalCmds =
+                externalMsg |> mainPageExternalMsgToCommand        
+            {model with MainPageModel = Some m; HasAudioItemTrigger = true}, Cmd.batch [(Cmd.map MainPageMsg cmd); externalCmds ]
 
 
     and onProcessLoginPageMsg msg model =
@@ -327,10 +368,14 @@ module App =
         
 
     and onProcessBrowserPageMsg msg model =
-        let m,cmd,externalMsg = BrowserPage.update msg model.BrowserPageModel
-        let externalCmds =
-            externalMsg |> browserExternalMsgToCommand
-        {model with BrowserPageModel = m}, Cmd.batch [(Cmd.map BrowserPageMsg cmd); externalCmds ]
+        match model.BrowserPageModel with
+        | None ->
+            model,Cmd.none
+        | Some mdl ->
+            let m,cmd,externalMsg = BrowserPage.update msg mdl
+            let externalCmds =
+                externalMsg |> browserExternalMsgToCommand
+            {model with BrowserPageModel = Some m}, Cmd.batch [(Cmd.map BrowserPageMsg cmd); externalCmds ]
 
 
     and onProcessAudioPlayerMsg msg model =
@@ -374,16 +419,20 @@ module App =
 
 
     and onProcessSettingsPageMsg msg model =
-        let settingsPageExternalMsgToCommand externalMsg =
-            match externalMsg with
-            | None -> Cmd.none
-            | Some excmd -> 
-                Cmd.none  
+        match model.SettingsPageModel with
+        | None ->
+            model,Cmd.none
+        | Some mdl ->
+            let settingsPageExternalMsgToCommand externalMsg =
+                match externalMsg with
+                | None -> Cmd.none
+                | Some excmd -> 
+                    Cmd.none  
         
-        let m,cmd,externalMsg = SettingsPage.update msg model.SettingsPageModel
-        let externalCmds = 
-            externalMsg |> settingsPageExternalMsgToCommand
-        {model with SettingsPageModel = m}, Cmd.batch [(Cmd.map SettingsPageMsg cmd); externalCmds]
+            let m,cmd,externalMsg = SettingsPage.update msg mdl
+            let externalCmds = 
+                externalMsg |> settingsPageExternalMsgToCommand
+            {model with SettingsPageModel = Some m}, Cmd.batch [(Cmd.map SettingsPageMsg cmd); externalCmds]
 
 
     and onGotoMainPageMsg model =
@@ -430,7 +479,16 @@ module App =
 
 
     and onGotoPermissionDeniedMsg model =
-        gotoPage "permissiondeniedpage"
+        async {
+            do! Common.Helpers.displayAlert(Translations.current.Error,"Ohne Freigabe auf den Speicher funktioniert die App nicht. Sie wird jetzt beendet.", "OK") 
+            try
+                Process.GetCurrentProcess().CloseMainWindow() |> ignore
+            with
+            | _ as ex ->
+                Crashes.TrackError ex
+            return ()
+        } |> Async.StartImmediate
+        
         model, Cmd.none
 
 
@@ -448,21 +506,25 @@ module App =
 
 
     and onSetBrowserPageCookieContainerAfterSucceedLoginMsg cc cameFrom model =
-        let downloadQueueModel = {model.BrowserPageModel.DownloadQueueModel with CurrentSessionCookieContainer = Some cc}
-        let browserPageModel = {model.BrowserPageModel with CurrentSessionCookieContainer = Some cc; DownloadQueueModel = downloadQueueModel}
-        let cmd = 
-            Cmd.batch [
-                match cameFrom with
-                | RefreshAudiobooks ->
-                    yield Cmd.ofMsg (BrowserPageMsg BrowserPage.Msg.LoadOnlineAudiobooks)
-                | DownloadAudioBook ->
-                    yield Cmd.ofMsg (BrowserPageMsg BrowserPage.Msg.StartDownloadQueue)
-            ]
+        match model.BrowserPageModel with
+        | None ->
+            model,Cmd.none
+        | Some browserModel ->
+            let downloadQueueModel = {browserModel.DownloadQueueModel with CurrentSessionCookieContainer = Some cc}
+            let browserPageModel = {browserModel with CurrentSessionCookieContainer = Some cc; DownloadQueueModel = downloadQueueModel}
+            let cmd = 
+                Cmd.batch [
+                    match cameFrom with
+                    | RefreshAudiobooks ->
+                        yield Cmd.ofMsg (BrowserPageMsg BrowserPage.Msg.LoadOnlineAudiobooks)
+                    | DownloadAudioBook ->
+                        yield Cmd.ofMsg (BrowserPageMsg BrowserPage.Msg.StartDownloadQueue)
+                ]
 
-        // and close Login Modal
-        closeCurrentModal ()
-        // set here login page model to None to avoid reopening of the loginPage
-        { model with BrowserPageModel = browserPageModel; LoginPageModel = None}, cmd
+            // and close Login Modal
+            closeCurrentModal ()
+            // set here login page model to None to avoid reopening of the loginPage
+            { model with BrowserPageModel = Some browserPageModel; LoginPageModel = None}, cmd
 
 
 
@@ -506,14 +568,18 @@ module App =
 
 
         let mainPage = 
-            dependsOn (model.MainPageModel, model.AudioPlayerPageModel) (fun _ (mdl, abMdl)->
-                (Controls.contentPageWithBottomOverlay
-                    AudioPlayerPage.pageRef
-                    (audioPlayerOverlay abMdl)
-                    (MainPage.view mdl (mainPageDispatch))
-                    model.MainPageModel.IsLoading
-                    Translations.current.MainPage)
+            model.MainPageModel
+            |> Option.map (fun mainPageModel ->
+                dependsOn (mainPageModel, model.AudioPlayerPageModel) (fun _ (mdl, abMdl)->
+                    (Controls.contentPageWithBottomOverlay
+                        AudioPlayerPage.pageRef
+                        (audioPlayerOverlay abMdl)
+                        (MainPage.view mdl (mainPageDispatch))
+                        mainPageModel.IsLoading
+                        Translations.current.MainPage)
+                )
             )
+            
 
 
         // try show login page, if necessary
@@ -533,14 +599,18 @@ module App =
             
 
         let browserPage =
-            let newView =
-                (BrowserPage.view model.BrowserPageModel (BrowserPageMsg >> dispatch))
-            (Controls.contentPageWithBottomOverlay 
-                BrowserPage.pageRef
-                (audioPlayerOverlay model.AudioPlayerPageModel)
-                newView
-                model.BrowserPageModel.IsLoading
-                Translations.current.BrowserPage)
+            model.BrowserPageModel
+            |> Option.map (fun browserModel ->
+
+                let newView =
+                    (BrowserPage.view browserModel (BrowserPageMsg >> dispatch))
+                (Controls.contentPageWithBottomOverlay 
+                    BrowserPage.pageRef
+                    (audioPlayerOverlay model.AudioPlayerPageModel)
+                    newView
+                    browserModel.IsLoading
+                    Translations.current.BrowserPage)
+            )
             
         
         let audioPlayerPage =
@@ -554,7 +624,10 @@ module App =
 
         
         let settingsPage =
-            (SettingsPage.view model.SettingsPageModel (SettingsPageMsg >> dispatch))
+            model.SettingsPageModel
+            |> Option.map (fun settingsModel ->
+                (SettingsPage.view settingsModel (SettingsPageMsg >> dispatch))
+            )
         
 
         View.Shell(
@@ -563,37 +636,48 @@ module App =
             title= "Eins A Medien",
             shellForegroundColor=Color.White,
             navigating=(fun e ->
-                
-                //match e.Target.Location.ToString() with
-                //| StringContains mainPageRoute ->
-                //    dispatch (MainPageMsg MainPage.Msg.LoadLocalAudiobooks)
-                //| StringContains browserPageRoute ->
-                //    dispatch (BrowserPageMsg BrowserPage.Msg.RefreshLocalAudiobooks)
-                //| _ ->
-                //    ()
-
                 ()
-                // LoadLocalAudiobooks
             ),
             // makenav bar invisible
             created=(fun e -> Shell.SetNavBarIsVisible(e,false)),
             items=[
                 
-                yield View.ShellItem(                    
+
+                View.ShellItem(                    
                     shellUnselectedColor = Consts.secondaryTextColor,
                     shellTabBarBackgroundColor=Consts.cardColor,
                     items=[
-                        yield createShellContent Translations.current.TabBarStartLabel mainPageRoute "home_icon.png" mainPage
-                        yield createShellContent Translations.current.TabBarBrowserLabel browserPageRoute "browse_icon.png" browserPage
-                        yield createShellContent Translations.current.TabBarOptionsLabel settingsPageRoute "settings_icon.png" settingsPage
+                        match mainPage with
+                        | None -> ()
+                        | Some mainPage -> 
+                            yield createShellContent Translations.current.TabBarStartLabel mainPageRoute "home_icon.png" mainPage
+
+                        match browserPage with
+                        | None -> ()
+                        | Some browserPage -> 
+                            yield createShellContent Translations.current.TabBarBrowserLabel browserPageRoute "browse_icon.png" browserPage
+
+                        match settingsPage with
+                        | None -> ()
+                        | Some settingsPage -> 
+                            yield createShellContent Translations.current.TabBarOptionsLabel settingsPageRoute "settings_icon.png" settingsPage
+
                         match audioPlayerPage with
                         | Some ap ->
                             yield createShellContent Translations.current.TabBarPlayerLabel playerPageRoute "player_icon.png" ap
                         | None ->
                             ()
+
+                        match mainPage,browserPage,settingsPage,audioPlayerPage with
+                        | None, None, None, None ->
+                            yield View.ShellContent(route="emptypage",content=View.ContentPage(content=View.Label(text="...")))
+                        | _ ->
+                            ()
                     ]
                     
                 )
+                View.ShellContent(route="permissiondeniedpage",content=View.ContentPage(content=View.Label(text="...")))
+                
             ]
         )
                 
@@ -603,13 +687,15 @@ module App =
 
 type MainApp () as app = 
     inherit Application ()
-
+   
     do 
         AppCenter.Start(sprintf "ios=(...);android=%s" Global.appcenterAndroidId, typeof<Analytics>, typeof<Crashes>)
         // Display Error when somthing is with the storage processor
         Services.DataBase.storageProcessorOnError.Add(fun e ->
             async {
-                let message = sprintf "Es ist ein Fehler mit der Datenbank aufgetreten. (%s). Das Programm wird jetzt beendet. Versuchen Sie es noch einmal oder melden Sie sich bin Support." e.Message
+                let message = 
+                    sprintf "Es ist ein Fehler mit der Datenbank aufgetreten. (%s). Das Programm wird jetzt beendet. Versuchen Sie es noch einmal oder melden Sie sich bin Support." e.Message
+
                 do! Common.Helpers.displayAlert(Translations.current.Error,message, "OK") 
                 try
                     Process.GetCurrentProcess().CloseMainWindow() |> ignore
@@ -627,6 +713,9 @@ type MainApp () as app =
                 return ()
             } |> Async.StartImmediate
         )
+
+        
+
     
     let runner =
         App.program
@@ -652,9 +741,9 @@ type MainApp () as app =
     //
     //do runner.EnableLiveUpdate()
 #endif    
-
-    override __.OnSleep() =         
-        base.OnSleep()        
+            
+    override this.OnSleep() =         
+        base.OnSleep()           
         ()
 
     override __.OnResume() = 
@@ -662,8 +751,10 @@ type MainApp () as app =
         ()
 
     override this.OnStart() = 
-        base.OnStart()
+        base.OnStart()        
         ()
+    
+
 
     
 

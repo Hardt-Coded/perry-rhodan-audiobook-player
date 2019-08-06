@@ -21,6 +21,7 @@ let private abItemUpdatedEvent = Event<AudioBookItem.Model>()
 let onAbItemUpdated = abItemUpdatedEvent.Publish
 
 let private abItemProcessor = 
+    lazy
     MailboxProcessor<Msg>.Start(
         fun inbox ->
             try
@@ -110,23 +111,23 @@ let private abItemProcessor =
 let getAudioBookItem fullname =
     let msg replyChannel =
         GetAudioBookItem (fullname,replyChannel)
-    abItemProcessor.PostAndAsyncReply(msg)
+    abItemProcessor.Force().PostAndAsyncReply(msg)
 
 
 let getAudioBookItems fullname =
     let msg replyChannel =
         GetAudioBookItems (fullname,replyChannel)
-    abItemProcessor.PostAndAsyncReply(msg)
+    abItemProcessor.Force().PostAndAsyncReply(msg)
 
 let getDownloadingAndDownloadedAudioBookItems () =
-    abItemProcessor.PostAndAsyncReply(GetDownloadingAndDownloadedAudioBookItems)
+    abItemProcessor.Force().PostAndAsyncReply(GetDownloadingAndDownloadedAudioBookItems)
 
 let updateAudiobookItem item =
-    abItemProcessor.Post(UpdateAudioBookItem item)
+    abItemProcessor.Force().Post(UpdateAudioBookItem item)
 
 
 let insertAudiobookItems items =
-    abItemProcessor.Post(InsertAudioBooks items)
+    abItemProcessor.Force().Post(InsertAudioBooks items)
 
 let insertAudiobooks items =
     let items = 
@@ -135,9 +136,9 @@ let insertAudiobooks items =
             let mdl,_,_ = AudioBookItem.init i
             mdl
         )
-    abItemProcessor.Post(InsertAudioBooks items)
+    abItemProcessor.Force().Post(InsertAudioBooks items)
 
 
 let updateUnderlyingAudioBookInItem audiobook =
-    abItemProcessor.Post(UpdateAudioBook audiobook)
+    abItemProcessor.Force().Post(UpdateAudioBook audiobook)
 
