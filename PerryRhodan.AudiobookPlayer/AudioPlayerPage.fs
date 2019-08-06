@@ -37,7 +37,8 @@ open AudioPlayer
         TimeUntilSleeps: TimeSpan option 
         AudioPlayerBusy:bool 
         HasPlayedBeforeDragSlider:bool
-        SliderIsDraged:bool }
+        SliderIsDraged:bool 
+        PlaybackSpeed: float }
 
     type Msg = 
         | Play 
@@ -54,7 +55,9 @@ open AudioPlayer
         | ProgressBarChanged of float
         | SaveCurrentPosition //of AudioBook
         | OpenSleepTimerActionMenu
+        | OpenPlaybackSpeedActionMenu
         | StartSleepTimer of TimeSpan option
+        | SetPlaybackSpeed of float
         | UpdateSleepTimer of TimeSpan option        
         | SetPlayerStateFromExtern of AudioPlayer.AudioPlayerState
         | UpdateTrackNumber of int
@@ -209,7 +212,8 @@ open AudioPlayer
           TimeUntilSleeps = None
           AudioPlayerBusy = false 
           HasPlayedBeforeDragSlider = false
-          SliderIsDraged = false }
+          SliderIsDraged = false 
+          PlaybackSpeed = 1.0 }
 
 
     let startAudioPlayerService abMdl fileList =
@@ -317,7 +321,9 @@ open AudioPlayer
         | SaveCurrentPosition  ->
             model |> onSaveCurrentPosition     
         | OpenSleepTimerActionMenu ->
-            model |> onOpenSleepTimerActionMenu   
+            model |> onOpenSleepTimerActionMenu  
+         | OpenPlaybackSpeedActionMenu ->
+            model |> onOpenPlaybackSpeedActionMenu
         | StartSleepTimer sleepTime ->
             model |> onSetSleepTime sleepTime
         | UpdateSleepTimer sleepTime ->
@@ -326,6 +332,8 @@ open AudioPlayer
             model |> onSetPlayerStateFromExtern state
         | UpdateTrackNumber num ->
             model |> onUpdateTrackNumber num
+        | SetPlaybackSpeed speed ->
+            model |> onSetPlaybackSpeed speed
             
         | ChangeBusyState state -> 
             model |> onChangeBusyState state
@@ -396,7 +404,40 @@ open AudioPlayer
             } |> Cmd.ofAsyncMsgOption
 
         model, (openSleepTimerActionMenu ()), None
+
+
+
+    and onOpenPlaybackSpeedActionMenu model =
+        
+        let openPlaybackSpeedActionMenu () =            
+            async {
+                let buttons = [|
+                    
+                    yield ("0,70x",(fun () -> SetPlaybackSpeed 0.70) ())
+                    yield ("0,75x", (fun () -> SetPlaybackSpeed 0.75) ())
+                    yield ("0,80x",(fun () -> SetPlaybackSpeed 0.80) ())
+                    yield ("0,85x",(fun () -> SetPlaybackSpeed 0.85) ())
+                    yield ("0,90x",(fun () -> SetPlaybackSpeed 0.90) ())
+                    yield ("0,95x",(fun () -> SetPlaybackSpeed 0.95) ())
+                    yield ("1,00x",(fun () -> SetPlaybackSpeed 1.00) ())
+                    yield ("1,05x",(fun () -> SetPlaybackSpeed 1.05) ())
+                    yield ("1,10x",(fun () -> SetPlaybackSpeed 1.10) ())
+                    yield ("1,15x",(fun () -> SetPlaybackSpeed 1.15) ())
+                    yield ("1,20x",(fun () -> SetPlaybackSpeed 1.20) ())
+                    yield ("1,25x",(fun () -> SetPlaybackSpeed 1.25) ())
+                    yield ("1,30x",(fun () -> SetPlaybackSpeed 1.30) ())
+                   
+                        
+                |]
+                return! Helpers.displayActionSheet (Some Translations.current.SelectPlaybackSpeed) (Some Translations.current.Cancel) buttons
+            } |> Cmd.ofAsyncMsgOption
+
+        model, (openPlaybackSpeedActionMenu ()), None
     
+    and onSetPlaybackSpeed speed model =
+        speed |> audioPlayer.SetPlaybackSpeed 
+        { model with PlaybackSpeed = speed }, Cmd.none, None
+
     
 
     and onPlayMsg model = 
@@ -528,9 +569,6 @@ open AudioPlayer
 
 
     and onProgressBarChangedMsg e model =
-        //let min = model.TrackPositionProcess - 0.3
-        //let max = model.TrackPositionProcess + 0.3
-        //if (e < min || e > max ) then
         if model.SliderIsDraged then
             match model.CurrentDurationMs with
             | Some currentMs ->
@@ -670,16 +708,30 @@ open AudioPlayer
                     
                     yield View.StackLayout(orientation=StackOrientation.Horizontal,
                             children=[
-                                yield (Controls.primaryColorSymbolLabelWithTapCommand (fun () -> dispatch OpenSleepTimerActionMenu) 45. true "\uf017")
+                                yield (Controls.primaryColorSymbolLabelWithTapCommand (fun () -> dispatch OpenSleepTimerActionMenu) 35. true "\uf017")
 
                                 match model.TimeUntilSleeps with
                                 | None -> ()
                                 | Some tus ->
                                     let formatedTus =
                                         sprintf "%02i:%02i" (tus.TotalMinutes |> int) tus.Seconds
-                                    yield (Controls.primaryTextColorLabel 30. formatedTus)
+                                    yield (Controls.primaryTextColorLabel 25. formatedTus)
                             ]
                         ).GridRow(3)
+
+                    yield View.StackLayout(
+                        orientation=StackOrientation.Horizontal,
+                        horizontalOptions=LayoutOptions.End,
+                        
+                        children=[
+                            let formatedSpeed =
+                                sprintf "%sx" (model.PlaybackSpeed.ToString("0.00"))
+                            yield (Controls.primaryTextColorLabel 25. formatedSpeed)
+                            yield (Controls.primaryColorSymbolLabelWithTapCommand (fun () -> dispatch OpenPlaybackSpeedActionMenu) 35. true "\uf3fd")
+                            
+                            
+                        ]
+                            ).GridRow(3)
                     
                     if model.IsLoading then 
                         yield Common.createBusyLayer().GridRowSpan(4)

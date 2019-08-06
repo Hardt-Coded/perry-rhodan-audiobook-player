@@ -17,17 +17,20 @@
     type Mp3FileList = (string * int) list
         
     type AudioPlayerInfo =
-        { Filename: string
-          Position: int
-          Duration: int
-          CurrentTrackNumber: int
-          State: AudioPlayerState 
-          AudioBook: AudioBook
-          Mp3FileList: Mp3FileList
-          PlaybackDelayed: bool 
-          ResumeOnAudioFocus: bool 
-          ServiceState: AudioPlayerServiceState
-          TimeUntilSleep: TimeSpan option }
+        { 
+            Filename: string
+            Position: int
+            Duration: int
+            CurrentTrackNumber: int
+            State: AudioPlayerState 
+            AudioBook: AudioBook
+            Mp3FileList: Mp3FileList
+            PlaybackDelayed: bool 
+            ResumeOnAudioFocus: bool 
+            ServiceState: AudioPlayerServiceState
+            TimeUntilSleep: TimeSpan option 
+            PlaybackSpeed:float
+        }
         
         static member Empty =
             { Filename = ""
@@ -40,7 +43,8 @@
               PlaybackDelayed = false
               ResumeOnAudioFocus = false 
               ServiceState = AudioPlayerServiceState.Stopped
-              TimeUntilSleep = None }
+              TimeUntilSleep = None 
+              PlaybackSpeed = 1.0 }
 
 
     type IAudioPlayer = 
@@ -57,7 +61,7 @@
         abstract member JumpForward: unit -> unit
         abstract member JumpBackward: unit -> unit
         abstract member JumpBackward: int -> unit
-
+        abstract member SetPlaybackSpeed: float -> unit
         abstract member SetSleepTimer: TimeSpan option -> unit
 
         abstract member GetCurrentState: unit -> Async<AudioPlayerInfo option>
@@ -84,6 +88,7 @@
         | SetCurrentAudioServiceStateToStarted
         | StartSleepTimer of TimeSpan option
         | DecreaseSleepTimer
+        | SetPlaybackSpeed of float
 
         | QuitAudioPlayer
                
@@ -99,6 +104,7 @@
         abstract member MoveToNextTrack: AudioPlayerInfo -> Async<AudioPlayerInfo>
         abstract member MoveToPreviousTrack: AudioPlayerInfo -> Async<AudioPlayerInfo>
         abstract member SetPosition: AudioPlayerInfo -> Async<AudioPlayerInfo>
+        abstract member SetPlaybackSpeed: AudioPlayerInfo -> Async<AudioPlayerInfo>
         abstract member OnUpdatePositionNumber: AudioPlayerInfo -> AudioPlayerInfo
         abstract member StateMailbox:MailboxProcessor<AudioPlayerCommand> with get
 
@@ -312,8 +318,21 @@
                         | QuitAudioPlayer ->
                             state |> onQuitAudioPlayer
                             return state
+                        | SetPlaybackSpeed value ->
+                            let! newState = state |> onSetPlaybackSpeed value
+                            return newState
 
                     }
+
+
+                and onSetPlaybackSpeed value state =
+                    async {
+                        let! newState = 
+                            { state with PlaybackSpeed = value }
+                            |> audioService.SetPlaybackSpeed
+                        return newState
+                    }
+                    
 
 
                 and onQuitAudioPlayer state =
@@ -451,7 +470,7 @@
                             { state with
                                 Filename = filename
                                 Position = pos 
-                                ResumeOnAudioFocus = true 
+                                ResumeOnAudioFocus = false 
                                 CurrentTrackNumber = index + 1
                                 Duration = duration
                                 PlaybackDelayed = false }

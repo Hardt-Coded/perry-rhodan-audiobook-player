@@ -87,6 +87,8 @@
           Seconds:string
           Minutes:string
 
+          SelectPlaybackSpeed:string
+
         }
 
 
@@ -171,6 +173,8 @@
                 SelectRewindWhenStartAfterLongPeriodInSec="Select how many seconds to rewind after a long break:"
                 SelectLongPeriodBeginsAfterInMinutes="Select how long is a \"long Break\" in Minutes:"
                 SelectJumpDistance="Select how many seconds should the player jump forward or backward:"
+
+                SelectPlaybackSpeed="Select Playback Speed"
             }
 
     
@@ -257,6 +261,7 @@
                 Seconds="Sekunden"
                 Minutes="Minuten"
 
+                SelectPlaybackSpeed="Wiedergabegeschwindigkeit wählen:"
 
             }
 
