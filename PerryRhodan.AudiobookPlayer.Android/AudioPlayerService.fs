@@ -956,16 +956,31 @@ module rec AudioPlayerServiceImplementation =
                     | Some state ->
                         Microsoft.AppCenter.Analytics.Analytics.TrackEvent(
                             "audio focus changed: state found", 
-                            [("focusChangeValue",focusChange.ToString()); ("state",sprintf "%A" state)] |> dict
+                            [
+                                ("focusChangeValue: ",focusChange.ToString()); 
+                                ("PlaybackDelayed",state.PlaybackDelayed.ToString())
+                                ("resumeOnAudioFocus",state.ResumeOnAudioFocus.ToString())
+                                ("state",state.State.ToString())
+                            ] |> dict
                         )    
                         match focusChange with
                         | AudioFocus.Gain ->
                             if (state.PlaybackDelayed || state.ResumeOnAudioFocus) then                                    
                                 stateMailBox.Post(StartAudioPlayer)                                    
                         | AudioFocus.Loss ->
-                            stateMailBox.Post(StopAudioPlayer false)
+                            match state.State with
+                            | Playing ->
+                                stateMailBox.Post(StopAudioPlayer false)
+                            | Stopped ->
+                                ()
+                            
                         | AudioFocus.LossTransient | AudioFocus.LossTransientCanDuck->
-                            stateMailBox.Post(StopAudioPlayer true)
+                            match state.State with
+                            | Playing ->
+                                stateMailBox.Post(StopAudioPlayer true)
+                            | Stopped ->
+                                ()
+                            
                         | _ ->
                             () 
             
