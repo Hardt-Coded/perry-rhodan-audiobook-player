@@ -1,5 +1,10 @@
 ﻿namespace PerryRhodan.AudiobookPlayer.Android
 
+
+module GlobalType =
+    let mutable typeOfMainactivity:System.Type = null
+
+
 module rec AudioPlayerServiceImplementation =
 
     open System
@@ -247,15 +252,19 @@ module rec AudioPlayerServiceImplementation =
         let  private NOTIFICATION_BROADCAST_ACTION = "PerryRhodan.Notification.Action"
         //let DELAY_BETWEEN_LOG_MESSAGES = 1000L
 
-        let  private context = Android.App.Application.Context
+        let private context = Android.App.Application.Context
+
+
+        // uff, but i need the type of mainactivity here
+        
 
 
         let private buildIntentToShowMainActivity () =
-            let notificationIntent = new Intent(context, typeof<FormsAppCompatActivity>)
+            let notificationIntent = new Intent(context, GlobalType.typeOfMainactivity)
             notificationIntent.SetAction(ACTION_MAIN_ACTIVITY) |> ignore
             notificationIntent.SetFlags(ActivityFlags.SingleTop ||| ActivityFlags.ClearTask)  |> ignore
             //notificationIntent.PutExtra(SERVICE_STARTED_KEY, true)  |> ignore
-            PendingIntent.GetActivity(context, 0, notificationIntent, PendingIntentFlags.UpdateCurrent)
+            PendingIntent.GetActivity(context, 0, notificationIntent, PendingIntentFlags.Immutable)
 
 
         let private buildStartStopToggleAction state =
@@ -421,6 +430,7 @@ module rec AudioPlayerServiceImplementation =
             let style = new Notification.MediaStyle();
             style.SetMediaSession(mediaSession.SessionToken) |> ignore
             
+            
             let currenInfoString = 
                 sprintf "%i - %s / %s"
                     info.CurrentTrackNumber
@@ -440,7 +450,7 @@ module rec AudioPlayerServiceImplementation =
                     .SetContentText(currenInfoString)
                     .SetSmallIcon(icon)                    
                     .SetContentIntent(buildIntentToShowMainActivity())
-                    .SetOngoing(true)  
+                    .SetOngoing(true)                      
                     .AddAction(buildPreviousAudioAction())
                     .AddAction(buildBackwardAudioAction())
                     .AddAction(buildStartStopToggleAction info)
@@ -580,6 +590,7 @@ module rec AudioPlayerServiceImplementation =
             (playFile: AudioPlayerInfo -> Async<AudioPlayerInfo>)
             (service:Services.AudioPlayerService)
             (registerNoisyHeadPhoneReciever:unit -> unit)
+            (mediaSession:MediaSession)
             info =
                 async {
                     let audioFocusRes = 
@@ -597,6 +608,8 @@ module rec AudioPlayerServiceImplementation =
                         match info.State with
                         | Stopped ->
                             registerNoisyHeadPhoneReciever ()
+                            //let notification = info |> Notification.buildNotification mediaSession
+                            //service.StartForeground(Notification.SERVICE_RUNNING_NOTIFICATION_ID, notification)
                             return! (playFile info)
                         | Playing ->
                             return info
@@ -694,6 +707,7 @@ module rec AudioPlayerServiceImplementation =
                     ()
 
         let private onStopAudioPlayer 
+            (service:Services.AudioPlayerService)
             (mediaPlayer:MediaPlayer) 
             (unregisterNoisyHeadPhoneReciever:unit -> unit)
             (updateTimer:System.Threading.Timer option ref )
@@ -709,6 +723,7 @@ module rec AudioPlayerServiceImplementation =
                     updateTimer.Value |> Option.map(fun i -> i.Dispose()) |> ignore
                     updateTimer := None
                     unregisterNoisyHeadPhoneReciever ()
+                    //service.StopForeground(true)
                     newState
 
 
@@ -830,6 +845,7 @@ module rec AudioPlayerServiceImplementation =
 
             let stopPlayer = 
                 onStopAudioPlayer
+                    service
                     mediaPlayer
                     unregisterNoisyHeadPhoneReciever
                     updateTimer
@@ -886,9 +902,11 @@ module rec AudioPlayerServiceImplementation =
                         playFile
                         service
                         registerNoisyHeadPhoneReciever
+                        mediaSession
                         info
                 member this.StopAudioPlayer info =
                     onStopAudioPlayer
+                        service
                         mediaPlayer
                         unregisterNoisyHeadPhoneReciever
                         updateTimer
@@ -929,7 +947,7 @@ module rec AudioPlayerServiceImplementation =
     
     module Services =
 
-        [<Service>]
+        [<Service(Name="Perry.Rhodan.AudioService")>]
         type AudioPlayerService() as self =
             inherit Android.Service.Media.MediaBrowserService()
 
@@ -1010,7 +1028,7 @@ module rec AudioPlayerServiceImplementation =
                         else
                             stateMailBox.Post(StartAudioPlayerExtern (file,pos))
                     | x when x = STOP_PLAYER ->
-                        stateMailBox.Post(StopAudioPlayer false)
+                        stateMailBox.Post(StopAudioPlayer false)                        
                     | x when x = MOVEFORWARD_PLAYER ->
                         stateMailBox.Post(MoveToNextTrack -1)
                     | x when x = MOVEBACKWARD_PLAYER ->
