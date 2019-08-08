@@ -7,4 +7,6 @@
 	<uses-permission android:name="android.permission.WAKE_LOCK" />
 	<uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 	<application android:label="Eins A Medien Audiobook Player" android:icon="@mipmap/eins_a_launcher"></application>
+  <service android:name="Perry.Rhodan.AudioService" android:stopWithTask="true">
+  </service>
 </manifest>

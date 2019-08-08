@@ -31,34 +31,6 @@ module DependencyServices =
 
     
 
-    //type IAudioPlayer = 
-
-    //    abstract member OnInfo: (AudioPlayerInfo -> unit) option with get,set
-    //    abstract member OnUpdateState: (AudioPlayerState -> unit) option with get,set
-    //    abstract member CurrentInfo: AudioPlayerInfo option with get
-    //    abstract member CurrentAudiobook: AudioBook option with get
-
-    //    abstract member IsStarted: bool with get
-    //    //// triggers to get async position and duration via onInfo Handler
-    //    //abstract member GetInfo: unit -> Async<unit>
-        
-
-    //    abstract member RunService: AudioBook -> (string * int) list -> Async<unit>
-    //    abstract member StopService: unit -> Async<unit>
-    //    //abstract member GetRunningService: unit -> IAudioPlayer option
-
-    //    abstract member StartAudio: AudioPlayerInfo -> unit
-    //    abstract member StopAudio: unit -> unit
-    //    abstract member TogglePlayPause: unit -> unit
-    //    abstract member MoveForward: unit -> unit
-    //    abstract member MoveBackward: unit -> unit
-    //    abstract member GotToPosition: int -> unit
-    //    abstract member JumpForward: unit -> unit
-    //    abstract member JumpBackward: unit -> unit
-    //    abstract member UpdateMetaData: AudioBook -> unit
-
-
-
     type INotificationService =
         abstract member ShowNotification: string -> unit
         abstract member OnSecondActivity: (string -> unit) option with get,set

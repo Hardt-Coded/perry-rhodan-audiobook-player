@@ -19,6 +19,7 @@ open Microsoft.AppCenter.Crashes
 open Microsoft.AppCenter.Analytics
 open Android.Support.Design.Widget
 open Xamarin.Forms.Platform.Android
+open Android.Arch.Lifecycle
 
 
 
@@ -35,27 +36,32 @@ type AndroidDownloadFolder() =
 
 
 
-[<Activity (Label = "Eins A Medien Audiobook Player", Icon = "@mipmap/eins_a_launcher", Theme = "@style/MainTheme.Launcher", MainLauncher = true, ConfigurationChanges = (ConfigChanges.ScreenSize ||| ConfigChanges.Orientation),ScreenOrientation = ScreenOrientation.Portrait)>]
+[<Activity (Label = "Eins A Medien Audiobook Player", Icon = "@mipmap/eins_a_launcher", Theme = "@style/MainTheme.Launcher", MainLauncher = true,LaunchMode = LaunchMode.SingleInstance, ConfigurationChanges = (ConfigChanges.ScreenSize ||| ConfigChanges.Orientation),ScreenOrientation = ScreenOrientation.Portrait)>]
 type MainActivity() =
     inherit FormsAppCompatActivity()
+
     override this.OnCreate (bundle: Bundle) =
         base.SetTheme(PerryRhodan.AudiobookPlayer.Android.Resources.Style.MainTheme)
         FormsAppCompatActivity.TabLayoutResource <- Resources.Layout.Tabbar
         FormsAppCompatActivity.ToolbarResource <- Resources.Layout.Toolbar
         base.OnCreate (bundle)
 
-        AppCenter.Start(Global.appcenterAndroidId, typeof<Analytics>, typeof<Crashes>)
+        GlobalType.typeOfMainactivity <- typeof<MainActivity>
+
         
+        AppCenter.Start(Global.appcenterAndroidId, typeof<Analytics>, typeof<Crashes>)
+            
         Xamarin.Essentials.Platform.Init(this, bundle)
 
         Xamarin.Forms.Forms.Init (this, bundle)
         Xamarin.Forms.DependencyService.Register<AndroidDownloadFolder>()
         Xamarin.Forms.DependencyService.Register<AudioPlayerServiceImplementation.DecpencyService.AudioPlayer>()
-        
+            
         Plugin.CurrentActivity.CrossCurrentActivity.Current.Init(this, bundle);
 
         let appcore  = new PerryRhodan.AudiobookPlayer.MainApp()
         this.LoadApplication (appcore)
+    
     
     override this.OnRequestPermissionsResult(requestCode: int, permissions: string[], [<GeneratedEnum>] grantResults: Android.Content.PM.Permission[]) =
         Xamarin.Essentials.Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults)
