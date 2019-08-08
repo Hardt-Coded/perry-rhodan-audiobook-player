@@ -26,6 +26,8 @@
         | UpdateDownloadProgress of (int * int) option
         | OpenAudioBookPlayer
         | OpenAudioBookDetail
+        | DeleteItemFromDb
+        | TriggerUpdateAudiobook of AudioBook
 
         | DoNothing
 
@@ -98,10 +100,41 @@
             model |> onOpenAudioBookPlayerMsg
         | Msg.OpenAudioBookDetail ->
             model |> onOpenAudioBookDetailMsg
+        | DeleteItemFromDb ->
+            model |> onDeleteItemFromDb
         | DoNothing ->
             model |> onDoNothingMsg
+        | TriggerUpdateAudiobook ab ->
+            model |> onTriggerUpdateAudiobook ab
 
     
+
+    and onTriggerUpdateAudiobook ab model =
+        model,Cmd.none, Some (UpdateAudioBook model)
+
+
+    and onDeleteItemFromDb model =
+        let cmd =
+            async {
+                let! diaRes = Common.Helpers.displayAlertWithConfirm("Remove item from DB","Are you sure?",Translations.current.Yes,Translations.current.No)
+                if diaRes then
+                    let! res = DataBase.removeAudiobookFromDatabase model.AudioBook
+                    match res with
+                    | Error e ->
+                        do! Common.Helpers.displayAlert("Delete Audiobook Entry",e,"OK")
+                        return None
+                    | Ok _ ->
+                       return (Some (TriggerUpdateAudiobook model.AudioBook))
+                else
+                    return None
+            } |> Cmd.ofAsyncMsgOption
+
+        model,cmd,None
+        
+
+        
+
+
     and onOpenAudioBookActionMenuMsg model =
         
         let openActionMenuCmd =
@@ -113,6 +146,7 @@
                 (fun a -> UnmarkAudioBookAsListend)
                 (fun a -> DoNothing)
                 (fun a -> Msg.OpenAudioBookDetail)
+                (fun a -> DeleteItemFromDb)
                 model.QueuedToDownload 
                 model.IsDownloading
                 model.AudioBook

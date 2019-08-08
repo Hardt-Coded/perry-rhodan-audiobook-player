@@ -18,6 +18,7 @@ open ICSharpCode.SharpZipLib.Zip
 
 open Common
 open Plugin.Permissions.Abstractions
+open Common.EventHelper
 
 
 
@@ -72,6 +73,7 @@ module DataBase =
         | UpdateAudioBook of AudioBook * AsyncReplyChannel<Result<unit,string>>
         | InsertAudioBooks of AudioBook [] * AsyncReplyChannel<Result<unit,string>>
         | GetAudioBooks of AsyncReplyChannel<AudioBook[]>
+        | RemoveAudiobookFromDatabase of AudioBook * AsyncReplyChannel<Result<unit,string>>
 
 
     let initAppFolders () =
@@ -103,6 +105,24 @@ module DataBase =
             else (Error Translations.current.ErrorDbWriteAccess)
 
 
+    let private deleteAudioBookDb (audioBook:AudioBook) =
+        use db = new LiteDatabase(audioBooksStateDataFile, mapper)
+        let audioBooks = db.GetCollection<AudioBook>("audiobooks")
+
+        let query = Query.Where("FullName", (fun name -> name.AsString = audioBook.FullName))
+        let check = audioBooks.Find(query)
+
+        let res = 
+            if check |> Seq.length > 0 then               
+                audioBooks.Delete(query)
+            else
+                -1
+
+        if  res > -1
+        then (Ok ())
+        else (Error Translations.current.ErrorDbWriteAccess)
+
+
     let private loadAudioBooksFromDb () =
         initAppFolders ()
                 
@@ -123,18 +143,19 @@ module DataBase =
 
         audioBooks
 
-
-    let private storageProcessorErrorEvent = Event<exn>()
-
-    let storageProcessorOnError = storageProcessorErrorEvent.Publish
-
-    let private storageProcessorAudioBookUpdatedEvent = Event<AudioBook>()
+    let storageProcessorErrorEvent = CountedEvent<exn>()
+    let storageProcessorAudioBookUpdatedEvent = CountedEvent<AudioBook>()
+    let storageProcessorAudioBookAdded = CountedEvent<AudioBook[]>()
+    let storageProcessorAudioBookDeletedEvent = CountedEvent<AudioBook>()
     
-    let storageProcessorOnAudiobookUpdated = storageProcessorAudioBookUpdatedEvent.Publish
+    module Events =
 
-    let private storageProcessorAudioBookAdded = Event<AudioBook[]>()
-    
-    let storageProcessorOnAudiobookAdded = storageProcessorAudioBookAdded.Publish
+        let storageProcessorOnError = storageProcessorErrorEvent.Publish
+        let storageProcessorOnAudiobookUpdated = storageProcessorAudioBookUpdatedEvent.Publish
+        let storageProcessorOnAudiobookAdded = storageProcessorAudioBookAdded.Publish
+        let storageProcessorOnAudiobookDeleted= storageProcessorAudioBookDeletedEvent.Publish
+
+
 
     // lazy evaluation, to avoid try loading data without permission
     let private storageProcessor = 
@@ -190,6 +211,20 @@ module DataBase =
                                     replyChannel.Reply(state |> Array.sortBy (fun i -> i.FullName))
                                     return! (loop state)
 
+                                | RemoveAudiobookFromDatabase (audiobook,replyChannel) ->
+                                    let dbRes = deleteAudioBookDb audiobook
+                                    match dbRes with
+                                    | Ok _ ->
+                                        let newState =
+                                            state |> Array.filter (fun i -> i.FullName <> audiobook.FullName)
+
+                                        storageProcessorAudioBookDeletedEvent.Trigger(audiobook)
+                                        replyChannel.Reply(Ok ())
+                                        return! (loop newState)
+                                    | Error e ->
+                                        replyChannel.Reply(Error e)
+                                        return! (loop state)
+
                                 return! (loop state)
                                         
                             }
@@ -228,6 +263,12 @@ module DataBase =
     let updateAudioBookInStateFile (audioBook:AudioBook) =
         let msg replyChannel = 
             UpdateAudioBook (audioBook,replyChannel)
+        storageProcessor.Force().PostAndAsyncReply(msg)
+
+
+    let removeAudiobookFromDatabase audiobook =
+        let msg replyChannel = 
+            RemoveAudiobookFromDatabase (audiobook,replyChannel)
         storageProcessor.Force().PostAndAsyncReply(msg)
 
 
@@ -770,6 +811,7 @@ module SystemSettings =
     let private keykeyRewindWhenStartAfterLongPeriodInSec ="PerryRhodanAudioBookRewindWhenStartAfterLongPeriodInSec"
     let private keyLongPeriodBeginsAfterInMinutes ="PerryRhodanAudioBookLongPeriodBeginsAfterInMinutes"
     let private keyAudioJumpDistance = "PerryRhodanAudioBookAudioJumpDistance"
+    let private keyDeveloperMode= "PerryRhodanAudioBookDeveloperModee"
 
     let getRewindWhenStartAfterShortPeriodInSec () =
         keyRewindWhenStartAfterShortPeriodInSec 
@@ -802,6 +844,13 @@ module SystemSettings =
             result |> optToInt defaultAudioJumpDistance
         )
 
+    let getDeveloperMode () =
+        keyDeveloperMode 
+        |> getSecuredValue
+        |> Async.map (fun result ->
+            result |> Option.map(fun v -> v = "true") |> Option.defaultValue false
+        )
+
 
     let setRewindWhenStartAfterShortPeriodInSec (value:int) =
         keyRewindWhenStartAfterShortPeriodInSec |> setSecuredValue (value.ToString())
@@ -817,6 +866,9 @@ module SystemSettings =
 
     let setJumpDistance (value:int) =
         keyAudioJumpDistance |> setSecuredValue (value.ToString())
+
+    let setDeveloperMode(value:bool) =
+        keyDeveloperMode |> setSecuredValue (if value then "true" else "false")
 
         
 

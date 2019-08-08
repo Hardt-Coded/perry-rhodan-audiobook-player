@@ -395,6 +395,32 @@
 
 
         let largePicker = Device.GetNamedSize(NamedSize.Large,typeof<Picker>)
+
+
+
+    module EventHelper =
+        
+        
+
+        type CountedEvent<'a>() = 
+            let evt = new Event<'a>()
+            let mutable counter = 0
+            let published = { 
+                new IEvent<'a> with
+                    member x.AddHandler(h) = 
+                        evt.Publish.AddHandler(h)
+                        counter <- counter + 1; 
+                    member x.RemoveHandler(h) = 
+                        evt.Publish.RemoveHandler(h)
+                        counter <- counter - 1; 
+                    member x.Subscribe(s) = 
+                        let h = new Handler<_>(fun _ -> s.OnNext)
+                        x.AddHandler(h)
+                        { new System.IDisposable with 
+                            member y.Dispose() = x.RemoveHandler(h) } }
+            member x.Trigger(v) = evt.Trigger(v)
+            member x.Publish = published
+            member x.HasListeners = counter > 0
         
         
 

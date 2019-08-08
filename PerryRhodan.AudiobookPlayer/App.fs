@@ -528,17 +528,29 @@ module App =
 
     let subscription model =
         Cmd.ofSub (fun dispatch ->
-            AudioBookItemProcessor.onAbItemUpdated.Add(fun i ->
-                dispatch (MainPageMsg (MainPage.Msg.UpdateAudioBook i))
-                dispatch (BrowserPageMsg (BrowserPage.Msg.UpdateAudioBook))
-            )
+
+            // avoid double registration of event handlers
+
+            if (not AudioBookItemProcessor.abItemUpdatedEvent.HasListeners) then
+                AudioBookItemProcessor.Events.onAbItemUpdated.Add(fun i ->
+                    dispatch (MainPageMsg (MainPage.Msg.UpdateAudioBook i))
+                    dispatch (BrowserPageMsg (BrowserPage.Msg.UpdateAudioBook))
+                )
             // when updating an audio book, that update the underlying audio book in the Item
-            Services.DataBase.storageProcessorOnAudiobookUpdated.Add(fun item ->
-                AudioBookItemProcessor.updateUnderlyingAudioBookInItem item
-            )
-            Services.DataBase.storageProcessorOnAudiobookAdded.Add(fun items ->
-                AudioBookItemProcessor.insertAudiobooks items
-            )
+            if (not Services.DataBase.storageProcessorAudioBookUpdatedEvent.HasListeners) then
+                Services.DataBase.Events.storageProcessorOnAudiobookUpdated.Add(fun item ->
+                    AudioBookItemProcessor.updateUnderlyingAudioBookInItem item
+                )
+
+            if (not Services.DataBase.storageProcessorAudioBookDeletedEvent.HasListeners) then
+                Services.DataBase.Events.storageProcessorOnAudiobookDeleted.Add(fun item->
+                    AudioBookItemProcessor.deleteAudioBookInItem item
+                )
+
+            if (not Services.DataBase.storageProcessorAudioBookAdded.HasListeners) then
+                Services.DataBase.Events.storageProcessorOnAudiobookAdded.Add(fun items ->
+                    AudioBookItemProcessor.insertAudiobooks items
+                )
         )
 
         
@@ -689,28 +701,30 @@ type MainApp () as app =
     do 
         AppCenter.Start(sprintf "ios=(...);android=%s" Global.appcenterAndroidId, typeof<Analytics>, typeof<Crashes>)
         // Display Error when somthing is with the storage processor
-        Services.DataBase.storageProcessorOnError.Add(fun e ->
-            async {
-                let message = 
-                    sprintf "Es ist ein Fehler mit der Datenbank aufgetreten. (%s). Das Programm wird jetzt beendet. Versuchen Sie es noch einmal oder melden Sie sich bin Support." e.Message
+        if not Services.DataBase.storageProcessorErrorEvent.HasListeners then
+            Services.DataBase.Events.storageProcessorOnError.Add(fun e ->
+                async {
+                    let message = 
+                        sprintf "Es ist ein Fehler mit der Datenbank aufgetreten. (%s). Das Programm wird jetzt beendet. Versuchen Sie es noch einmal oder melden Sie sich bin Support." e.Message
 
-                do! Common.Helpers.displayAlert(Translations.current.Error,message, "OK") 
-                try
-                    Process.GetCurrentProcess().CloseMainWindow() |> ignore
-                with
-                | _ as ex ->
-                    Crashes.TrackError ex
-                return ()
-            } |> Async.StartImmediate
-        )
+                    do! Common.Helpers.displayAlert(Translations.current.Error,message, "OK") 
+                    try
+                        Process.GetCurrentProcess().CloseMainWindow() |> ignore
+                    with
+                    | _ as ex ->
+                        Crashes.TrackError ex
+                    return ()
+                } |> Async.StartImmediate
+            )
 
-        AudioBookItemProcessor.abItemOnError.Add(fun e ->
-            async {
-                let message = sprintf "(%s)" e.Message
-                do! Common.Helpers.displayAlert(Translations.current.Error,message, "OK") 
-                return ()
-            } |> Async.StartImmediate
-        )
+        if not AudioBookItemProcessor.abItemErrorEvent.HasListeners then
+            AudioBookItemProcessor.Events.abItemOnError.Add(fun e ->
+                async {
+                    let message = sprintf "(%s)" e.Message
+                    do! Common.Helpers.displayAlert(Translations.current.Error,message, "OK") 
+                    return ()
+                } |> Async.StartImmediate
+            )
 
         
 
@@ -751,6 +765,8 @@ type MainApp () as app =
     override this.OnStart() = 
         base.OnStart()        
         ()
+
+    
     
 
 

@@ -1,6 +1,7 @@
 ﻿module AudioBookItemProcessor
 
 open Domain
+open Common.EventHelper
 
 
 type private Msg =
@@ -10,15 +11,18 @@ type private Msg =
     | InsertAudioBooks of AudioBookItem.Model []
     | UpdateAudioBookItem of AudioBookItem.Model
     | UpdateAudioBook of AudioBook
+    | DeleteAudioBookFromDb of AudioBook
+    
     
 
-let private abItemErrorEvent = Event<exn>()
+let abItemErrorEvent = CountedEvent<exn>()
+let abItemUpdatedEvent = CountedEvent<AudioBookItem.Model>()
 
-let abItemOnError = abItemErrorEvent.Publish
 
-let private abItemUpdatedEvent = Event<AudioBookItem.Model>()
 
-let onAbItemUpdated = abItemUpdatedEvent.Publish
+module Events =
+    let onAbItemUpdated = abItemUpdatedEvent.Publish
+    let abItemOnError = abItemErrorEvent.Publish
 
 let private abItemProcessor = 
     lazy
@@ -96,6 +100,14 @@ let private abItemProcessor =
                                 |> Array.sortBy (fun i-> i.AudioBook.FullName)
                                 
                             return! (loop newState)
+
+                        | DeleteAudioBookFromDb audioBook ->
+                            let newState =
+                                state 
+                                |> Array.filter (fun i -> i.AudioBook.FullName <> audioBook.FullName)
+                                |> Array.sortBy (fun i-> i.AudioBook.FullName)
+
+                            return! (loop newState)
                     }
                 
                 loop audioBooks
@@ -141,4 +153,7 @@ let insertAudiobooks items =
 
 let updateUnderlyingAudioBookInItem audiobook =
     abItemProcessor.Force().Post(UpdateAudioBook audiobook)
+
+let deleteAudioBookInItem audiobook =
+    abItemProcessor.Force().Post(DeleteAudioBookFromDb audiobook)
 
