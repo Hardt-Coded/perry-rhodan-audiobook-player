@@ -262,7 +262,7 @@ module rec AudioPlayerServiceImplementation =
         let private buildIntentToShowMainActivity () =
             let notificationIntent = new Intent(context, GlobalType.typeOfMainactivity)
             notificationIntent.SetAction(ACTION_MAIN_ACTIVITY) |> ignore
-            notificationIntent.SetFlags(ActivityFlags.SingleTop ||| ActivityFlags.ClearTask)  |> ignore
+            notificationIntent.SetFlags(ActivityFlags.SingleTop)  |> ignore
             //notificationIntent.PutExtra(SERVICE_STARTED_KEY, true)  |> ignore
             PendingIntent.GetActivity(context, 0, notificationIntent, PendingIntentFlags.Immutable)
 

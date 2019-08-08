@@ -27,8 +27,8 @@
     <RestorePackages>true</RestorePackages>
     <OtherFlags>/warnon:1182</OtherFlags>
     <WarningLevel>4</WarningLevel>
-    <SelectedDevice>my_device_1</SelectedDevice>
-    <DefaultDevice>my_device_1</DefaultDevice>
+    <SelectedDevice>Android_Accelerated_x86</SelectedDevice>
+    <DefaultDevice>Android_Accelerated_x86</DefaultDevice>
     <AndroidDesignerPreferredTheme>Theme.DeviceDefault</AndroidDesignerPreferredTheme>
     <AndroidDesignerPreferredDevice>Nexus 4</AndroidDesignerPreferredDevice>
   </PropertyGroup>
@@ -229,9 +229,6 @@
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Mono.Android" />
-    <Reference Include="NAudio">
-      <HintPath>..\packages\NAudio.1.9.0\lib\netstandard2.0\NAudio.dll</HintPath>
-    </Reference>
     <Reference Include="Plugin.CurrentActivity">
       <HintPath>..\packages\Plugin.CurrentActivity.2.1.0.2\lib\monoandroid44\Plugin.CurrentActivity.dll</HintPath>
     </Reference>

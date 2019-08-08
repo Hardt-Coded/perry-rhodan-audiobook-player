@@ -31,6 +31,9 @@
         JumpDistance:int
         JumpDistanceModalModel:NumberPickerModal.Model option
 
+        DeveloperModeSwitchCounter:int
+        DeveloperMode:bool
+
         ShellRef:ViewRef<Shell>
     }
 
@@ -61,6 +64,9 @@
         | CloseLongPeriodBeginsAfterInMinutesPicker
         | SetLongPeriodBeginsAfterInMinutesValue of int
 
+        | SetDeveloperModeSwitchCounter of int
+        | SetDeveloperMode of bool
+
 
     let strToOptInt str =
         let (isInt,value) = System.Int32.TryParse(str)
@@ -88,6 +94,10 @@
                 |> Async.RunSynchronously) / 1000
             JumpDistanceModalModel = None
             ShellRef = shellref
+            DeveloperMode = 
+                (Services.SystemSettings.getDeveloperMode() 
+                |> Async.RunSynchronously)
+            DeveloperModeSwitchCounter = 0
         }
 
 
@@ -142,9 +152,33 @@
         | SetLongPeriodBeginsAfterInMinutesValue min ->
             model |> onSetLongPeriodBeginsAfterInMinutesValue min
 
+        | SetDeveloperMode value ->
+            model |> onSetDeveloperMode value
+        | SetDeveloperModeSwitchCounter value ->
+            model |> onSetDeveloperSwitchCounter value
 
 
+    and onSetDeveloperSwitchCounter value model  =
+        let switchCmd =
+            if value > 5 then
+                Cmd.ofMsg (SetDeveloperMode (not model.DeveloperMode))
+            else
+                Cmd.none
+        let resetCmd =
+            if value = 1 then
+                async {
+                    do! Async.Sleep 1000
+                    return (SetDeveloperModeSwitchCounter 0)
+                } |> Cmd.ofAsyncMsg
+            else
+                Cmd.none
+
+        {model with DeveloperModeSwitchCounter = value},Cmd.batch [ switchCmd; resetCmd ],None
     
+    and onSetDeveloperMode value model =
+        Services.SystemSettings.setDeveloperMode value |> Async.RunSynchronously
+        {model with DeveloperMode = value;},Cmd.none,None
+
 
     and onSetJumpDistanceValue jd model =
         let jdMs = jd * 1000
@@ -354,44 +388,52 @@
                 title=Translations.current.SettingsPage,useSafeArea=true,
                 backgroundColor = Consts.backgroundColor,
                 content = View.Grid(
+                    
                     children = [
                         yield View.ScrollView(
                                 content=
                                     View.StackLayout(
+                                        gestureRecognizers= [View.TapGestureRecognizer(command=(fun () -> dispatch (SetDeveloperModeSwitchCounter (model.DeveloperModeSwitchCounter + 1))))],
                                         orientation=StackOrientation.Vertical,
                                         margin=5.0,
                                         children=[
                                             
                                             yield View.Grid(
                                                 coldefs=[ "*" ],
-                                                rowdefs=[ "auto"; "auto"; "auto";"auto" ],
+                                                rowdefs=[ "auto"; "auto"; "auto";"auto"; "auto" ],
                                                 children=[
 
-                                                    (settingsEntry 
+                                                    yield (settingsEntry 
                                                         Translations.current.RewindWhenStartAfterShortPeriodInSec 
-                                                        (sprintf "%i %s" model.RewindWhenStartAfterShortPeriodInSec Translations.current.Seconds)
+                                                        (sprintf "%i %s" mdl.RewindWhenStartAfterShortPeriodInSec Translations.current.Seconds)
                                                         (fun ()->dispatch OpenRewindWhenStartAfterShortPeriodInSecPicker)).GridRow(0)
 
-                                                    (settingsEntry 
+                                                    yield (settingsEntry 
                                                         Translations.current.RewindWhenStartAfterLongPeriodInSec 
-                                                        (sprintf "%i %s" model.RewindWhenStartAfterLongPeriodInSec Translations.current.Seconds)
+                                                        (sprintf "%i %s" mdl.RewindWhenStartAfterLongPeriodInSec Translations.current.Seconds)
                                                         (fun ()->dispatch OpenRewindWhenStartAfterLongPeriodInSecPicker)).GridRow(1)
 
-                                                    (settingsEntry 
+                                                    yield (settingsEntry 
                                                         Translations.current.LongPeriodBeginsAfterInMinutes 
-                                                        (sprintf "%i %s" model.LongPeriodBeginsAfterInMinutes Translations.current.Minutes)
+                                                        (sprintf "%i %s" mdl.LongPeriodBeginsAfterInMinutes Translations.current.Minutes)
                                                         (fun ()->dispatch OpenLongPeriodBeginsAfterInMinutesPicker)).GridRow(2)
 
-                                                    (settingsEntry 
+                                                    yield (settingsEntry 
                                                         Translations.current.JumpDistance 
-                                                        (sprintf "%i %s" model.JumpDistance Translations.current.Seconds)
+                                                        (sprintf "%i %s" mdl.JumpDistance Translations.current.Seconds)
                                                         (fun () -> dispatch OpenJumpDistancePicker)).GridRow(3)
+
+                                                    if mdl.DeveloperMode then
+                                                        yield (settingsEntry 
+                                                            "DeveloperMode" 
+                                                            "Unter anderem kann man Einträge aus der DB löschen"
+                                                            (fun () -> ())).GridRow(4)
                                                 ]
                                             )
                                             
                                             yield View.Button(
-                                                text=(if model.DataProtectionStuff then Translations.current.HideDataProtection else Translations.current.ShowDataProtection),                                                                                        
-                                                command=(fun ()-> dispatch (if model.DataProtectionStuff then HideDataProtectionStuff else ShowDataProtectionStuff)),
+                                                text=(if mdl.DataProtectionStuff then Translations.current.HideDataProtection else Translations.current.ShowDataProtection),                                                                                        
+                                                command=(fun ()-> dispatch (if mdl.DataProtectionStuff then HideDataProtectionStuff else ShowDataProtectionStuff)),
                                                 margin=Thickness(0.,10.,0.,0.)
                                             )
 
@@ -403,7 +445,7 @@
                                             //    ]
                                             //)
 
-                                            if (model.DataProtectionStuff) then
+                                            if (mdl.DataProtectionStuff) then
                                                 let viewSource = UrlWebViewSource(Url="https://hardt-solutions.com/PrivacyPolicies/EinsAMedienAudiobookPlayer.html")
 
                                                 yield View.ScrollView(

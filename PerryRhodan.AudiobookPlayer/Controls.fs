@@ -26,6 +26,7 @@ let audioBookEntryActionSheet
     cmdMarkAsUnlistend
     cmdDownloadOnlyPicture 
     cmdDescription
+    cmdDeleteFromDatabase
     isOnDownloadQueue
     isCurrentlyDownloading
     audiobook =
@@ -47,6 +48,11 @@ let audioBookEntryActionSheet
                 yield (Translations.current.UnmarkAsListend,cmdMarkAsUnlistend audiobook)                
             else
                 yield (Translations.current.MarkAsListend,cmdMarkAsListend audiobook)
+
+
+            let isDevMode = Services.SystemSettings.getDeveloperMode() |> Async.RunSynchronously
+            if isDevMode then
+                yield ("Remove Item from Database",cmdDeleteFromDatabase audiobook)  
 
         |]
         return! Helpers.displayActionSheet (Some Translations.current.PleaseSelect) (Some Translations.current.Cancel) buttons
