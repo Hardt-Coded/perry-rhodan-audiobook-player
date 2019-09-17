@@ -33,6 +33,7 @@ module App =
         AudioPlayerPageModel:AudioPlayerPage.Model option
         AudioBookDetailPageModel:AudioBookDetailPage.Model option
         SettingsPageModel:SettingsPage.Model option
+        SupportFeedbackModel:SupportFeedback.Model option
         
         AppLanguage:Language
         CurrentPage: Pages
@@ -52,6 +53,7 @@ module App =
         | AudioPlayerPageMsg of AudioPlayerPage.Msg
         | AudioBookDetailPageMsg of AudioBookDetailPage.Msg
         | SettingsPageMsg of SettingsPage.Msg
+        | SupportFeedbackPageMsg of SupportFeedback.Msg
 
         | GotoMainPage
         | GotoBrowserPage
@@ -61,6 +63,8 @@ module App =
         | LoginClosed
         | GotoPermissionDeniedPage
         | GotoSettingsPage
+        | GotoFeedbackSupportPage
+        | FeedbackSupportPageClosed
 
         | OpenAudioBookDetailPage of AudioBook
         | CloseAudioBookDetailPage
@@ -132,6 +136,7 @@ module App =
             AudioPlayerPageModel = None 
             AudioBookDetailPageModel = None 
             SettingsPageModel = None 
+            SupportFeedbackModel = None
             AppLanguage = English
             CurrentPage = MainPage
             NavIsVisible = false 
@@ -171,6 +176,8 @@ module App =
             model |> onProcessAudioBookDetailPageMsg msg
         | SettingsPageMsg msg ->
             model |> onProcessSettingsPageMsg msg
+        | SupportFeedbackPageMsg msg ->
+            model |> onSupportFeedbackPageMsg msg
         | GotoMainPage ->
             model |> onGotoMainPageMsg
         | GotoLoginPage cameFrom ->
@@ -185,6 +192,10 @@ module App =
             model |> onGotoPermissionDeniedMsg
         | GotoSettingsPage ->
             model |> onGotoSettingsPageMsg
+        | GotoFeedbackSupportPage ->
+            model |> onGotoFeedbackSupportPageMsg
+        | FeedbackSupportPageClosed ->
+            model |> onFeedbackSupportPageClosedPage
         | OpenAudioBookDetailPage ab ->
             model |> onOpenAudioBookDetailPage ab
         | CloseAudioBookDetailPage ->
@@ -440,7 +451,30 @@ module App =
             let m,cmd,externalMsg = SettingsPage.update msg mdl
             let externalCmds = 
                 externalMsg |> settingsPageExternalMsgToCommand
-            {model with SettingsPageModel = Some m}, Cmd.batch [(Cmd.map SettingsPageMsg cmd); externalCmds]
+
+            let feedbackPageCmd =
+                if msg = SettingsPage.Msg.OpenFeedbackPage then Cmd.ofMsg GotoFeedbackSupportPage else Cmd.none
+
+            {model with SettingsPageModel = Some m}, Cmd.batch [(Cmd.map SettingsPageMsg cmd); externalCmds; feedbackPageCmd]
+
+
+    and onSupportFeedbackPageMsg msg model =
+         match model.SupportFeedbackModel with
+         | None ->
+             model,Cmd.none
+         | Some mdl ->
+             
+             let m,cmd = SupportFeedback.update msg mdl
+             let updateFeedbackPageCmd =
+                 fun dispatch ->
+                     ModalHelpers.updateFeedbackModal dispatch SupportFeedbackPageMsg FeedbackSupportPageClosed shellRef m
+                 |> Cmd.ofSub
+             
+             if msg = SupportFeedback.Msg.SendSuccessful then 
+                 Common.ModalBaseHelpers.closeCurrentModal shellRef
+
+
+             {model with SupportFeedbackModel = Some m}, Cmd.batch [updateFeedbackPageCmd;(Cmd.map SupportFeedbackPageMsg cmd)]
 
 
     and onGotoMainPageMsg model =
@@ -459,8 +493,6 @@ module App =
             fun dispatch ->
                 ModalHelpers.pushLoginModal dispatch LoginPageMsg LoginClosed shellRef m
             |> Cmd.ofSub
-
-
 
         {model with LoginPageModel = Some m},Cmd.batch [ openLoginPageCmd; (Cmd.map LoginPageMsg cmd)  ]
         
@@ -511,6 +543,22 @@ module App =
     and onGotoSettingsPageMsg model =
         gotoPage settingsPageRoute
         {model with CurrentPage = SettingsPage}, Cmd.none
+
+
+    and onGotoFeedbackSupportPageMsg model =
+        let m,cmd = SupportFeedback.init ()
+        
+        let openFeedbackPageCmd =
+            fun dispatch ->
+                ModalHelpers.pushFeedbackModal dispatch Msg.SupportFeedbackPageMsg FeedbackSupportPageClosed shellRef m
+            |> Cmd.ofSub
+        
+        {model with SupportFeedbackModel = Some m},Cmd.batch [ openFeedbackPageCmd; (Cmd.map SupportFeedbackPageMsg cmd)  ]
+        
+
+    and onFeedbackSupportPageClosedPage model =
+        {model with SupportFeedbackModel = None }, Cmd.none
+
 
 
     and onOpenAudioBookDetailPage audiobook model =

@@ -39,6 +39,7 @@
     <Compile Include="AudioBookDetail.fs" />
     <Compile Include="NumberPickerModal.fs" />
     <Compile Include="SettingsPage.fs" />
+    <Compile Include="SupportFeedback.fs" />
     <Compile Include="MainPage.fs" />
     <Compile Include="ModalHelpers.fs" />
     <Compile Include="App.fs" />
