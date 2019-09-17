@@ -112,9 +112,13 @@
                 {model with DownloadQueue = model.DownloadQueue @ [abModel]}
 
         let cmd,exCmd = 
-            match model.State with
-            | Idle -> Cmd.ofMsg StartProcessing, Some (UpdateAudioBook newAbModel)                
-            | Downloading | Paused -> Cmd.none, None
+            // use old download queue, to check, if the download queue is in Download Mode, but empty
+            match (model.State,model.DownloadQueue) with
+            | Idle, _ 
+            | Downloading, [] -> 
+                Cmd.ofMsg StartProcessing, Some (UpdateAudioBook newAbModel)
+            | _ -> 
+                Cmd.none, None
 
         AudioBookItemProcessor.updateAudiobookItem newAbModel
 
@@ -203,7 +207,7 @@
                         // deactivate loading spinner if login needed, 
                         // because the startProcessing checks if loading already is actived, 
                         // and do not start the download at all
-                        return [ DeactivateLoading audiobookItemModel; OpenLoginPage ]
+                        return [ DeactivateLoading audiobookItemModel; (ChangeQueueState Idle); OpenLoginPage ]
                     | Some cc ->
                         let updateProgress (a,b) = dispatch (Msg.UpdateDownloadProgress (audiobookItemModel,(Some (a,b))))
                         
@@ -212,7 +216,7 @@
                         | Error e ->
                             match e with
                             | SessionExpired s -> 
-                                return [ DeactivateLoading audiobookItemModel; OpenLoginPage ]
+                                return [ DeactivateLoading audiobookItemModel; (ChangeQueueState Idle); OpenLoginPage ]
                             | Other o ->
                                 return [ DownloadFailed audiobookItemModel; ShowErrorMessage o ]
                             | Network o ->
@@ -240,7 +244,7 @@
                 let (itemToProcess,queueTail) = model.DownloadQueue |> Helpers.getTailHead
                 match itemToProcess with
                 | None ->
-                    Cmd.none, model, None
+                    Cmd.ofMsg (ChangeQueueState Idle), model, None
                 | Some itemToProcess ->
                     let newItemToProcess = {itemToProcess with IsDownloading = true; QueuedToDownload = true}
                     let newQueue = newItemToProcess::queueTail
@@ -248,14 +252,17 @@
 
                     
                     if not itemToProcess.IsDownloading then
-                        newItemToProcess |> downloadAudiobook model, newModel, Some (UpdateAudioBook newItemToProcess)
+                        let downloadCmd = newItemToProcess |> downloadAudiobook model
+                        let setStateCmd = Cmd.ofMsg (ChangeQueueState Downloading)
+
+                        Cmd.batch [setStateCmd;downloadCmd], newModel, Some (UpdateAudioBook newItemToProcess)
                     else
                         Cmd.none, model, None
                     
             
         let processCmd, newModel,exCmd = model |> processQueue
 
-        newModel, Cmd.batch [Cmd.ofMsg (ChangeQueueState Downloading); processCmd ], exCmd
+        newModel, processCmd, exCmd
 
     
     and onPauseProcessingMsg model =
