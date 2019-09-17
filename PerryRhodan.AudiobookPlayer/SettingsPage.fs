@@ -67,6 +67,8 @@
         | SetDeveloperModeSwitchCounter of int
         | SetDeveloperMode of bool
 
+        | OpenFeedbackPage
+
 
     let strToOptInt str =
         let (isInt,value) = System.Int32.TryParse(str)
@@ -156,6 +158,9 @@
             model |> onSetDeveloperMode value
         | SetDeveloperModeSwitchCounter value ->
             model |> onSetDeveloperSwitchCounter value
+        | OpenFeedbackPage ->
+            // will be handled by the app.fs
+            model, Cmd.none, None
 
 
     and onSetDeveloperSwitchCounter value model  =
@@ -482,6 +487,12 @@
                                                             "Unter anderem kann man Einträge aus der DB löschen"
                                                             (fun () -> ())).GridRow(4)
                                                 ]
+                                            )
+
+                                            yield View.Button(
+                                                text="Sende Feedback oder Supportanfrage",                                                                                        
+                                                command=(fun ()-> dispatch OpenFeedbackPage),
+                                                margin=Thickness(0.,10.,0.,0.)
                                             )
                                             
                                             yield View.Button(

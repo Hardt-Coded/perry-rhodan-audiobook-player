@@ -770,6 +770,7 @@ module SecureLoginStorage =
             | _ as e -> return (Error (e.Message))
         }
 
+
 module Files =
 
     let fromTimeSpan (ts:TimeSpan) =
@@ -870,7 +871,42 @@ module SystemSettings =
     let setDeveloperMode(value:bool) =
         keyDeveloperMode |> setSecuredValue (if value then "true" else "false")
 
+ 
+module SupportFeedback =
+
+    open FSharp.Data.HttpRequestHeaders
+    
+    type Message = {
+        Category:string
+        Name:string
+        Message:string
+    }
+
+    let sendSupportFeedBack name category message =
+        async {
+            
+            let msg = {
+                Category = category
+                Message = message
+                Name = name
+            }
+            let json = JsonConvert.SerializeObject(msg)
+            let body = HttpRequestBody.TextRequest json
+            try
+                let! response = Http.AsyncRequest(url=Global.supportMessageApi,httpMethod="POST", body=body,headers=[Accept HttpContentTypes.Json;ContentType HttpContentTypes.Json])
+                if response.StatusCode <> 202 then
+                    return Error "Fehler beim Senden der Nachricht. Probieren Sie es noch einmal."
+                else
+                    return Ok ()
+            with
+            | _ as ex ->
+                Microsoft.AppCenter.Crashes.Crashes.TrackError(ex)
+                return Error "Fehlerbeim Senden der Nachricht. Probieren Sie es noch einmal."
+
+        }
         
+
+
 
 
 
