@@ -1,6 +1,7 @@
 ﻿module Global
 
     let appcenterAndroidId = ""
+    let supportMessageApi = ""
 
 
     type Language =

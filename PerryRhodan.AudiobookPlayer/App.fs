@@ -279,15 +279,15 @@ module App =
     and onUpdateAudioBookMsg ab cameFrom model =
 
         let mainPageMsg = 
-            if cameFrom = "MainPage" then
-                MainPageMsg (MainPage.Msg.DoNothing)
-            else
+            //if cameFrom = "MainPage" then
+            //    MainPageMsg (MainPage.Msg.DoNothing)
+            //else
                 MainPageMsg (MainPage.Msg.UpdateAudioBook ab)
 
         let browserPageMsg = 
-            if cameFrom = "Browser" then
-                BrowserPageMsg (BrowserPage.Msg.DoNothing)
-            else
+            //if cameFrom = "Browser" then
+            //    BrowserPageMsg (BrowserPage.Msg.DoNothing)
+            //else
                 BrowserPageMsg (BrowserPage.Msg.UpdateAudioBookItemList ab)
 
 
@@ -345,8 +345,13 @@ module App =
 
             let externalCmds =
                 externalMsg |> loginPageExternalMsgToCommand
+
+            let updateLoginPageCmd =
+                fun dispatch ->
+                    ModalHelpers.updateLoginModal dispatch LoginPageMsg LoginClosed shellRef m
+                |> Cmd.ofSub
             
-            {model with LoginPageModel = Some m}, Cmd.batch [(Cmd.map LoginPageMsg cmd); externalCmds ]
+            {model with LoginPageModel = Some m}, Cmd.batch [updateLoginPageCmd;(Cmd.map LoginPageMsg cmd); externalCmds ]
         | None -> model, Cmd.none   
 
 
@@ -410,7 +415,12 @@ module App =
             let externalCmds = 
                 externalMsg |> audioBookDetailPageExternalMsgToCommand
 
-            {model with AudioBookDetailPageModel = Some m}, Cmd.batch [(Cmd.map AudioBookDetailPageMsg cmd); externalCmds]
+            let updateAudioBookDetailPageCmd =
+                fun dispatch ->
+                    ModalHelpers.updateDetailModal dispatch AudioBookDetailPageMsg CloseAudioBookDetailPage shellRef m
+                |> Cmd.ofSub
+
+            {model with AudioBookDetailPageModel = Some m}, Cmd.batch [updateAudioBookDetailPageCmd; (Cmd.map AudioBookDetailPageMsg cmd); externalCmds ]
 
         | None -> model, Cmd.none
 
@@ -444,7 +454,15 @@ module App =
 
     and onGotoLoginPageMsg cameFrom model =
         let m,cmd = LoginPage.init cameFrom
-        {model with LoginPageModel = Some m},Cmd.batch [ (Cmd.map LoginPageMsg cmd) ]
+
+        let openLoginPageCmd =
+            fun dispatch ->
+                ModalHelpers.pushLoginModal dispatch LoginPageMsg LoginClosed shellRef m
+            |> Cmd.ofSub
+
+
+
+        {model with LoginPageModel = Some m},Cmd.batch [ openLoginPageCmd; (Cmd.map LoginPageMsg cmd)  ]
         
 
     and onLoginClosed model =
@@ -496,8 +514,14 @@ module App =
 
 
     and onOpenAudioBookDetailPage audiobook model =
-        let m,cmd = AudioBookDetailPage.init audiobook        
-        { model with AudioBookDetailPageModel = Some m }, Cmd.batch [ (Cmd.map AudioBookDetailPageMsg cmd) ]
+        let m,cmd = AudioBookDetailPage.init audiobook 
+        
+        let openAudioBookDetailPageCmd =
+            fun dispatch ->
+                ModalHelpers.pushDetailModal dispatch AudioBookDetailPageMsg CloseAudioBookDetailPage shellRef m
+            |> Cmd.ofSub
+
+        { model with AudioBookDetailPageModel = Some m }, Cmd.batch [ (Cmd.map AudioBookDetailPageMsg cmd); openAudioBookDetailPageCmd ]
 
     and onCloseAudioBookDetailPage model =
         {model with AudioBookDetailPageModel = None }, Cmd.none
@@ -593,19 +617,19 @@ module App =
 
 
         // try show login page, if necessary
-        model.LoginPageModel
-        |> Option.map (
-            fun m -> 
-                m |> ModalHelpers.showLoginModal dispatch LoginPageMsg LoginClosed shellRef 
-        ) |> ignore
+        //model.LoginPageModel
+        //|> Option.map (
+        //    fun m -> 
+        //        m |> ModalHelpers.showLoginModal dispatch LoginPageMsg LoginClosed shellRef 
+        //) |> ignore
 
 
-        // show audio book detail page modal
-        model.AudioBookDetailPageModel
-        |> Option.map (
-            fun m -> 
-                m |> ModalHelpers.showDetailModal dispatch AudioBookDetailPageMsg CloseAudioBookDetailPage shellRef 
-        ) |> ignore
+        //// show audio book detail page modal
+        //model.AudioBookDetailPageModel
+        //|> Option.map (
+        //    fun m -> 
+        //        m |> ModalHelpers.showDetailModal dispatch AudioBookDetailPageMsg CloseAudioBookDetailPage shellRef 
+        //) |> ignore
             
 
         let browserPage =

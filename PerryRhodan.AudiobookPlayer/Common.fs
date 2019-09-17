@@ -350,7 +350,7 @@
         let private tryFindModal (sr:Shell) title =
             sr.Navigation.ModalStack |> Seq.tryFind (fun i -> i.Title = title)
         
-        let pushOrUpdateModal dispatch closeMessage pageTitle (shellRef:ViewRef<Shell>) page =
+        let pushModal dispatch closeMessage pageTitle (shellRef:ViewRef<Shell>) page =
             shellRef.TryValue
             |> Option.map (fun sr ->
                 let hasLoginPageInStack =
@@ -359,6 +359,19 @@
                 | None ->
                     // creates a new page and push it to the modal stack
                     page |> pushModalPage dispatch sr closeMessage 
+                    ()
+                | _e -> 
+                    ()
+            )
+            |> ignore
+
+        let updateModal dispatch closeMessage pageTitle (shellRef:ViewRef<Shell>) (page:ViewElement) =
+            shellRef.TryValue
+            |> Option.map (fun sr ->
+                let hasLoginPageInStack =
+                    tryFindModal sr pageTitle //
+                match hasLoginPageInStack with
+                | None ->
                     ()
                 | Some pushedPage -> 
                     // this uses the new view Element and through model updated Page 

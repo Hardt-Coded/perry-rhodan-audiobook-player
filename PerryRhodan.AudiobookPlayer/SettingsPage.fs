@@ -189,7 +189,14 @@
 
     and onOpenJumpDistancePicker model =
         let (mdl,cmd) = NumberPickerModal.init Translations.current.SelectJumpDistance [5..5..60] model.JumpDistance
-        {model with JumpDistanceModalModel = Some mdl},Cmd.none,None
+
+        let openCmd =
+            fun dispatch ->
+                let page = NumberPickerModal.view mdl (JumpDistanceMsg >> dispatch)
+                Common.ModalBaseHelpers.pushModal dispatch CloseJumpDistancePicker NumberPickerModal.modalTitle model.ShellRef page
+            |> Cmd.ofSub
+
+        {model with JumpDistanceModalModel = Some mdl},openCmd,None
 
 
     and onCloseJumpDistancePicker model =
@@ -210,7 +217,14 @@
                         Cmd.ofMsg (SetJumpDistanceValue (mdl.Value))
                 )
                 |> Option.defaultValue Cmd.none
-            {model with JumpDistanceModalModel = Some mdl},Cmd.batch [ cmd;exCmd],None
+
+            let updateCmd =
+                fun dispatch ->
+                    let page = NumberPickerModal.view mdl (JumpDistanceMsg >> dispatch)
+                    Common.ModalBaseHelpers.updateModal dispatch CloseJumpDistancePicker NumberPickerModal.modalTitle model.ShellRef page
+                |> Cmd.ofSub
+
+            {model with JumpDistanceModalModel = Some mdl},Cmd.batch [ updateCmd; cmd; exCmd  ],None
 
 
 
@@ -222,7 +236,13 @@
 
     and onOpenRewindWhenStartAfterShortPeriodInSecPicker model =
         let (mdl,cmd) = NumberPickerModal.init Translations.current.SelectRewindWhenStartAfterShortPeriodInSec [0..5..60] model.RewindWhenStartAfterShortPeriodInSec
-        {model with RewindWhenStartAfterShortPeriodInSecModalModel = Some mdl},Cmd.none,None
+        let openCmd =
+            fun dispatch ->
+                let page = NumberPickerModal.view mdl (RewindWhenStartAfterShortPeriodInSecMsg >> dispatch)
+                Common.ModalBaseHelpers.pushModal dispatch CloseRewindWhenStartAfterShortPeriodInSecPicker NumberPickerModal.modalTitle model.ShellRef page
+            |> Cmd.ofSub
+
+        {model with RewindWhenStartAfterShortPeriodInSecModalModel = Some mdl},openCmd,None
 
 
     and onCloseRewindWhenStartAfterShortPeriodInSecPicker model =
@@ -243,7 +263,13 @@
                         Cmd.ofMsg (SetRewindWhenStartAfterShortPeriodInSecValue (mdl.Value))
                 )
                 |> Option.defaultValue Cmd.none
-            {model with RewindWhenStartAfterShortPeriodInSecModalModel = Some mdl},Cmd.batch [ cmd;exCmd],None
+            let updateCmd =
+                fun dispatch ->
+                    let page = NumberPickerModal.view mdl (RewindWhenStartAfterShortPeriodInSecMsg >> dispatch)
+                    Common.ModalBaseHelpers.updateModal dispatch CloseRewindWhenStartAfterShortPeriodInSecPicker NumberPickerModal.modalTitle model.ShellRef page
+                |> Cmd.ofSub
+
+            {model with RewindWhenStartAfterShortPeriodInSecModalModel = Some mdl},Cmd.batch [ updateCmd;cmd;exCmd],None
 
 
 
@@ -255,7 +281,13 @@
 
     and onOpenRewindWhenStartAfterLongPeriodInSecPicker model =
         let (mdl,cmd) = NumberPickerModal.init Translations.current.SelectRewindWhenStartAfterLongPeriodInSec [0..5..120] model.RewindWhenStartAfterLongPeriodInSec
-        {model with RewindWhenStartAfterLongPeriodInSecModalModel = Some mdl},Cmd.none,None
+        let openCmd =
+            fun dispatch ->
+                let page = NumberPickerModal.view mdl (RewindWhenStartAfterLongPeriodInSecMsg >> dispatch)
+                Common.ModalBaseHelpers.pushModal dispatch CloseRewindWhenStartAfterLongPeriodInSecPicker NumberPickerModal.modalTitle model.ShellRef page
+            |> Cmd.ofSub
+
+        {model with RewindWhenStartAfterLongPeriodInSecModalModel = Some mdl},openCmd,None
 
 
     and onCloseRewindWhenStartAfterLongPeriodInSecPicker model =
@@ -276,7 +308,14 @@
                         Cmd.ofMsg (SetRewindWhenStartAfterLongPeriodInSecValue (mdl.Value))
                 )
                 |> Option.defaultValue Cmd.none
-            {model with RewindWhenStartAfterLongPeriodInSecModalModel = Some mdl},Cmd.batch [ cmd;exCmd],None
+
+            let updateCmd =
+                fun dispatch ->
+                    let page = NumberPickerModal.view mdl (RewindWhenStartAfterLongPeriodInSecMsg >> dispatch)
+                    Common.ModalBaseHelpers.updateModal dispatch CloseRewindWhenStartAfterLongPeriodInSecPicker NumberPickerModal.modalTitle model.ShellRef page
+                |> Cmd.ofSub
+
+            {model with RewindWhenStartAfterLongPeriodInSecModalModel = Some mdl},Cmd.batch [ updateCmd;cmd;exCmd],None
 
 
 
@@ -288,7 +327,13 @@
 
     and onOpenLongPeriodBeginsAfterInMinutesPicker model =
         let (mdl,cmd) = NumberPickerModal.init Translations.current.SelectLongPeriodBeginsAfterInMinutes [10..10..600] model.LongPeriodBeginsAfterInMinutes
-        {model with LongPeriodBeginsAfterInMinutesModalModel = Some mdl},Cmd.none,None
+        let openCmd =
+            fun dispatch ->
+                let page = NumberPickerModal.view mdl (LongPeriodBeginsAfterInMinutesMsg >> dispatch)
+                Common.ModalBaseHelpers.pushModal dispatch CloseLongPeriodBeginsAfterInMinutesPicker NumberPickerModal.modalTitle model.ShellRef page
+            |> Cmd.ofSub
+
+        {model with LongPeriodBeginsAfterInMinutesModalModel = Some mdl},openCmd,None
 
 
     and onCloseLongPeriodBeginsAfterInMinutesPicker model =
@@ -309,7 +354,15 @@
                         Cmd.ofMsg (SetLongPeriodBeginsAfterInMinutesValue (mdl.Value))
                 )
                 |> Option.defaultValue Cmd.none
-            {model with LongPeriodBeginsAfterInMinutesModalModel = Some mdl},Cmd.batch [ cmd;exCmd],None
+
+            let updateCmd =
+                fun dispatch ->
+                    let page = NumberPickerModal.view mdl (LongPeriodBeginsAfterInMinutesMsg >> dispatch)
+                    Common.ModalBaseHelpers.updateModal dispatch CloseLongPeriodBeginsAfterInMinutesPicker NumberPickerModal.modalTitle model.ShellRef page
+                |> Cmd.ofSub
+
+
+            {model with LongPeriodBeginsAfterInMinutesModalModel = Some mdl},Cmd.batch [ updateCmd;cmd;exCmd],None
     
     
     
@@ -358,29 +411,29 @@
     let view model dispatch =
 
         // modals
-        model.JumpDistanceModalModel
-        |> Option.map (fun mdl ->
-            let page = NumberPickerModal.view mdl (JumpDistanceMsg >> dispatch)
-            Common.ModalBaseHelpers.pushOrUpdateModal dispatch CloseJumpDistancePicker NumberPickerModal.modalTitle model.ShellRef page
-        ) |> ignore
+        //model.JumpDistanceModalModel
+        //|> Option.map (fun mdl ->
+        //    let page = NumberPickerModal.view mdl (JumpDistanceMsg >> dispatch)
+        //    Common.ModalBaseHelpers.pushOrUpdateModal dispatch CloseJumpDistancePicker NumberPickerModal.modalTitle model.ShellRef page
+        //) |> ignore
 
-        model.RewindWhenStartAfterShortPeriodInSecModalModel
-        |> Option.map (fun mdl ->
-            let page = NumberPickerModal.view mdl (RewindWhenStartAfterShortPeriodInSecMsg >> dispatch)
-            Common.ModalBaseHelpers.pushOrUpdateModal dispatch CloseRewindWhenStartAfterShortPeriodInSecPicker NumberPickerModal.modalTitle model.ShellRef page
-        ) |> ignore
+        //model.RewindWhenStartAfterShortPeriodInSecModalModel
+        //|> Option.map (fun mdl ->
+        //    let page = NumberPickerModal.view mdl (RewindWhenStartAfterShortPeriodInSecMsg >> dispatch)
+        //    Common.ModalBaseHelpers.pushOrUpdateModal dispatch CloseRewindWhenStartAfterShortPeriodInSecPicker NumberPickerModal.modalTitle model.ShellRef page
+        //) |> ignore
 
-        model.RewindWhenStartAfterLongPeriodInSecModalModel
-        |> Option.map (fun mdl ->
-            let page = NumberPickerModal.view mdl (RewindWhenStartAfterLongPeriodInSecMsg >> dispatch)
-            Common.ModalBaseHelpers.pushOrUpdateModal dispatch CloseRewindWhenStartAfterLongPeriodInSecPicker NumberPickerModal.modalTitle model.ShellRef page
-        ) |> ignore
+        //model.RewindWhenStartAfterLongPeriodInSecModalModel
+        //|> Option.map (fun mdl ->
+        //    let page = NumberPickerModal.view mdl (RewindWhenStartAfterLongPeriodInSecMsg >> dispatch)
+        //    Common.ModalBaseHelpers.pushOrUpdateModal dispatch CloseRewindWhenStartAfterLongPeriodInSecPicker NumberPickerModal.modalTitle model.ShellRef page
+        //) |> ignore
 
-        model.LongPeriodBeginsAfterInMinutesModalModel
-        |> Option.map (fun mdl ->
-            let page = NumberPickerModal.view mdl (LongPeriodBeginsAfterInMinutesMsg >> dispatch)
-            Common.ModalBaseHelpers.pushOrUpdateModal dispatch CloseLongPeriodBeginsAfterInMinutesPicker NumberPickerModal.modalTitle model.ShellRef page
-        ) |> ignore
+        //model.LongPeriodBeginsAfterInMinutesModalModel
+        //|> Option.map (fun mdl ->
+        //    let page = NumberPickerModal.view mdl (LongPeriodBeginsAfterInMinutesMsg >> dispatch)
+        //    Common.ModalBaseHelpers.pushOrUpdateModal dispatch CloseLongPeriodBeginsAfterInMinutesPicker NumberPickerModal.modalTitle model.ShellRef page
+        //) |> ignore
 
 
         dependsOn model (fun _ mdl ->

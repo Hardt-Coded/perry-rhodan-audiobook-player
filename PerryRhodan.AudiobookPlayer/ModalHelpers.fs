@@ -6,14 +6,22 @@ open Common.ModalBaseHelpers
 
 
 
-let showLoginModal dispatch loginPageMsg loginClosed (shellRef:ViewRef<Shell>) loginModel =
+let pushLoginModal dispatch loginPageMsg loginClosed (shellRef:ViewRef<Shell>) loginModel =
     (LoginPage.view loginModel (loginPageMsg >> dispatch))
-    |> pushOrUpdateModal dispatch loginClosed Translations.current.LoginPage shellRef
+    |> pushModal dispatch loginClosed Translations.current.LoginPage shellRef
+
+let updateLoginModal dispatch loginPageMsg loginClosed (shellRef:ViewRef<Shell>) loginModel =
+    (LoginPage.view loginModel (loginPageMsg >> dispatch))
+    |> updateModal dispatch loginClosed Translations.current.LoginPage shellRef
 
 
-let showDetailModal dispatch detailPageMsg detailPageClosed (shellRef:ViewRef<Shell>) detailModel =
+let pushDetailModal dispatch detailPageMsg detailPageClosed (shellRef:ViewRef<Shell>) detailModel =
     (AudioBookDetailPage.view detailModel (detailPageMsg >> dispatch))
-    |> pushOrUpdateModal dispatch detailPageClosed Translations.current.AudioBookDetailPage shellRef
+    |> pushModal dispatch detailPageClosed Translations.current.AudioBookDetailPage shellRef
+
+let updateDetailModal dispatch detailPageMsg detailPageClosed (shellRef:ViewRef<Shell>) detailModel =
+    (AudioBookDetailPage.view detailModel (detailPageMsg >> dispatch))
+    |> updateModal dispatch detailPageClosed Translations.current.AudioBookDetailPage shellRef
     
         
 
