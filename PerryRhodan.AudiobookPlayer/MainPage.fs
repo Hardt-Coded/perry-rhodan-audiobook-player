@@ -24,7 +24,7 @@ open Services
         | LoadLocalAudiobooks
         | LocalAudioBooksLoaded of AudioBook []
         | AudioBooksItemMsg of AudioBookItem.Model * AudioBookItem.Msg
-        | UpdateAudioBook of AudioBookItem.Model
+        | UpdateAudioBook
 
         | ChangeBusyState of bool
         | DoNothing
@@ -50,8 +50,8 @@ open Services
             model |> onLoadAudioBooksMsg
         | LocalAudioBooksLoaded ab ->
             model |> onLocalAudioBooksLoadedMsg ab
-        | UpdateAudioBook ab ->
-            model |> onUpdateAudioBookMsg ab
+        | UpdateAudioBook ->
+            model |> onUpdateAudioBookMsg
         | ChangeBusyState state -> 
             model |> onChangeBusyStateMsg state
         | DoNothing ->
@@ -73,7 +73,7 @@ open Services
         Cmd.ofMsg busyMsg
 
 
-    and onUpdateAudioBookMsg ab model =
+    and onUpdateAudioBookMsg model =
         let allDownloadedAndDownloadingItems =
             AudioBookItemProcessor.getDownloadingAndDownloadedAudioBookItems ()
             |> Async.RunSynchronously
@@ -91,7 +91,7 @@ open Services
             | Some excmd -> 
                 match excmd with
                 | AudioBookItem.ExternalMsg.UpdateAudioBook ab ->
-                    Cmd.ofMsg (UpdateAudioBook ab), Some (UpdateAudioBookGlobal (ab, "MainPage"))
+                    Cmd.ofMsg (UpdateAudioBook), Some (UpdateAudioBookGlobal (ab, "MainPage"))
                 | AudioBookItem.ExternalMsg.AddToDownloadQueue mdl ->
                     Cmd.ofMsg DoNothing, None
                 | AudioBookItem.ExternalMsg.RemoveFromDownloadQueue mdl ->

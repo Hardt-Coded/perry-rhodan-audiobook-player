@@ -1,7 +1,9 @@
 ﻿#r "netstandard"
 #r "System.Xml.Linq"
 //#r @"C:\Users\Dieselmeister\.nuget\packages\fsharp.data\3.0.0\lib\netstandard2.0\FSharp.Data.dll"
-#r @"C:\Users\Daniel\.nuget\packages\fsharp.data\3.0.0\lib\netstandard2.0\FSharp.Data.dll"
+#r @"C:\Users\Dieselmeister\.nuget\packages\fsharp.data\3.0.0\lib\netstandard2.0\FSharp.Data.dll"
+
+
 
 open FSharp.Data
 open System
@@ -240,8 +242,32 @@ let ps () =
     
     productDetail
         
-            
+#r "netstandard.dll"
+#r @"C:\Users\Dieselmeister\.nuget\packages\sixlabors.imagesharp\1.0.0-beta0005\lib\netstandard2.0\SixLabors.ImageSharp.dll"
+#r @"C:\Users\Dieselmeister\.nuget\packages\system.memory\4.5.2\lib\netstandard2.0\System.Memory.dll"
+#r @"C:\Users\Dieselmeister\.nuget\packages\sixlabors.core\1.0.0-beta0006\lib\netcoreapp2.0\SixLabors.Core.dll"
+#r @"C:\Users\Dieselmeister\.nuget\packages\system.buffers\4.5.0\lib\netstandard2.0\System.Buffers.dll"
+#r @"C:\Users\Dieselmeister\.nuget\packages\system.runtime.compilerservices.unsafe\4.5.0\lib\netstandard2.0\System.Runtime.CompilerServices.Unsafe.dll"
+#r @"C:\Users\Dieselmeister\.nuget\packages\System.Numerics.Vectors\4.5.0\lib\netstandard2.0\System.Numerics.Vectors.dll"
 
+
+
+            
+open SixLabors.ImageSharp
+open SixLabors.ImageSharp.Processing
+open System.IO
+
+let thumb = SixLabors.ImageSharp.Image.Load(@"E:\Downloads\PERRY_RHODAN_3025_Ich_erinnere_mich\PERRY RHODAN 3025 - Ich erinnere mich\PR3025_Ich_erinnere_mich.jpg")
+
+
+thumb.Mutate(fun x -> 
+    x.Resize(200,200) |> ignore
+    ()
+    ) |> ignore                                        
+
+let fileStream = new FileStream(@"E:\Downloads\PERRY_RHODAN_3025_Ich_erinnere_mich\PERRY RHODAN 3025 - Ich erinnere mich\test.jpg",FileMode.Create)
+thumb.SaveAsJpeg(fileStream)
+fileStream.Close()
     
             
 

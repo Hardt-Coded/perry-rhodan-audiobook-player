@@ -31,7 +31,7 @@ open Global
         LastSelectedGroup: string option
         IsLoading:bool 
         CurrentDownloadProgress: (int * int) option
-        DownloadQueueModel: DownloadQueue.Model 
+        //DownloadQueueModel: DownloadQueue.Model 
         ListStates:ListState list
         DummyUpdateValue:Guid
     }
@@ -65,9 +65,9 @@ open Global
         | GoToLoginPage of LoginRequestCameFrom
 
         | AudioBooksItemMsg of AudioBookItem.Model * AudioBookItem.Msg
-        | DownloadQueueMsg of DownloadQueue.Msg
+        //| DownloadQueueMsg of DownloadQueue.Msg
         | UpdateAudioBookItemList of AudioBookItem.Model
-        | StartDownloadQueue
+        //| StartDownloadQueue
 
         | UpdateAudioBook
 
@@ -81,6 +81,8 @@ open Global
         | OpenAudioBookPlayer of AudioBook 
         | OpenAudioBookDetail of AudioBook
         | UpdateAudioBookGlobal  of AudioBookItem.Model *  string
+        | DownloadQueueMsg of DownloadQueue.Msg
+        | StartDownloadQueue
 
 
     let pageRef = ViewRef<ContentPage>()
@@ -94,7 +96,7 @@ open Global
         SelectedGroupItems = None
         LastSelectedGroup = None
         CurrentDownloadProgress = None 
-        DownloadQueueModel = DownloadQueue.initModel None 
+        //DownloadQueueModel = DownloadQueue.initModel None 
         ListStates = []     
         DummyUpdateValue = Guid.Empty
     }
@@ -258,7 +260,8 @@ open Global
                     else
                         i
                 )
-            {model with ListStates = newListeState}, Cmd.none, None
+            let newModel = {model with ListStates = newListeState}
+            newModel, updateOpenPagesSubCmd newModel, None
         //| ShowAudiobooks ab ->
         //    model |> onShowAudiobooksMsg ab
         | AddSelectGroup group ->
@@ -273,12 +276,12 @@ open Global
             model |> onGotoLoginPageMsg cameFrom
         | AudioBooksItemMsg (abModel, msg) ->
             model |> onProcessAudioBookItemMsg abModel msg
-        | DownloadQueueMsg msg ->
-            model |> onProcessDownloadQueueMsg msg            
+        //| DownloadQueueMsg msg ->
+        //    model |> onProcessDownloadQueueMsg msg            
         | UpdateAudioBookItemList abModel ->
             model |> onUpdateAudioBookItemListMsg abModel            
-        | StartDownloadQueue ->
-            model |> onStartDownloadQueueMsg
+        //| StartDownloadQueue ->
+        //    model |> onStartDownloadQueueMsg
         | DoNothing ->
             model |> onDoNothingMsg            
 
@@ -553,9 +556,9 @@ open Global
                 | AudioBookItem.ExternalMsg.UpdateAudioBook ab ->
                     Cmd.ofMsg DoNothing, Some (UpdateAudioBookGlobal (ab, "Browser"))
                 | AudioBookItem.ExternalMsg.AddToDownloadQueue mdl ->
-                    Cmd.ofMsg (DownloadQueueMsg (DownloadQueue.Msg.AddItemToQueue mdl)), None
+                    Cmd.none, Some (DownloadQueueMsg (DownloadQueue.Msg.AddItemToQueue mdl))
                 | AudioBookItem.ExternalMsg.RemoveFromDownloadQueue mdl ->
-                    Cmd.ofMsg (DownloadQueueMsg (DownloadQueue.Msg.RemoveItemFromQueue mdl)), None
+                    Cmd.none, Some (DownloadQueueMsg (DownloadQueue.Msg.RemoveItemFromQueue mdl))
                 | AudioBookItem.ExternalMsg.OpenLoginPage cameFrom ->
                     Cmd.ofMsg DoNothing, Some (OpenLoginPage cameFrom)
                 | AudioBookItem.ExternalMsg.PageChangeBusyState state ->
@@ -571,22 +574,23 @@ open Global
     
     
     and onProcessDownloadQueueMsg msg model =
-        let newModel, cmd, externalMsg = DownloadQueue.update msg model.DownloadQueueModel
-        let (externalCmds,mainPageMsg) =
-            match externalMsg with
-            | None -> Cmd.none, None
-            | Some excmd -> 
-                match excmd with
-                | DownloadQueue.ExternalMsg.ExOpenLoginPage cameFrom ->
-                    Cmd.ofMsg DoNothing, Some (OpenLoginPage cameFrom)
-                | DownloadQueue.ExternalMsg.UpdateAudioBook abModel ->
-                    Cmd.ofMsg (UpdateAudioBookItemList abModel), Some (UpdateAudioBookGlobal (abModel, "Browser"))
-                | DownloadQueue.ExternalMsg.UpdateDownloadProgress (abModel,progress) ->
-                    Cmd.batch [ Cmd.ofMsg (AudioBooksItemMsg (abModel,(AudioBookItem.Msg.UpdateDownloadProgress progress))); Cmd.ofMsg (UpdateAudioBookItemList abModel) ], None
-                | DownloadQueue.ExternalMsg.PageChangeBusyState state ->
-                    Cmd.ofMsg (ChangeBusyState state), None
+        //let newModel, cmd, externalMsg = DownloadQueue.update msg model.DownloadQueueModel
+        //let (externalCmds,mainPageMsg) =
+        //    match externalMsg with
+        //    | None -> Cmd.none, None
+        //    | Some excmd -> 
+        //        match excmd with
+        //        | DownloadQueue.ExternalMsg.ExOpenLoginPage cameFrom ->
+        //            Cmd.ofMsg DoNothing, Some (OpenLoginPage cameFrom)
+        //        | DownloadQueue.ExternalMsg.UpdateAudioBook abModel ->
+        //            Cmd.ofMsg (UpdateAudioBookItemList abModel), Some (UpdateAudioBookGlobal (abModel, "Browser"))
+        //        | DownloadQueue.ExternalMsg.UpdateDownloadProgress (abModel,progress) ->
+        //            Cmd.batch [ Cmd.ofMsg (AudioBooksItemMsg (abModel,(AudioBookItem.Msg.UpdateDownloadProgress progress))); Cmd.ofMsg (UpdateAudioBookItemList abModel) ], None
+        //        | DownloadQueue.ExternalMsg.PageChangeBusyState state ->
+        //            Cmd.ofMsg (ChangeBusyState state), None
 
-        {model with DownloadQueueModel = newModel}, Cmd.batch [(Cmd.map DownloadQueueMsg cmd); externalCmds; updateOpenPagesSubCmd model ], mainPageMsg
+        //{model with DownloadQueueModel = newModel}, Cmd.batch [(Cmd.map DownloadQueueMsg cmd); externalCmds; updateOpenPagesSubCmd model ], mainPageMsg
+        model, Cmd.none, None
     
     
     and onUpdateAudioBookItemListMsg abModel model =
@@ -696,10 +700,10 @@ open Global
                 //if (model.SelectedGroups.Length > 0) then
                 //    yield View.Button(text = Translations.current.Back,command = (fun ()-> dispatch RemoveLastSelectGroup)).GridRow(2)
                 
-                let downloadQueueDispatch =
-                    DownloadQueueMsg >> dispatch
+                //let downloadQueueDispatch =
+                //    DownloadQueueMsg >> dispatch
 
-                yield (DownloadQueue.view model.DownloadQueueModel downloadQueueDispatch).GridRow(3)
+                //yield (DownloadQueue.view model.DownloadQueueModel downloadQueueDispatch).GridRow(3)
 
 
                 

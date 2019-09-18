@@ -21,6 +21,7 @@ module App =
     let browserPageRoute = "browserpage"
     let settingsPageRoute = "settingspage"
     let playerPageRoute = "playerpage"
+    let downloadQueue = "downloadqueue"
 
     
     
@@ -34,6 +35,8 @@ module App =
         AudioBookDetailPageModel:AudioBookDetailPage.Model option
         SettingsPageModel:SettingsPage.Model option
         SupportFeedbackModel:SupportFeedback.Model option
+
+        DownloadQueueModel: DownloadQueue.Model 
         
         AppLanguage:Language
         CurrentPage: Pages
@@ -54,6 +57,7 @@ module App =
         | AudioBookDetailPageMsg of AudioBookDetailPage.Msg
         | SettingsPageMsg of SettingsPage.Msg
         | SupportFeedbackPageMsg of SupportFeedback.Msg
+        | DownloadQueueMsg of DownloadQueue.Msg
 
         | GotoMainPage
         | GotoBrowserPage
@@ -137,6 +141,9 @@ module App =
             AudioBookDetailPageModel = None 
             SettingsPageModel = None 
             SupportFeedbackModel = None
+
+            DownloadQueueModel = DownloadQueue.initModel None
+
             AppLanguage = English
             CurrentPage = MainPage
             NavIsVisible = false 
@@ -178,6 +185,8 @@ module App =
             model |> onProcessSettingsPageMsg msg
         | SupportFeedbackPageMsg msg ->
             model |> onSupportFeedbackPageMsg msg
+        | DownloadQueueMsg msg ->
+            model |> onProcessDownloadQueueMsg msg
         | GotoMainPage ->
             model |> onGotoMainPageMsg
         | GotoLoginPage cameFrom ->
@@ -293,7 +302,7 @@ module App =
             //if cameFrom = "MainPage" then
             //    MainPageMsg (MainPage.Msg.DoNothing)
             //else
-                MainPageMsg (MainPage.Msg.UpdateAudioBook ab)
+                MainPageMsg (MainPage.Msg.UpdateAudioBook)
 
         let browserPageMsg = 
             //if cameFrom = "Browser" then
@@ -379,6 +388,10 @@ module App =
                 Cmd.ofMsg (UpdateAudioBook (ab,cameFrom))
             | BrowserPage.ExternalMsg.OpenAudioBookDetail ab ->
                 Cmd.ofMsg (OpenAudioBookDetailPage ab)
+            | BrowserPage.ExternalMsg.DownloadQueueMsg dqMsg ->
+                Cmd.ofMsg (DownloadQueueMsg dqMsg)
+            | BrowserPage.ExternalMsg.StartDownloadQueue ->
+                Cmd.ofMsg (DownloadQueueMsg DownloadQueue.Msg.StartProcessing)
         
 
     and onProcessBrowserPageMsg msg model =
@@ -475,6 +488,32 @@ module App =
 
 
              {model with SupportFeedbackModel = Some m}, Cmd.batch [updateFeedbackPageCmd;(Cmd.map SupportFeedbackPageMsg cmd)]
+
+
+    and onProcessDownloadQueueMsg msg model =
+        let newModel, cmd, externalMsg = DownloadQueue.update msg model.DownloadQueueModel
+        let mainCmds =
+            match externalMsg with
+            | None -> Cmd.none
+            | Some excmd -> 
+                match excmd with
+                | DownloadQueue.ExternalMsg.ExOpenLoginPage cameFrom ->
+                    Cmd.ofMsg (GotoLoginPage cameFrom)
+                | DownloadQueue.ExternalMsg.UpdateAudioBook abModel ->
+                    Cmd.ofMsg (UpdateAudioBook (abModel,""))
+                | DownloadQueue.ExternalMsg.UpdateDownloadProgress (abModel,progress) ->
+                    //let itemMsg = AudioBookItem.Msg.UpdateDownloadProgress progress
+                    //let newItemModel, _, _ = AudioBookItem.update itemMsg abModel
+                    //// item aktualisieren
+                    //AudioBookItemProcessor.updateAudiobookItem newItemModel
+                    // update browserpage and main page
+                    let bpCmd = BrowserPageMsg BrowserPage.Msg.UpdateAudioBook |> Cmd.ofMsg
+                    let mpCmd = MainPageMsg MainPage.Msg.UpdateAudioBook |> Cmd.ofMsg
+                    Cmd.batch [ bpCmd; mpCmd]
+                | DownloadQueue.ExternalMsg.PageChangeBusyState state ->
+                    Cmd.none
+
+        { model with DownloadQueueModel = newModel}, Cmd.batch [(Cmd.map DownloadQueueMsg cmd); mainCmds ]
 
 
     and onGotoMainPageMsg model =
@@ -580,21 +619,22 @@ module App =
         | None ->
             model,Cmd.none
         | Some browserModel ->
-            let downloadQueueModel = {browserModel.DownloadQueueModel with CurrentSessionCookieContainer = Some cc}
-            let browserPageModel = {browserModel with CurrentSessionCookieContainer = Some cc; DownloadQueueModel = downloadQueueModel}
+            let downloadQueueModel = {model.DownloadQueueModel with CurrentSessionCookieContainer = Some cc}
+            let browserPageModel = {browserModel with CurrentSessionCookieContainer = Some cc}
             let cmd = 
                 Cmd.batch [
                     match cameFrom with
                     | RefreshAudiobooks ->
                         yield Cmd.ofMsg (BrowserPageMsg BrowserPage.Msg.LoadOnlineAudiobooks)
                     | DownloadAudioBook ->
-                        yield Cmd.ofMsg (BrowserPageMsg BrowserPage.Msg.StartDownloadQueue)
+                        yield Cmd.ofMsg (DownloadQueueMsg DownloadQueue.Msg.StartProcessing)
+                        
                 ]
 
             // and close Login Modal
             closeCurrentModal ()
             // set here login page model to None to avoid reopening of the loginPage
-            { model with BrowserPageModel = Some browserPageModel; LoginPageModel = None}, cmd
+            { model with BrowserPageModel = Some browserPageModel; LoginPageModel = None; DownloadQueueModel = downloadQueueModel}, cmd
 
 
 
@@ -605,7 +645,7 @@ module App =
 
             if (not AudioBookItemProcessor.abItemUpdatedEvent.HasListeners) then
                 AudioBookItemProcessor.Events.onAbItemUpdated.Add(fun i ->
-                    dispatch (MainPageMsg (MainPage.Msg.UpdateAudioBook i))
+                    dispatch (MainPageMsg (MainPage.Msg.UpdateAudioBook))
                     dispatch (BrowserPageMsg (BrowserPage.Msg.UpdateAudioBook))
                 )
             // when updating an audio book, that update the underlying audio book in the Item
@@ -749,6 +789,17 @@ module App =
                             yield createShellContent Translations.current.TabBarPlayerLabel playerPageRoute "player_icon.png" ap
                         | None ->
                             ()
+
+                        
+                        let dqView = DownloadQueue.view model.DownloadQueueModel (DownloadQueueMsg >> dispatch)
+                        let icon =
+                            match model.DownloadQueueModel.State with
+                            | DownloadQueue.QueueState.Downloading -> "download_icon_running.png"
+                            | DownloadQueue.QueueState.Paused -> "download_icon_error.png"
+                            | DownloadQueue.QueueState.Idle -> "download_icon.png"
+                        yield createShellContent "Downloads" downloadQueue icon dqView
+                        
+                        
 
                         match mainPage,browserPage,settingsPage,audioPlayerPage with
                         | None, None, None, None ->
