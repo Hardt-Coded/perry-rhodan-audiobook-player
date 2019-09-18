@@ -87,15 +87,19 @@
 
     
     and onOpenActionMenuMsg abModel model =
-
-        let openDownloadQueueActionMenu audiobook =            
+        
+        let openDownloadQueueActionMenu (audiobook:AudioBookItem.Model) =            
             async {
-                let buttons = [|
+                if (audiobook.IsDownloading) then
+                    return None
+                else
+                    let buttons = [|
                         
-                    yield ("Remove from Download Queue",(fun a -> (RemoveItemFromQueue audiobook)) audiobook)
+                        yield ("Remove from Download Queue",(fun a -> (RemoveItemFromQueue audiobook)) audiobook)
                         
-                |]
-                return! Helpers.displayActionSheet (Some audiobook.AudioBook.FullName) (Some Translations.current.Cancel) buttons
+                    |]
+                    return! Helpers.displayActionSheet (Some audiobook.AudioBook.FullName) (Some Translations.current.Cancel) buttons
+                
             } |> Cmd.ofAsyncMsgOption
 
         model, (abModel |> openDownloadQueueActionMenu), None
@@ -298,7 +302,7 @@
             |> List.map (fun i -> if i.AudioBook.FullName = abModel.AudioBook.FullName then newAbModel else i)
         let newModel = {model with DownloadQueue = newQueue}
         AudioBookItemProcessor.updateAudiobookItem newAbModel
-        newModel, Cmd.none, None //Some (ExternalMsg.UpdateDownloadProgress (newAbModel,progress))
+        newModel, Cmd.none, Some (ExternalMsg.UpdateDownloadProgress (newAbModel,progress))
 
     
     and onChangeGlobalBusyStateMsg state model =
@@ -313,34 +317,61 @@
     
     
     let view model dispatch =
-        View.StackLayout(
-            orientation = StackOrientation.Vertical,
-            children = [
-                if model.DownloadQueue.Length > 0 then
-                    yield Controls.secondaryTextColorLabel 16. "Queued Downloads:"
-                    if model.State = Paused then
-                        yield Controls.secondaryTextColorLabel 16. "(network error - retrying in 30 seconds):"
-                    yield View.StackLayout(
-                        orientation = StackOrientation.Horizontal,
+        View.ContentPage(
+            title="Downloads",useSafeArea=true,
+            backgroundColor = Consts.backgroundColor,
+            content = View.Grid(
+                
+                children = [
+                    View.StackLayout(
+                        orientation = StackOrientation.Vertical,
                         children = [
-                        
-                            for (idx,item) in model.DownloadQueue |> List.indexed do
-                                let (cmd,isRed) =
-                                    if (idx > 0) then
-                                        (fun () -> dispatch (OpenActionMenu item)), false
-                                    else
-                                        (fun () -> ()), true
-                                
-                                let item = 
-                                    if isRed then
-                                        (Controls.primaryColorSymbolLabelWithTapCommand cmd 25. true "\uf019").TextColor(Color.Red)
-                                    else
-                                        Controls.primaryColorSymbolLabelWithTapCommand cmd 25. true "\uf019"
+                            if model.DownloadQueue.Length > 0 then
+                                yield Controls.secondaryTextColorLabel 16. "aktuelle Downloads:"
+                                if model.State = Paused then
+                                    yield Controls.secondaryTextColorLabel 16. "Netzwerkfehler! Eventuell bestehlt keine Internetverbindung mehr. Es wird in 30 sek nochmal versucht."
 
-                                yield item
+                                yield View.ScrollView(horizontalOptions = LayoutOptions.Fill,
+                                    verticalOptions = LayoutOptions.Fill,
+                                    content = 
+                                        View.StackLayout(orientation=StackOrientation.Vertical,
+                                            children= [
+                                                let downloadItemTitles = 
+                                                    model.DownloadQueue 
+                                                    |> List.map (fun x -> x.AudioBook.FullName)
+                                                    |> List.toArray
+                                                let abItems = AudioBookItemProcessor.getAudioBookItems downloadItemTitles |> Async.RunSynchronously
+                                                for item in abItems do
+                                                    let noNeedForADispatch = fun _ -> ()
+                                                    yield (AudioBookItem.view item noNeedForADispatch)
+                                                        .GestureRecognizers([View.TapGestureRecognizer(command = fun ()-> dispatch (OpenActionMenu item))])
+                                            ]
+                                        )
+                                    )
+                            //    yield View.StackLayout(
+                            //        orientation = StackOrientation.Horizontal,
+                            //        children = [
+                        
+                            //            for (idx,item) in model.DownloadQueue |> List.indexed do
+                            //                let (cmd,isRed) =
+                            //                    if (idx > 0) then
+                            //                        (fun () -> dispatch (OpenActionMenu item)), false
+                            //                    else
+                            //                        (fun () -> ()), true
+                                
+                            //                let item = 
+                            //                    if isRed then
+                            //                        (Controls.primaryColorSymbolLabelWithTapCommand cmd 25. true "\uf019").TextColor(Color.Red)
+                            //                    else
+                            //                        Controls.primaryColorSymbolLabelWithTapCommand cmd 25. true "\uf019"
+
+                            //                yield item
+                            //        ]
+                            //)
                         ]
-                )
-            ]
+                    )
+                ]
+            )
         )
         
 
