@@ -94,9 +94,17 @@ let private abItemProcessor =
                             return! (loop newState)
 
                         | InsertAudioBooks audioBooks ->
+                            let filteredAudiobooks =
+                                audioBooks
+                                |> Array.filter (fun i -> 
+                                    state 
+                                    |> Array.exists(fun s -> s.AudioBook.FullName = i.AudioBook.FullName) 
+                                    |> not
+                                )
+
                             let newState =
                                 state 
-                                |> Array.append audioBooks
+                                |> Array.append filteredAudiobooks
                                 |> Array.sortBy (fun i-> i.AudioBook.FullName)
                                 
                             return! (loop newState)
