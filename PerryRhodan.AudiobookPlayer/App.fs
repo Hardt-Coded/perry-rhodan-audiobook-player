@@ -298,18 +298,10 @@ module App =
 
     and onUpdateAudioBookMsg ab cameFrom model =
 
-        let mainPageMsg = 
-            //if cameFrom = "MainPage" then
-            //    MainPageMsg (MainPage.Msg.DoNothing)
-            //else
-                MainPageMsg (MainPage.Msg.UpdateAudioBook)
-
-        let browserPageMsg = 
-            //if cameFrom = "Browser" then
-            //    BrowserPageMsg (BrowserPage.Msg.DoNothing)
-            //else
-                BrowserPageMsg (BrowserPage.Msg.UpdateAudioBookItemList ab)
-
+        //let browserPageMsg = BrowserPageMsg (BrowserPage.Msg.UpdateAudioBookItemList ab) |> Cmd.ofMsg
+        let bpCmd = BrowserPageMsg BrowserPage.Msg.UpdateAudioBook |> Cmd.ofMsg
+        let mpCmd = MainPageMsg MainPage.Msg.UpdateAudioBook |> Cmd.ofMsg
+        let cmd = Cmd.batch [ bpCmd; mpCmd; ] //browserPageMsg]
 
         let audioPlayerModel =
             match model.AudioPlayerPageModel with
@@ -324,7 +316,7 @@ module App =
                 else
                     model.AudioPlayerPageModel
 
-        {model with AudioPlayerPageModel = audioPlayerModel}, Cmd.batch [Cmd.ofMsg mainPageMsg; Cmd.ofMsg browserPageMsg ]        
+        {model with AudioPlayerPageModel = audioPlayerModel}, cmd        
             
     
     and onProcessMainPageMsg msg model =
@@ -502,14 +494,7 @@ module App =
                 | DownloadQueue.ExternalMsg.UpdateAudioBook abModel ->
                     Cmd.ofMsg (UpdateAudioBook (abModel,""))
                 | DownloadQueue.ExternalMsg.UpdateDownloadProgress (abModel,progress) ->
-                    //let itemMsg = AudioBookItem.Msg.UpdateDownloadProgress progress
-                    //let newItemModel, _, _ = AudioBookItem.update itemMsg abModel
-                    //// item aktualisieren
-                    //AudioBookItemProcessor.updateAudiobookItem newItemModel
-                    // update browserpage and main page
-                    let bpCmd = BrowserPageMsg BrowserPage.Msg.UpdateAudioBook |> Cmd.ofMsg
-                    let mpCmd = MainPageMsg MainPage.Msg.UpdateAudioBook |> Cmd.ofMsg
-                    Cmd.batch [ bpCmd; mpCmd]
+                    Cmd.ofMsg (UpdateAudioBook (abModel,""))
                 | DownloadQueue.ExternalMsg.PageChangeBusyState state ->
                     Cmd.none
 
@@ -765,7 +750,7 @@ module App =
             items=[
                 
 
-                View.ShellItem(                    
+                yield View.ShellItem(                    
                     shellUnselectedColor = Consts.secondaryTextColor,
                     shellTabBarBackgroundColor=Consts.cardColor,
                     items=[
@@ -792,12 +777,17 @@ module App =
 
                         
                         let dqView = DownloadQueue.view model.DownloadQueueModel (DownloadQueueMsg >> dispatch)
-                        let icon =
-                            match model.DownloadQueueModel.State with
-                            | DownloadQueue.QueueState.Downloading -> "download_icon_running.png"
-                            | DownloadQueue.QueueState.Paused -> "download_icon_error.png"
-                            | DownloadQueue.QueueState.Idle -> "download_icon.png"
-                        yield createShellContent "Downloads" downloadQueue icon dqView
+
+                        match model.DownloadQueueModel.State with
+                        | DownloadQueue.QueueState.Downloading -> 
+                            let icon = "download_icon_running.png"
+                            yield createShellContent "Downloads" downloadQueue icon dqView
+                        | DownloadQueue.QueueState.Paused -> 
+                            let icon = "download_icon_error.png"
+                            yield createShellContent "Downloads" downloadQueue icon dqView
+                        | DownloadQueue.QueueState.Idle -> 
+                            ()
+                        
                         
                         
 
@@ -809,7 +799,16 @@ module App =
                     ]
                     
                 )
-                View.ShellContent(route="permissiondeniedpage",content=View.ContentPage(content=View.Label(text="...")))
+
+                yield View.ShellContent(route="permissiondeniedpage",content=View.ContentPage(content=View.Label(text="...")))
+
+                match model.DownloadQueueModel.State with
+                | DownloadQueue.QueueState.Idle -> 
+                    let dqView = DownloadQueue.view model.DownloadQueueModel (DownloadQueueMsg >> dispatch)
+                    yield createShellContent "Downloads" downloadQueue "" dqView
+                | _ -> ()
+
+
                 
             ]
         )
