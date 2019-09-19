@@ -66,7 +66,7 @@ open Global
 
         | AudioBooksItemMsg of AudioBookItem.Model * AudioBookItem.Msg
         //| DownloadQueueMsg of DownloadQueue.Msg
-        | UpdateAudioBookItemList of AudioBookItem.Model
+        //| UpdateAudioBookItemList of AudioBookItem.Model
         //| StartDownloadQueue
 
         | UpdateAudioBook
@@ -278,8 +278,8 @@ open Global
             model |> onProcessAudioBookItemMsg abModel msg
         //| DownloadQueueMsg msg ->
         //    model |> onProcessDownloadQueueMsg msg            
-        | UpdateAudioBookItemList abModel ->
-            model |> onUpdateAudioBookItemListMsg abModel            
+        //| UpdateAudioBookItemList abModel ->
+        //    model |> onUpdateAudioBookItemListMsg abModel            
         //| StartDownloadQueue ->
         //    model |> onStartDownloadQueueMsg
         | DoNothing ->
@@ -574,28 +574,12 @@ open Global
     
     
     and onProcessDownloadQueueMsg msg model =
-        //let newModel, cmd, externalMsg = DownloadQueue.update msg model.DownloadQueueModel
-        //let (externalCmds,mainPageMsg) =
-        //    match externalMsg with
-        //    | None -> Cmd.none, None
-        //    | Some excmd -> 
-        //        match excmd with
-        //        | DownloadQueue.ExternalMsg.ExOpenLoginPage cameFrom ->
-        //            Cmd.ofMsg DoNothing, Some (OpenLoginPage cameFrom)
-        //        | DownloadQueue.ExternalMsg.UpdateAudioBook abModel ->
-        //            Cmd.ofMsg (UpdateAudioBookItemList abModel), Some (UpdateAudioBookGlobal (abModel, "Browser"))
-        //        | DownloadQueue.ExternalMsg.UpdateDownloadProgress (abModel,progress) ->
-        //            Cmd.batch [ Cmd.ofMsg (AudioBooksItemMsg (abModel,(AudioBookItem.Msg.UpdateDownloadProgress progress))); Cmd.ofMsg (UpdateAudioBookItemList abModel) ], None
-        //        | DownloadQueue.ExternalMsg.PageChangeBusyState state ->
-        //            Cmd.ofMsg (ChangeBusyState state), None
-
-        //{model with DownloadQueueModel = newModel}, Cmd.batch [(Cmd.map DownloadQueueMsg cmd); externalCmds; updateOpenPagesSubCmd model ], mainPageMsg
         model, Cmd.none, None
     
     
-    and onUpdateAudioBookItemListMsg abModel model =
-        AudioBookItemProcessor.updateAudiobookItem abModel
-        {model with DummyUpdateValue = Guid.NewGuid() }, updateOpenPagesSubCmd model, None
+    //and onUpdateAudioBookItemListMsg abModel model =
+    //    AudioBookItemProcessor.updateAudiobookItem abModel
+    //    {model with DummyUpdateValue = Guid.NewGuid() }, updateOpenPagesSubCmd model, None
     
     
     and onStartDownloadQueueMsg model =

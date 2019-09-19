@@ -198,7 +198,6 @@
     <AndroidResource Include="Resources\drawable\download_icon_running.png" />
     <AndroidResource Include="Resources\drawable\download_icon_error.png" />
     <!--<None Include="..\PerryRhodan.AudiobookPlayer.Android_\Resources\mipmap-hdpi\eins_a_launcher.png" />-->
-    
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Control.AsyncSeq">
