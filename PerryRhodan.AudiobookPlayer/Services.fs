@@ -12,13 +12,12 @@ open Xamarin.Forms
 open System.Net.Http
 open System.IO.Compression
 open System.Threading.Tasks
-open SixLabors.ImageSharp
-open SixLabors.ImageSharp.Processing
 open ICSharpCode.SharpZipLib.Zip
 
 open Common
 open Plugin.Permissions.Abstractions
 open Common.EventHelper
+open SkiaSharp
 
 
 
@@ -572,15 +571,18 @@ module WebAccess =
                     
             // try create thumb nail picture if necessary
             if not (File.Exists(thumbFullName)) then
-                use thumb = SixLabors.ImageSharp.Image.Load(imageFullName)
-                thumb.Mutate(fun x -> 
-                    x.Resize(200,200) |> ignore
-                    ()
-                    ) |> ignore                                        
 
-                use fileStream = new FileStream(thumbFullName,FileMode.Create)
-                thumb.SaveAsJpeg(fileStream)
-                fileStream.Close()
+                //use thumbInputStream = File.OpenRead()
+                use orig = SKBitmap.Decode(imageFullName)
+                use thumb = orig.Resize(SKImageInfo(200, 200),SKFilterQuality.Medium)
+                if thumb = null then
+                    ()
+                else
+                    use thumbImage = SKImage.FromBitmap(thumb)
+                    use fileStream = new FileStream(thumbFullName,FileMode.Create)
+                    thumbImage.Encode(SKEncodedImageFormat.Jpeg,90).SaveTo(fileStream)
+                  
+                    fileStream.Close()
         
             progress
 
