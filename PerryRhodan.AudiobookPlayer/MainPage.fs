@@ -79,7 +79,7 @@ open Services
             |> Async.RunSynchronously
             |> Array.map (fun i -> i.AudioBook)
 
-        {model with DummyUpdateValue=Guid.NewGuid()}, Cmd.ofMsg (LocalAudioBooksLoaded allDownloadedAndDownloadingItems), None
+        {model with DummyUpdateValue=Guid.NewGuid()}, Cmd.none (* Cmd.ofMsg (LocalAudioBooksLoaded allDownloadedAndDownloadingItems) *), None
     
     
     
@@ -91,15 +91,15 @@ open Services
             | Some excmd -> 
                 match excmd with
                 | AudioBookItem.ExternalMsg.UpdateAudioBook ab ->
-                    Cmd.ofMsg (UpdateAudioBook), Some (UpdateAudioBookGlobal (ab, "MainPage"))
+                    Cmd.none, Some (UpdateAudioBookGlobal (ab, "MainPage"))
                 | AudioBookItem.ExternalMsg.AddToDownloadQueue mdl ->
                     Cmd.ofMsg DoNothing, None
                 | AudioBookItem.ExternalMsg.RemoveFromDownloadQueue mdl ->
                     Cmd.ofMsg DoNothing, None
                 | AudioBookItem.ExternalMsg.OpenLoginPage _ ->
                     Cmd.ofMsg DoNothing, None
-                | AudioBookItem.ExternalMsg.PageChangeBusyState state ->
-                    Cmd.ofMsg (ChangeBusyState state), None
+                //| AudioBookItem.ExternalMsg.PageChangeBusyState state ->
+                //    Cmd.ofMsg (ChangeBusyState state), None
                 | AudioBookItem.ExternalMsg.OpenAudioBookPlayer ab ->
                     Cmd.none, Some (OpenAudioBookPlayer ab)
                 | AudioBookItem.ExternalMsg.OpenAudioBookDetail ab ->
