@@ -442,16 +442,36 @@ open AudioPlayer
         { model with PlaybackSpeed = speed }, Cmd.none, None
 
     
+    // repair model, if current track is greater than the actually count of files
+    // it can sometime happen. this has to leave inside until the bug is found
+    and fixModelWhenCurrentTrackGreaterThanNumberOfTracks model =
+        if model.CurrentAudioFileIndex > (model.AudioFileList.Length - 1) then
+            {model with CurrentAudioFileIndex = model.AudioFileList.Length - 1}
+        else
+            model
+
+    and onPlayBaseMsg rewindInSec model =
+        let playAudioCmd = model |> playAudio rewindInSec
+        
+        let newModel = 
+            {model with CurrentState = Playing}
+            |> setCurrentPositionToAudiobookState
+            |> updateLastListendTimeInAudioBookState
+        
+        newModel, Cmd.batch [ playAudioCmd; newModel |> saveNewAudioBookStateCmd ], None
 
     and onPlayMsg model = 
-
+        let model = model |> fixModelWhenCurrentTrackGreaterThanNumberOfTracks
         // determinate Rewind
         let rewindInSec =
             async {
-                match model.AudioBook.State.LastTimeListend with
-                | None ->
+                match model.CurrentPositionMs,model.AudioBook.State.LastTimeListend with
+                | _, None // no last time listend
+                | None, _ // current position is none or 0
+                | Some 0, _ ->
                     return 0
-                | Some lastTimeListend ->
+                | _, Some lastTimeListend ->
+                    
                     let minutesSinceLastListend =
                         (DateTime.Now.Subtract(lastTimeListend)).TotalMinutes
                     let secondsSinceLastListend =
@@ -469,28 +489,12 @@ open AudioPlayer
                             return! Services.SystemSettings.getRewindWhenStartAfterShortPeriodInSec ()
             } |> Async.RunSynchronously
             
-        
-
-
-        let playAudioCmd = model |> playAudio rewindInSec
-        
-        let newModel = 
-            {model with CurrentState = Playing}
-            |> setCurrentPositionToAudiobookState
-            |> updateLastListendTimeInAudioBookState
-        
-        newModel, Cmd.batch [ playAudioCmd; newModel |> saveNewAudioBookStateCmd ], None
+        model |> onPlayBaseMsg rewindInSec
 
 
     and onPlayWithoutRewindMsg model =
-        let playAudioCmd = model |> playAudio 0
-        
-        let newModel = 
-            {model with CurrentState = Playing}
-            |> setCurrentPositionToAudiobookState
-            |> updateLastListendTimeInAudioBookState
-        
-        newModel, Cmd.batch [ playAudioCmd; newModel |> saveNewAudioBookStateCmd ], None
+        let model = model |> fixModelWhenCurrentTrackGreaterThanNumberOfTracks
+        model |> onPlayBaseMsg 0
 
 
     and onPlayStartedMsg model =
@@ -500,7 +504,13 @@ open AudioPlayer
     and onStopMsg model =
         audioPlayer.StopAudio()
         let currentAudioBook = AudioBookItemProcessor.getAudioBookItem model.AudioBook.FullName |> Async.RunSynchronously
-        {model with AudioBook =currentAudioBook.AudioBook} , Cmd.none , None
+        let newModel =
+            match currentAudioBook with
+            | None -> model
+            | Some ca -> {model with AudioBook =ca.AudioBook}
+            
+            
+        newModel, Cmd.none , None
 
     
     and onNextAudioFileMsg model =
