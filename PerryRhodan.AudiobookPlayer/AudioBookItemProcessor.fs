@@ -131,13 +131,15 @@ let private abItemProcessor =
 let getAudioBookItem fullname =
     let msg replyChannel =
         GetAudioBookItem (fullname,replyChannel)
-    abItemProcessor.Force().PostAndAsyncReply(msg)
+    abItemProcessor.Force().PostAndReply(msg)
+    //abItemProcessor.Force().PostAndAsyncReply(msg)
 
 
 let getAudioBookItems fullname =
     let msg replyChannel =
         GetAudioBookItems (fullname,replyChannel)
-    abItemProcessor.Force().PostAndAsyncReply(msg)
+    abItemProcessor.Force().PostAndReply(msg)
+    //abItemProcessor.Force().PostAndAsyncReply(msg)
 
 let getDownloadingAndDownloadedAudioBookItems () =
     abItemProcessor.Force().PostAndAsyncReply(GetDownloadingAndDownloadedAudioBookItems)

@@ -25,6 +25,7 @@ open Services
         | LocalAudioBooksLoaded of AudioBook []
         | AudioBooksItemMsg of AudioBookItem.Model * AudioBookItem.Msg
         | UpdateAudioBook
+        | RefreshAudioBookList
 
         | ChangeBusyState of bool
         | DoNothing
@@ -54,6 +55,8 @@ open Services
             model |> onUpdateAudioBookMsg
         | ChangeBusyState state -> 
             model |> onChangeBusyStateMsg state
+        | RefreshAudioBookList ->
+            model |> onRefreshAudioBookListMsg
         | DoNothing ->
             model |> onDoNothingMsg
 
@@ -74,14 +77,16 @@ open Services
 
 
     and onUpdateAudioBookMsg model =
-        let allDownloadedAndDownloadingItems =
-            AudioBookItemProcessor.getDownloadingAndDownloadedAudioBookItems ()
-            |> Async.RunSynchronously
-            |> Array.map (fun i -> i.AudioBook)
-
-        {model with DummyUpdateValue=Guid.NewGuid()}, Cmd.none (* Cmd.ofMsg (LocalAudioBooksLoaded allDownloadedAndDownloadingItems) *), None
+        {model with DummyUpdateValue=Guid.NewGuid()}, Cmd.ofMsg RefreshAudioBookList, None
     
-    
+    and onRefreshAudioBookListMsg model =
+        let cmd =
+            let allDownloadedAndDownloadingItems =
+                AudioBookItemProcessor.getDownloadingAndDownloadedAudioBookItems ()
+                |> Async.RunSynchronously
+                |> Array.map (fun i -> i.AudioBook)
+            Cmd.ofMsg <| LocalAudioBooksLoaded allDownloadedAndDownloadingItems 
+        model, cmd, None
     
     and onProcessAudioBookItemMsg abModel msg model =
         let newModel, cmd, externalMsg = AudioBookItem.update msg abModel
@@ -91,7 +96,16 @@ open Services
             | Some excmd -> 
                 match excmd with
                 | AudioBookItem.ExternalMsg.UpdateAudioBook ab ->
-                    Cmd.none, Some (UpdateAudioBookGlobal (ab, "MainPage"))
+                    // in case you remove the audio book from the main page. refresh list of audio books
+                    let cmd =
+                        Cmd.ofMsg UpdateAudioBook
+                        //if not ab.AudioBook.State.Downloaded then
+                        //    Cmd.ofMsg RefreshAudioBookList 
+                        //else
+                        //    Cmd.none
+
+                    cmd, Some (UpdateAudioBookGlobal (ab, "MainPage"))
+
                 | AudioBookItem.ExternalMsg.AddToDownloadQueue mdl ->
                     Cmd.ofMsg DoNothing, None
                 | AudioBookItem.ExternalMsg.RemoveFromDownloadQueue mdl ->
@@ -177,7 +191,7 @@ open Services
                 | None ->()
                 | Some labItem ->
 
-                    let abItem = AudioBookItemProcessor.getAudioBookItem labItem |> Async.RunSynchronously
+                    let abItem = AudioBookItemProcessor.getAudioBookItem labItem
                     match abItem with
                     | None ->
                         ()
@@ -220,7 +234,7 @@ open Services
                                         content = 
                                             View.StackLayout(orientation=StackOrientation.Vertical,
                                                 children= [
-                                                    let abItems = AudioBookItemProcessor.getAudioBookItems model.Audiobooks |> Async.RunSynchronously
+                                                    let abItems = AudioBookItemProcessor.getAudioBookItems model.Audiobooks
                                                     for item in abItems do
                                                         let audioBookItemDispatch =
                                                             let d msg = AudioBooksItemMsg (item,msg)

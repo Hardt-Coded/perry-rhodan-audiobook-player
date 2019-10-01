@@ -350,7 +350,7 @@
                                                     model.DownloadQueue 
                                                     |> List.map (fun x -> x.AudioBook.FullName)
                                                     |> List.toArray
-                                                let abItems = AudioBookItemProcessor.getAudioBookItems downloadItemTitles |> Async.RunSynchronously
+                                                let abItems = AudioBookItemProcessor.getAudioBookItems downloadItemTitles
                                                 for item in abItems do
                                                     
                                                     yield item.AudioBook 

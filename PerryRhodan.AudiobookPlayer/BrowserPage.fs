@@ -665,7 +665,7 @@ open Global
                                     content = 
                                         View.StackLayout(orientation=StackOrientation.Vertical,
                                             children= [
-                                                let abItems = AudioBookItemProcessor.getAudioBookItems model.DisplayedAudioBooks |> Async.RunSynchronously
+                                                let abItems = AudioBookItemProcessor.getAudioBookItems model.DisplayedAudioBooks
                                                 for item in abItems do
                                                     let audioBookItemDispatch =
                                                         let d msg = AudioBooksItemMsg (item,msg)

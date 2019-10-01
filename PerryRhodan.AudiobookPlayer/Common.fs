@@ -121,7 +121,7 @@
                     async {
                         try
                             let! res = Application.Current.MainPage.DisplayAlert(title, message, accept, cancel) |> Async.AwaitTask
-                            tsc.SetResult(true)
+                            tsc.SetResult(res)
                         with
                         | _ as ex ->
                             Crashes.TrackError(ex)

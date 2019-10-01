@@ -503,7 +503,7 @@ open AudioPlayer
 
     and onStopMsg model =
         audioPlayer.StopAudio()
-        let currentAudioBook = AudioBookItemProcessor.getAudioBookItem model.AudioBook.FullName |> Async.RunSynchronously
+        let currentAudioBook = AudioBookItemProcessor.getAudioBookItem model.AudioBook.FullName
         let newModel =
             match currentAudioBook with
             | None -> model
