@@ -178,20 +178,23 @@ open Services
                 | Some labItem ->
 
                     let abItem = AudioBookItemProcessor.getAudioBookItem labItem |> Async.RunSynchronously
+                    match abItem with
+                    | None ->
+                        ()
+                    | Some abItem ->
+                        yield View.Label(text=Translations.current.LastListendAudioBookTitle, fontAttributes = FontAttributes.Bold,
+                            fontSize = 25.,
+                            horizontalOptions = LayoutOptions.Fill,
+                            horizontalTextAlignment = TextAlignment.Center,
+                            textColor = Consts.primaryTextColor,
+                            backgroundColor = Consts.cardColor,
+                            margin=0.).GridRow(0)
 
-                    yield View.Label(text=Translations.current.LastListendAudioBookTitle, fontAttributes = FontAttributes.Bold,
-                        fontSize = 25.,
-                        horizontalOptions = LayoutOptions.Fill,
-                        horizontalTextAlignment = TextAlignment.Center,
-                        textColor = Consts.primaryTextColor,
-                        backgroundColor = Consts.cardColor,
-                        margin=0.).GridRow(0)
+                        let audioBookItemDispatch =
+                            let d msg = AudioBooksItemMsg (abItem,msg)
+                            d >> dispatch
 
-                    let audioBookItemDispatch =
-                        let d msg = AudioBooksItemMsg (abItem,msg)
-                        d >> dispatch
-
-                    yield (AudioBookItem.view abItem audioBookItemDispatch).Margin(10.).GridRow(1)
+                        yield (AudioBookItem.view abItem audioBookItemDispatch).Margin(10.).GridRow(1)
 
                 yield View.Label(text=Translations.current.AudiobookOnDevice, fontAttributes = FontAttributes.Bold,
                                                 fontSize = 25.,

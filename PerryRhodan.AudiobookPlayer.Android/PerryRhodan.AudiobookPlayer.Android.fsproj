@@ -27,8 +27,8 @@
     <RestorePackages>true</RestorePackages>
     <OtherFlags>/warnon:1182</OtherFlags>
     <WarningLevel>4</WarningLevel>
-    <SelectedDevice>android_accelerated_x64_90</SelectedDevice>
-    <DefaultDevice>android_accelerated_x64_90</DefaultDevice>
+    <SelectedDevice>HUAWEI CLT-L29</SelectedDevice>
+    <DefaultDevice>pixel_2_pie_9_0_api_28</DefaultDevice>
     <AndroidDesignerPreferredTheme>Theme.DeviceDefault</AndroidDesignerPreferredTheme>
     <AndroidDesignerPreferredDevice>Nexus 4</AndroidDesignerPreferredDevice>
   </PropertyGroup>

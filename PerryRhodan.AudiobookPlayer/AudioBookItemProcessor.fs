@@ -5,7 +5,7 @@ open Common.EventHelper
 
 
 type private Msg =
-    | GetAudioBookItem of (string * AsyncReplyChannel<AudioBookItem.Model>)
+    | GetAudioBookItem of (string * AsyncReplyChannel<AudioBookItem.Model option>)
     | GetAudioBookItems of (string[] * AsyncReplyChannel<AudioBookItem.Model[]>)
     | GetDownloadingAndDownloadedAudioBookItems of AsyncReplyChannel<AudioBookItem.Model[]>
     | InsertAudioBooks of AudioBookItem.Model []
@@ -45,7 +45,7 @@ let private abItemProcessor =
                         | GetAudioBookItem (fullName,replyChannel) ->
                             let item =
                                 state 
-                                |> Array.find (fun i -> i.AudioBook.FullName = fullName)
+                                |> Array.tryFind (fun i -> i.AudioBook.FullName = fullName)
                             replyChannel.Reply(item)
                             return! (loop state)
                         | GetAudioBookItems (fullNames,replyChannel) ->
