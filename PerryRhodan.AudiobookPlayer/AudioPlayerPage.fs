@@ -42,6 +42,7 @@ open AudioPlayer
 
     type Msg = 
         | Play 
+        | PlayWithoutRewind
         | PlayStarted
         | Stop
         | PlayStopped
@@ -298,6 +299,8 @@ open AudioPlayer
         match msg with
         | Play -> 
             model |> onPlayMsg
+        | PlayWithoutRewind ->
+            model |> onPlayWithoutRewindMsg
         | PlayStarted -> 
             model |> onPlayStartedMsg          
         | Stop ->
@@ -322,7 +325,7 @@ open AudioPlayer
             model |> onSaveCurrentPosition     
         | OpenSleepTimerActionMenu ->
             model |> onOpenSleepTimerActionMenu  
-         | OpenPlaybackSpeedActionMenu ->
+        | OpenPlaybackSpeedActionMenu ->
             model |> onOpenPlaybackSpeedActionMenu
         | StartSleepTimer sleepTime ->
             model |> onSetSleepTime sleepTime
@@ -348,7 +351,7 @@ open AudioPlayer
         | SliderDragFinished ->
             let cmd = 
                 if model.HasPlayedBeforeDragSlider then
-                    Cmd.ofMsg Play
+                    Cmd.ofMsg PlayWithoutRewind
                 else
                     Cmd.none
             let newModel = { model with HasPlayedBeforeDragSlider = false; SliderIsDraged = false }
@@ -470,6 +473,17 @@ open AudioPlayer
 
 
         let playAudioCmd = model |> playAudio rewindInSec
+        
+        let newModel = 
+            {model with CurrentState = Playing}
+            |> setCurrentPositionToAudiobookState
+            |> updateLastListendTimeInAudioBookState
+        
+        newModel, Cmd.batch [ playAudioCmd; newModel |> saveNewAudioBookStateCmd ], None
+
+
+    and onPlayWithoutRewindMsg model =
+        let playAudioCmd = model |> playAudio 0
         
         let newModel = 
             {model with CurrentState = Playing}
