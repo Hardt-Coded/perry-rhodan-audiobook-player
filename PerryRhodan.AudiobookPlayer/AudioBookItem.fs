@@ -7,6 +7,7 @@
     open Xamarin.Forms
     open Services
     open Global
+    open System
 
     type Model = { AudioBook: AudioBook
                    CurrentDownloadProgress: (int * int) option
@@ -22,7 +23,7 @@
         | MarkAudioBookAsListend
         | UnmarkAudioBookAsListend
         | ChangeBusyState of bool
-        | ChangeGlobalBusyState of bool
+        //| ChangeGlobalBusyState of bool
         | UpdateDownloadProgress of (int * int) option
         | OpenAudioBookPlayer
         | OpenAudioBookDetail
@@ -36,7 +37,7 @@
         | UpdateAudioBook of Model
         | AddToDownloadQueue of Model
         | RemoveFromDownloadQueue of Model
-        | PageChangeBusyState of bool
+        //| PageChangeBusyState of bool
         | OpenAudioBookPlayer of AudioBook
         | OpenAudioBookDetail of AudioBook
 
@@ -49,10 +50,10 @@
         let setBusyCmd = Cmd.ofMsg (ChangeBusyState true)
 
 
-        let unsetGlobalBusyCmd = Cmd.ofMsg (ChangeGlobalBusyState false)
+        //let unsetGlobalBusyCmd = Cmd.ofMsg (ChangeGlobalBusyState false)
 
 
-        let setGlobalBusyCmd = Cmd.ofMsg (ChangeGlobalBusyState true)
+        //let setGlobalBusyCmd = Cmd.ofMsg (ChangeGlobalBusyState true)
 
         
 
@@ -63,9 +64,9 @@
             match res with
             | Error e ->
                 Common.Helpers.displayAlert(Translations.current.Error,e,"OK") |> Async.StartImmediate
-                return ChangeGlobalBusyState false
+                return DoNothing
             | Ok _ ->
-                return ChangeGlobalBusyState false
+                return DoNothing
         } |> Cmd.ofAsyncMsg
     
     let initModel audiobook = { AudioBook = audiobook; CurrentDownloadProgress = None; QueuedToDownload=false; IsDownloading = false }
@@ -94,8 +95,8 @@
             model |> onUpdateDownloadProgressMsg progress
         | ChangeBusyState state -> 
             model |> onChangeBusyStateMsg state
-        | ChangeGlobalBusyState state -> 
-            model |> onChangeGlobalBusyStateMsg state
+        //| ChangeGlobalBusyState state -> 
+        //    model |> onChangeGlobalBusyStateMsg state
         | Msg.OpenAudioBookPlayer  ->
             model |> onOpenAudioBookPlayerMsg
         | Msg.OpenAudioBookDetail ->
@@ -170,7 +171,7 @@
         let newAudioBook = {ab with State = newState; Picture = imageFullName; Thumbnail = thumbnail}                            
         let newModel = {model with AudioBook = newAudioBook }
         let updateStateCmd = newModel |> updateAudiobookInStateFile
-        newModel, Cmd.batch [Helpers.unsetBusyCmd;Helpers.setGlobalBusyCmd; updateStateCmd], Some (UpdateAudioBook newModel)
+        newModel, Cmd.batch [Helpers.unsetBusyCmd; updateStateCmd], Some (UpdateAudioBook newModel)
     
     
     and onDeleteAudioBookMsg model =
@@ -183,22 +184,33 @@
         | Ok _ ->
             let newModel = {model with AudioBook = newAudioBook }
             let updateStateCmd = newModel |> updateAudiobookInStateFile
-            newModel, Cmd.batch [Helpers.setGlobalBusyCmd;updateStateCmd ], Some (UpdateAudioBook newModel)
+            newModel, Cmd.batch [updateStateCmd ], Some (UpdateAudioBook newModel)
 
     
     and onMarkAudioBookListendMsg model =
-        let newState = {model.AudioBook.State with Completed = true}
-        let newAudioBook = {model.AudioBook with State = newState; }                
-        let newModel = {model with AudioBook = newAudioBook }
-        let updateStateCmd = newModel |> updateAudiobookInStateFile
-        newModel, Cmd.batch [Helpers.setGlobalBusyCmd; updateStateCmd ], Some (UpdateAudioBook newModel)
+        if model.AudioBook.State.Completed then
+            model, Cmd.none, None
+        else
+            let newState = {model.AudioBook.State with Completed = true}
+            let newAudioBook = {model.AudioBook with State = newState; }                
+            let newModel = {model with AudioBook = newAudioBook }
+            let updateStateCmd = newModel |> updateAudiobookInStateFile
+            newModel, Cmd.batch [ updateStateCmd ], Some (UpdateAudioBook newModel)
     
     and onMarkAudioBookUnlistendMsg model =
-        let newState = {model.AudioBook.State with Completed = false}
-        let newAudioBook = {model.AudioBook with State = newState; }
-        let newModel = {model with AudioBook = newAudioBook }
-        let updateStateCmd = newModel |> updateAudiobookInStateFile
-        newModel, Cmd.batch [Helpers.setGlobalBusyCmd; updateStateCmd ], Some (UpdateAudioBook newModel)
+        if not model.AudioBook.State.Completed then
+            model, Cmd.none, None
+        else
+            let newState = {
+                model.AudioBook.State 
+                    with 
+                        Completed = false
+                        CurrentPosition = None
+            }
+            let newAudioBook = {model.AudioBook with State = newState;  }
+            let newModel = {model with AudioBook = newAudioBook }
+            let updateStateCmd = newModel |> updateAudiobookInStateFile
+            newModel, Cmd.batch [ updateStateCmd ], Some (UpdateAudioBook newModel)
     
     
     and onUpdateDownloadProgressMsg progress model =
@@ -209,8 +221,8 @@
         {model with IsDownloading = state}, Cmd.none, None
 
     
-    and onChangeGlobalBusyStateMsg state model =
-        model, Cmd.none, Some (PageChangeBusyState state)
+    //and onChangeGlobalBusyStateMsg state model =
+    //    model, Cmd.none, Some (PageChangeBusyState state)
     
     
     and onOpenAudioBookPlayerMsg model =

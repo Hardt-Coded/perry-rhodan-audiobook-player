@@ -561,8 +561,8 @@ open Global
                     Cmd.none, Some (DownloadQueueMsg (DownloadQueue.Msg.RemoveItemFromQueue mdl))
                 | AudioBookItem.ExternalMsg.OpenLoginPage cameFrom ->
                     Cmd.ofMsg DoNothing, Some (OpenLoginPage cameFrom)
-                | AudioBookItem.ExternalMsg.PageChangeBusyState state ->
-                    Cmd.ofMsg (ChangeBusyState state), None
+                //| AudioBookItem.ExternalMsg.PageChangeBusyState state ->
+                //    Cmd.ofMsg (ChangeBusyState state), None
                 | AudioBookItem.ExternalMsg.OpenAudioBookPlayer ab ->
                     Cmd.none, Some (OpenAudioBookPlayer ab)
                 | AudioBookItem.ExternalMsg.OpenAudioBookDetail ab ->

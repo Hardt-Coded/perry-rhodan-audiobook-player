@@ -578,18 +578,21 @@ open AudioPlayer
 
 
     and onUpdatePositionMsg (position, duration) model =
-        let trackProcess = 
-            if (duration = 0) then 0.
-            else
-                (position |> float) / (duration |> float)
+        if model.SliderIsDraged then
+            model, Cmd.none, None
+        else
+            let trackProcess = 
+                if (duration = 0) then 0.
+                else
+                    (position |> float) / (duration |> float)
 
-        {model with 
-            CurrentPosition = Some (position |> toTimeSpan)
-            CurrentPositionMs = Some position
-            CurrentDuration = Some (duration |> toTimeSpan)
-            CurrentDurationMs = Some duration
-            TrackPositionProcess = trackProcess
-        }, Cmd.none, None
+            {model with 
+                CurrentPosition = Some (position |> toTimeSpan)
+                CurrentPositionMs = Some position
+                CurrentDuration = Some (duration |> toTimeSpan)
+                CurrentDurationMs = Some duration
+                TrackPositionProcess = trackProcess
+            }, Cmd.none, None
 
 
     and onProgressBarChangedMsg e model =
