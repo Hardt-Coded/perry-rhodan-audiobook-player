@@ -154,8 +154,10 @@
 
         type InfoDispatcherMsg =
             | AddListener of (string * (AudioPlayerInfo -> Async<unit>))
-            | RemoveListener of string
+            | RemoveListener of (string * AsyncReplyChannel<bool>)
             | Dispatch of AudioPlayerInfo
+            | RegisterShutDownEvent of (AudioPlayerInfo -> Async<unit>)
+            | ShutDownService
 
 
         let audioPlayerStateInformationDispatcher =
@@ -172,16 +174,28 @@
                                         state @ [(key,handler)]
                                     else
                                         state
-                                | RemoveListener key ->
-                                    state |> List.filter (fun (k,_) -> k <> key)
+                                | RemoveListener (key,reply) ->
+                                    let newState =
+                                        state |> List.filter (fun (k,_) -> k <> key)
+                                    reply.Reply(true)
+                                    newState
                                 | Dispatch info ->
                                     let aseq =
                                         asyncSeq {
-                                            for (_,handler) in state do
+                                            for (_,handler) in state |> List.filter (fun (k,_) -> k <> "audioplayer-shutdown-event") do
                                                 do! handler(info)
                                         }
                                         |> AsyncSeq.toList
                                     state
+                                | RegisterShutDownEvent handler ->
+                                    state @ [("audioplayer-shutdown-event",handler)]
+                                | ShutDownService ->
+                                    let shutdownhandler =
+                                        state |> List.tryFind (fun (key,_) -> key = "audioplayer-shutdown-event")
+                                    shutdownhandler
+                                    |> Option.iter (fun (_,h) -> h(AudioPlayerInfo.Empty) |> Async.RunSynchronously)
+                                    state
+                                    
                                     
                                              
                             do! loop newState
@@ -196,7 +210,8 @@
 
     let audioPlayerStateMailbox         
         (audioService:IAudioServiceImplementation)
-        (informationDispatcher: MailboxProcessor<InformationDispatcher.InfoDispatcherMsg>) =        
+        (informationDispatcher: MailboxProcessor<InformationDispatcher.InfoDispatcherMsg>) =
+             
         MailboxProcessor<AudioPlayerCommand>.Start(
             fun inbox ->
                 

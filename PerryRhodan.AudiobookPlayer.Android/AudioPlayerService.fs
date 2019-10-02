@@ -146,6 +146,8 @@ module rec AudioPlayerServiceImplementation =
                     | Keycode.MediaRewind | Keycode.MediaStepBackward ->
                         ServiceActions.JUMP_BACKWARD_PLAYER
                         |> Helpers.sendCommandToService typeof<Services.AudioPlayerService> [] []
+                    | _ ->
+                        ()
 
 
     module Dependencies =
@@ -451,11 +453,11 @@ module rec AudioPlayerServiceImplementation =
                     .SetSmallIcon(icon)                    
                     .SetContentIntent(buildIntentToShowMainActivity())
                     .SetOngoing(true)                      
-                    .AddAction(buildPreviousAudioAction())
+                    //.AddAction(buildPreviousAudioAction())
                     .AddAction(buildBackwardAudioAction())
                     .AddAction(buildStartStopToggleAction info)
                     .AddAction(buildForwardAudioAction())
-                    .AddAction(buildNextAudioAction())
+                    //.AddAction(buildNextAudioAction())
                     .AddAction(buildQuitPlayerAction())
                     .SetVisibility(NotificationVisibility.Public)
                     
@@ -562,7 +564,8 @@ module rec AudioPlayerServiceImplementation =
             (service:Services.AudioPlayerService)
             (mediaPlayer:MediaPlayer byref)
             (mediaSession:MediaSession byref)
-            (stopPlayer:AudioPlayerInfo->AudioPlayerInfo)            
+            (stopPlayer:AudioPlayerInfo->AudioPlayerInfo)
+            (informationDispatcher:MailboxProcessor<InformationDispatcher.InfoDispatcherMsg>)
             info =
                 match info.ServiceState with
                 | AudioPlayerServiceState.Started ->
@@ -574,12 +577,19 @@ module rec AudioPlayerServiceImplementation =
                         | _ -> 
                             info
 
-                    service.StopForeground(true)
-                    service.StopSelf()                    
+                    
+                    let _ = informationDispatcher.PostAndReply(fun channel -> InformationDispatcher.RemoveListener ("notifyUpdater",channel))
+                    let _ = informationDispatcher.PostAndReply(fun channel -> InformationDispatcher.RemoveListener ("abPage",channel))
+                    informationDispatcher.Post(InformationDispatcher.ShutDownService)
+                                        
                     
                     let notificationManager = Android.App.Application.Context.GetSystemService(Android.Content.Context.NotificationService) :?> NotificationManager
                     notificationManager.Cancel(Notification.SERVICE_RUNNING_NOTIFICATION_ID)
                     mediaSession.Dispose()
+                    service.StopForeground(true)
+                    service.StopSelf()
+                    service.StopService(new Intent(service.ApplicationContext,service.Class)) |> ignore
+                    
                     newState
                 | _ ->
                     info
@@ -894,6 +904,7 @@ module rec AudioPlayerServiceImplementation =
                         &mediaPlayer
                         &mediaSession
                         stopPlayer
+                        informationDispatcher
                         info
 
                 member this.StartAudioPlayer info =
@@ -1064,6 +1075,9 @@ module rec AudioPlayerServiceImplementation =
                                 Some (time |> Common.TimeSpanHelpers.toTimeSpan)
                         stateMailBox.Post(StartSleepTimer time)
                     | x when x = QUIT_PLAYER ->
+                        //
+                        stateMailBox.Post(StopAudioPlayer false)
+                        //stateMailBox.Post(StopAudioService)
                         stateMailBox.Post(QuitAudioPlayer)
 
                     | x when x = SET_PLAYBACKSPEED ->
