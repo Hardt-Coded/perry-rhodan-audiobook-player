@@ -63,6 +63,7 @@ module App =
         | GotoBrowserPage
         | ProcessFurtherActionsOnBrowserPageAfterLogin of Map<string,string> * LoginRequestCameFrom
         | GotoAudioPlayerPage of AudioBook
+        | CloseAudioPlayerPage
         | GotoLoginPage of LoginRequestCameFrom
         | LoginClosed
         | GotoPermissionDeniedPage
@@ -197,6 +198,8 @@ module App =
             model |> onGotoBrowserPageMsg
         | GotoAudioPlayerPage audioBook ->
             model |> onGotoAudioPageMsg audioBook
+        | CloseAudioPlayerPage ->
+            model |> onCloseAudioPlayerPageMsg
         | GotoPermissionDeniedPage ->
             model |> onGotoPermissionDeniedMsg
         | GotoSettingsPage ->
@@ -550,6 +553,10 @@ module App =
                 model, Cmd.none
 
 
+    and onCloseAudioPlayerPageMsg model =
+        {model with AudioPlayerPageModel = None}, Cmd.none
+
+
     and onGotoPermissionDeniedMsg model =
         async {
             do! Common.Helpers.displayAlert(Translations.current.Error,"Ohne Freigabe auf den Speicher funktioniert die App nicht. Sie wird jetzt beendet.", "OK") 
@@ -648,6 +655,8 @@ module App =
                 Services.DataBase.Events.storageProcessorOnAudiobookAdded.Add(fun items ->
                     AudioBookItemProcessor.insertAudiobooks items
                 )
+
+            AudioPlayer.InformationDispatcher.audioPlayerStateInformationDispatcher.Post(AudioPlayer.InformationDispatcher.RegisterShutDownEvent (fun _ -> async { return dispatch CloseAudioPlayerPage }))
         )
 
         
