@@ -352,6 +352,7 @@
 
                 and onQuitAudioPlayer state =
                     Helpers.storeCurrentAudiobookState state
+                    state |> audioService.StopAudioService |> ignore
                     System.Diagnostics.Process.GetCurrentProcess().CloseMainWindow() |> ignore
 
 
