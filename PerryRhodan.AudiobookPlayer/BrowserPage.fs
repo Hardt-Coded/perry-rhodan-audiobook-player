@@ -133,9 +133,14 @@ open Global
                 let shell = Shell.Current
                 let item = shell.CurrentItem
                 if item.CurrentItem.Title = Translations.current.TabBarBrowserLabel then
-                    dispatch closeEventMsg
-                    if prevPageMap.ContainsKey(p.Title) then
-                        prevPageMap.Remove(p.Title) |> ignore
+                    // disapear also is triggered when a new popup overlayes the old one.
+                    // if the current page is not the last page in the page map, than do not call the
+                    // close event msg
+                    let lastPageMapTitle =  prevPageMap.Keys |> Seq.last
+                    if lastPageMapTitle = p.Title then
+                        dispatch closeEventMsg
+                        if prevPageMap.ContainsKey(p.Title) then
+                            prevPageMap.Remove(p.Title) |> ignore
             )
 
             sr.Navigation.PushAsync(p) |> Async.AwaitTask |> Async.StartImmediate
@@ -155,8 +160,10 @@ open Global
                 match hasPageInStack with
                 | None ->
                     // creates a new page and push it to the modal stack
-                    page |> pushPageInternal dispatch sr (closeMessage pageTitle)
+                    // update page map first, because the disappeare event will rely on that, that the new page is already in the dict
                     prevPageMap.Add(pageTitle,page)
+                    page |> pushPageInternal dispatch sr (closeMessage pageTitle)
+                    
                     ()
                 | _ ->
                     ()
@@ -218,6 +225,7 @@ open Global
             
                 let cp = Controls.contentPageWithBottomOverlay subRef None (browseView newModel dispatch) false newStateItem.GroupName
                 pushAction dispatch RemoveLastSelectGroup newStateItem.GroupName false pageRef cp
+                
                 ()
             |> Cmd.ofSub
 
