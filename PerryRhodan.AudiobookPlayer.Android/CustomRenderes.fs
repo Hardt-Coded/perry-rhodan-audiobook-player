@@ -44,14 +44,31 @@ module CustomRender =
         
 
 
+    open System
+    open System.ComponentModel
+    // add fix for null reference exception error in xamarin, in disposting
+    // https://github.com/xamarin/Xamarin.Forms/issues/6640
     type CustomShellRenderer (context) =
         inherit ShellRenderer(context) 
+
+        let mutable disposed = false
 
         override this.CreateBottomNavViewAppearanceTracker(item) =
             let sctx = this :> IShellContext
             new MyShellBottomNavViewAppearanceTracker(sctx,item) :> IShellBottomNavViewAppearanceTracker
 
-
+        override this.Dispose(disposing) =
+            if (disposed) then
+                ()
+            else if (disposing) then
+                let pcEventHandler:PropertyChangedEventHandler = 
+                    Delegate.CreateDelegate(typeof<PropertyChangedEventHandler>,this,"OnElementPropertyChanged") :?> PropertyChangedEventHandler
+                this.Element.PropertyChanged.RemoveHandler(pcEventHandler)
+                let sizeChangedDelegate = Delegate.CreateDelegate(typeof<EventHandler>,this,"OnElementSizeChanged") :?> EventHandler
+                this.Element.SizeChanged.RemoveHandler(sizeChangedDelegate)
+            
+            disposed <- true
+                
 
 
     type WorkaroundNotScrollableViewRenderer(context) =
