@@ -142,7 +142,7 @@ let getAudioBookItems fullname =
     //abItemProcessor.Force().PostAndAsyncReply(msg)
 
 let getDownloadingAndDownloadedAudioBookItems () =
-    abItemProcessor.Force().PostAndAsyncReply(GetDownloadingAndDownloadedAudioBookItems)
+    abItemProcessor.Force().PostAndReply(GetDownloadingAndDownloadedAudioBookItems)
 
 let updateAudiobookItem item =
     abItemProcessor.Force().Post(UpdateAudioBookItem item)
