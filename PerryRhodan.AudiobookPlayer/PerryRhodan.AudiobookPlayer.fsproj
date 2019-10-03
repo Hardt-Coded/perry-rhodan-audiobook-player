@@ -54,4 +54,7 @@
     <PackageReference Update="FSharp.Core" Version="4.6.2" /> <!-- workaround for VSMac bug https://github.com/mono/monodevelop/pull/5137 --> 
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
   </ItemGroup>
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="rem copy android fix dll&#xD;&#xA;copy $(ProjectDir)\..\FrameworkIssueFixes\Fabulous.XamarinForms.dll $(ProjectDir)\..\Packages\Fabulous.XamarinForms.0.42.0\lib\netstandard2.0" />
+  </Target>
 </Project>
