@@ -83,7 +83,6 @@ open Services
         let cmd =
             let allDownloadedAndDownloadingItems =
                 AudioBookItemProcessor.getDownloadingAndDownloadedAudioBookItems ()
-                |> Async.RunSynchronously
                 |> Array.map (fun i -> i.AudioBook)
             Cmd.ofMsg <| LocalAudioBooksLoaded allDownloadedAndDownloadingItems 
         model, cmd, None
