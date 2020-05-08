@@ -958,7 +958,7 @@ module rec AudioPlayerServiceImplementation =
     
     module Services =
 
-        [<Service(Name="Perry.Rhodan.AudioService")>]
+        [<Service(Name="perry.rhodan.audioservice")>]
         type AudioPlayerService() as self =
             inherit Android.Service.Media.MediaBrowserService()
 
