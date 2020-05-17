@@ -76,7 +76,7 @@ open AudioPlayer
 
     let audioPlayer = DependencyService.Get<AudioPlayer.IAudioPlayer>()
 
-    let pageRef = ViewRef<ContentPage>()
+    let pageRef = ViewRef<CustomContentPage>()
         
     
 
@@ -657,10 +657,10 @@ open AudioPlayer
           title=Translations.current.AudioPlayerPage,useSafeArea=true,
           backgroundColor = Consts.backgroundColor,
           content = 
-            View.Grid(padding = 20.,
+            View.Grid(padding = Thickness 20.,
                 horizontalOptions = LayoutOptions.Fill,
                 verticalOptions = LayoutOptions.Fill,                
-                rowdefs = [ box "*"; box "*"; box "*"; box "auto" ],
+                rowdefs = [ Star; Star; Star; Auto ],
                 
                 children = [
 
@@ -670,26 +670,26 @@ open AudioPlayer
                             View.Grid(
                                 horizontalOptions = LayoutOptions.Fill,
                                 verticalOptions = LayoutOptions.Fill,                
-                                rowdefs = [ box "auto"; box "auto"; box "auto" ],
+                                rowdefs = [ Auto; Auto; Auto ],
                                 children = [
-                                    yield (Controls.primaryTextColorLabel 25. (title)).GridRow(0)
-                                    yield (Controls.primaryTextColorLabel 30. (currentTrackString)).GridRow(1).HorizontalOptions(LayoutOptions.Center)
-                                    yield (Controls.primaryTextColorLabel 30. (currentTimeString)).GridRow(2).HorizontalOptions(LayoutOptions.Center)
+                                    yield (Controls.primaryTextColorLabel 25. (title)).Row(0)
+                                    yield (Controls.primaryTextColorLabel 30. (currentTrackString)).Row(1).HorizontalOptions(LayoutOptions.Center)
+                                    yield (Controls.primaryTextColorLabel 30. (currentTimeString)).Row(2).HorizontalOptions(LayoutOptions.Center)
                                 ]
-                            ).GridRow(0)
+                            ).Row(0)
                     )
                     
                     yield View.Image(
-                        source=
+                        source= 
                             match model.AudioBook.Picture with
-                            | None -> "AudioBookPlaceholder_Dark.png"
-                            | Some p -> p
+                            | None -> ImagePath "AudioBookPlaceholder_Dark.png"
+                            | Some p -> ImagePath p
                             ,
                         horizontalOptions=LayoutOptions.Fill,
                         verticalOptions=LayoutOptions.Fill,
                         aspect=Aspect.AspectFit
                         
-                        ).GridRow(1)
+                        ).Row(1)
                     
                     let runIfNotBusy (cmd:(unit->unit)) =
                         if not model.AudioPlayerBusy 
@@ -699,22 +699,22 @@ open AudioPlayer
                            
 
                     yield View.Grid(
-                        coldefs=[box "*";box "*";box "*";box "*";box "*"],
-                        rowdefs=[box "*";box "*" ],
+                        coldefs=[Star;Star;Star;Star;Star],
+                        rowdefs=[Star;Star ],
                         children=[
-                            yield (Controls.primaryColorSymbolLabelWithTapCommand ((fun () -> dispatch PreviousAudioFile) |> runIfNotBusy) 30. true "\uf048").GridColumn(0).GridRow(0)
-                            yield (Controls.primaryColorSymbolLabelWithTapCommand ((fun () -> dispatch JumpBackwards) |> runIfNotBusy) 30. true "\uf04a").GridColumn(1).GridRow(0)
+                            yield (Controls.primaryColorSymbolLabelWithTapCommand ((fun () -> dispatch PreviousAudioFile) |> runIfNotBusy) 30. true "\uf048").Column(0).Row(0)
+                            yield (Controls.primaryColorSymbolLabelWithTapCommand ((fun () -> dispatch JumpBackwards) |> runIfNotBusy) 30. true "\uf04a").Column(1).Row(0)
 
                             match model.CurrentState with
                             | Stopped ->
-                                yield (Controls.primaryColorSymbolLabelWithTapCommand (fun () -> dispatch Play) 60. false "\uf144").GridColumn(2).GridRow(0)
+                                yield (Controls.primaryColorSymbolLabelWithTapCommand (fun () -> dispatch Play) 60. false "\uf144").Column(2).Row(0)
                             | Playing ->
-                                yield (Controls.primaryColorSymbolLabelWithTapCommand (fun () -> dispatch Stop) 60. false "\uf28b").GridColumn(2).GridRow(0)
+                                yield (Controls.primaryColorSymbolLabelWithTapCommand (fun () -> dispatch Stop) 60. false "\uf28b").Column(2).Row(0)
 
                                 
                             
-                            yield (Controls.primaryColorSymbolLabelWithTapCommand ((fun () -> dispatch JumpForward) |> runIfNotBusy) 30. true "\uf04e").GridColumn(3).GridRow(0)
-                            yield (Controls.primaryColorSymbolLabelWithTapCommand ((fun () -> dispatch NextAudioFile) |> runIfNotBusy) 30. true "\uf051").GridColumn(4).GridRow(0)
+                            yield (Controls.primaryColorSymbolLabelWithTapCommand ((fun () -> dispatch JumpForward) |> runIfNotBusy) 30. true "\uf04e").Column(3).Row(0)
+                            yield (Controls.primaryColorSymbolLabelWithTapCommand ((fun () -> dispatch NextAudioFile) |> runIfNotBusy) 30. true "\uf051").Column(4).Row(0)
                             
                             yield (View.Slider(
                                     value=model.TrackPositionProcess,
@@ -729,9 +729,9 @@ open AudioPlayer
                                         slider.DragCompleted.Add(fun _ -> dispatch SliderDragFinished)
                                     )
                                     
-                                  )).GridColumnSpan(5).GridRow(1)
+                                  )).ColumnSpan(5).Row(1)
 
-                        ]).GridRow(2)
+                        ]).Row(2)
                     
                     yield View.StackLayout(orientation=StackOrientation.Horizontal,
                             children=[
@@ -744,7 +744,7 @@ open AudioPlayer
                                         sprintf "%02i:%02i" (tus.TotalMinutes |> int) tus.Seconds
                                     yield (Controls.primaryTextColorLabel 25. formatedTus)
                             ]
-                        ).GridRow(3)
+                        ).Row(3)
 
                     yield View.StackLayout(
                         orientation=StackOrientation.Horizontal,
@@ -758,10 +758,10 @@ open AudioPlayer
                             
                             
                         ]
-                            ).GridRow(3)
+                            ).Row(3)
                     
                     if model.IsLoading then 
-                        yield Common.createBusyLayer().GridRowSpan(4)
+                        yield Common.createBusyLayer().RowSpan(4)
                 ]
             )
           
@@ -769,8 +769,8 @@ open AudioPlayer
 
     let viewSmall openPlayerPageCommand (model: Model) dispatch =
         View.Grid(
-            coldefs=["auto"; "*"; "auto"; "auto"; "auto"],
-            rowdefs=["auto"; 2.0],
+            coldefs=[Auto; Star; Auto; Auto; Auto],
+            rowdefs=[Auto; Absolute 2.0],
             backgroundColor=Consts.cardColor,
             gestureRecognizers = [
                 View.TapGestureRecognizer(command=openPlayerPageCommand)
@@ -781,42 +781,42 @@ open AudioPlayer
                 yield View.Image(
                     source=
                         match model.AudioBook.Picture with
-                        | None -> "AudioBookPlaceholder_Dark.png"
-                        | Some p -> p
+                        | None -> ImagePath "AudioBookPlaceholder_Dark.png"
+                        | Some p -> ImagePath p
                         ,
                     horizontalOptions=LayoutOptions.Fill,
                     verticalOptions=LayoutOptions.Fill,
                     aspect=Aspect.AspectFit,
-                    widthRequest = 30.,
-                    heightRequest = 30.,
+                    width = 30.,
+                    height = 30.,
                     margin=Thickness(5.,3.,5.,3.)
                     
-                    ).GridColumn(0)
+                    ).Column(0)
 
                 yield (Controls.primaryTextColorLabel 12. (model.AudioBook.FullName ))
-                    .GridColumn(1)
+                    .Column(1)
                     .With(horizontalOptions=LayoutOptions.Start, margin=Thickness(5.,0.,0.,0.))
                     
                 if not model.IsLoading then
                     yield (Controls.primaryTextColorLabel 12. (sprintf "%i/%i" (model.CurrentAudioFileIndex + 1) model.AudioFileList.Length ))
-                        .GridColumn(2)
+                        .Column(2)
                     yield (Controls.primaryTextColorLabel 12. (sprintf "%s" currentPos))
-                        .GridColumn(3)
+                        .Column(3)
                 match model.CurrentState with
                 | Stopped ->
                     yield (Controls.primaryColorSymbolLabelWithTapCommandRightAlign (fun () -> dispatch Play) 30. false "\uf144")
-                        .GridColumn(4)
-                        .GridRow(0)
+                        .Column(4)
+                        .Row(0)
                         .With(margin=Thickness(5.,3.,5.,3.))
                 | Playing ->
                     yield (Controls.primaryColorSymbolLabelWithTapCommandRightAlign (fun () -> dispatch Stop) 30. false "\uf28b")
-                        .GridColumn(4)
-                        .GridRow(0)
+                        .Column(4)
+                        .Row(0)
                         .With(margin=Thickness(5.,3.,5.,3.))
 
                 yield View.BoxView(color=Consts.backgroundColor,horizontalOptions=LayoutOptions.Fill)
-                    .GridRow(1)
-                    .GridColumnSpan(5)
+                    .Row(1)
+                    .ColumnSpan(5)
 
             ]
         )

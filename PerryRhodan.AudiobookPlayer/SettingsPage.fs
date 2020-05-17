@@ -391,19 +391,19 @@
     let settingsEntry label value onTap =
         
         View.Grid(
-            rowdefs=["auto";"auto";1.0],
+            rowdefs=[Auto;Auto;Absolute 1.0],
             horizontalOptions=LayoutOptions.Start,
             children=[
                 (Controls.primaryTextColorLabel Common.FontSizeHelper.mediumLabel label)
-                    .GridRow(0)
+                    .Row(0)
                     .Margin(Thickness(10.,0.,0.,0.))
                     .HorizontalTextAlignment(TextAlignment.Start)
                 (Controls.secondaryTextColorLabel Common.FontSizeHelper.smallLabel value)
-                    .GridRow(1)
+                    .Row(1)
                     .Margin(Thickness(30.,0.,0.,0.))
                     .HorizontalTextAlignment(TextAlignment.Start)
                 View.BoxView(color=Common.Consts.cardColor)
-                    .GridRow(2)
+                    .Row(2)
                     .HorizontalOptions(LayoutOptions.Fill)
 
             ]
@@ -453,39 +453,39 @@
                                     View.StackLayout(
                                         gestureRecognizers= [View.TapGestureRecognizer(command=(fun () -> dispatch (SetDeveloperModeSwitchCounter (model.DeveloperModeSwitchCounter + 1))))],
                                         orientation=StackOrientation.Vertical,
-                                        margin=5.0,
+                                        margin=Thickness 5.0,
                                         children=[
                                             
                                             yield View.Grid(
-                                                coldefs=[ "*" ],
-                                                rowdefs=[ "auto"; "auto"; "auto";"auto"; "auto" ],
+                                                coldefs=[ Star ],
+                                                rowdefs=[ Auto; Auto; Auto;Auto; Auto ],
                                                 children=[
 
                                                     yield (settingsEntry 
                                                         Translations.current.RewindWhenStartAfterShortPeriodInSec 
                                                         (sprintf "%i %s" mdl.RewindWhenStartAfterShortPeriodInSec Translations.current.Seconds)
-                                                        (fun ()->dispatch OpenRewindWhenStartAfterShortPeriodInSecPicker)).GridRow(0)
+                                                        (fun ()->dispatch OpenRewindWhenStartAfterShortPeriodInSecPicker)).Row(0)
 
                                                     yield (settingsEntry 
                                                         Translations.current.RewindWhenStartAfterLongPeriodInSec 
                                                         (sprintf "%i %s" mdl.RewindWhenStartAfterLongPeriodInSec Translations.current.Seconds)
-                                                        (fun ()->dispatch OpenRewindWhenStartAfterLongPeriodInSecPicker)).GridRow(1)
+                                                        (fun ()->dispatch OpenRewindWhenStartAfterLongPeriodInSecPicker)).Row(1)
 
                                                     yield (settingsEntry 
                                                         Translations.current.LongPeriodBeginsAfterInMinutes 
                                                         (sprintf "%i %s" mdl.LongPeriodBeginsAfterInMinutes Translations.current.Minutes)
-                                                        (fun ()->dispatch OpenLongPeriodBeginsAfterInMinutesPicker)).GridRow(2)
+                                                        (fun ()->dispatch OpenLongPeriodBeginsAfterInMinutesPicker)).Row(2)
 
                                                     yield (settingsEntry 
                                                         Translations.current.JumpDistance 
                                                         (sprintf "%i %s" mdl.JumpDistance Translations.current.Seconds)
-                                                        (fun () -> dispatch OpenJumpDistancePicker)).GridRow(3)
+                                                        (fun () -> dispatch OpenJumpDistancePicker)).Row(3)
 
                                                     if mdl.DeveloperMode then
                                                         yield (settingsEntry 
                                                             "DeveloperMode" 
                                                             "Unter anderem kann man Einträge aus der DB löschen"
-                                                            (fun () -> ())).GridRow(4)
+                                                            (fun () -> ())).Row(4)
                                                 ]
                                             )
 

@@ -88,7 +88,7 @@ module App =
         View.ShellContent(
             title=title,
             route=route,
-            icon=icon,
+            icon=ImagePath icon,
             content=content,
             shellBackgroundColor=Consts.backgroundColor,
             shellForegroundColor=Consts.primaryTextColor
@@ -98,7 +98,7 @@ module App =
     let createShellSection title route icon content =
         View.ShellSection(
             title=title,
-            icon=icon,
+            icon=ImagePath icon,
             items = [
                 createShellContent title route icon content
             ]
