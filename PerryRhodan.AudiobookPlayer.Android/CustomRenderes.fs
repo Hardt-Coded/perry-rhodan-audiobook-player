@@ -11,8 +11,8 @@ open Xamarin.Forms.Platform.Android
 
 module CustomRender =
 
-
-    type MyShellBottomNavViewAppearanceTracker(context,item) =
+    // The Selected Item appears to be brighter and not the other way around as it seems normal!
+    type BrighterIconAndTextOnSelectedITemBottomNavViewAppearanceTracker(context,item) =
         inherit ShellBottomNavViewAppearanceTracker(context,item)
 
         let makeColorStateList () =
@@ -48,26 +48,27 @@ module CustomRender =
     open System.ComponentModel
     // add fix for null reference exception error in xamarin, in disposting
     // https://github.com/xamarin/Xamarin.Forms/issues/6640
+    // fixed with a newer version of Xamarin
     type CustomShellRenderer (context) =
         inherit ShellRenderer(context) 
 
-        let mutable disposed = false
+        //let mutable disposed = false
 
         override this.CreateBottomNavViewAppearanceTracker(item) =
             let sctx = this :> IShellContext
-            new MyShellBottomNavViewAppearanceTracker(sctx,item) :> IShellBottomNavViewAppearanceTracker
+            new BrighterIconAndTextOnSelectedITemBottomNavViewAppearanceTracker(sctx,item) :> IShellBottomNavViewAppearanceTracker
 
-        override this.Dispose(disposing) =
-            if (disposed) then
-                ()
-            else if (disposing) then
-                let pcEventHandler:PropertyChangedEventHandler = 
-                    Delegate.CreateDelegate(typeof<PropertyChangedEventHandler>,this,"OnElementPropertyChanged") :?> PropertyChangedEventHandler
-                this.Element.PropertyChanged.RemoveHandler(pcEventHandler)
-                let sizeChangedDelegate = Delegate.CreateDelegate(typeof<EventHandler>,this,"OnElementSizeChanged") :?> EventHandler
-                this.Element.SizeChanged.RemoveHandler(sizeChangedDelegate)
+        //override this.Dispose(disposing) =
+        //    if (disposed) then
+        //        ()
+        //    else if (disposing) then
+        //        let pcEventHandler:PropertyChangedEventHandler = 
+        //            Delegate.CreateDelegate(typeof<PropertyChangedEventHandler>,this,"OnElementPropertyChanged") :?> PropertyChangedEventHandler
+        //        this.Element.PropertyChanged.RemoveHandler(pcEventHandler)
+        //        let sizeChangedDelegate = Delegate.CreateDelegate(typeof<EventHandler>,this,"OnElementSizeChanged") :?> EventHandler
+        //        this.Element.SizeChanged.RemoveHandler(sizeChangedDelegate)
             
-            disposed <- true
+        //    disposed <- true
                 
 
 
