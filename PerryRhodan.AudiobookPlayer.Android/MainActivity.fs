@@ -36,7 +36,7 @@ type AndroidDownloadFolder() =
 
 
 
-[<Activity (Label = "Eins A Medien Audiobook Player", Icon = "@mipmap/eins_a_launcher", Theme = "@style/MainTheme.Launcher", MainLauncher = true,LaunchMode = LaunchMode.SingleTop, ConfigurationChanges = (ConfigChanges.ScreenSize ||| ConfigChanges.Orientation),ScreenOrientation = ScreenOrientation.Portrait)>]
+[<Activity (Label = "Eins A Medien Audiobook Player", Icon = "@drawable/eins_a_launcher", Theme = "@style/MainTheme.Launcher", MainLauncher = true,LaunchMode = LaunchMode.SingleTop, ConfigurationChanges = (ConfigChanges.ScreenSize ||| ConfigChanges.Orientation),ScreenOrientation = ScreenOrientation.Portrait)>]
 type MainActivity() =
     inherit FormsAppCompatActivity()
 
@@ -57,6 +57,7 @@ type MainActivity() =
         Xamarin.Forms.Forms.Init (this, bundle)
         Xamarin.Forms.DependencyService.Register<AndroidDownloadFolder>()
         Xamarin.Forms.DependencyService.Register<AudioPlayerServiceImplementation.DecpencyService.AudioPlayer>()
+        Xamarin.Forms.DependencyService.Register<NotificationService.NotificationService>()
                     
         Plugin.CurrentActivity.CrossCurrentActivity.Current.Init(this, bundle);
         let appcore  = new PerryRhodan.AudiobookPlayer.MainApp()

@@ -327,14 +327,14 @@
                         orientation = StackOrientation.Vertical,
                         children = [
                             yield View.Label(text="aktuelle Downloads", fontAttributes = FontAttributes.Bold,
-                                fontSize = 25.,
+                                fontSize=FontSize 25.,
                                 verticalOptions=LayoutOptions.Fill,
                                 horizontalOptions=LayoutOptions.Fill,
                                 horizontalTextAlignment=TextAlignment.Center,
                                 verticalTextAlignment=TextAlignment.Center,
                                 textColor = Consts.primaryTextColor,
                                 backgroundColor = Consts.cardColor,
-                                margin=0.)
+                                margin=Thickness 0.)
                             
                             
                             if model.DownloadQueue.Length > 0 then

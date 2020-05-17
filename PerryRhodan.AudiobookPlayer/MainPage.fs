@@ -181,7 +181,7 @@ open Services
 
     let view (model: Model) dispatch =
         View.Grid(
-            rowdefs= [box "auto"; box "auto"; box "auto"; box "*"],
+            rowdefs= [Auto; Auto; Auto; Star],
             rowSpacing = 0.,
             verticalOptions = LayoutOptions.Fill,
             children = [
@@ -196,37 +196,37 @@ open Services
                         ()
                     | Some abItem ->
                         yield View.Label(text=Translations.current.LastListendAudioBookTitle, fontAttributes = FontAttributes.Bold,
-                            fontSize = 25.,
+                            fontSize = FontSize 25.,
                             horizontalOptions = LayoutOptions.Fill,
                             horizontalTextAlignment = TextAlignment.Center,
                             textColor = Consts.primaryTextColor,
                             backgroundColor = Consts.cardColor,
-                            margin=0.).GridRow(0)
+                            margin=Thickness 0.).Row(0)
 
                         let audioBookItemDispatch =
                             let d msg = AudioBooksItemMsg (abItem,msg)
                             d >> dispatch
 
-                        yield (AudioBookItem.view abItem audioBookItemDispatch).Margin(10.).GridRow(1)
+                        yield (AudioBookItem.view abItem audioBookItemDispatch).Margin(Thickness 10.).Row(1)
 
                 yield View.Label(text=Translations.current.AudiobookOnDevice, fontAttributes = FontAttributes.Bold,
-                                                fontSize = 25.,
+                                                fontSize = FontSize 25.,
                                                 horizontalOptions = LayoutOptions.Fill,
                                                 horizontalTextAlignment = TextAlignment.Center,
                                                 textColor = Consts.primaryTextColor,
                                                 backgroundColor = Consts.cardColor,
-                                                margin=0.).GridRow(2)
+                                                margin=Thickness 0.).Row(2)
 
                     
-                yield View.StackLayout(padding = 10., verticalOptions = LayoutOptions.Start,
+                yield View.StackLayout(padding = Thickness 10., verticalOptions = LayoutOptions.Start,
                     children = [ 
                         if not model.IsLoading then
                             //yield dependsOn (model.Audiobooks) (fun _ (abItems) ->
                             match model.Audiobooks,model.LastTimeListendAudioBook with
                             | [||], None  ->
-                                yield View.Label(text=Translations.current.NoAudiobooksOnDevice, fontSize=25., textColor=Consts.secondaryTextColor)
+                                yield View.Label(text=Translations.current.NoAudiobooksOnDevice, fontSize=FontSize 25., textColor=Consts.secondaryTextColor)
                             | [||], Some _  ->
-                                yield View.Label(text="...", fontSize=25., textColor=Consts.secondaryTextColor)
+                                yield View.Label(text="...", fontSize=FontSize 25., textColor=Consts.secondaryTextColor)
                             | _, _ ->
                                 yield View.ScrollView(horizontalOptions = LayoutOptions.Fill,
                                         verticalOptions = LayoutOptions.Fill,
@@ -244,11 +244,11 @@ open Services
                                             )
                                 
                             //)
-                    ]).GridRow(3)
+                    ]).Row(3)
 
 
                 if model.IsLoading then 
-                    yield Common.createBusyLayer().GridRowSpan(4)
+                    yield Common.createBusyLayer().RowSpan(4)
             ]
             )
     

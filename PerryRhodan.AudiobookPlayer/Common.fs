@@ -93,45 +93,37 @@
         open Fabulous
         
         let displayAlert(title, message, cancel) =
-            let tsc = TaskCompletionSource()
-            
-            Device.BeginInvokeOnMainThread(
-                (fun () -> 
-                    async {
-                        try
-                            do! Application.Current.MainPage.DisplayAlert(title, message, cancel) |> Async.AwaitTask
-                            tsc.SetResult()
-                        with
-                        | _ as ex ->
-                            Crashes.TrackError(ex)
-                            tsc.SetResult()
-                    } |> Async.StartImmediate
+            Async.FromContinuations <| fun (resolve, reject, _) ->
+                Device.BeginInvokeOnMainThread(
+                    (fun () -> 
+                        async {
+                            try
+                                do! Application.Current.MainPage.DisplayAlert(title, message, cancel) |> Async.AwaitTask
+                                resolve ()
+                            with
+                            | _ as ex ->
+                                Crashes.TrackError(ex)
+                                resolve ()
+                        } |> Async.StartImmediate
+                    )
                 )
-            )
-
-            tsc.Task |> Async.AwaitTask
-            
 
 
         let displayAlertWithConfirm(title, message, accept, cancel) =
-            let tsc = TaskCompletionSource<bool>()
-            
-            Device.BeginInvokeOnMainThread(
-                (fun () -> 
-                    async {
-                        try
-                            let! res = Application.Current.MainPage.DisplayAlert(title, message, accept, cancel) |> Async.AwaitTask
-                            tsc.SetResult(res)
-                        with
-                        | _ as ex ->
-                            Crashes.TrackError(ex)
-                            tsc.SetResult(false)
-                    } |> Async.StartImmediate
+            Async.FromContinuations <| fun (resolve, reject, _) ->
+                Device.BeginInvokeOnMainThread(
+                    (fun () -> 
+                        async {
+                            try
+                                let! res = Application.Current.MainPage.DisplayAlert(title, message, accept, cancel) |> Async.AwaitTask
+                                resolve res
+                            with
+                            | _ as ex ->
+                                Crashes.TrackError(ex)
+                                resolve false
+                        } |> Async.StartImmediate
+                    )
                 )
-            )
-
-            tsc.Task |> Async.AwaitTask
-            
 
 
         let askPermissionAsync permission = async {
@@ -167,6 +159,22 @@
                 | Some (txt,_) when (txt = "cancel") -> return None
                 | Some (_, msg) -> return Some msg
             }
+
+
+        module Notifications =
+
+            type INotificationService = 
+                abstract ShowMessage : string->string -> unit
+
+
+            let private notificationService = lazy (DependencyService.Get<INotificationService>())
+
+            let showNotification title message =
+                let ns = notificationService.Force()
+                ns.ShowMessage title message
+                
+
+
             
 
     module Cmd =
@@ -394,20 +402,20 @@
     module FontSizeHelper =
 
 
-        let bodyLabel = Device.GetNamedSize(NamedSize.Body,typeof<Label>)
-        let captionLabel = Device.GetNamedSize(NamedSize.Caption,typeof<Label>)
-        let defaultLabel = Device.GetNamedSize(NamedSize.Default,typeof<Label>)
-        let headerLabel = Device.GetNamedSize(NamedSize.Header,typeof<Label>)
-        let largeLabel = Device.GetNamedSize(NamedSize.Large,typeof<Label>)
-        let mediumLabel = Device.GetNamedSize(NamedSize.Medium,typeof<Label>)
+        let bodyLabel =     Device.GetNamedSize(NamedSize.Body,typeof<Label>)
+        let captionLabel =  Device.GetNamedSize(NamedSize.Caption,typeof<Label>)
+        let defaultLabel =  Device.GetNamedSize(NamedSize.Default,typeof<Label>)
+        let headerLabel =   Device.GetNamedSize(NamedSize.Header,typeof<Label>)
+        let largeLabel =    Device.GetNamedSize(NamedSize.Large,typeof<Label>)
+        let mediumLabel =   Device.GetNamedSize(NamedSize.Medium,typeof<Label>)
         
-        let smallLabel = Device.GetNamedSize(NamedSize.Small,typeof<Label>)
-        let microLabel = Device.GetNamedSize(NamedSize.Micro,typeof<Label>)
-        let titleLabel = Device.GetNamedSize(NamedSize.Title,typeof<Label>)
+        let smallLabel =    Device.GetNamedSize(NamedSize.Small,typeof<Label>)
+        let microLabel =    Device.GetNamedSize(NamedSize.Micro,typeof<Label>)
+        let titleLabel =    Device.GetNamedSize(NamedSize.Title,typeof<Label>)
         let subtitleLabel = Device.GetNamedSize(NamedSize.Subtitle,typeof<Label>)
 
 
-        let largePicker = Device.GetNamedSize(NamedSize.Large,typeof<Picker>)
+        let largePicker =   Device.GetNamedSize(NamedSize.Large,typeof<Picker>)
 
 
 

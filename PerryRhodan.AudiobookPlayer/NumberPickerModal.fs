@@ -38,29 +38,34 @@ let view model (dispatch:Msg->unit) =
     View.ContentPage(
         title = modalTitle,
         content=View.Grid(
-            rowdefs=["auto";"auto";"auto"],
+            rowdefs=[Auto;Auto;Auto],
             verticalOptions=LayoutOptions.Center,
             horizontalOptions=LayoutOptions.Center,
             children=[
                 (Controls.primaryTextColorLabel Common.FontSizeHelper.largeLabel model.LabelText)
-                    .GridRow(0)
+                    .Row(0)
                     
-                View.Picker(itemsSource=model.Range,
-                    fontSize=Common.FontSizeHelper.largePicker,
+                View.Picker(items=(model.Range |> List.map (string)),
+                
+                    fontSize=FontSize Common.FontSizeHelper.largePicker,
                     selectedIndex=(model.Range |> List.tryFindIndex (fun x-> x=model.Value) |> Option.defaultValue 0),
                     selectedIndexChanged=(
                         fun (idx,e) -> 
                             e 
-                            |> Option.map (fun v->
-                                dispatch (SelectValue v)
+                            |> Option.map (fun v ->
+                                match System.Int32.TryParse v with
+                                | true, v ->
+                                    dispatch (SelectValue v)
+                                | _ ->
+                                    ()
                             ) 
                             |> ignore
                         )
                     )
-                    .GridRow(1)
+                    .Row(1)
                     .HorizontalOptions(LayoutOptions.Center)
 
-                //View.Button(text="Ok",command=(fun ()-> dispatch Ok)).GridRow(2)
+                //View.Button(text="Ok",command=(fun ()-> dispatch Ok)).Row(2)
             ]
         )
     )

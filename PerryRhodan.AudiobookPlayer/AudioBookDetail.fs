@@ -81,11 +81,11 @@
                                 View.StackLayout(
                                     orientation=StackOrientation.Vertical,
                                     children=[
-                                        yield (Controls.primaryTextColorLabel 35 model.AudioBook.FullName)
+                                        yield (Controls.primaryTextColorLabel 35. model.AudioBook.FullName)
                                            
                                         if (model.Image.IsSome) then
                                             yield View.Image(
-                                                source=model.Image.Value,
+                                                source=ImagePath model.Image.Value,
                                                 aspect=Aspect.AspectFit,
                                                 horizontalOptions=LayoutOptions.Fill,
                                                 verticalOptions=LayoutOptions.Fill
@@ -93,7 +93,7 @@
                                                 .Margin(Thickness(10.,10.,10.,10.))
                                         if (model.Description.IsSome) then
                                             yield View.Label(
-                                                fontSize=20.,
+                                                fontSize=FontSize 20.,
                                                 text=model.Description.Value,
                                                 horizontalTextAlignment=TextAlignment.Start,
                                                 textColor=Common.Consts.secondaryTextColor,
