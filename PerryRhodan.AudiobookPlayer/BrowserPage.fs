@@ -85,7 +85,7 @@ open Global
         | StartDownloadQueue
 
 
-    let pageRef = ViewRef<ContentPage>()
+    let pageRef = ViewRef<CustomContentPage>()
 
     let initModel = {
         AudioBooks = None
@@ -152,7 +152,7 @@ open Global
    
 
 
-        let pushPage dispatch closeMessage pageTitle suppressUpdate (pageRef:ViewRef<ContentPage>) page =
+        let pushPage dispatch closeMessage pageTitle suppressUpdate (pageRef:ViewRef<CustomContentPage>) page =
             pageRef.TryValue
             |> Option.map (fun sr ->
                 let hasPageInStack =
@@ -170,7 +170,7 @@ open Global
             )
             |> ignore
 
-        let updatePage dispatch closeMessage pageTitle suppressUpdate (pageRef:ViewRef<ContentPage>) (page:ViewElement) =
+        let updatePage dispatch closeMessage pageTitle suppressUpdate (pageRef:ViewRef<CustomContentPage>) (page:ViewElement) =
             pageRef.TryValue
             |> Option.map (fun sr ->
                 let hasPageInStack =
@@ -214,7 +214,7 @@ open Global
     // push ne page
         let pushBaseCmd pushAction model newStateItem=
             fun dispatch ->
-                let subRef = ViewRef<ContentPage>()
+                let subRef = ViewRef<CustomContentPage>()
                 let newModel = { 
                     model with 
                         ListStates= []
@@ -603,7 +603,7 @@ open Global
     
     let rec browseView (model: Model) dispatch =
         View.Grid(
-            rowdefs= [box "auto"; box "*"; box "auto"; box "auto"],
+            rowdefs= [Auto; Star;Auto; Auto],
             verticalOptions = LayoutOptions.Fill,
             children = [
                 let browseTitle = 
@@ -613,16 +613,16 @@ open Global
                         
 
                 yield View.Label(text=browseTitle, fontAttributes = FontAttributes.Bold,
-                                    fontSize = 25.,
+                                    fontSize = FontSize 25.,
                                     verticalOptions=LayoutOptions.Fill,
                                     horizontalOptions=LayoutOptions.Fill,
                                     horizontalTextAlignment=TextAlignment.Center,
                                     verticalTextAlignment=TextAlignment.Center,
                                     textColor = Consts.primaryTextColor,
                                     backgroundColor = Consts.cardColor,
-                                    margin=0.).GridRow(0)
+                                    margin=Thickness 0.).Row(0)
                     
-                yield View.StackLayout(padding = 10., verticalOptions = LayoutOptions.Start,
+                yield View.StackLayout(padding = Thickness 10., verticalOptions = LayoutOptions.Start,
                     children = [ 
                         
                         // show refresh button only on category selection
@@ -652,8 +652,8 @@ open Global
                                                     for (idx,item) in groups |> Array.indexed do
                                                         yield 
                                                             View.Label(text=item
-                                                                , margin = 2.
-                                                                , fontSize = 20.
+                                                                , margin = Thickness 2.
+                                                                , fontSize = FontSize 20.
                                                                 , textColor = Consts.secondaryTextColor
                                                                 , horizontalOptions = LayoutOptions.Fill
                                                                 , horizontalTextAlignment= if (model.LastSelectedGroup.IsNone) then TextAlignment.Start else TextAlignment.Center
@@ -686,22 +686,22 @@ open Global
                                             
                         
                     ])
-                    .GridRow(1)
+                    .Row(1)
 
 
                 //if (model.SelectedGroups.Length > 0) then
-                //    yield View.Button(text = Translations.current.Back,command = (fun ()-> dispatch RemoveLastSelectGroup)).GridRow(2)
+                //    yield View.Button(text = Translations.current.Back,command = (fun ()-> dispatch RemoveLastSelectGroup)).Row(2)
                 
                 //let downloadQueueDispatch =
                 //    DownloadQueueMsg >> dispatch
 
-                //yield (DownloadQueue.view model.DownloadQueueModel downloadQueueDispatch).GridRow(3)
+                //yield (DownloadQueue.view model.DownloadQueueModel downloadQueueDispatch).Row(3)
 
 
                 
 
                 if model.IsLoading then 
-                    yield Common.createBusyLayer().GridRowSpan(2)
+                    yield Common.createBusyLayer().RowSpan(2)
 
                     
             ]
