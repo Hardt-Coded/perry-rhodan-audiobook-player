@@ -8,21 +8,12 @@ open Android.App
 open Android.Content
 open Android.Content.PM
 open Android.Runtime
-open Android.Views
-open Android.Widget
-open Android.Media
 open Android.OS
 open Xamarin.Forms.Platform.Android
 open Services
 open Microsoft.AppCenter
 open Microsoft.AppCenter.Crashes
 open Microsoft.AppCenter.Analytics
-open Android.Support.Design.Widget
-open Xamarin.Forms.Platform.Android
-open Android.Arch.Lifecycle
-
-
-
     
 
 
@@ -39,6 +30,13 @@ type AndroidDownloadFolder() =
 [<Activity (Label = "Eins A Medien Audiobook Player", Icon = "@drawable/eins_a_launcher", Theme = "@style/MainTheme.Launcher", MainLauncher = true,LaunchMode = LaunchMode.SingleTop, ConfigurationChanges = (ConfigChanges.ScreenSize ||| ConfigChanges.Orientation),ScreenOrientation = ScreenOrientation.Portrait)>]
 type MainActivity() =
     inherit FormsAppCompatActivity()
+
+    override this.OnDestroy () =
+        base.OnDestroy()
+        // remove all push pages if main app is destroyed
+        BrowserPage.PushModalHelper.clearPushPages ()
+        ()
+
 
     override this.OnCreate (bundle: Bundle) =
         base.SetTheme(PerryRhodan.AudiobookPlayer.Android.Resources.Style.MainTheme)
@@ -58,6 +56,7 @@ type MainActivity() =
         Xamarin.Forms.DependencyService.Register<AndroidDownloadFolder>()
         Xamarin.Forms.DependencyService.Register<AudioPlayerServiceImplementation.DecpencyService.AudioPlayer>()
         Xamarin.Forms.DependencyService.Register<NotificationService.NotificationService>()
+        Xamarin.Forms.DependencyService.Register<DownloadServiceImplementation.DependencyService.DownloadService>()
                     
         Plugin.CurrentActivity.CrossCurrentActivity.Current.Init(this, bundle);
         let appcore  = new PerryRhodan.AudiobookPlayer.MainApp()

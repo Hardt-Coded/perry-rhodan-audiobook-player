@@ -10,6 +10,7 @@ open Microsoft.AppCenter.Crashes
 open Microsoft.AppCenter.Analytics
 open Fabulous
 open Fabulous.XamarinForms
+open Services.DownloadService
 
 module App = 
     open Xamarin.Essentials
@@ -70,6 +71,8 @@ module App =
         | GotoSettingsPage
         | GotoFeedbackSupportPage
         | FeedbackSupportPageClosed
+
+        | GotoDownloadPage of DownloadServiceState
 
         | OpenAudioBookDetailPage of AudioBook
         | CloseAudioBookDetailPage
@@ -206,6 +209,8 @@ module App =
             model |> onGotoSettingsPageMsg
         | GotoFeedbackSupportPage ->
             model |> onGotoFeedbackSupportPageMsg
+        | GotoDownloadPage state ->
+            model |> onGotoDownloadPage state
         | FeedbackSupportPageClosed ->
             model |> onFeedbackSupportPageClosedPage
         | OpenAudioBookDetailPage ab ->
@@ -228,6 +233,19 @@ module App =
         let mainPageModel, mainPageMsg = MainPage.init ()
         let browserPageModel, browserPageMsg, _ = BrowserPage.init ()
         let settingsPageModel, settingsPageMsg, _ = SettingsPage.init shellRef true
+
+        // check if download Service is running
+        let checkDownloadServiceCmd =
+            async {
+                let! state = Services.DownloadService.getCurrentState ()
+                return state 
+                    |> Option.map (fun state ->
+                        GotoDownloadPage state
+                    )
+                        
+            }
+            |> Cmd.ofAsyncMsgOption
+                
 
         // check if audio player is current available, if so, init AudioPlayer as well
         let checkAudioPlayerRunningCmds =
@@ -253,6 +271,7 @@ module App =
                 (Cmd.map BrowserPageMsg browserPageMsg)
                 (Cmd.map SettingsPageMsg settingsPageMsg)
                 checkAudioPlayerRunningCmds
+                checkDownloadServiceCmd
             ]
 
         initModel, cmds
@@ -352,7 +371,7 @@ module App =
             | Some excmd -> 
                 match excmd with
                 | LoginPage.ExternalMsg.GotoForwardToBrowsing (cookies,cameFrom) ->                    
-                    Cmd.batch ([ Cmd.ofMsg (ProcessFurtherActionsOnBrowserPageAfterLogin (cookies,cameFrom)); Cmd.ofMsg GotoBrowserPage ])
+                    Cmd.batch ([ Cmd.ofMsg (ProcessFurtherActionsOnBrowserPageAfterLogin (cookies,cameFrom)); Cmd.ofMsg <| BrowserPageMsg BrowserPage.RefreshLocalAudiobooks ])
 
         match model.LoginPageModel with
         | Some loginPageModel ->
@@ -586,6 +605,13 @@ module App =
         
         {model with SupportFeedbackModel = Some m},Cmd.batch [ openFeedbackPageCmd; (Cmd.map SupportFeedbackPageMsg cmd)  ]
         
+
+    and onGotoDownloadPage state model =
+        let (dpModel,cmd) = DownloadQueue.initFromDownloadService state
+        let cmd = Cmd.map DownloadQueueMsg cmd
+
+        { model with DownloadQueueModel = dpModel }, cmd
+
 
     and onFeedbackSupportPageClosedPage model =
         {model with SupportFeedbackModel = None }, Cmd.none
@@ -894,7 +920,8 @@ type MainApp () as app =
         ()
 
     override this.OnStart() = 
-        base.OnStart()        
+        base.OnStart()    
+        BrowserPage.PushModalHelper.clearPushPages ()
         ()
 
     

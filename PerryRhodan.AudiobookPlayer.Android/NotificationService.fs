@@ -9,7 +9,7 @@ module NotificationService =
     open Android.Support.V4.App
     open Android.App
     open Android.OS
-    open Common.Helpers.Notifications
+    open Services.DependencyServices
     open Android.Content
 
     let icon name = 
@@ -24,7 +24,7 @@ module NotificationService =
         let titleKey = "title"
         let messageKey = "message"
 
-        let smallIcon = icon "download_icon_running"
+        let smallIcon = icon "einsa_small_icon"
         let logo = 
             //Android.Graphics.BitmapFactory.DecodeFile("@drawable/eins_a_medien_logo.png")
             Android.Graphics.BitmapFactory.DecodeResource(Android.App.Application.Context.Resources ,icon "eins_a_medien_logo")
@@ -46,9 +46,8 @@ module NotificationService =
             ()
 
         interface INotificationService with
-
             
-            member this.ShowMessage title message =
+            override this.ShowMessage title message =
 
                 let buildNotification (manager:NotificationManager) =
                     messageId <- messageId + 1

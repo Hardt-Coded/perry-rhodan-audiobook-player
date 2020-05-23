@@ -161,17 +161,7 @@
             }
 
 
-        module Notifications =
-
-            type INotificationService = 
-                abstract ShowMessage : string->string -> unit
-
-
-            let private notificationService = lazy (DependencyService.Get<INotificationService>())
-
-            let showNotification title message =
-                let ns = notificationService.Force()
-                ns.ShowMessage title message
+        
                 
 
 
