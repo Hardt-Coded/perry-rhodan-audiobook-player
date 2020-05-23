@@ -121,7 +121,9 @@ open Global
 
     module PushModalHelper =
 
-        let private prevPageMap = new System.Collections.Generic.Dictionary<string, ViewElement>()
+        let private lazyPageMap = lazy (new System.Collections.Generic.Dictionary<string, ViewElement>())
+        
+        let private prevPageMap = lazyPageMap.Force ()
 
         let private pushPageInternal dispatch (sr:ContentPage) closeEventMsg (page:ViewElement) =
         
@@ -147,9 +149,6 @@ open Global
     
         let private tryFindPage (sr:ContentPage) title =
             sr.Navigation.NavigationStack |> Seq.filter (fun e -> e<>null) |> Seq.tryFind (fun i -> i.Title = title)
-
-        
-   
 
 
         let pushPage dispatch closeMessage pageTitle suppressUpdate (pageRef:ViewRef<CustomContentPage>) page =
@@ -207,6 +206,11 @@ open Global
                         ()
             )
             |> ignore
+
+        let clearPushPages () =
+            prevPageMap.Clear ()
+            let a = 1
+            ()
 
 
     module PushCmdHelper =

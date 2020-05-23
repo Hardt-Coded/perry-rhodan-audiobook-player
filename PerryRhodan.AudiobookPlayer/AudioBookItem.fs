@@ -50,13 +50,6 @@
         let setBusyCmd = Cmd.ofMsg (ChangeBusyState true)
 
 
-        //let unsetGlobalBusyCmd = Cmd.ofMsg (ChangeGlobalBusyState false)
-
-
-        //let setGlobalBusyCmd = Cmd.ofMsg (ChangeGlobalBusyState true)
-
-        
-
     
     let updateAudiobookInStateFile model =
         async {

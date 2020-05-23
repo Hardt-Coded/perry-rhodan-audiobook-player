@@ -26,11 +26,11 @@ let updateDetailModal dispatch detailPageMsg detailPageClosed (shellRef:ViewRef<
 
 let pushFeedbackModal dispatch feedbackPageMsg feedbackPageClosed (shellRef:ViewRef<Shell>) feedbackModel =
     (SupportFeedback.view feedbackModel (feedbackPageMsg >> dispatch))
-    |> pushModal dispatch feedbackPageClosed Translations.current.AudioBookDetailPage shellRef
+    |> pushModal dispatch feedbackPageClosed Translations.current.FeedbackPage shellRef
 
 let updateFeedbackModal dispatch feedbackPageMsg feedbackPageClosed (shellRef:ViewRef<Shell>) feedbackModel =
     (SupportFeedback.view feedbackModel (feedbackPageMsg >> dispatch))
-    |> updateModal dispatch feedbackPageClosed Translations.current.AudioBookDetailPage shellRef
+    |> updateModal dispatch feedbackPageClosed Translations.current.FeedbackPage shellRef
     
         
 

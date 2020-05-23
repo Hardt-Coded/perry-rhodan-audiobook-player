@@ -37,7 +37,9 @@
             {model with Category = cat}, Cmd.none
         | UpdateMessage msg ->
             {model with Message = msg}, Cmd.none
+        
         | SendMessage ->
+
             let sendCmd =
                 async {
                     if (model.Message = "") then
@@ -52,7 +54,7 @@
                 }
                 |> Cmd.ofAsyncMsg
 
-            model,sendCmd
+            model,Cmd.batch [sendCmd ]
         | SendSuccessful ->
             let cmd = Cmd.ofSub <| fun _ -> Common.Helpers.displayAlert("Vielen Dank!","Für ihre Nachricht!","OK") |> Async.StartImmediate
             model, cmd
@@ -63,7 +65,7 @@
 
     let view model dispatch =
         View.ContentPage(
-            title=Translations.current.SettingsPage,useSafeArea=true,
+            title=Translations.current.FeedbackPage,
             backgroundColor = Consts.backgroundColor,
             content = View.Grid(
                 rowdefs = [ Auto;Auto;Auto;Auto;Star ],
@@ -71,6 +73,8 @@
                     (Controls.primaryTextColorLabel 14.0 "Senden Sie uns ein Feedback oder eine Anfrage bei Problemen oder Verbesserungsvorschlägen. Die Anfrage geht direkt zum Entwickler. Es wird nur die E-Mail (falls angegeben) und der Text übermittelt. Mehr nicht! Bei Problemen wäre eine Beschreibung hilfreich und die Angabe ihrer Mailadresse, damit wir uns bei Ihnen melden können.").Row(0)
 
                     View.Button(text = "Nachricht senden!", command = (fun () -> dispatch SendMessage), horizontalOptions = LayoutOptions.Center).Row(1)
+
+                    View.Label(text = model.Name).Row(3)
 
                     View.Entry(text = model.Name
                         , placeholder = "EMail (freiwillig)"
@@ -82,15 +86,7 @@
                         , created = (fun e -> e.Unfocused.Add(fun args -> if model.Name<>e.Text then dispatch (UpdateName e.Text)))
                         ).Row(2)
 
-                    //View.Entry(text = model.Category
-                    //    , placeholder = "Art der Nachricht"
-                    //    , textColor = Consts.primaryTextColor
-                    //    , backgroundColor = Consts.backgroundColor
-                    //    , placeholderColor = Consts.secondaryTextColor                                
-                    //    , keyboard=Keyboard.Chat
-                    //    , completed = (fun t  -> if t <> model.Category then dispatch (UpdateCategory t))
-                    //    , created = (fun e -> e.Unfocused.Add(fun args -> if model.Category<>e.Text then dispatch (UpdateCategory e.Text)))
-                    //    ).Row(2)
+                    
                     View.Editor(text = model.Message
                         , placeholder = "Nachricht"
                         , textColor = Consts.primaryTextColor

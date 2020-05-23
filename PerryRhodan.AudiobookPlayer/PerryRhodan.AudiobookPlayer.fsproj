@@ -37,9 +37,9 @@
 		<None Include="repl_stuff.fsx" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="Xamarin.Forms" Version="4.6.0.726" />
+		<PackageReference Include="Xamarin.Forms" Version="4.6.0.772" />
 		<PackageReference Include="Xamarin.Essentials" Version="1.5.1" />
-		<PackageReference Include="Fabulous.XamarinForms" Version="0.54.0" />
+		<PackageReference Include="Fabulous.XamarinForms" Version="0.54.1" />
 		<PackageReference Include="Fabulous.XamarinForms.LiveUpdate" Version="0.54.0" />
 		<PackageReference Include="FSharp.Core" Version="4.7.1" />
 		<PackageReference Update="FSharp.Core" Version="4.7.1" />
