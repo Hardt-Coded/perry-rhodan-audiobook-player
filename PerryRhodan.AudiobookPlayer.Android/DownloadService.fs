@@ -82,8 +82,9 @@
 
                 let downloadServiceMailbox =
                      Services.DownloadService.External.createExternalDownloadService
-                        (Services.DownloadService.External.startDownload updateNotification)
+                        (Services.DownloadService.External.startDownload)
                         shutDownService
+                        updateNotification
 
 
                 override this.OnBind _ =

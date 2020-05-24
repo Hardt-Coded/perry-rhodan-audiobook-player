@@ -432,6 +432,12 @@
             member x.Trigger(v) = evt.Trigger(v)
             member x.Publish = published
             member x.HasListeners = counter > 0
+
+
+
+    module String =
+        
+        let concatStr (str:string list) = System.String.Join ("", str)
         
         
 

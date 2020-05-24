@@ -310,9 +310,9 @@ module Filters =
         if episodeNoGreater10 && (episodeNoSame10 |> not) then Some() else None
 
 
-    let groupsFilter (groups:string[]) (audiobooks:AudioBookListType) =
+    let groupsFilter (groups:string list) (audiobooks:AudioBookListType) =
         (audiobooks,groups)
-        ||> Array.fold (
+        ||> List.fold (
             fun state item -> 
                 let nameFilterResult =
                     state

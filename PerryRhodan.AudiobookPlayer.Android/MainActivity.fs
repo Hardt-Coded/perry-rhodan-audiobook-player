@@ -34,7 +34,7 @@ type MainActivity() =
     override this.OnDestroy () =
         base.OnDestroy()
         // remove all push pages if main app is destroyed
-        BrowserPage.PushModalHelper.clearPushPages ()
+        //BrowserPage.PushModalHelper.clearPushPages ()
         ()
 
 

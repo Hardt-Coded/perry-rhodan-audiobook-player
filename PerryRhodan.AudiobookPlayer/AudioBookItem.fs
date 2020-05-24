@@ -23,7 +23,6 @@
         | MarkAudioBookAsListend
         | UnmarkAudioBookAsListend
         | ChangeBusyState of bool
-        //| ChangeGlobalBusyState of bool
         | UpdateDownloadProgress of (int * int) option
         | OpenAudioBookPlayer
         | OpenAudioBookDetail
@@ -37,7 +36,6 @@
         | UpdateAudioBook of Model
         | AddToDownloadQueue of Model
         | RemoveFromDownloadQueue of Model
-        //| PageChangeBusyState of bool
         | OpenAudioBookPlayer of AudioBook
         | OpenAudioBookDetail of AudioBook
 
@@ -61,6 +59,7 @@
             | Ok _ ->
                 return DoNothing
         } |> Cmd.ofAsyncMsg
+
     
     let initModel audiobook = { AudioBook = audiobook; CurrentDownloadProgress = None; QueuedToDownload=false; IsDownloading = false }
 
@@ -88,8 +87,6 @@
             model |> onUpdateDownloadProgressMsg progress
         | ChangeBusyState state -> 
             model |> onChangeBusyStateMsg state
-        //| ChangeGlobalBusyState state -> 
-        //    model |> onChangeGlobalBusyStateMsg state
         | Msg.OpenAudioBookPlayer  ->
             model |> onOpenAudioBookPlayerMsg
         | Msg.OpenAudioBookDetail ->

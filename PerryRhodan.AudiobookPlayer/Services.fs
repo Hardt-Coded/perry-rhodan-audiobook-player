@@ -1183,12 +1183,14 @@ module DownloadService =
             | DownloadError of ComError
             | FinishedDownload of DownloadInfo * WebAccess.Downloader.DownloadResult
             | ShutDownService
+            | UpdateNotification of DownloadInfo * int
             | GetState of AsyncReplyChannel<DownloadServiceState>
 
 
         let createExternalDownloadService 
             startDownload
-            shutDownExternalService =
+            shutDownExternalService 
+            updateNotification =
             MailboxProcessor<Msg>.Start(
                 fun inbox ->
                     let rec loop (state:DownloadServiceState) =
@@ -1197,50 +1199,57 @@ module DownloadService =
                                 
                             match msg with
                             | StartDownload ->
-                                let openDownloads =  
-                                    state.Downloads 
-                                    |> List.filter (fun i -> i.State = Open)
-
-                                let download =
-                                    openDownloads
-                                    |> List.tryHead
-
-                                match download with
+                                match state.CurrentDownload with
+                                | Some _ ->
+                                    // when currently a download is running, than wait
+                                    do! Async.Sleep 3000
+                                    inbox.Post StartDownload
+                                    return! loop state
                                 | None ->
-                                    // change failed network downloads to state open, if there where any
-                                    if state.Downloads |> List.exists (fun i -> match i.State with | Failed (ComError.Network _) -> true | _ -> false) then
-                                        let newState =
-                                            { state with
-                                                Downloads = 
-                                                    state.Downloads 
-                                                    |> List.map (fun i -> match i.State with | Failed (ComError.Network _) -> { i with State = Open } | _ -> i)
+                                    let openDownloads =  
+                                        state.Downloads 
+                                        |> List.filter (fun i -> i.State = Open)
+
+                                    let download =
+                                        openDownloads
+                                        |> List.tryHead
+
+                                    match download with
+                                    | None ->
+                                        // change failed network downloads to state open, if there where any
+                                        if state.Downloads |> List.exists (fun i -> match i.State with | Failed (ComError.Network _) -> true | _ -> false) then
+                                            let newState =
+                                                { state with
+                                                    Downloads = 
+                                                        state.Downloads 
+                                                        |> List.map (fun i -> match i.State with | Failed (ComError.Network _) -> { i with State = Open } | _ -> i)
+                                                }
+                                            // wait a moment to try again
+                                            do! Async.Sleep 30000
+                                            inbox.Post StartDownload
+                                            return! loop newState
+                                        else
+                                            // no failed download than shut down the service
+                                            inbox.Post ShutDownService
+                                            return! loop state
+
+                                    | Some download ->
+                                        let download = 
+                                            { download 
+                                                with 
+                                                    State = DownloadState.Running (0,0)
                                             }
-                                        // wait a moment to try again
-                                        do! Async.Sleep 30000
-                                        inbox.Post StartDownload
+
+                                        let newState = 
+                                            { state with 
+                                                CurrentDownload = Some download 
+                                                Downloads = state.Downloads |> List.map (fun i -> if i.AudioBook.Id = download.AudioBook.Id then download else i) 
+                                            }
+
+                                        // start download
+                                        startDownload inbox download |> Async.Start
+
                                         return! loop newState
-                                    else
-                                        // no failed download than shut down the service
-                                        inbox.Post ShutDownService
-                                        return! loop state
-
-                                | Some download ->
-                                    let download = 
-                                        { download 
-                                            with 
-                                                State = DownloadState.Running (0,0)
-                                        }
-
-                                    let newState = 
-                                        { state with 
-                                            CurrentDownload = Some download 
-                                            Downloads = state.Downloads |> List.map (fun i -> if i.AudioBook.Id = download.AudioBook.Id then download else i) 
-                                        }
-
-                                    // start download
-                                    startDownload inbox openDownloads.Length download |> Async.Start
-
-                                    return! loop newState
 
                             | DownloadError error ->
                                 match state.CurrentDownload with
@@ -1324,6 +1333,21 @@ module DownloadService =
                                 reply.Reply(state)
                                 return! loop state
 
+                            | UpdateNotification (info,percent) ->
+                                let openCount = 
+                                    state.Downloads |> List.filter (fun i -> match i.State with | Open | Failed -> true | _ -> false) |> List.length 
+                                let allCount = state.Downloads  |> List.length// |> List.filter (fun i -> match i.State with | Finished -> true | _ -> false)
+
+                                let stateText  =
+                                    sprintf "(%i/%i) %s" (openCount + 1) allCount info.AudioBook.FullName
+
+                                let stateTitle =
+                                    sprintf "Lade runter... (%i %%)" percent
+
+                                updateNotification stateTitle stateText
+
+                                return! loop state
+
                         }
 
                     loop { Downloads = []; CurrentDownload = None }
@@ -1349,13 +1373,9 @@ module DownloadService =
                 reply.Reply(state)
 
 
-        let startDownload updateNotification (inbox:MailboxProcessor<Msg>) countRest (info:DownloadInfo) =
+        let startDownload (inbox:MailboxProcessor<Msg>) (info:DownloadInfo) =
 
-                    let stateText countRest name =
-                        sprintf "(%i) Hörbuch: %s" countRest name
-
-                    let stateTitle v =
-                        sprintf "Lade runter... (%i %%)" v
+                    
 
                     
                     let updateStateDownloadInfo newState (downloadInfo:DownloadInfo) =
@@ -1369,10 +1389,7 @@ module DownloadService =
                         let updateProgress (c,a) =
                             let factor = if a = 0 then 0.0 else (c |> float) / (a |> float)
                             let percent = factor * 100.0 |> int
-                            let title = stateTitle percent
-                            let text = stateText countRest info.AudioBook.FullName
-                            updateNotification title text
-                            //mutDemoData <- (updateStateDownloadInfo (Running (a,c)) mutDemoData)
+                            inbox.Post <| UpdateNotification (info,percent)
                             let newState = updateStateDownloadInfo  (Running (a,c)) info
                             sendInfo newState
 

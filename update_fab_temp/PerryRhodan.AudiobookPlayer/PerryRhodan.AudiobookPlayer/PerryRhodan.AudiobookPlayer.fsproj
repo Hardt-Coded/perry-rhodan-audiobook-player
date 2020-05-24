@@ -1,0 +1,63 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Include="LiteDbExtensions\Json.fs" />
+		<Compile Include="LiteDbExtensions\Bson.fs" />
+		<Compile Include="LiteDbExtensions\FSharpBsonMapper.fs" />
+		<None Include="repl_stuff.fsx" />
+		<Compile Include="SampleData.fs" />
+		<Compile Include="Common.fs" />
+		<Compile Include="Translations.fs" />
+		<Compile Include="Global.fs" />
+		<Compile Include="Domain.fs" />
+		<Compile Include="Services.fs" />
+		<Compile Include="AudioPlayer.fs" />
+		<Compile Include="Controls.fs" />
+		<Compile Include="LoginPage.fs" />
+		<Compile Include="AudioBookItem.fs" />
+		<Compile Include="AudioBookItemProcessor.fs" />
+		<Compile Include="DownloadQueue.fs" />
+		<Compile Include="BrowserPage.fs" />
+		<Compile Include="AudioPlayerPage.fs" />
+		<Compile Include="AudioBookDetail.fs" />
+		<Compile Include="NumberPickerModal.fs" />
+		<Compile Include="SettingsPage.fs" />
+		<Compile Include="SupportFeedback.fs" />
+		<Compile Include="MainPage.fs" />
+		<Compile Include="ModalHelpers.fs" />
+		<Compile Include="App.fs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="repl_stuff.fsx" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Xamarin.Forms" Version="4.6.0.726" />
+		<PackageReference Include="Xamarin.Essentials" Version="1.5.1" />
+		<PackageReference Include="Fabulous.XamarinForms" Version="0.54.0" />
+		<PackageReference Include="Fabulous.XamarinForms.LiveUpdate" Version="0.54.0" />
+		<PackageReference Include="FSharp.Core" Version="4.7.1" />
+		<PackageReference Update="FSharp.Core" Version="4.7.1" />
+		<!-- workaround for VSMac bug https://github.com/mono/monodevelop/pull/5137 -->
+		<PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+
+		<PackageReference Include="FSharp.Control.AsyncSeq" Version="2.0.21" />
+		<PackageReference Include="FSharp.Data" Version="3.0.0" />
+		<PackageReference Include="FSharpx.Async" Version="1.14.1" />
+		<PackageReference Include="LiteDB" Version="4.1.4" />
+		<PackageReference Include="Microsoft.AppCenter.Analytics" Version="2.1.1" />
+		<PackageReference Include="Microsoft.AppCenter.Crashes" Version="2.1.1" />
+		<PackageReference Include="Microsoft.AppCenter.Push" Version="2.1.1" />
+		<PackageReference Include="Plugin.Permissions" Version="3.0.0.12" />
+		<PackageReference Include="SharpZipLib" Version="1.1.0" />
+		<PackageReference Include="SkiaSharp" Version="1.68.0" />
+		<PackageReference Include="System.Memory" Version="4.5.2" />
+		<PackageReference Include="taglib-sharp-netstandard2.0" Version="2.1.0" />
+		
+	</ItemGroup>
+</Project>
