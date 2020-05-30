@@ -212,22 +212,22 @@ module ModalManager =
 //    |> updateModal dispatch loginClosed Translations.current.LoginPage shellRef
 
 
-let pushDetailModal dispatch detailPageMsg detailPageClosed (shellRef:ViewRef<Shell>) detailModel =
-    (AudioBookDetailPage.view detailModel (detailPageMsg >> dispatch))
-    |> pushModal dispatch detailPageClosed Translations.current.AudioBookDetailPage shellRef
+//let pushDetailModal dispatch detailPageMsg detailPageClosed (shellRef:ViewRef<Shell>) detailModel =
+//    (AudioBookDetailPage.view detailModel (detailPageMsg >> dispatch))
+//    |> pushModal dispatch detailPageClosed Translations.current.AudioBookDetailPage shellRef
 
-let updateDetailModal dispatch detailPageMsg detailPageClosed (shellRef:ViewRef<Shell>) detailModel =
-    (AudioBookDetailPage.view detailModel (detailPageMsg >> dispatch))
-    |> updateModal dispatch detailPageClosed Translations.current.AudioBookDetailPage shellRef
+//let updateDetailModal dispatch detailPageMsg detailPageClosed (shellRef:ViewRef<Shell>) detailModel =
+//    (AudioBookDetailPage.view detailModel (detailPageMsg >> dispatch))
+//    |> updateModal dispatch detailPageClosed Translations.current.AudioBookDetailPage shellRef
 
 
-let pushFeedbackModal dispatch feedbackPageMsg feedbackPageClosed (shellRef:ViewRef<Shell>) feedbackModel =
-    (SupportFeedback.view feedbackModel (feedbackPageMsg >> dispatch))
-    |> pushModal dispatch feedbackPageClosed Translations.current.FeedbackPage shellRef
+//let pushFeedbackModal dispatch feedbackPageMsg feedbackPageClosed (shellRef:ViewRef<Shell>) feedbackModel =
+//    (SupportFeedback.view feedbackModel (feedbackPageMsg >> dispatch))
+//    |> pushModal dispatch feedbackPageClosed Translations.current.FeedbackPage shellRef
 
-let updateFeedbackModal dispatch feedbackPageMsg feedbackPageClosed (shellRef:ViewRef<Shell>) feedbackModel =
-    (SupportFeedback.view feedbackModel (feedbackPageMsg >> dispatch))
-    |> updateModal dispatch feedbackPageClosed Translations.current.FeedbackPage shellRef
+//let updateFeedbackModal dispatch feedbackPageMsg feedbackPageClosed (shellRef:ViewRef<Shell>) feedbackModel =
+//    (SupportFeedback.view feedbackModel (feedbackPageMsg >> dispatch))
+//    |> updateModal dispatch feedbackPageClosed Translations.current.FeedbackPage shellRef
 
 
 

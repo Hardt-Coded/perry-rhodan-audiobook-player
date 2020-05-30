@@ -65,6 +65,7 @@
 
     let view model dispatch =
         View.ContentPage(
+            automationId="supportFeedback",
             title=Translations.current.FeedbackPage,
             backgroundColor = Consts.backgroundColor,
             content = View.Grid(

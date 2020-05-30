@@ -705,7 +705,14 @@ module App =
 
             let updateAudioBookDetailPageCmd =
                 fun dispatch ->
-                    ModalHelpers.updateDetailModal dispatch AudioBookDetailPageMsg CloseAudioBookDetailPage shellRef m
+                    let modalInput:ModalHelpers.ModalManager.PushModelInput = {
+                        Appearence=ModalHelpers.ModalManager.Shell
+                        UniqueId="audiobookDetail"
+                        CloseEvent= (fun () -> dispatch <| CloseAudioBookDetailPage)
+                        Page = AudioBookDetailPage.view m (AudioBookDetailPageMsg >> dispatch)
+                    }
+                    ModalHelpers.ModalManager.pushOrUpdateModal modalInput
+                    
                 |> Cmd.ofSub
 
             {model with AudioBookDetailPageModel = Some m}, Cmd.batch [updateAudioBookDetailPageCmd; (Cmd.map AudioBookDetailPageMsg cmd); externalCmds ]
@@ -744,7 +751,13 @@ module App =
              let m,cmd = SupportFeedback.update msg mdl
              let updateFeedbackPageCmd =
                  fun dispatch ->
-                     ModalHelpers.updateFeedbackModal dispatch SupportFeedbackPageMsg FeedbackSupportPageClosed shellRef m
+                     let modalInput:ModalHelpers.ModalManager.PushModelInput = {
+                         Appearence=ModalHelpers.ModalManager.Shell
+                         UniqueId="supportFeedback"
+                         CloseEvent= (fun () -> dispatch <| FeedbackSupportPageClosed)
+                         Page = SupportFeedback.view m (SupportFeedbackPageMsg >> dispatch)
+                     }
+                     ModalHelpers.ModalManager.pushOrUpdateModal modalInput
                  |> Cmd.ofSub
              
              if msg = SupportFeedback.Msg.SendSuccessful then 
@@ -876,7 +889,13 @@ module App =
         
         let openFeedbackPageCmd =
             fun dispatch ->
-                ModalHelpers.pushFeedbackModal dispatch Msg.SupportFeedbackPageMsg FeedbackSupportPageClosed shellRef m
+                let modalInput:ModalHelpers.ModalManager.PushModelInput = {
+                    Appearence=ModalHelpers.ModalManager.Shell
+                    UniqueId="supportFeedback"
+                    CloseEvent= (fun () -> dispatch <| FeedbackSupportPageClosed)
+                    Page = SupportFeedback.view m (SupportFeedbackPageMsg >> dispatch)
+                }
+                ModalHelpers.ModalManager.pushOrUpdateModal modalInput
             |> Cmd.ofSub
         
         {model with SupportFeedbackModel = Some m},Cmd.batch [ openFeedbackPageCmd; (Cmd.map SupportFeedbackPageMsg cmd)  ]
@@ -915,7 +934,13 @@ module App =
         
         let openAudioBookDetailPageCmd =
             fun dispatch ->
-                ModalHelpers.pushDetailModal dispatch AudioBookDetailPageMsg CloseAudioBookDetailPage shellRef m
+                let modalInput:ModalHelpers.ModalManager.PushModelInput = {
+                    Appearence=ModalHelpers.ModalManager.Shell
+                    UniqueId="audiobookDetail"
+                    CloseEvent= (fun () -> dispatch <| CloseAudioBookDetailPage)
+                    Page = AudioBookDetailPage.view m (AudioBookDetailPageMsg >> dispatch)
+                }
+                ModalHelpers.ModalManager.pushOrUpdateModal modalInput
             |> Cmd.ofSub
 
         { model with AudioBookDetailPageModel = Some m }, Cmd.batch [ (Cmd.map AudioBookDetailPageMsg cmd); openAudioBookDetailPageCmd ]
