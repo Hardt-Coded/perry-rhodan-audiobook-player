@@ -11,14 +11,12 @@ open Microsoft.AppCenter.Analytics
 open Fabulous
 open Fabulous.XamarinForms
 open Services.DownloadService
-open System.IO
-open AudioBookItem
-open System.Text.RegularExpressions
+
 
 module App = 
     open Xamarin.Essentials
     open System.Net
-    //open Fabulous.DynamicViews
+    
     open Global
     
     let mainPageRoute = "mainpage"
@@ -93,7 +91,7 @@ module App =
         | OpenAudioBookDetailPage of AudioBook
         | CloseAudioBookDetailPage
         | NavigationPopped of Pages
-        | UpdateAudioBook of AudioBookItem.Model * string
+        | UpdateAudioBook of AudioBookItemNew.Model * string
 
         | QuitApplication
         
@@ -372,6 +370,14 @@ module App =
                     Commands.removeDownloadCmd abModel
                 ]
             model, cmds
+
+        | AudioBookItemMsg (abModel, AudioBookItemNew.OpenAudioBookDetail) ->
+            let cmd = Cmd.ofMsg <| OpenAudioBookDetailPage abModel.AudioBook
+            model, cmd
+
+        | AudioBookItemMsg (abModel, AudioBookItemNew.OpenAudioBookPlayer) ->
+            let cmd = Cmd.ofMsg <| GotoAudioPlayerPage abModel.AudioBook
+            model, cmd
 
         | AudioBookItemMsg msg ->
             model |> onProcessAudioBookItemMsg msg
@@ -989,29 +995,29 @@ module App =
     let subscription model =
         Cmd.ofSub (fun dispatch ->
 
-            // avoid double registration of event handlers
+            //// avoid double registration of event handlers
 
-            if (not AudioBookItemProcessor.abItemUpdatedEvent.HasListeners) then
-                AudioBookItemProcessor.Events.onAbItemUpdated.Add(fun i ->
-                    //dispatch (MainPageMsg (MainPage.Msg.UpdateAudioBook))
-                    //dispatch (BrowserPageMsg (BrowserPage.Msg.UpdateAudioBook))
-                    dispatch AudioBookItemsUpdated
-            )
-            // when updating an audio book, that update the underlying audio book in the Item
-            if (not Services.DataBase.storageProcessorAudioBookUpdatedEvent.HasListeners) then
-                Services.DataBase.Events.storageProcessorOnAudiobookUpdated.Add(fun item ->
-                    AudioBookItemProcessor.updateUnderlyingAudioBookInItem item
-                )
+            //if (not AudioBookItemProcessor.abItemUpdatedEvent.HasListeners) then
+            //    AudioBookItemProcessor.Events.onAbItemUpdated.Add(fun i ->
+            //        //dispatch (MainPageMsg (MainPage.Msg.UpdateAudioBook))
+            //        //dispatch (BrowserPageMsg (BrowserPage.Msg.UpdateAudioBook))
+            //        dispatch AudioBookItemsUpdated
+            //)
+            //// when updating an audio book, that update the underlying audio book in the Item
+            //if (not Services.DataBase.storageProcessorAudioBookUpdatedEvent.HasListeners) then
+            //    Services.DataBase.Events.storageProcessorOnAudiobookUpdated.Add(fun item ->
+            //        AudioBookItemProcessor.updateUnderlyingAudioBookInItem item
+            //    )
 
-            if (not Services.DataBase.storageProcessorAudioBookDeletedEvent.HasListeners) then
-                Services.DataBase.Events.storageProcessorOnAudiobookDeleted.Add(fun item->
-                    AudioBookItemProcessor.deleteAudioBookInItem item
-                )
+            //if (not Services.DataBase.storageProcessorAudioBookDeletedEvent.HasListeners) then
+            //    Services.DataBase.Events.storageProcessorOnAudiobookDeleted.Add(fun item->
+            //        AudioBookItemProcessor.deleteAudioBookInItem item
+            //    )
 
-            if (not Services.DataBase.storageProcessorAudioBookAdded.HasListeners) then
-                Services.DataBase.Events.storageProcessorOnAudiobookAdded.Add(fun items ->
-                    AudioBookItemProcessor.insertAudiobooks items
-                )
+            //if (not Services.DataBase.storageProcessorAudioBookAdded.HasListeners) then
+            //    Services.DataBase.Events.storageProcessorOnAudiobookAdded.Add(fun items ->
+            //        AudioBookItemProcessor.insertAudiobooks items
+            //    )
 
             AudioPlayer.InformationDispatcher.audioPlayerStateInformationDispatcher.Post(AudioPlayer.InformationDispatcher.RegisterShutDownEvent (fun _ -> async { return dispatch CloseAudioPlayerPage }))
         )
@@ -1104,16 +1110,6 @@ module App =
         rest
         |> List.iteri (
             fun idx (bPage,selectedGroup) ->
-                
-                //let modalStackPage =
-                //    browserPageRef.Value.Navigation.ModalStack
-                //    |> Seq.tryItem idx
-
-                //match modalStackPage with
-                //| None ->
-                //    let pageTitle = selectedGroup |> String.concatStr
-                //    ModalHelpers.BrowserPageModal.pushPage dispatch BrowserPageModelClosed pageTitle false browserPageRef bPage
-                //| Some page ->
                 let pageTitle = selectedGroup |> String.concatStr
                 let modalInput:ModalHelpers.ModalManager.PushModelInput = {
                     Appearence=ModalHelpers.ModalManager.BrowserPage
@@ -1122,7 +1118,6 @@ module App =
                     Page = bPage
                 }
                 ModalHelpers.ModalManager.pushOrUpdateModal modalInput
-                //ModalHelpers.BrowserPageModal.updatePage dispatch BrowserPageModelClosed pageTitle false browserPageRef bPage
         )
 
         
@@ -1233,16 +1228,6 @@ type MainApp () as app =
                     return ()
                 } |> Async.StartImmediate
             )
-
-        if not AudioBookItemProcessor.abItemErrorEvent.HasListeners then
-            AudioBookItemProcessor.Events.abItemOnError.Add(fun e ->
-                async {
-                    let message = sprintf "(%s)" e.Message
-                    do! Common.Helpers.displayAlert(Translations.current.Error,message, "OK") 
-                    return ()
-                } |> Async.StartImmediate
-            )
-
         
 
     

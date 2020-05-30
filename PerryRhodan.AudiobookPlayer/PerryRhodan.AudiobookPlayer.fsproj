@@ -19,10 +19,7 @@
 		<Compile Include="AudioPlayer.fs" />
 		<Compile Include="Controls.fs" />
 		<Compile Include="LoginPage.fs" />
-		<Compile Include="AudioBookItem.fs" />
 		<Compile Include="AudioBookItemNew.fs" />
-		<Compile Include="AudioBookItemProcessor.fs" />
-		<Compile Include="DownloadQueue.fs" />
 		<Compile Include="DownloadQueueNew.fs" />
 		<Compile Include="BrowserPage.fs" />
 		<Compile Include="AudioPlayerPage.fs" />

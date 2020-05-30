@@ -79,122 +79,123 @@ open AudioPlayer
     let pageRef = ViewRef<CustomContentPage>()
         
     
+    module Commands =
 
-    let loadFilesAsyncMsg (model:AudioBook) =
-        async {
-            match model.State.DownloadedFolder with
-            | None -> return None
-            | Some folder ->
-                let! files = 
-                    asyncFunc( 
-                        fun () ->  Directory.EnumerateFiles(folder, "*.mp3")
-                    )
-                
-                let! res =
-                    asyncFunc (fun () ->
-                        files 
-                        |> Seq.toList 
-                        |> List.map (
-                            fun i ->
-                                use tfile = TagLib.File.Create(i)
-                                (i,tfile.Properties.Duration |> fromTimeSpan)
-                        )
-                    )
-                return Some (FileListLoaded (res |> List.sortBy (fun (f,_) -> f)))
-        }
-
-    let loadFilesAsyncCmd =
-         loadFilesAsyncMsg >> Cmd.ofAsyncMsgOption 
-
-
-    let getTrackNumberFromFileName file model = 
-        model.AudioFileList
-        |> List.tryFindIndex (fun (f,_) -> f = file)
-        |> Option.map (fun i -> i + 1)
-        |> Option.defaultValue 1
-
-    let playAudio rewindInSec model =
-        (fun (dispatch:Dispatch<Msg>) -> 
+        let loadFilesAsyncMsg (model:AudioBook) =
             async {
-                if model.CurrentState = Playing then
-                    return DoNothing
-                else
-                    if model.AudioFileList.Length = 0 then
+                match model.State.DownloadedFolder with
+                | None -> return None
+                | Some folder ->
+                    let! files = 
+                        asyncFunc( 
+                            fun () ->  Directory.EnumerateFiles(folder, "*.mp3")
+                        )
+                
+                    let! res =
+                        asyncFunc (fun () ->
+                            files 
+                            |> Seq.toList 
+                            |> List.map (
+                                fun i ->
+                                    use tfile = TagLib.File.Create(i)
+                                    (i,tfile.Properties.Duration |> fromTimeSpan)
+                            )
+                        )
+                    return Some (FileListLoaded (res |> List.sortBy (fun (f,_) -> f)))
+            }
+
+        let loadFilesAsyncCmd =
+             loadFilesAsyncMsg >> Cmd.ofAsyncMsgOption 
+
+
+        let getTrackNumberFromFileName file model = 
+            model.AudioFileList
+            |> List.tryFindIndex (fun (f,_) -> f = file)
+            |> Option.map (fun i -> i + 1)
+            |> Option.defaultValue 1
+
+        let playAudio rewindInSec model =
+            (fun (dispatch:Dispatch<Msg>) -> 
+                async {
+                    if model.CurrentState = Playing then
                         return DoNothing
                     else
-                        let (file,_) = model.AudioFileList.[model.CurrentAudioFileIndex]
-                        let currentPosition = model.CurrentPosition |> fromTimeSpanOpt
-                        let rewindInMs = rewindInSec * 1000
+                        if model.AudioFileList.Length = 0 then
+                            return DoNothing
+                        else
+                            let (file,_) = model.AudioFileList.[model.CurrentAudioFileIndex]
+                            let currentPosition = model.CurrentPosition |> fromTimeSpanOpt
+                            let rewindInMs = rewindInSec * 1000
                         
-                        audioPlayer.StartAudio file (currentPosition - rewindInMs)
+                            audioPlayer.StartAudio file (currentPosition - rewindInMs)
 
-                        return DoNothing
-            }
-        ) |> Cmd.ofAsyncMsgWithInternalDispatch
+                            return DoNothing
+                }
+            ) |> Cmd.ofAsyncMsgWithInternalDispatch
 
 
-    let setAudioPositionRelative value model =
-        match model.CurrentPosition with
-        | None -> ()            
-        |  Some pos ->
-            let msPos = pos |> fromTimeSpan
-            let newPos = if msPos + value < 0 then 0 else msPos + value
-            audioPlayer.GotToPosition (newPos) |> ignore
+        let setAudioPositionRelative value model =
+            match model.CurrentPosition with
+            | None -> ()            
+            |  Some pos ->
+                let msPos = pos |> fromTimeSpan
+                let newPos = if msPos + value < 0 then 0 else msPos + value
+                audioPlayer.GotToPosition (newPos) |> ignore
  
  
-    let setAudioPositionAbsolute value =
-        audioPlayer.GotToPosition (value) |> ignore
+        let setAudioPositionAbsolute value =
+            audioPlayer.GotToPosition (value) |> ignore
 
 
-    let saveNewAudioBookStateCmd model =
-        async {
-            let! res =  model.AudioBook |> DataBase.updateAudioBookInStateFile
-            match res with
-            | Error e ->
-                do! Common.Helpers.displayAlert(Translations.current.Error_Saving_AudioBookState,e,"Ok")
-                return (Some Stop)
-            | Ok _ ->
-                if (model.CurrentState = Stopped) then
-                    return None
-                else
-                    return None
-        } |> Cmd.ofAsyncMsgOption
+        let saveNewAudioBookStateCmd model =
+            async {
+                let! res =  model.AudioBook |> DataBase.updateAudioBookInStateFile
+                match res with
+                | Error e ->
+                    do! Common.Helpers.displayAlert(Translations.current.Error_Saving_AudioBookState,e,"Ok")
+                    return (Some Stop)
+                | Ok _ ->
+                    if (model.CurrentState = Stopped) then
+                        return None
+                    else
+                        return None
+            } |> Cmd.ofAsyncMsgOption
 
 
-    let setCurrentPositionToAudiobookState model =
-        match model.CurrentPosition, model.CurrentAudioFile with
-        | Some cp, Some file ->
-            let newPos = { Position = cp; Filename = file } 
-            let newState = { model.AudioBook.State with CurrentPosition = Some newPos }
-            let newAudioBook = { model.AudioBook with State = newState }
-            { model with AudioBook = newAudioBook }
-        | _,_ ->
-            model
+        let setCurrentPositionToAudiobookState model =
+            match model.CurrentPosition, model.CurrentAudioFile with
+            | Some cp, Some file ->
+                let newPos = { Position = cp; Filename = file } 
+                let newState = { model.AudioBook.State with CurrentPosition = Some newPos }
+                let newAudioBook = { model.AudioBook with State = newState }
+                { model with AudioBook = newAudioBook }
+            | _,_ ->
+                model
 
-    let updateLastListendTimeInAudioBookState model =        
-        let newAbState = 
-            {model.AudioBook.State with LastTimeListend = Some DateTime.UtcNow }
-        let newAudioBook = {model.AudioBook with State=newAbState}
-        {model with AudioBook = newAudioBook }
+        let updateLastListendTimeInAudioBookState model =        
+            let newAbState = 
+                {model.AudioBook.State with LastTimeListend = Some DateTime.UtcNow }
+            let newAudioBook = {model.AudioBook with State=newAbState}
+            {model with AudioBook = newAudioBook }
         
     
-    let sleepTimerUpdateCmd model =
-        async {
-            match model.TimeUntilSleeps with
-            | None -> 
-                return None
-            | Some t ->
-                do! Async.Sleep 1000
-                return Some DecreaseSleepTimer
-        } |> Cmd.ofAsyncMsgOption
+        let sleepTimerUpdateCmd model =
+            async {
+                match model.TimeUntilSleeps with
+                | None -> 
+                    return None
+                | Some t ->
+                    do! Async.Sleep 1000
+                    return Some DecreaseSleepTimer
+            } |> Cmd.ofAsyncMsgOption
 
             
         
 
-    let unsetBusyCmd = Cmd.ofMsg (ChangeBusyState false)
+        let unsetBusyCmd = Cmd.ofMsg (ChangeBusyState false)
 
 
-    let setBusyCmd = Cmd.ofMsg (ChangeBusyState true)
+        let setBusyCmd = Cmd.ofMsg (ChangeBusyState true)
 
 
     let initModel audioBook = 
@@ -270,24 +271,24 @@ open AudioPlayer
                 match info with
                 | None ->
                     
-                    return! model.AudioBook |> loadFilesAsyncMsg
+                    return! model.AudioBook |> Commands.loadFilesAsyncMsg
                 | Some info ->                    
                     match info.ServiceState with
                     | Started ->
                         // if the same audio is active, restore else start a new one
                         if info.AudioBook.FullName <> model.AudioBook.FullName then
-                            return! model.AudioBook |> loadFilesAsyncMsg
+                            return! model.AudioBook |> Commands.loadFilesAsyncMsg
                         else
                             return Some (RestoreStateFormAudioService info)
                     | _ ->
-                        return! model.AudioBook |> loadFilesAsyncMsg
+                        return! model.AudioBook |> Commands.loadFilesAsyncMsg
             } |> Cmd.ofAsyncMsgOption
 
         let cmds = 
             Cmd.batch [
                 model |> decideOnAudioPlayerStateCommand
                 addAudioServiceInfoHandler
-                setBusyCmd
+                Commands.setBusyCmd
             ]
                          
         model, cmds
@@ -358,7 +359,7 @@ open AudioPlayer
             match model.CurrentPositionMs with
             | None -> ()
             | Some newPos -> 
-                setAudioPositionAbsolute newPos
+                Commands.setAudioPositionAbsolute newPos
             newModel, cmd, None
 
     and onRestoreStateFormAudioService info model =
@@ -373,7 +374,7 @@ open AudioPlayer
                 AudioFileList = info.Mp3FileList
                 AudioBook = info.AudioBook }
 
-        newModel, unsetBusyCmd, None
+        newModel, Commands.unsetBusyCmd, None
     
     and onUpdateTrackNumber num model =
         { model with CurrentAudioFileIndex = num - 1}, Cmd.none, None
@@ -451,14 +452,14 @@ open AudioPlayer
             model
 
     and onPlayBaseMsg rewindInSec model =
-        let playAudioCmd = model |> playAudio rewindInSec
+        let playAudioCmd = model |> Commands.playAudio rewindInSec
         
         let newModel = 
             {model with CurrentState = Playing}
-            |> setCurrentPositionToAudiobookState
-            |> updateLastListendTimeInAudioBookState
+            |> Commands.setCurrentPositionToAudiobookState
+            |> Commands.updateLastListendTimeInAudioBookState
         
-        newModel, Cmd.batch [ playAudioCmd; newModel |> saveNewAudioBookStateCmd ], None
+        newModel, Cmd.batch [ playAudioCmd; newModel |> Commands.saveNewAudioBookStateCmd ], None
 
     and onPlayMsg model = 
         let model = model |> fixModelWhenCurrentTrackGreaterThanNumberOfTracks
@@ -503,14 +504,14 @@ open AudioPlayer
 
     and onStopMsg model =
         audioPlayer.StopAudio()
-        let currentAudioBook = AudioBookItemProcessor.getAudioBookItem model.AudioBook.FullName
-        let newModel =
-            match currentAudioBook with
-            | None -> model
-            | Some ca -> {model with AudioBook =ca.AudioBook}
+        //let currentAudioBook = AudioBookItemProcessor.getAudioBookItem model.AudioBook.FullName
+        //let newModel =
+        //    match currentAudioBook with
+        //    | None -> model
+        //    | Some ca -> {model with AudioBook =ca.AudioBook}
             
             
-        newModel, Cmd.none , None
+        model, Cmd.none , None
 
     
     and onNextAudioFileMsg model =
@@ -535,7 +536,7 @@ open AudioPlayer
 
     and onFileListLoadedMsg fileList model =
         
-        let cmd = Cmd.batch [startAudioPlayerService model.AudioBook fileList; unsetBusyCmd]
+        let cmd = Cmd.batch [startAudioPlayerService model.AudioBook fileList; Commands.unsetBusyCmd]
         
         let beginNew () =
             let (fn,duration) = fileList.[0]
@@ -614,7 +615,7 @@ open AudioPlayer
 
     
     and onSaveCurrentPosition model =
-        let newModel =model |> setCurrentPositionToAudiobookState
+        let newModel =model |> Commands.setCurrentPositionToAudiobookState
         newModel, Cmd.none, None
 
 

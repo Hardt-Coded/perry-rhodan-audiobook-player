@@ -69,13 +69,14 @@
             title=Translations.current.FeedbackPage,
             backgroundColor = Consts.backgroundColor,
             content = View.Grid(
-                rowdefs = [ Auto;Auto;Auto;Auto;Star ],
+                rowdefs = [ Auto;Auto;Auto;Auto;Auto;Star ],
                 children = [
-                    (Controls.primaryTextColorLabel 14.0 "Senden Sie uns ein Feedback oder eine Anfrage bei Problemen oder Verbesserungsvorschlägen. Die Anfrage geht direkt zum Entwickler. Es wird nur die E-Mail (falls angegeben) und der Text übermittelt. Mehr nicht! Bei Problemen wäre eine Beschreibung hilfreich und die Angabe ihrer Mailadresse, damit wir uns bei Ihnen melden können.").Row(0)
+                    (Controls.primaryTextColorLabel 22.0 "Support und Feedback").Row(0)
+                    
+                    (Controls.primaryTextColorLabel 14.0 "Senden Sie uns ein Feedback oder eine Anfrage bei Problemen oder Verbesserungsvorschlägen. Die Anfrage geht direkt zum Entwickler. Es wird nur die E-Mail (falls angegeben) und der Text übermittelt. Mehr nicht! Bei Problemen wäre eine Beschreibung hilfreich und die Angabe ihrer Mailadresse, damit wir uns bei Ihnen melden können.").Row(1)
 
-                    View.Button(text = "Nachricht senden!", command = (fun () -> dispatch SendMessage), horizontalOptions = LayoutOptions.Center).Row(1)
+                    View.Button(text = "Nachricht senden!", command = (fun () -> dispatch SendMessage), horizontalOptions = LayoutOptions.Center).Row(2)
 
-                    View.Label(text = model.Name).Row(3)
 
                     View.Entry(text = model.Name
                         , placeholder = "EMail (freiwillig)"
@@ -85,11 +86,11 @@
                         , keyboard=Keyboard.Email
                         , completed = (fun t  -> if t <> model.Name then dispatch (UpdateName t))
                         , created = (fun e -> e.Unfocused.Add(fun args -> if model.Name<>e.Text then dispatch (UpdateName e.Text)))
-                        ).Row(2)
+                        ).Row(3)
 
                     
                     View.Editor(text = model.Message
-                        , placeholder = "Nachricht"
+                        , placeholder = "Hier die Nachricht eingeben"
                         , textColor = Consts.primaryTextColor
                         , backgroundColor = Consts.backgroundColor
                         , placeholderColor = Consts.secondaryTextColor                                
