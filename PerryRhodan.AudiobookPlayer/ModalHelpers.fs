@@ -6,14 +6,210 @@ open Common.ModalBaseHelpers
 open Fabulous.XamarinForms
 
 
+module ModalManager =
+    
+    let shellRef: ViewRef<Shell> = ViewRef<Shell>()
 
-let pushLoginModal dispatch loginPageMsg loginClosed (shellRef:ViewRef<Shell>) loginModel =
-    (LoginPage.view loginModel (loginPageMsg >> dispatch))
-    |> pushModal dispatch loginClosed Translations.current.LoginPage shellRef
+    let browserRef: ViewRef<CustomContentPage> = ViewRef<CustomContentPage>()
 
-let updateLoginModal dispatch loginPageMsg loginClosed (shellRef:ViewRef<Shell>) loginModel =
-    (LoginPage.view loginModel (loginPageMsg >> dispatch))
-    |> updateModal dispatch loginClosed Translations.current.LoginPage shellRef
+
+    type Appearence =
+        | Shell
+        | BrowserPage
+
+    type PushModelInput = {
+        Appearence:Appearence
+        UniqueId:string
+        CloseEvent: unit -> unit
+        Page:ViewElement
+    }
+
+    type private PushedPage = {
+        UniqueId:string
+        Page:ViewElement
+        ContentPage: ContentPage
+        Appearence:Appearence
+    }
+
+    type private PushModalState = {
+        PushedPages: PushedPage list
+    }
+
+
+    type private Msg =
+        | PushOrUpdateModal of PushModelInput
+        | RemovePage of string
+        | RemoveLastModal
+        | GetLastPageId of AsyncReplyChannel<string>
+
+
+    let private modalManager = lazy( 
+        MailboxProcessor<Msg>.Start(
+            fun inbox ->
+                let rec loop (state:PushModalState) =
+                    async {
+                        let! msg = inbox.Receive()
+                        match msg with
+
+                        | PushOrUpdateModal input ->
+
+                            let pageToPush =
+                                state.PushedPages
+                                |> List.tryFind (fun i -> i.UniqueId = input.UniqueId)
+
+                            match pageToPush with
+                            | Some pageToPush ->
+                                Device.BeginInvokeOnMainThread(
+                                    fun () ->
+                                        input.Page.UpdateIncremental(pageToPush.Page, pageToPush.ContentPage)
+                                )
+                                
+                                let newPageToPush = { pageToPush with Page = input.Page }
+                                let newPushedPages = 
+                                    state.PushedPages 
+                                    |> List.map (fun i -> if i.UniqueId = pageToPush.UniqueId then newPageToPush else i)
+
+                                let newState = { state with PushedPages = newPushedPages }
+                                return! loop newState
+
+                            | None ->
+                                let pageToPush = input.Page.Create() :?> ContentPage
+                                pageToPush.Disappearing.Add (fun e -> 
+                                    
+                                    //let shellParent = Some Shell.Current.CurrentItem.CurrentItem
+                                    //let pageParent = 
+                                    //    if pageToPush.Parent.GetType() = typeof<ShellSection> then
+                                    //        Some <| (pageToPush.Parent :?> ShellSection)
+                                    //    else
+                                    //        None
+
+
+                                    //if shellParent = pageParent ||
+                                    //   pageToPush.Parent.GetType().BaseType = typeof<Xamarin.Forms.Application> then
+
+
+                                    let shellParent = Shell.Current.CurrentItem.CurrentItem :> Element
+                                    let pageParent = pageToPush.Parent
+
+                                    if shellParent = pageParent ||
+                                        // in case of a gloabl modal like the login
+                                       pageToPush.Parent.GetType().BaseType = typeof<Xamarin.Forms.Application> then
+
+                                        let lastPageId = inbox.PostAndReply (fun rply -> GetLastPageId rply)
+                                        if pageToPush.AutomationId = lastPageId then 
+                                            input.CloseEvent ()
+                                            inbox.Post <| RemovePage pageToPush.AutomationId
+                                            ()
+                                )
+                                match input.Appearence with
+                                | Shell -> 
+                                    match shellRef.TryValue with
+                                    | Some shellRef ->
+                                        Device.BeginInvokeOnMainThread(
+                                            fun () ->
+                                                shellRef.Navigation.PushModalAsync (pageToPush,true) |> ignore
+                                        )
+                                    | None ->
+                                        ()
+
+                                | BrowserPage ->
+                                    match browserRef.TryValue with
+                                    | Some browserRef ->
+                                        Device.BeginInvokeOnMainThread(
+                                            fun () ->
+                                                browserRef.Navigation.PushAsync (pageToPush,true) |> ignore
+                                        )
+                                        
+                                    | None ->
+                                        ()
+
+
+                                let pushPage = {
+                                    UniqueId=input.UniqueId
+                                    Page=input.Page
+                                    ContentPage=pageToPush
+                                    Appearence=input.Appearence
+                                }
+
+                                return! loop {state with PushedPages = pushPage::state.PushedPages }
+
+                        | RemovePage id ->
+                            let newState =
+                                { state with PushedPages = state.PushedPages |> List.filter (fun i -> i.UniqueId <> id) }
+
+                            return! loop newState
+
+                        | RemoveLastModal ->
+                            match state.PushedPages |> List.tryHead with
+                            | None ->
+                                return! loop state
+                            | Some last ->
+                                match last.Appearence with
+                                | Shell -> 
+                                    match shellRef.TryValue with
+                                    | Some shellRef ->
+                                        Device.BeginInvokeOnMainThread(
+                                            fun () ->
+                                                shellRef.Navigation.PopModalAsync () |> ignore
+                                        )
+
+                                        //let! _ = shellRef.Navigation.PopModalAsync (true) |> Async.AwaitTask
+                                        ()
+                                    | None ->
+                                        ()
+
+                                | BrowserPage ->
+                                    match browserRef.TryValue with
+                                    | Some browserRef ->
+                                        Device.BeginInvokeOnMainThread(
+                                            fun () ->
+                                                browserRef.Navigation.RemovePage (last.ContentPage) |> ignore
+                                        )
+
+                                        //let! _ = shellRef.Navigation.PopModalAsync (true) |> Async.AwaitTask
+                                        ()
+                                    | None ->
+                                        ()
+
+
+                                return! loop { state with PushedPages = state.PushedPages.Tail }
+
+                        | GetLastPageId reply ->
+                            match state.PushedPages |> List.tryHead with
+                            | None ->
+                                reply.Reply ("")
+                            | Some last ->
+                                reply.Reply (last.UniqueId)
+                                return! loop state
+
+                            return! loop state
+                    }
+
+                loop { PushedPages = [] }
+        )
+    )
+                    
+
+    let pushOrUpdateModal input =
+        modalManager.Force().Post <| PushOrUpdateModal input
+
+
+    let removeLastModal () =
+        modalManager.Force().Post <| RemoveLastModal
+
+
+    let getLastPageId () =
+        modalManager.Force().PostAndReply <| GetLastPageId
+
+
+
+//let pushLoginModal dispatch loginPageMsg loginClosed (shellRef:ViewRef<Shell>) loginModel =
+//    (LoginPage.view loginModel (loginPageMsg >> dispatch))
+//    |> pushModal dispatch loginClosed Translations.current.LoginPage shellRef
+
+//let updateLoginModal dispatch loginPageMsg loginClosed (shellRef:ViewRef<Shell>) loginModel =
+//    (LoginPage.view loginModel (loginPageMsg >> dispatch))
+//    |> updateModal dispatch loginClosed Translations.current.LoginPage shellRef
 
 
 let pushDetailModal dispatch detailPageMsg detailPageClosed (shellRef:ViewRef<Shell>) detailModel =

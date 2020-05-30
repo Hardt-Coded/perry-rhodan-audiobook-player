@@ -284,7 +284,7 @@ module DataBase =
     let removeAudiobook audiobook = 
         try
             match audiobook.State.DownloadedFolder with
-            | None -> Error (Translations.current.ErrorDownloadAudiobook)
+            | None -> Error (Translations.current.ErrorRemoveAudioBook)
             | Some folder ->
                 Directory.Delete(folder,true)
                 Ok ()

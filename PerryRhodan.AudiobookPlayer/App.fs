@@ -44,7 +44,7 @@ module App =
         SettingsPageModel:SettingsPage.Model option
         SupportFeedbackModel:SupportFeedback.Model option
 
-        DownloadQueueModel: DownloadQueue.Model 
+        //DownloadQueueModel: DownloadQueue.Model 
         
         AppLanguage:Language
         CurrentPage: Pages
@@ -74,7 +74,7 @@ module App =
         | AudioBookDetailPageMsg of AudioBookDetailPage.Msg
         | SettingsPageMsg of SettingsPage.Msg
         | SupportFeedbackPageMsg of SupportFeedback.Msg
-        | DownloadQueueMsg of DownloadQueue.Msg
+        //| DownloadQueueMsg of DownloadQueue.Msg
 
         | GotoMainPage
         | GotoBrowserPage
@@ -125,9 +125,9 @@ module App =
         
 
         
-    let shellRef = ViewRef<Shell>()
+    let shellRef = ModalHelpers.ModalManager.shellRef
 
-    let browserPageRef = ViewRef<CustomContentPage>()
+    //let browserPageRef = ViewRef<CustomContentPage>()
 
 
     let gotoPage routeName =
@@ -142,15 +142,6 @@ module App =
                 ()
         } |> Async.StartImmediate
 
-
-    let closeCurrentModal () =
-        shellRef.TryValue
-        |> Option.map (fun sr ->
-            async {
-                let! _ = sr.Navigation.PopModalAsync(true) |> Async.AwaitTask
-                return ()
-            } |> Async.StartImmediate
-        ) |> ignore
 
 
 
@@ -261,7 +252,7 @@ module App =
             SettingsPageModel = None 
             SupportFeedbackModel = None
 
-            DownloadQueueModel = DownloadQueue.initModel None
+            //DownloadQueueModel = DownloadQueue.initModel None
 
             AppLanguage = English
             CurrentPage = MainPage
@@ -387,7 +378,6 @@ module App =
 
         | AskForAppPermission ->
             model |> onAskForAppPermissionMsg
-
         
 
         | MainPageMsg msg ->
@@ -430,8 +420,8 @@ module App =
             model |> onProcessSettingsPageMsg msg
         | SupportFeedbackPageMsg msg ->
             model |> onSupportFeedbackPageMsg msg
-        | DownloadQueueMsg msg ->
-            model |> onProcessDownloadQueueMsg msg
+        //| DownloadQueueMsg msg ->
+        //    model |> onProcessDownloadQueueMsg msg
         | GotoMainPage ->
             model |> onGotoMainPageMsg
         | GotoLoginPage cameFrom ->
@@ -626,7 +616,13 @@ module App =
 
             let updateLoginPageCmd =
                 fun dispatch ->
-                    ModalHelpers.updateLoginModal dispatch LoginPageMsg LoginClosed shellRef m
+                    let modalInput:ModalHelpers.ModalManager.PushModelInput = {
+                        Appearence=ModalHelpers.ModalManager.Shell
+                        UniqueId="loginPage"
+                        CloseEvent= (fun () -> dispatch <| LoginClosed)
+                        Page = LoginPage.view m (LoginPageMsg >> dispatch)
+                    }
+                    ModalHelpers.ModalManager.pushOrUpdateModal modalInput
                 |> Cmd.ofSub
             
             {model with LoginPageModel = Some m}, Cmd.batch [updateLoginPageCmd;(Cmd.map LoginPageMsg cmd); externalCmds ]
@@ -758,23 +754,23 @@ module App =
              {model with SupportFeedbackModel = Some m}, Cmd.batch [updateFeedbackPageCmd;(Cmd.map SupportFeedbackPageMsg cmd)]
 
 
-    and onProcessDownloadQueueMsg msg model =
-        let newModel, cmd, externalMsg = DownloadQueue.update msg model.DownloadQueueModel
-        let mainCmds =
-            match externalMsg with
-            | None -> Cmd.none
-            | Some excmd -> 
-                match excmd with
-                | DownloadQueue.ExternalMsg.ExOpenLoginPage cameFrom ->
-                    Cmd.ofMsg (GotoLoginPage cameFrom)
-                | DownloadQueue.ExternalMsg.UpdateAudioBook abModel ->
-                    Cmd.ofMsg (UpdateAudioBook (abModel,""))
-                | DownloadQueue.ExternalMsg.UpdateDownloadProgress (abModel,progress) ->
-                    Cmd.ofMsg (UpdateAudioBook (abModel,""))
-                | DownloadQueue.ExternalMsg.PageChangeBusyState state ->
-                    Cmd.none
+    //and onProcessDownloadQueueMsg msg model =
+    //    let newModel, cmd, externalMsg = DownloadQueue.update msg model.DownloadQueueModel
+    //    let mainCmds =
+    //        match externalMsg with
+    //        | None -> Cmd.none
+    //        | Some excmd -> 
+    //            match excmd with
+    //            | DownloadQueue.ExternalMsg.ExOpenLoginPage cameFrom ->
+    //                Cmd.ofMsg (GotoLoginPage cameFrom)
+    //            | DownloadQueue.ExternalMsg.UpdateAudioBook abModel ->
+    //                Cmd.ofMsg (UpdateAudioBook (abModel,""))
+    //            | DownloadQueue.ExternalMsg.UpdateDownloadProgress (abModel,progress) ->
+    //                Cmd.ofMsg (UpdateAudioBook (abModel,""))
+    //            | DownloadQueue.ExternalMsg.PageChangeBusyState state ->
+    //                Cmd.none
 
-        { model with DownloadQueueModel = newModel}, Cmd.batch [(Cmd.map DownloadQueueMsg cmd); mainCmds ]
+    //    { model with DownloadQueueModel = newModel}, Cmd.batch [(Cmd.map DownloadQueueMsg cmd); mainCmds ]
 
 
     and onGotoMainPageMsg model =
@@ -791,14 +787,40 @@ module App =
 
         let openLoginPageCmd =
             fun dispatch ->
-                ModalHelpers.pushLoginModal dispatch LoginPageMsg LoginClosed shellRef m
+                let modalInput:ModalHelpers.ModalManager.PushModelInput = {
+                    Appearence=ModalHelpers.ModalManager.Shell
+                    UniqueId="loginPage"
+                    CloseEvent= (fun () -> dispatch <| LoginClosed)
+                    Page = LoginPage.view m (LoginPageMsg >> dispatch)
+                }
+                ModalHelpers.ModalManager.pushOrUpdateModal modalInput
             |> Cmd.ofSub
 
         {model with LoginPageModel = Some m},Cmd.batch [ openLoginPageCmd; (Cmd.map LoginPageMsg cmd)  ]
         
 
     and onLoginClosed model =
-        {model with LoginPageModel = None},Cmd.none
+        // if there is no cookie container, than remove all queued items
+        // because when the login page appears it's maybe from download
+        // so if the user dismiss the login, than remove the queued state
+        let model =
+            if model.CookieContainer.IsNone then
+                { 
+                    model with 
+                        AudioBookItems = 
+                            model.AudioBookItems 
+                            |> Array.map (fun i -> 
+                                if i.Model.DownloadState = AudioBookItemNew.Queued then
+                                    { i with Model = { i.Model with DownloadState = AudioBookItemNew.NotDownloaded } }
+                                else
+                                    i
+                            )
+                }
+            else
+                model
+
+        
+        { model with LoginPageModel = None }, Cmd.ofMsg AudioBookItemsUpdated
 
 
     and onGotoBrowserPageMsg model =
@@ -861,10 +883,26 @@ module App =
         
 
     and onGotoDownloadPage state model =
-        let (dpModel,cmd) = DownloadQueue.initFromDownloadService state
-        let cmd = Cmd.map DownloadQueueMsg cmd
+        let queue =
+            state.Downloads
+            |> List.filter (fun i -> match i.State with | Services.DownloadService.Open | Services.DownloadService.Running _ -> true | _ -> false )
+            |> List.choose (fun i ->
+                let abModel =
+                    model.AudioBookItems
+                    |> Array.tryFind (fun a -> a.Model.AudioBook.Id = i.AudioBook.Id)
+                
+                match i.State with
+                | Services.DownloadService.Open ->
+                    abModel |> Option.map (fun abModel -> { abModel with Model = { abModel.Model with DownloadState = AudioBookItemNew.Queued } })
+                | Services.DownloadService.Running (a,c) ->
+                    abModel |> Option.map (fun abModel -> { abModel with Model = { abModel.Model with DownloadState = AudioBookItemNew.Downloading (a,c)} })
+                | _ ->
+                    None
+            )
 
-        { model with DownloadQueueModel = dpModel }, cmd
+        { model with AudioBookItems = queue |> List.toArray }, Cmd.none
+
+       
 
 
     and onFeedbackSupportPageClosedPage model =
@@ -900,11 +938,22 @@ module App =
                 model, Cmd.ofMsg (BrowserPageMsg (models.[0].SelectedGroups, BrowserPage.Msg.LoadOnlineAudiobooks))
 
             | DownloadAudioBook ->
-                let downloadQueueModel = { model.DownloadQueueModel with CurrentSessionCookieContainer = Some cc}
-                { model with DownloadQueueModel = downloadQueueModel}, Cmd.ofMsg (DownloadQueueMsg DownloadQueue.Msg.StartProcessing)
+                // look who is queued and start the download again
+                let queued =
+                    model.AudioBookItems
+                    |> Array.filter (fun i -> i.Model.DownloadState = AudioBookItemNew.Queued)
+
+                let restartDownloadCmds = 
+                    queued
+                    |> Array.map (fun i -> AudioBookItemMsg (i.Model, AudioBookItemNew.Msg.AddToDownloadQueue))
+                    |> Array.map (Cmd.ofMsg)
+                    |> Array.toList
+
+                // Todo: try download again
+                model, Cmd.batch restartDownloadCmds
 
         // and close Login Modal
-        closeCurrentModal ()
+        ModalHelpers.ModalManager.removeLastModal ()
         // set here login page model to None to avoid reopening of the loginPage
         { model with LoginPageModel = None; CookieContainer = Some cc }, cmd
         
@@ -975,7 +1024,8 @@ module App =
                         (audioPlayerOverlay abMdl)
                         (MainPage.view mdl (mainPageDispatch))
                         mainPageModel.IsLoading
-                        Translations.current.MainPage)
+                        Translations.current.MainPage
+                        "mainPage")
                 )
             )
             
@@ -1005,21 +1055,22 @@ module App =
                 let newView =
                     (BrowserPage.view browserModel bDispatch)
 
-                (Controls.contentPageWithBottomOverlay 
+                Controls.contentPageWithBottomOverlay 
                     ref
                     (audioPlayerOverlay model.AudioPlayerPageModel)
                     newView
                     browserModel.IsLoading
+                    "BrowserPage"
                     (String.concatStr browserModel.SelectedGroups)
-                    )
+                    
 
             match model.BrowserPageModels with
             | [] ->
                 None, []
             | [x] ->
-                Some <| createPage browserPageRef x, []
+                Some <| createPage ModalHelpers.ModalManager.browserRef x, []
             | head::tail ->
-                let h = Some <| createPage browserPageRef head
+                let h = Some <| createPage ModalHelpers.ModalManager.browserRef head
                 let t = tail |> List.map (fun m -> createPage BrowserPage.pageRef m, m.SelectedGroups)
                 h, t
             
@@ -1039,7 +1090,14 @@ module App =
                 //    ModalHelpers.BrowserPageModal.pushPage dispatch BrowserPageModelClosed pageTitle false browserPageRef bPage
                 //| Some page ->
                 let pageTitle = selectedGroup |> String.concatStr
-                ModalHelpers.BrowserPageModal.updatePage dispatch BrowserPageModelClosed pageTitle false browserPageRef bPage
+                let modalInput:ModalHelpers.ModalManager.PushModelInput = {
+                    Appearence=ModalHelpers.ModalManager.BrowserPage
+                    UniqueId=pageTitle
+                    CloseEvent= (fun () -> dispatch <| BrowserPageModelClosed pageTitle)
+                    Page = bPage
+                }
+                ModalHelpers.ModalManager.pushOrUpdateModal modalInput
+                //ModalHelpers.BrowserPageModal.updatePage dispatch BrowserPageModelClosed pageTitle false browserPageRef bPage
         )
 
         
@@ -1065,7 +1123,7 @@ module App =
         
 
         View.Shell(
-            ref = shellRef,     
+            ref = ModalHelpers.ModalManager.shellRef,     
             flyoutBehavior=FlyoutBehavior.Disabled,
             title= "Eins A Medien",
             shellForegroundColor=Color.White,
@@ -1103,20 +1161,12 @@ module App =
                             ()
 
                         
-                        let dqView = DownloadQueue.view model.DownloadQueueModel (DownloadQueueMsg >> dispatch)
-
-                        match model.DownloadQueueModel.State with
-                        | DownloadQueue.QueueState.Downloading -> 
-                            let icon = "download_icon_running.png"
-                            yield createShellContent "Downloads" downloadQueue icon dqView
-                        | DownloadQueue.QueueState.Paused -> 
-                            let icon = "download_icon_error.png"
-                            yield createShellContent "Downloads" downloadQueue icon dqView
-                        | DownloadQueue.QueueState.Idle -> 
+                        match DownloadQueueNew.init model.AudioBookItems with
+                        | [||] ->
                             ()
-                        
-                        
-                        
+                        | items ->
+                            yield createShellContent "Downloads" downloadQueue "download_icon.png" <| DownloadQueueNew.view items
+
 
                         match mainPage,browserPage,settingsPage,audioPlayerPage with
                         | None, None, None, None ->
@@ -1128,13 +1178,6 @@ module App =
                 )
 
                 yield View.ShellContent(route="permissiondeniedpage",content=View.ContentPage(content=View.Label(text="...")))
-
-                match model.DownloadQueueModel.State with
-                | DownloadQueue.QueueState.Idle -> 
-                    let dqView = DownloadQueue.view model.DownloadQueueModel (DownloadQueueMsg >> dispatch)
-                    yield createShellContent "Downloads" downloadQueue "" dqView
-                | _ -> ()
-
 
                 
             ]

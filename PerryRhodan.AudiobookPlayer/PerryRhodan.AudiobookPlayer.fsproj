@@ -23,6 +23,7 @@
 		<Compile Include="AudioBookItemNew.fs" />
 		<Compile Include="AudioBookItemProcessor.fs" />
 		<Compile Include="DownloadQueue.fs" />
+		<Compile Include="DownloadQueueNew.fs" />
 		<Compile Include="BrowserPage.fs" />
 		<Compile Include="AudioPlayerPage.fs" />
 		<Compile Include="AudioBookDetail.fs" />

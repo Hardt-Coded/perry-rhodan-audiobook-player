@@ -322,7 +322,13 @@ let primaryColorSymbolLabelWithTapCommandRightAlign command size solid text =
         )
 
 
-let contentPageWithBottomOverlay (pageRef:ViewRef<CustomContentPage>) (bottomOverlay:ViewElement option) (content:ViewElement) isBusy title =
+let contentPageWithBottomOverlay 
+    (pageRef:ViewRef<CustomContentPage>) 
+    (bottomOverlay:ViewElement option) 
+    (content:ViewElement) 
+    isBusy 
+    title
+    uniqueId =
     View.ContentPage(
         title=title,
         backgroundColor = Consts.backgroundColor,
@@ -336,7 +342,8 @@ let contentPageWithBottomOverlay (pageRef:ViewRef<CustomContentPage>) (bottomOve
                     if bottomOverlay.IsSome then
                         yield bottomOverlay.Value.Row(1)
                 ]
-        )
+        ),
+        automationId = uniqueId
     )
 
 

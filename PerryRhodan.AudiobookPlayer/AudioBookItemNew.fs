@@ -208,8 +208,8 @@
 
     and onAudioBookDeletedMsg model =
         let newState = {model.AudioBook.State with Downloaded = false; DownloadedFolder = None}
-        let newAudioBook = {model.AudioBook with State = newState; }
-        let newModel = {model with AudioBook = newAudioBook }
+        let newAudioBook = {model.AudioBook with State = newState }
+        let newModel = { model with AudioBook = newAudioBook; DownloadState = NotDownloaded }
         newModel, Commands.updateAudiobookInStateFile newModel
 
     
@@ -281,7 +281,7 @@
                             | NotDownloaded ->
                                 Controls.arrowDownLabel.Column(1).Row(1)
                             | Queued ->
-                                Controls.inDownloadQueueLabel.Column(2).Row(2)
+                                Controls.inDownloadQueueLabel.Column(1).Row(1)
                             | Downloading (c,a) ->
                                 ((c,a) |> Controls.showDownloadProgress).ColumnSpan(3).Row(2).Column(0)
                             | Downloaded ->
