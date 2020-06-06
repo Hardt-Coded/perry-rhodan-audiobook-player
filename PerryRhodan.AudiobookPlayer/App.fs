@@ -55,24 +55,22 @@ module App =
 
     type Msg = 
         | Init
-        | AudioBookItemsRead of AudioBookItemNew.AudioBookItem []
+        | InitSuccessful of AudioBookItemNew.AudioBookItem []
+        | AudioBookItemsChanged of AudioBookItemNew.AudioBookItem []
         | AudioBookItemMsg of (AudioBookItemNew.Model * AudioBookItemNew.Msg)
         | AudioBookItemsUpdated
 
         | AskForAppPermission
         | MainPageMsg of MainPage.Msg 
         | LoginPageMsg of LoginPage.Msg 
-
         
         | BrowserPageMsg of (string list * BrowserPage.Msg)
         | BrowserPageModelClosed of string
-
 
         | AudioPlayerPageMsg of AudioPlayerPage.Msg
         | AudioBookDetailPageMsg of AudioBookDetailPage.Msg
         | SettingsPageMsg of SettingsPage.Msg
         | SupportFeedbackPageMsg of SupportFeedback.Msg
-        //| DownloadQueueMsg of DownloadQueue.Msg
 
         | GotoMainPage
         | GotoBrowserPage
@@ -91,7 +89,7 @@ module App =
         | OpenAudioBookDetailPage of AudioBook
         | CloseAudioBookDetailPage
         | NavigationPopped of Pages
-        | UpdateAudioBook of AudioBookItemNew.Model * string
+       
 
         | QuitApplication
         
@@ -124,8 +122,6 @@ module App =
 
         
     let shellRef = ModalHelpers.ModalManager.shellRef
-
-    //let browserPageRef = ViewRef<CustomContentPage>()
 
 
     let gotoPage routeName =
@@ -235,6 +231,258 @@ module App =
             |> Cmd.ofSub
 
 
+        let loadAudioBookItemsCmd =
+            fun dispatch ->
+                async {
+                    let! ab = Services.DataBase.loadAudioBooksStateFile ()
+                    let itemsWithDispatcher =
+                        ab 
+                        |> Array.map (fun i -> AudioBookItemNew.init i) 
+                        |> Array.map (fun i -> AudioBookItemHelper.createAudioBookItem dispatch i)
+
+                    dispatch <| InitSuccessful itemsWithDispatcher
+                }
+                |> Async.Start
+
+            |> Cmd.ofSub
+
+
+        
+
+
+        type SynchronizeWithCloudErrors =
+            | NoSessionAvailable
+            | WebError of ComError
+            | StorageError of string
+
+        let synchronizeWithCloudCmd model =
+            fun dispatch ->
+                async {
+
+                    let audioBookItemDispatch item msg =
+                        dispatch <| AudioBookItemMsg (item, msg)
+
+                    let notifyAfterSync (synchedAb:AudioBookItemNew.AudioBookItem []) =
+                        async {
+                            match synchedAb with
+                            | [||] ->
+                                do! Common.Helpers.displayAlert(Translations.current.NoNewAudioBooksSinceLastRefresh," ¯\_(ツ)_/¯","OK")
+                            | _ ->
+                                let message = synchedAb |> Array.map (fun i -> i.Model.AudioBook.FullName) |> String.concat "\r\n"
+                                do! Common.Helpers.displayAlert(Translations.current.NewAudioBooksSinceLastRefresh,message,"OK")
+                        }
+                    
+                    let checkLoginSession () =
+                        match model.CookieContainer with
+                        | Some cc ->
+                            Ok cc
+                        | None ->
+                            Error NoSessionAvailable
+                        |> AsyncResult.ofResult
+                        
+                    
+                    let loadAudioBooksFromCloud (sessionResult:AsyncResult<Map<string,string>,SynchronizeWithCloudErrors>) =
+                        asyncResult {
+                            let! cookies = sessionResult
+                            let! audioBooks = 
+                                Services.WebAccess.getAudiobooksOnline cookies
+                                |> AsyncResult.mapError (fun e -> WebError e)
+                            return audioBooks
+                        }
+
+                    let loadAudioBooksFromDevice 
+                        (modelAudioBooks:AudioBookItemNew.AudioBookItem[])
+                        (loadResult:AsyncResult<Domain.AudioBook[],SynchronizeWithCloudErrors>) =
+                        asyncResult {
+                            let! cloudAudioBooks = loadResult
+
+                            let audioBooksAlreadyOnTheDevice =
+                                Services.DataBase.getAudiobooksFromDownloadFolder cloudAudioBooks
+                                // remove items that are already in the model itself
+                                |> Array.filter (fun i -> modelAudioBooks |> Array.exists (fun a -> a.Model.AudioBook.Id = i.Id) |> not)
+                                |> Array.map (fun i -> AudioBookItemNew.init i) 
+                                |> Array.map (fun i -> AudioBookItemHelper.createAudioBookItem dispatch i)
+
+                            
+                                
+                            return (audioBooksAlreadyOnTheDevice,cloudAudioBooks)
+                        }
+
+                    let processLoadedAudioBookFromDevice 
+                        (input:AsyncResult<(AudioBookItemNew.AudioBookItem [] * Domain.AudioBook[]),SynchronizeWithCloudErrors>) =
+                        asyncResult {
+                            let! (audioBooksItemsAlreadyOnTheDevice, cloudAudioBooks) = input
+
+                            let audioBooksAlreadyOnTheDevice = 
+                                audioBooksItemsAlreadyOnTheDevice 
+                                |> Array.map (fun i -> i.Model.AudioBook)
+                            
+                            do! audioBooksAlreadyOnTheDevice 
+                                |> Services.DataBase.insertNewAudioBooksInStateFile
+                                |> AsyncResult.mapError (fun e -> StorageError e)
+
+                            return (audioBooksItemsAlreadyOnTheDevice, cloudAudioBooks)
+                        }
+
+                    
+
+
+                    let determinateNewAddedAudioBooks 
+                        (modelAudioBooks:AudioBookItemNew.AudioBookItem[])
+                        (input:AsyncResult<(AudioBookItemNew.AudioBookItem [] * Domain.AudioBook[]),SynchronizeWithCloudErrors>) =
+                        asyncResult {
+                            let! (audioBooksAlreadyOnTheDevice, cloudAudioBooks) = input
+                            
+                            let modelAndDeviceAudiobooks = Array.concat [audioBooksAlreadyOnTheDevice; modelAudioBooks]
+
+                            let newAudioBookItems = 
+                                AudioBookItemNew.Helpers.getNew audioBookItemDispatch modelAndDeviceAudiobooks cloudAudioBooks
+
+                            return newAudioBookItems, modelAndDeviceAudiobooks, cloudAudioBooks
+                        }
+
+
+
+                    
+
+                    let processNewAddedAudioBooks 
+                        (input:AsyncResult<(AudioBookItemNew.AudioBookItem [] * AudioBookItemNew.AudioBookItem [] * Domain.AudioBook[]),SynchronizeWithCloudErrors>) =
+                        asyncResult {
+                            let! (newAudioBookItems,currentAudioBooks,cloudAudioBooks) = input
+
+                            let onlyAudioBooks = 
+                                newAudioBookItems 
+                                |> Array.map (fun i -> i.Model.AudioBook)
+
+                            do! onlyAudioBooks 
+                                |> Services.DataBase.insertNewAudioBooksInStateFile 
+                                |> AsyncResult.mapError (fun e -> StorageError e)
+
+
+                            return newAudioBookItems, currentAudioBooks, cloudAudioBooks
+                            
+                        }
+
+                    let repairAudiobookMetadataIfNeeded
+                        (input:AsyncResult<(AudioBookItemNew.AudioBookItem [] * AudioBookItemNew.AudioBookItem [] * Domain.AudioBook []),SynchronizeWithCloudErrors>) =
+                        asyncResult {
+                            let! newAudioBookItems, currentAudioBooks, cloudAudioBooks = input
+
+                            let hasDiffMetaData a b =
+                                a.FullName <> b.FullName ||
+                                a.EpisodeNo <> b.EpisodeNo ||
+                                a.EpisodenTitel <> b.EpisodenTitel ||
+                                a.Group <> b.Group
+
+                            let repairedAudioBooksItem =
+                                currentAudioBooks
+                                |> Array.choose (fun i ->
+                                    cloudAudioBooks 
+                                    |> Array.tryFind (fun c -> c.Id = i.Model.AudioBook.Id)
+                                    |> Option.bind (fun c -> 
+                                        if hasDiffMetaData c (i.Model.AudioBook) then
+                                            let newAb = { 
+                                                i.Model.AudioBook with 
+                                                    FullName = c.FullName
+                                                    EpisodeNo = c.EpisodeNo
+                                                    EpisodenTitel = c.EpisodenTitel
+                                                    Group = c.Group
+                                            }
+                                            Some { i with Model = { i.Model with AudioBook = newAb } }
+                                        else
+                                            None
+                                    )
+                                )
+
+                            match repairedAudioBooksItem with
+                            | [||] ->
+                                return newAudioBookItems, currentAudioBooks
+                            | _ ->
+                                do!
+                                    repairedAudioBooksItem
+                                    |> Array.map (fun i -> i.Model.AudioBook)
+                                    |> Array.map (fun i -> Services.DataBase.updateAudioBookInStateFile i)
+                                    |> Async.Sequential
+                                    |> Async.map (fun i ->
+                                        i 
+                                        |> Array.tryFind (function | Error _ -> true | Ok _ -> false)
+                                        |> Option.defaultValue (Ok ())
+                                    )
+                                    |> AsyncResult.mapError (StorageError)
+
+                                // replacing fixed entries
+                                let currentAudioBooks =
+                                    currentAudioBooks
+                                    |> Array.map (fun c ->
+                                        match repairedAudioBooksItem |> Array.tryFind (fun r -> c.Model.AudioBook.Id = r.Model.AudioBook.Id) with
+                                        | None ->
+                                            c
+                                        | Some r ->
+                                            r
+                                    )
+
+                                return newAudioBookItems, currentAudioBooks
+                            
+                        }
+
+                    let processResult 
+                        (input:AsyncResult<AudioBookItemNew.AudioBookItem [] * AudioBookItemNew.AudioBookItem [],SynchronizeWithCloudErrors>) =
+                        async {
+                            match! input with
+                            | Ok (newAudioBookItems,currentAudioBooks) ->
+                                do! newAudioBookItems |> notifyAfterSync
+                                dispatch <| AudioBookItemsChanged (Array.concat [newAudioBookItems;currentAudioBooks])
+                            | Error err ->
+                                match err with
+                                | NoSessionAvailable ->
+                                    dispatch <| GotoLoginPage RefreshAudiobooks
+
+                                | WebError comError ->
+                                    match comError with
+                                    | SessionExpired e -> 
+                                        dispatch <| GotoLoginPage RefreshAudiobooks
+                                        
+                                    | Other e -> 
+                                        do! Common.Helpers.displayAlert (Translations.current.Error, e, "OK")
+                                        
+                                    | Exception e ->
+                                        let ex = e.GetBaseException()
+                                        let msg = ex.Message + "|" + ex.StackTrace
+                                        do! Common.Helpers.displayAlert (Translations.current.Error, msg, "OK")
+
+                                    | Network msg ->
+                                        do! Common.Helpers.displayAlert (Translations.current.Error, msg, "OK")
+
+                                | StorageError msg ->
+                                    do! Common.Helpers.displayAlert (Translations.current.Error, msg, "OK")
+                        }
+
+                    do!
+                        checkLoginSession ()
+                        |> loadAudioBooksFromCloud
+                        |> loadAudioBooksFromDevice model.AudioBookItems
+                        |> processLoadedAudioBookFromDevice
+                        |> determinateNewAddedAudioBooks model.AudioBookItems
+                        |> processNewAddedAudioBooks
+                        |> repairAudiobookMetadataIfNeeded
+                        |> processResult
+
+
+                    dispatch <| BrowserPageMsg ([], BrowserPage.Msg.ChangeBusyState false)
+
+                }
+                |> Async.Start
+            |> Cmd.ofSub
+
+        let deleteDatabaseCmd =
+            fun dispatch ->
+                Services.DataBase.deleteAudiobookDatabase ()
+                dispatch Init
+            |> Cmd.ofSub
+            
+            
+
+
     let init () = 
         let initModel = { 
             IsNav = false
@@ -277,7 +525,8 @@ module App =
         match msg with
         | Init ->
             model |> onInitMsg
-        | AudioBookItemsRead items ->
+
+        | InitSuccessful items ->
 
             // check if download Service is running
             let checkDownloadServiceCmd =
@@ -324,6 +573,19 @@ module App =
                     checkDownloadServiceCmd
                 ]
 
+            newModel, cmds
+
+        | AudioBookItemsChanged items ->
+            let newModel = { 
+                model with
+                    AudioBookItems = items
+            }
+            let cmds =
+                Cmd.batch [
+                    Cmd.ofMsg AudioBookItemsUpdated
+                    // disable spinner only on main browser site
+                    Cmd.ofMsg <| BrowserPageMsg ([], BrowserPage.Msg.ChangeBusyState false)
+                ]
             newModel, cmds
 
         | AudioBookItemsUpdated ->
@@ -405,6 +667,18 @@ module App =
             newModel, cmd
             
 
+        | BrowserPageMsg (_, BrowserPage.LoadOnlineAudiobooks) ->
+            let cmds =
+                Cmd.batch [
+                    // show spinner only on main browser site
+                    Cmd.ofMsg <| BrowserPageMsg ([], BrowserPage.Msg.ChangeBusyState true)
+                    Commands.synchronizeWithCloudCmd model
+
+                ]
+            
+            model, cmds
+            
+
         | BrowserPageMsg msg ->
             model |> onProcessBrowserPageMsg msg
 
@@ -422,6 +696,12 @@ module App =
             model |> onProcessAudioPlayerMsg msg
         | AudioBookDetailPageMsg msg ->
             model |> onProcessAudioBookDetailPageMsg msg
+        | SettingsPageMsg (SettingsPage.DeleteDatabase) ->
+            let cmds = Cmd.batch [
+                Commands.deleteDatabaseCmd
+            ]
+            { model with AudioBookItems = [||] }, cmds
+            
         | SettingsPageMsg msg ->
             model |> onProcessSettingsPageMsg msg
         | SupportFeedbackPageMsg msg ->
@@ -460,30 +740,15 @@ module App =
             model, Cmd.none
         | ProcessFurtherActionsOnBrowserPageAfterLogin (cc,cameFrom) ->
             model |> onSetBrowserPageCookieContainerAfterSucceedLoginMsg cc cameFrom
-        | UpdateAudioBook (ab, cameFrom) ->
-            model |> onUpdateAudioBookMsg ab cameFrom
+        
         | QuitApplication ->
             model |> onQuitApplication
 
 
     and onInitMsg model =
-        let loadAudioBookItemsCmd =
-            fun dispatch ->
-                async {
-                    let! ab = Services.DataBase.loadAudioBooksStateFile ()
-                    let itemsWithDispatcher =
-                        ab 
-                        |> Array.map (fun i -> AudioBookItemNew.init i) 
-                        |> Array.map (fun i -> AudioBookItemHelper.createAudioBookItem dispatch i)
-                        
+        
 
-                    dispatch <| AudioBookItemsRead itemsWithDispatcher
-                }
-                |> Async.Start
-
-            |> Cmd.ofSub
-
-        model, loadAudioBookItemsCmd
+        model, Commands.loadAudioBookItemsCmd
 
 
     and onAskForAppPermissionMsg model =
@@ -527,29 +792,7 @@ module App =
         
     
 
-    and onUpdateAudioBookMsg ab cameFrom model =
-        model, Cmd.none
-        ////let browserPageMsg = BrowserPageMsg (BrowserPage.Msg.UpdateAudioBookItemList ab) |> Cmd.ofMsg
-        //let bpCmd = BrowserPageMsg BrowserPage.Msg.UpdateAudioBook |> Cmd.ofMsg
-        ////let mpCmd = MainPageMsg MainPage.Msg.UpdateAudioBook |> Cmd.ofMsg
-        //let cmd = Cmd.batch [ bpCmd; (* mpCmd; *) ] //browserPageMsg]
-
-        //let audioPlayerModel =
-        //    match model.AudioPlayerPageModel with
-        //    | None -> None
-        //    | Some amdl ->
-        //        if amdl.AudioBook.FullName = ab.AudioBook.FullName then
-        //            if ab.AudioBook.State.Downloaded then
-                
-        //                Some ({amdl with AudioBook = ab.AudioBook})
-        //            else
-        //                None
-        //        else
-        //            model.AudioPlayerPageModel
-
-        //{model with AudioPlayerPageModel = audioPlayerModel}, cmd        
-            
-    
+   
     and onProcessAudioBookItemMsg msg model =
         let (msgItem, msg) = msg
         let item = 
@@ -795,7 +1038,7 @@ module App =
     and onGotoMainPageMsg model =
         match shellRef.TryValue with
         | Some sr ->
-            sr.GoToAsync("mainpage" |> routeToShellNavigationState) |> Async.AwaitTask |> Async.RunSynchronously
+            sr.GoToAsync("///mainpage" |> routeToShellNavigationState) |> Async.AwaitTask |> Async.RunSynchronously
         | None ->
             ()
         model, Cmd.none

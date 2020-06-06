@@ -23,19 +23,10 @@ open Services
 
     
     let emptyModel = { Audiobooks = [||] ; IsLoading = true; LastTimeListendAudioBook = None }
-
     
-
-    let initModel audiobooks = 
-        let filtered =
-            audiobooks
-            |> Array.filter (fun (i:AudioBookItemNew.AudioBookItem) -> i.Model.DownloadState = AudioBookItemNew.Downloaded)
-
-        { Audiobooks = filtered ; IsLoading = false; LastTimeListendAudioBook = None }
-
     
     let init (audiobooks:AudioBookItemNew.AudioBookItem []) = 
-        let getLastListendAb () =
+        let lastListenAudioBook =
             audiobooks 
             |> Array.filter (fun i -> i.Model.DownloadState = AudioBookItemNew.Downloaded)
             |> Array.sortByDescending (fun i -> i.Model.AudioBook.State.LastTimeListend) 
@@ -45,13 +36,22 @@ open Services
                 | None -> None
                 | Some _ -> Some i
             ) 
-            
-        
-        {
-            initModel audiobooks
-                with
-                    LastTimeListendAudioBook = getLastListendAb ()
-        }, Cmd.none
+        let model = {
+            Audiobooks = 
+                audiobooks
+                |> Array.filter (fun x -> match x.Model.DownloadState with | AudioBookItemNew.Downloaded | AudioBookItemNew.Downloading _ -> true | _ -> false)
+                |> Array.filter (fun i -> 
+                    lastListenAudioBook 
+                    |> Option.map (fun o -> o.Model.AudioBook.Id <> i.Model.AudioBook.Id)
+                    |> Option.defaultValue true
+                )
+            LastTimeListendAudioBook = lastListenAudioBook
+            IsLoading = false
+        }
+        let a = function 
+            | Some x -> x 
+            | None -> ""
+        model, Cmd.none
 
 
     let rec update msg model =

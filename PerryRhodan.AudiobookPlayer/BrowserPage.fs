@@ -21,72 +21,22 @@ open Global
         IsLoading:bool 
     }
 
-    //let updateItemListState item list =
-    //    if (list |> List.exists (fun i -> i.GroupName = item.GroupName)) then
-    //        // update
-    //        list
-    //        |> List.map (fun i ->
-    //            if i.GroupName = item.GroupName then
-    //                item
-    //            else
-    //                i
-    //        )
-    //    else
-    //        // add
-    //        list @ [item]
-        
-
 
     type Msg = 
-        //| LoadLocalAudiobooks
-        //| RefreshLocalAudiobooks
-
-
         | LoadOnlineAudiobooks 
-        //| InitAudiobooks of NameGroupedAudioBooks
         | AddSelectGroup of string
         | RemoveLastSelectGroup of string
         | ShowErrorMessage of string
         | ChangeBusyState of bool
         | GoToLoginPage of LoginRequestCameFrom
 
-        //| AudioBooksItemMsg of AudioBookItem.Model * AudioBookItem.Msg
-
-        //| UpdateAudioBook
-
-
-        //| DoNothing
-        
-
-    //type ExternalMsg =
-    //    | OpenLoginPage of LoginRequestCameFrom
-    //    | OpenAudioBookPlayer of AudioBook 
-    //    | OpenAudioBookDetail of AudioBook
-    //    | UpdateAudioBookGlobal  of AudioBookItem.Model *  string
-    //    | DownloadQueueMsg of DownloadQueue.Msg
-    //    | StartDownloadQueue
-
-
     let pageRef = ViewRef<CustomContentPage>()
 
-    
+    module Commands =
+        let unbusyCmd = Cmd.ofMsg (ChangeBusyState false)
 
 
-    //let loadLocalAudioBooks () =
-    //    async {
-    //        let! audioBooks = DataBase.loadAudioBooksStateFile ()
-    //        match audioBooks with
-    //        | [||] -> return DoNothing
-    //        | _ ->     
-    //            let result = audioBooks |> Domain.Filters.nameFilter
-    //            return (InitAudiobooks result)
-    //    } |> Cmd.ofAsyncMsg
-    
-
-    let unbusyCmd = Cmd.ofMsg (ChangeBusyState false)
-
-
-    let busyCmd = Cmd.ofMsg (ChangeBusyState true)
+        let busyCmd = Cmd.ofMsg (ChangeBusyState true)
 
 
     //module PushModalHelper =

@@ -83,6 +83,7 @@ module DataBase =
         | InsertAudioBooks of AudioBook [] * AsyncReplyChannel<Result<unit,string>>
         | GetAudioBooks of AsyncReplyChannel<AudioBook[]>
         | RemoveAudiobookFromDatabase of AudioBook * AsyncReplyChannel<Result<unit,string>>
+        | DeleteDatabase 
 
 
     let initAppFolders () =
@@ -106,12 +107,12 @@ module DataBase =
 
 
     let private updateAudioBookDb (audioBook:AudioBook) =
-            use db = new LiteDatabase(audioBooksStateDataFile, mapper)
-            let audioBooks = db.GetCollection<AudioBook>("audiobooks")
+        use db = new LiteDatabase(audioBooksStateDataFile, mapper)
+        let audioBooks = db.GetCollection<AudioBook>("audiobooks")
 
-            if audioBooks.Update(audioBook)
-            then (Ok ())
-            else (Error Translations.current.ErrorDbWriteAccess)
+        if audioBooks.Update(audioBook)
+        then (Ok ())
+        else (Error Translations.current.ErrorDbWriteAccess)
 
 
     let private deleteAudioBookDb (audioBook:AudioBook) =
@@ -130,6 +131,12 @@ module DataBase =
         if  res > -1
         then (Ok ())
         else (Error Translations.current.ErrorDbWriteAccess)
+
+
+    let private deleteDatabase () =
+        use db = new LiteDatabase(audioBooksStateDataFile, mapper)
+        let _result = db.DropCollection("audiobooks")
+        ()
 
 
     let private loadAudioBooksFromDb () =
@@ -234,7 +241,10 @@ module DataBase =
                                         replyChannel.Reply(Error e)
                                         return! (loop state)
 
-                                return! (loop state)
+                                | DeleteDatabase ->
+                                    deleteDatabase ()
+
+                                return! (loop <| loadAudioBooksFromDb ())
                                         
                             }
                         
@@ -267,6 +277,7 @@ module DataBase =
         let msg replyChannel = 
             InsertAudioBooks (audioBooks,replyChannel)
         storageProcessor.Force().PostAndAsyncReply(msg)
+        
 
 
     let updateAudioBookInStateFile (audioBook:AudioBook) =
@@ -279,6 +290,9 @@ module DataBase =
         let msg replyChannel = 
             RemoveAudiobookFromDatabase (audiobook,replyChannel)
         storageProcessor.Force().PostAndAsyncReply(msg)
+
+    let deleteAudiobookDatabase () =
+        storageProcessor.Force().Post(DeleteDatabase)
 
 
     let removeAudiobook audiobook = 
@@ -322,17 +336,17 @@ module DataBase =
             |> Array.Parallel.map (fun i-> i.Value)
     
     
-    let syncPossibleDownloadFolder audiobooks =
+    let getAudiobooksFromDownloadFolder audiobooks =
         let audioBooksOnDevice = parseDownloadFolderForAlreadyDownloadedAudioBooks ()
         audiobooks
-        |> Array.map (
+        |> Array.choose (
             fun i ->
                 let onDeviceItem = audioBooksOnDevice |> Array.tryFind (fun (title,_,_,_,_) -> title = i.FullName)
                 match onDeviceItem with
-                | None -> i
+                | None -> None
                 | Some (_, picPath, thumbPath, hasAudioBook, audioBookPath) ->
                     let newState = {i.State with Downloaded = hasAudioBook; DownloadedFolder=audioBookPath}
-                    {i with State = newState; Picture = picPath; Thumbnail = thumbPath}
+                    Some {i with State = newState; Picture = picPath; Thumbnail = thumbPath}
         )
    
 
@@ -422,21 +436,15 @@ module WebAccess =
     
     
     let getAudiobooksOnline cookies =
-        async {
+        asyncResult {
             initAppFolders ()        
+           
+            let! html = getDownloadPage cookies
+            let audioBooks =
+                html
+                |> parseDownloadData
     
-            match cookies with
-            | None -> return Ok [||]
-            | Some cc ->
-                let! dPage = getDownloadPage cc
-                match dPage with
-                | Error e -> return Error e
-                | Ok html ->
-                    let audioBooks =
-                        html
-                        |> parseDownloadData
-    
-                    return Ok audioBooks
+            return audioBooks
         }
 
 

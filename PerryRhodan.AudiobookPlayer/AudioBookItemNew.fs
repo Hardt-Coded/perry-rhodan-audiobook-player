@@ -23,8 +23,6 @@
         | Listend
 
 
-
-
     type Model = { 
         AudioBook: AudioBook
         DownloadState: DownloadState
@@ -46,6 +44,9 @@
         | OpenAudioBookDetail
         | DeleteItemFromDb
         | DeletedFromDb
+
+        | ShowMetaData
+
         | DownloadCompleted of Services.WebAccess.Downloader.DownloadResult
 
 
@@ -85,7 +86,8 @@
                     let isDevMode = 
                         Services.SystemSettings.getDeveloperMode() |> Async.RunSynchronously
                     if isDevMode then
-                        ("Remove Item from Database",DeleteItemFromDb)  
+                        ("Remove Item from Database", DeleteItemFromDb)  
+                        ("Show Entry MetaData", ShowMetaData)
 
                 |]
                 return! Helpers.displayActionSheet (Some Translations.current.PleaseSelect) (Some Translations.current.Cancel) buttons
@@ -135,10 +137,15 @@
             }
             |> Cmd.ofAsyncMsgOption
 
+        let showMetaDataCmd (model:Model) =
+            fun _ ->
+                async {
+                    let msg = sprintf "%A" model.AudioBook
+                    do! Common.Helpers.displayAlert ("MetaData",msg,"OK")
+                }
+                |> Async.Start
+            |> Cmd.ofSub
 
-
-        
-            
 
     
     let init audiobook = 
@@ -152,7 +159,6 @@
                 | false, None       -> Unlistend
         }
 
-    
 
     let rec update msg (model:Model) =
         match msg with
@@ -194,6 +200,9 @@
 
         | DeletedFromDb ->
             model, Cmd.none
+
+        | ShowMetaData ->
+            model, Commands.showMetaDataCmd model
         
     
 
@@ -244,7 +253,6 @@
             let newModel = {model with AudioBook = newAudioBook; ListenState = Unlistend }
             newModel, newModel |> Commands.updateAudiobookInStateFile
         
-   
 
     let view (model: Model) dispatch =
         View.Grid(
@@ -338,8 +346,33 @@
                 ).Column(2).Row(0)
 
         ]
-        )
-    
+        )    
+
+
+
+    module Helpers =
+        
+        let getNew toDispatch (audiobookItems:AudioBookItem []) (audiobooks:Domain.AudioBook []) =
+            let currentItems = audiobookItems |> Array.map (fun i -> i.Model.AudioBook)
+            let newAudioBooks = Domain.filterNewAudioBooks currentItems audiobooks
+            newAudioBooks
+            |> Array.map (init)
+            |> Array.map (fun i ->
+                {
+                    Model = i
+                    Dispatch = toDispatch i
+                }
+            )
+
+        let synchronize toDispatch (audiobookItems:AudioBookItem []) (audiobooks:Domain.AudioBook []) =
+            let currentItems = audiobookItems |> Array.map (fun i -> i.Model.AudioBook)
+            let newAudioBooks = Domain.filterNewAudioBooks currentItems audiobooks
+            let namesToFix = Domain.findDifferentAudioBookNames currentItems audiobooks
+            let newAudioBookItems =
+                getNew toDispatch audiobookItems audiobooks 
+            Array.concat [audiobookItems; newAudioBookItems]
+
+
 
 
     

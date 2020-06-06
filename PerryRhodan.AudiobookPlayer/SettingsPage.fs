@@ -66,6 +66,7 @@
 
         | SetDeveloperModeSwitchCounter of int
         | SetDeveloperMode of bool
+        | DeleteDatabase
 
         | OpenFeedbackPage
 
@@ -160,6 +161,8 @@
             model |> onSetDeveloperSwitchCounter value
         | OpenFeedbackPage ->
             // will be handled by the app.fs
+            model, Cmd.none, None
+        | DeleteDatabase ->
             model, Cmd.none, None
 
 
@@ -458,7 +461,7 @@
                                             
                                             yield View.Grid(
                                                 coldefs=[ Star ],
-                                                rowdefs=[ Auto; Auto; Auto;Auto; Auto ],
+                                                rowdefs=[ Auto; Auto; Auto;Auto; Auto; Auto ],
                                                 children=[
 
                                                     yield (settingsEntry 
@@ -486,6 +489,11 @@
                                                             "DeveloperMode" 
                                                             "Unter anderem kann man Einträge aus der DB löschen"
                                                             (fun () -> ())).Row(4)
+
+                                                        yield (settingsEntry 
+                                                            "Datenbank löschen" 
+                                                            "Hiermit löscht an die ganze Datenbank und initialisiert die Anwendung neu."
+                                                            (fun () -> dispatch DeleteDatabase)).Row(5)
                                                 ]
                                             )
 

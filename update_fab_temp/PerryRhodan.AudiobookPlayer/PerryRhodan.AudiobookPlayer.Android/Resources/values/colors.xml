@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-  <color name="launcher_background">#FFFFFF</color>
-  <color name="colorPrimary">#424242</color>
-  <color name="colorPrimaryDark">#303030</color>
-  <!-- eins a media red -->
-  <color name="colorAccent">#C1282D</color>
-</resources>
