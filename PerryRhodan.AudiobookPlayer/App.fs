@@ -231,6 +231,59 @@ module App =
             |> Cmd.ofSub
 
 
+        let synchonizeCurrentAudiobooksWithDeviceCmd model =
+            fun dispatch ->
+                async {
+
+                    let currentAudioBooks =
+                        model.AudioBookItems |> Array.map (fun i -> i.Model.AudioBook)
+
+                    let audioBooksAlreadyOnTheDevice =
+                        Services.DataBase.getAudiobooksFromDownloadFolder currentAudioBooks
+                        |> Array.map (fun i -> AudioBookItemNew.init i) 
+                        |> Array.map (fun i -> AudioBookItemHelper.createAudioBookItem dispatch i)
+
+                    // mark all other audio book as not downloaded
+                    let newAudiobookItem =
+                        model.AudioBookItems
+                        |> Array.map (fun i ->
+                            audioBooksAlreadyOnTheDevice
+                            |> Array.tryFind (fun d -> d.Model.AudioBook.Id = i.Model.AudioBook.Id)
+                            |> Option.defaultValue { 
+                                i with Model = { 
+                                    i.Model with 
+                                        DownloadState = AudioBookItemNew.NotDownloaded
+                                        AudioBook = { 
+                                            i.Model.AudioBook with 
+                                                State = { 
+                                                    i.Model.AudioBook.State with Downloaded = false
+                                                }
+                                        }
+                                } 
+                            }
+                        )
+
+                    let! savedAudioBookResult = 
+                        newAudiobookItem 
+                        |> Array.map (fun i -> i.Model.AudioBook)
+                        |> Array.map Services.DataBase.updateAudioBookInStateFile
+                        |> Async.Sequential
+                        
+
+                    let error = 
+                        savedAudioBookResult
+                        |> Array.choose (function | Error e -> Some e | Ok _ -> None )
+
+                    if error.Length > 0 then
+                        do! Common.Helpers.displayAlert ("Fehler", "Beim Update der Hörbücher ist ein Speicherfehler aufgetreten.", "OK")
+                    else
+                        dispatch <| AudioBookItemsChanged newAudiobookItem
+
+                }
+                |> Async.Start
+            |> Cmd.ofSub
+
+
         let loadAudioBookItemsCmd =
             fun dispatch ->
                 async {
@@ -394,9 +447,24 @@ module App =
                                     )
                                 )
 
+                            let nameDiffOldNewDownloaded =
+                                currentAudioBooks
+                                |> Array.choose (fun i ->
+                                    cloudAudioBooks 
+                                    |> Array.tryFind (fun c -> c.Id = i.Model.AudioBook.Id && i.Model.DownloadState = AudioBookItemNew.Downloaded)
+                                    |> Option.bind (fun c -> 
+                                        if c.FullName <> i.Model.AudioBook.FullName then
+                                            Some {| OldName = i.Model.AudioBook.FullName; NewName = c.FullName |}
+                                        else
+                                            None
+                                    )
+                                )
+
+                            
+
                             match repairedAudioBooksItem with
                             | [||] ->
-                                return newAudioBookItems, currentAudioBooks
+                                return newAudioBookItems, currentAudioBooks, nameDiffOldNewDownloaded
                             | _ ->
                                 do!
                                     repairedAudioBooksItem
@@ -421,12 +489,32 @@ module App =
                                             r
                                     )
 
-                                return newAudioBookItems, currentAudioBooks
+                                return newAudioBookItems, currentAudioBooks, nameDiffOldNewDownloaded
                             
                         }
 
+                    let fixDownloadFolders 
+                        (input:AsyncResult<AudioBookItemNew.AudioBookItem [] * AudioBookItemNew.AudioBookItem [] * {| OldName:string; NewName:string |} [],SynchronizeWithCloudErrors>) =
+                        asyncResult {
+                            let! newAudioBookItems, currentAudioBooks, nameDiffOldNewDownloaded = input
+
+                            nameDiffOldNewDownloaded
+                            |> Array.map (fun x -> 
+                                {| 
+                                    OldFolder = System.IO.Path.Combine(Services.Consts.audioBookDownloadFolderBase,x.OldName)
+                                    NewFolder = System.IO.Path.Combine(Services.Consts.audioBookDownloadFolderBase,x.NewName) 
+                                |} 
+                            )
+                            |> Array.iter (fun x ->
+                                System.IO.Directory.Move(x.OldFolder,x.NewFolder)
+                            )
+
+                            return newAudioBookItems, currentAudioBooks
+                        }
+
+
                     let processResult 
-                        (input:AsyncResult<AudioBookItemNew.AudioBookItem [] * AudioBookItemNew.AudioBookItem [],SynchronizeWithCloudErrors>) =
+                        (input:AsyncResult<AudioBookItemNew.AudioBookItem [] * AudioBookItemNew.AudioBookItem [] ,SynchronizeWithCloudErrors>) =
                         async {
                             match! input with
                             | Ok (newAudioBookItems,currentAudioBooks) ->
@@ -465,6 +553,7 @@ module App =
                         |> determinateNewAddedAudioBooks model.AudioBookItems
                         |> processNewAddedAudioBooks
                         |> repairAudiobookMetadataIfNeeded
+                        |> fixDownloadFolders
                         |> processResult
 
 
@@ -571,6 +660,7 @@ module App =
                     (Cmd.map SettingsPageMsg settingsPageMsg)
                     checkAudioPlayerRunningCmds
                     checkDownloadServiceCmd
+                    Commands.synchonizeCurrentAudiobooksWithDeviceCmd newModel
                 ]
 
             newModel, cmds
@@ -1168,7 +1258,15 @@ module App =
                     None
             )
 
-        { model with AudioBookItems = queue |> List.toArray }, Cmd.none
+        let newItems =
+            model.AudioBookItems
+            |> Array.map (fun ab ->
+                queue 
+                |> List.tryFind (fun i -> i.Model.AudioBook.Id = ab.Model.AudioBook.Id)
+                |> Option.defaultValue ab
+            )
+
+        { model with AudioBookItems = newItems }, Cmd.none
 
        
 
