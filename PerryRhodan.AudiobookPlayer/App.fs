@@ -427,6 +427,7 @@ module App =
                                 a.EpisodenTitel <> b.EpisodenTitel ||
                                 a.Group <> b.Group
 
+
                             let repairedAudioBooksItem =
                                 currentAudioBooks
                                 |> Array.choose (fun i ->
@@ -435,17 +436,24 @@ module App =
                                     |> Option.bind (fun c -> 
                                         if hasDiffMetaData c (i.Model.AudioBook) then
                                             let newAudioBookFolder = System.IO.Path.Combine(Services.Consts.audioBookDownloadFolderBase, c.FullName)
+                                            
+                                            let opt predicate input =
+                                                if predicate then
+                                                    Some input
+                                                else
+                                                    None
+
                                             let newAb = { 
                                                 i.Model.AudioBook with 
                                                     FullName = c.FullName
                                                     EpisodeNo = c.EpisodeNo
                                                     EpisodenTitel = c.EpisodenTitel
                                                     Group = c.Group
-                                                    Thumbnail = Some <| System.IO.Path.Combine(newAudioBookFolder, c.FullName + ".thumb.jpg")
-                                                    Picture =   Some <| System.IO.Path.Combine(newAudioBookFolder, c.FullName + ".jpg")
+                                                    Thumbnail = System.IO.Path.Combine(newAudioBookFolder, c.FullName + ".thumb.jpg") |> opt i.Model.AudioBook.State.Downloaded 
+                                                    Picture =   System.IO.Path.Combine(newAudioBookFolder, c.FullName + ".jpg") |> opt i.Model.AudioBook.State.Downloaded 
                                                     State = {
                                                         i.Model.AudioBook.State with
-                                                            DownloadedFolder = Some <| System.IO.Path.Combine(newAudioBookFolder,"audio")
+                                                            DownloadedFolder = System.IO.Path.Combine(newAudioBookFolder,"audio") |> opt i.Model.AudioBook.State.Downloaded 
                                                     }
                                             }
                                             // we need to generate a new Item, because the dispatch itself contains also the audiobook data
