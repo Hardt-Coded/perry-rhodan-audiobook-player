@@ -434,14 +434,26 @@ module App =
                                     |> Array.tryFind (fun c -> c.Id = i.Model.AudioBook.Id)
                                     |> Option.bind (fun c -> 
                                         if hasDiffMetaData c (i.Model.AudioBook) then
+                                            let newAudioBookFolder = System.IO.Path.Combine(Services.Consts.audioBookDownloadFolderBase, c.FullName)
                                             let newAb = { 
                                                 i.Model.AudioBook with 
                                                     FullName = c.FullName
                                                     EpisodeNo = c.EpisodeNo
                                                     EpisodenTitel = c.EpisodenTitel
                                                     Group = c.Group
+                                                    Thumbnail = Some <| System.IO.Path.Combine(newAudioBookFolder, c.FullName + ".thumb.jpg")
+                                                    Picture =   Some <| System.IO.Path.Combine(newAudioBookFolder, c.FullName + ".jpg")
+                                                    State = {
+                                                        i.Model.AudioBook.State with
+                                                            DownloadedFolder = Some <| System.IO.Path.Combine(newAudioBookFolder,"audio")
+                                                    }
                                             }
-                                            Some { i with Model = { i.Model with AudioBook = newAb } }
+                                            // we need to generate a new Item, because the dispatch itself contains also the audiobook data
+                                            let newItem = 
+                                                newAb
+                                                |> AudioBookItemNew.init 
+                                                |> AudioBookItemHelper.createAudioBookItem dispatch
+                                            Some newItem
                                         else
                                             None
                                     )
@@ -498,16 +510,29 @@ module App =
                         asyncResult {
                             let! newAudioBookItems, currentAudioBooks, nameDiffOldNewDownloaded = input
 
-                            nameDiffOldNewDownloaded
-                            |> Array.map (fun x -> 
-                                {| 
-                                    OldFolder = System.IO.Path.Combine(Services.Consts.audioBookDownloadFolderBase,x.OldName)
-                                    NewFolder = System.IO.Path.Combine(Services.Consts.audioBookDownloadFolderBase,x.NewName) 
-                                |} 
-                            )
-                            |> Array.iter (fun x ->
-                                System.IO.Directory.Move(x.OldFolder,x.NewFolder)
-                            )
+                            try
+                                nameDiffOldNewDownloaded
+                                |> Array.map (fun x -> 
+                                    let oldFolder = System.IO.Path.Combine(Services.Consts.audioBookDownloadFolderBase,x.OldName)
+                                    let newFolder = System.IO.Path.Combine(Services.Consts.audioBookDownloadFolderBase,x.NewName)
+                                    {| 
+                                        OldFolder =     oldFolder
+                                        NewFolder =     newFolder
+
+                                        OldPicName =    System.IO.Path.Combine(oldFolder, x.OldName + ".jpg")
+                                        NewPicName =    System.IO.Path.Combine(oldFolder, x.NewName + ".jpg")
+                                        OldThumbName =  System.IO.Path.Combine(oldFolder, x.OldName + ".thumb.jpg")
+                                        NewThumbName =  System.IO.Path.Combine(oldFolder, x.NewName + ".thumb.jpg")
+                                    |} 
+                                )
+                                |> Array.iter (fun x ->
+                                    System.IO.File.Move(x.OldPicName,x.NewPicName)
+                                    System.IO.File.Move(x.OldThumbName,x.NewThumbName)
+                                    System.IO.Directory.Move(x.OldFolder,x.NewFolder)
+                                )
+                            with
+                            | ex ->
+                                return! AsyncResult.ofResult <| Error (StorageError ex.Message)
 
                             return newAudioBookItems, currentAudioBooks
                         }
@@ -558,7 +583,7 @@ module App =
 
 
                     dispatch <| BrowserPageMsg ([], BrowserPage.Msg.ChangeBusyState false)
-
+                    dispatch AudioBookItemsUpdated
                 }
                 |> Async.Start
             |> Cmd.ofSub
@@ -918,22 +943,7 @@ module App =
         | None ->
             model,Cmd.none
         | Some mdl ->
-            //let mainPageExternalMsgToCommand externalMsg =
-            //    match externalMsg with
-            //    | None -> Cmd.none
-            //    | Some excmd -> 
-            //        match excmd with                   
-            //        | MainPage.ExternalMsg.OpenAudioBookPlayer ab ->
-            //            Cmd.ofMsg (GotoAudioPlayerPage ab)
-            //        | MainPage.ExternalMsg.UpdateAudioBookGlobal (ab,cameFrom) ->
-            //            Cmd.ofMsg (UpdateAudioBook (ab, cameFrom))
-            //        | MainPage.ExternalMsg.OpenAudioBookDetail ab ->
-            //            Cmd.ofMsg (OpenAudioBookDetailPage ab)
-
             let m,cmd = MainPage.update msg mdl     
-            //let externalCmds =
-            //    externalMsg |> mainPageExternalMsgToCommand        
-
             {model with MainPageModel = Some m; HasAudioItemTrigger = true}, Cmd.batch [(Cmd.map MainPageMsg cmd) ]
 
 

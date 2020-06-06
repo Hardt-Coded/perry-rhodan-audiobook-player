@@ -178,6 +178,7 @@ module DataBase =
         lazy 
         MailboxProcessor<StorageMsg>.Start(
             fun inbox ->
+                let mutable reloadedAfterFailedInsert = false
                 async {
                     try
                         // init stuff
@@ -197,7 +198,7 @@ module DataBase =
                                         let newState =
                                             state
                                             |> Array.Parallel.map (fun i ->
-                                                if i.FullName = audiobook.FullName then
+                                                if i.Id = audiobook.Id then
                                                     audiobook
                                                 else
                                                     i
@@ -220,8 +221,15 @@ module DataBase =
                                         replyChannel.Reply(Ok ())
                                         return! (loop newState)
                                     | Error e ->
-                                        replyChannel.Reply(Error e)
-                                        return! (loop state)
+                                        if reloadedAfterFailedInsert then
+                                            replyChannel.Reply(Error e)
+                                            return! (loop state)
+                                        else
+                                            // reload database and try again to insert
+                                            let state = loadAudioBooksFromDb ()
+                                            inbox.Post <| InsertAudioBooks (audiobooks,replyChannel)
+                                            return! (loop state)
+
 
                                 | GetAudioBooks replyChannel ->
                                     replyChannel.Reply(state |> Array.sortBy (fun i -> i.FullName))
@@ -232,7 +240,7 @@ module DataBase =
                                     match dbRes with
                                     | Ok _ ->
                                         let newState =
-                                            state |> Array.filter (fun i -> i.FullName <> audiobook.FullName)
+                                            state |> Array.filter (fun i -> i.Id <> audiobook.Id)
 
                                         storageProcessorAudioBookDeletedEvent.Trigger(audiobook)
                                         replyChannel.Reply(Ok ())

@@ -86,6 +86,7 @@ open AudioPlayer
                 match model.State.DownloadedFolder with
                 | None -> return None
                 | Some folder ->
+                try
                     let! files = 
                         asyncFunc( 
                             fun () ->  Directory.EnumerateFiles(folder, "*.mp3")
@@ -102,6 +103,10 @@ open AudioPlayer
                             )
                         )
                     return Some (FileListLoaded (res |> List.sortBy (fun (f,_) -> f)))
+                with
+                | ex ->
+                    do! Common.Helpers.displayAlert ("Fehler!", "Konnte Hörbuch Dateien nicht finden.", "OK")
+                    return None 
             }
 
         let loadFilesAsyncCmd =
