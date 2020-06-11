@@ -168,6 +168,7 @@ open Global
           title=Translations.current.LoginPage,useSafeArea=true,
           backgroundColor = Consts.backgroundColor,
           tag="loginpage",
+          automationId="loginPage",
           content = View.Grid(
                 children = [
                     yield View.StackLayout(padding = Thickness 10., 

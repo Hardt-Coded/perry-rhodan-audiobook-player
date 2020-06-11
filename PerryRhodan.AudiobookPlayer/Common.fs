@@ -161,17 +161,7 @@
             }
 
 
-        module Notifications =
-
-            type INotificationService = 
-                abstract ShowMessage : string->string -> unit
-
-
-            let private notificationService = lazy (DependencyService.Get<INotificationService>())
-
-            let showNotification title message =
-                let ns = notificationService.Force()
-                ns.ShowMessage title message
+        
                 
 
 
@@ -442,6 +432,12 @@
             member x.Trigger(v) = evt.Trigger(v)
             member x.Publish = published
             member x.HasListeners = counter > 0
+
+
+
+    module String =
+        
+        let concatStr (str:string list) = System.String.Join ("", str)
         
         
 
