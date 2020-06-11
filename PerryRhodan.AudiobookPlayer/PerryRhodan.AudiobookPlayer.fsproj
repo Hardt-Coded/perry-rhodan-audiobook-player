@@ -11,6 +11,7 @@
 		<Compile Include="LiteDbExtensions\FSharpBsonMapper.fs" />
 		<None Include="repl_stuff.fsx" />
 		<Compile Include="SampleData.fs" />
+		<Compile Include="Result.fs" />
 		<Compile Include="Common.fs" />
 		<Compile Include="Translations.fs" />
 		<Compile Include="Global.fs" />
@@ -19,9 +20,8 @@
 		<Compile Include="AudioPlayer.fs" />
 		<Compile Include="Controls.fs" />
 		<Compile Include="LoginPage.fs" />
-		<Compile Include="AudioBookItem.fs" />
-		<Compile Include="AudioBookItemProcessor.fs" />
-		<Compile Include="DownloadQueue.fs" />
+		<Compile Include="AudioBookItemNew.fs" />
+		<Compile Include="DownloadQueueNew.fs" />
 		<Compile Include="BrowserPage.fs" />
 		<Compile Include="AudioPlayerPage.fs" />
 		<Compile Include="AudioBookDetail.fs" />
@@ -30,6 +30,7 @@
 		<Compile Include="SupportFeedback.fs" />
 		<Compile Include="MainPage.fs" />
 		<Compile Include="ModalHelpers.fs" />
+		<Compile Include="WhatsNew.fs" />
 		<Compile Include="App.fs" />
 	</ItemGroup>
 
@@ -37,9 +38,9 @@
 		<None Include="repl_stuff.fsx" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="Xamarin.Forms" Version="4.6.0.726" />
+		<PackageReference Include="Xamarin.Forms" Version="4.6.0.772" />
 		<PackageReference Include="Xamarin.Essentials" Version="1.5.1" />
-		<PackageReference Include="Fabulous.XamarinForms" Version="0.54.0" />
+		<PackageReference Include="Fabulous.XamarinForms" Version="0.54.1" />
 		<PackageReference Include="Fabulous.XamarinForms.LiveUpdate" Version="0.54.0" />
 		<PackageReference Include="FSharp.Core" Version="4.7.1" />
 		<PackageReference Update="FSharp.Core" Version="4.7.1" />

@@ -53,28 +53,62 @@ type AudioBookListType =
 
 
 
-[<AutoOpen>]
 module Helpers =
 
-    let downloadNameRegex = Regex(@"([A-Za-z .-]*)(\d*)(:| - )([\w\säöüÄÖÜ.:!\-]*[\(\)Teil \d]*)(.*)(( - Multitrack \/ Onetrack)|( - Multitrack)|( - Onetrack))")
+    let getDownloadNameRegex (innerText:string) = 
+        let indexFirst = innerText.IndexOf("(")
+        let part = innerText.[..indexFirst]
 
-    let getKey innerText =
+        let minusIdx = part.IndexOf(" - ")
+        let doubleIdx = part.IndexOf(": ")
+
+        if (minusIdx > doubleIdx) then
+            Regex(@"^([A-Za-z .:-]*[0-9.]*[A-Za-z .:-]*)([0-9]*)( - )([\w\säöüÄÖÜ.:!\-\/]*[\(\)Teil \d]*)(.*)")
+        else
+            Regex(@"^([A-Za-z .-]*)([0-9]*)(:| - )([\w\säöüÄÖÜ.:!\-\/]*[\(\)Teil \d]*)(.*)")
+
+
+    let regexReplace searchRegex newText input =
+        let regex = Regex(searchRegex)
+        if (regex.IsMatch(input)) then
+            let searchVal = regex.Match(input).Groups.[0].Value
+            input.Replace(searchVal, newText)
+        else
+            input
+    
+    
+    let getKey (downloadNameRegex:Regex) innerText =
         if not (downloadNameRegex.IsMatch(innerText)) then "Other"
         else
             let matchTitle = downloadNameRegex.Match(innerText)
             matchTitle.Groups.[1].Value.Replace("Nr.", "").Trim()
-
-
-    let tryGetEpisodenNumber innerText =
-        if not (downloadNameRegex.IsMatch(innerText)) then None
-        else
+    
+    
+    let tryGetEpisodenNumber (downloadNameRegex:Regex) innerText =
+        
+        let fallBackEpNum () =
+            let innerText = 
+                innerText
+                |> regexReplace "40\.000" ""
+    
+            let ep1Regex = Regex("\d+")
+            if ep1Regex.IsMatch(innerText) then
+                let (isNum,num) = Int32.TryParse(ep1Regex.Match(innerText).Groups.[0].Value)
+                if isNum then Some num else None
+            else
+                None
+    
+        if (downloadNameRegex.IsMatch(innerText)) then
             let epNumRes = Int32.TryParse(downloadNameRegex.Match(innerText).Groups.[2].Value)
             match epNumRes with
             | true, x -> Some x
-            | _ -> None
-
-
-    let getEpisodenTitle innerText =
+            | _ -> fallBackEpNum ()
+        else
+            fallBackEpNum ()
+                
+    
+    
+    let getEpisodenTitle (downloadNameRegex:Regex) innerText =
         if not (downloadNameRegex.IsMatch(innerText)) then innerText.Trim()
         else 
             let ept = downloadNameRegex.Match(innerText).Groups.[4].Value.Trim()
@@ -105,14 +139,40 @@ module Helpers =
         let (is,v) = Int32.TryParse(str)
         if is then Some v else None
 
+
     let tryGetProductId linkProductSite =
         linkProductSite
         |> RegExHelper.regexMatchGroupOpt 2 "(productID=)(\d*)"
         |> Option.bind (tryParseInt)
         
+    
+    let compansateManually input =
+        input
+        // Perry Rhodan Story Compansation
+        |> regexReplace "\([A-Z ]*\d+\)" ""    
+
+
+    type CompansationItem = {
+        ProductId:int
+        FullName:string
+        Group:string
+        EpisodeNo: int option
+        EpisodeTitle: string
+    }
+
+    let targetCompansation id =
+        let items = [
+            {
+                ProductId = 27718
+                FullName = "Perry Rhodan Silber Edition 21 - Straße nach Andromeda"
+                Group = "Perry Rhodan Silber Edition"
+                EpisodeNo = Some 21
+                EpisodeTitle = "Straße nach Andromeda"
+            }
+        ]
+        items |> List.tryFind (fun i -> i.ProductId = id)
         
-
-
+        
 
 let parseDownloadData htmlData =    
     HtmlDocument.Parse(htmlData).Descendants("div")
@@ -136,18 +196,33 @@ let parseDownloadData htmlData =
     |> Option.defaultValue ([||])
     |> Array.Parallel.map (
         fun i ->
-            let innerText = i.InnerText()
+            let downloadRegex = Helpers.getDownloadNameRegex (i.InnerText())
+            let innerText = i.InnerText() |> Helpers.compansateManually 
             //   little title work
-            let key = innerText |> getKey
-            let episodeNumber = innerText |> tryGetEpisodenNumber                
-            let episodeTitle = innerText |> getEpisodenTitle
-            let linkForMultiDownload = i |> tryGetLinkForMultiDownload
-            let linkProductSite = i |> tryGetProductionPage
-            let fullName = buildFullName episodeNumber key episodeTitle
+            let key = innerText |> Helpers.getKey downloadRegex
+            let epNum = innerText |> Helpers.tryGetEpisodenNumber downloadRegex   
+            let episodeNumber =
+                if epNum = None then
+                    i.InnerText() |> Helpers.tryGetEpisodenNumber downloadRegex 
+                else
+                    epNum                
+            let episodeTitle = innerText |> Helpers.getEpisodenTitle downloadRegex
+            let linkForMultiDownload = i |> Helpers.tryGetLinkForMultiDownload
+            let linkProductSite = i |> Helpers.tryGetProductionPage
+            let fullName = Helpers.buildFullName episodeNumber key episodeTitle
             let productId = 
                 linkProductSite 
-                |> tryGetProductId
+                |> Helpers.tryGetProductId
                 |> Option.defaultValue -1
+
+            // manual compantation of entries
+            let fullName,episodeTitle,episodeNumber,key = 
+                match Helpers.targetCompansation productId with
+                | None ->
+                    fullName,episodeTitle,episodeNumber,key
+                | Some item ->
+                    item.FullName, item.EpisodeTitle, item.EpisodeNo, item.Group
+            
                         
             {   Id = productId
                 FullName = fullName 
@@ -176,8 +251,19 @@ let filterNewAudioBooks (local:AudioBook[]) (online:AudioBook[]) =
 
 let synchronizeAudiobooks (local:AudioBook[]) (online:AudioBook[]) =
     let differences = filterNewAudioBooks local online
-    Array.concat [|local; differences|] 
+    Array.concat [|local; differences|]
 
+
+let findDifferentAudioBookNames (local:AudioBook[]) (online:AudioBook[]) = 
+    local
+    |> Array.choose (
+        fun i -> 
+            online 
+            |> Array.tryFind (fun l -> l.Id = i.Id)
+            |> Option.bind (fun n ->
+                if n.FullName = i.FullName then None else Some n
+            )
+    )
 
 //type ProductSite = HtmlProvider< SampleData.productSiteHtml >
 
@@ -310,9 +396,9 @@ module Filters =
         if episodeNoGreater10 && (episodeNoSame10 |> not) then Some() else None
 
 
-    let groupsFilter (groups:string[]) (audiobooks:AudioBookListType) =
+    let groupsFilter (groups:string list) (audiobooks:AudioBookListType) =
         (audiobooks,groups)
-        ||> Array.fold (
+        ||> List.fold (
             fun state item -> 
                 let nameFilterResult =
                     state
