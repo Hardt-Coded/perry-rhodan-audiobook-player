@@ -596,6 +596,15 @@ module App =
                 |> Async.Start
             |> Cmd.ofSub
 
+
+
+        let displayLatestInfoMessageCmd : Cmd<Msg> =
+            fun _ ->
+                WhatsNew.displayLatestMessage () |> Async.Start
+            |> Cmd.ofSub
+
+
+
         let deleteDatabaseCmd =
             fun dispatch ->
                 Services.DataBase.deleteAudiobookDatabase ()
@@ -694,6 +703,7 @@ module App =
                     checkAudioPlayerRunningCmds
                     checkDownloadServiceCmd
                     Commands.synchonizeCurrentAudiobooksWithDeviceCmd newModel
+                    Commands.displayLatestInfoMessageCmd
                 ]
 
             newModel, cmds

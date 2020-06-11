@@ -775,7 +775,7 @@ open AudioPlayer
 
     let viewSmall openPlayerPageCommand (model: Model) dispatch =
         View.Grid(
-            coldefs=[Auto; Star; Auto; Auto; Auto],
+            coldefs=[Auto; Star; Auto],
             rowdefs=[Auto; Absolute 2.0],
             backgroundColor=Consts.cardColor,
             gestureRecognizers = [
@@ -783,6 +783,7 @@ open AudioPlayer
             ],
             children = [
                 let currentPos = (model.CurrentPosition |> Option.defaultValue TimeSpan.Zero).ToString("hh\:mm\:ss")
+
 
                 yield View.Image(
                     source=
@@ -793,36 +794,48 @@ open AudioPlayer
                     horizontalOptions=LayoutOptions.Fill,
                     verticalOptions=LayoutOptions.Fill,
                     aspect=Aspect.AspectFit,
-                    width = 30.,
-                    height = 30.,
-                    margin=Thickness(5.,3.,5.,3.)
-                    
-                    ).Column(0)
+                    width = 40.,
+                    height = 40.,
+                    margin=Thickness(2.,2.,2.,2.),
+                    backgroundColor=Consts.cardColor
+                ).Column(0)
 
-                yield (Controls.primaryTextColorLabel 12. (model.AudioBook.FullName ))
-                    .Column(1)
-                    .With(horizontalOptions=LayoutOptions.Start, margin=Thickness(5.,0.,0.,0.))
-                    
-                if not model.IsLoading then
-                    yield (Controls.primaryTextColorLabel 12. (sprintf "%i/%i" (model.CurrentAudioFileIndex + 1) model.AudioFileList.Length ))
-                        .Column(2)
-                    yield (Controls.primaryTextColorLabel 12. (sprintf "%s" currentPos))
-                        .Column(3)
+                yield View.Grid(
+                    coldefs=[Star; Star],
+                    rowdefs=[Auto; Absolute 14.0],
+                    rowSpacing=0.0,
+                    horizontalOptions=LayoutOptions.Fill,
+                    children = [
+                        (Controls.tickerBand 20.0 model.AudioBook.FullName)
+                            .Column(0)
+                            .ColumnSpan(2)
+                            .Row(0)
+
+                        if not model.IsLoading then
+                            (Controls.primaryTextColorLabel 12. (sprintf "%i/%i" (model.CurrentAudioFileIndex + 1) model.AudioFileList.Length ))
+                                .Column(0)
+                                .Row(1)
+                            (Controls.primaryTextColorLabel 12. (sprintf "%s" currentPos))
+                                .Column(1)
+                                .Row(1)
+                    ]
+                ).Column(1)
+                
                 match model.CurrentState with
                 | Stopped ->
-                    yield (Controls.primaryColorSymbolLabelWithTapCommandRightAlign (fun () -> dispatch Play) 30. false "\uf144")
-                        .Column(4)
+                    yield (Controls.primaryColorSymbolLabelWithTapCommandRightAlign (fun () -> dispatch Play) 35. false "\uf144")
+                        .Column(2)
                         .Row(0)
-                        .With(margin=Thickness(5.,3.,5.,3.))
+                        .With(margin=Thickness(5.,0.,5.,0.))
                 | Playing ->
-                    yield (Controls.primaryColorSymbolLabelWithTapCommandRightAlign (fun () -> dispatch Stop) 30. false "\uf28b")
-                        .Column(4)
+                    yield (Controls.primaryColorSymbolLabelWithTapCommandRightAlign (fun () -> dispatch Stop) 35. false "\uf28b")
+                        .Column(2)
                         .Row(0)
-                        .With(margin=Thickness(5.,3.,5.,3.))
+                        .With(margin=Thickness(5.,0.,5.,0.))
 
                 yield View.BoxView(color=Consts.backgroundColor,horizontalOptions=LayoutOptions.Fill)
                     .Row(1)
-                    .ColumnSpan(5)
+                    .ColumnSpan(3)
 
             ]
         )

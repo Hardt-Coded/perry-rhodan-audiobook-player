@@ -30,6 +30,7 @@
 		<Compile Include="SupportFeedback.fs" />
 		<Compile Include="MainPage.fs" />
 		<Compile Include="ModalHelpers.fs" />
+		<Compile Include="WhatsNew.fs" />
 		<Compile Include="App.fs" />
 	</ItemGroup>
 
