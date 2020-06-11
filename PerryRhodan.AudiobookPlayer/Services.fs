@@ -1355,7 +1355,7 @@ module DownloadService =
                                 let allCount = state.Downloads  |> List.length// |> List.filter (fun i -> match i.State with | Finished -> true | _ -> false)
 
                                 let stateText  =
-                                    sprintf "(%i/%i) %s" (openCount + 1) allCount info.AudioBook.FullName
+                                    sprintf "(noch %i von %i) %s" (openCount + 1) allCount info.AudioBook.FullName
 
                                 let stateTitle =
                                     sprintf "Lade runter... (%i %%)" percent

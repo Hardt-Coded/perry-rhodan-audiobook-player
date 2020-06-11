@@ -1634,8 +1634,8 @@ type MainApp () as app =
         ()
 
     override this.OnStart() = 
-        base.OnStart()    
-        //BrowserPage.PushModalHelper.clearPushPages ()
+        base.OnStart()
+        ModalHelpers.ModalManager.cleanUpModalPageStack ()
         ()
 
     
