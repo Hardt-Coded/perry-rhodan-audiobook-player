@@ -72,6 +72,7 @@
     
     let view model dispatch =
         View.ContentPage(
+            automationId="audiobookDetail",
             title=Translations.current.AudioBookDetailPage,
             backgroundColor = Consts.backgroundColor,
             content = View.Grid(

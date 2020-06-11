@@ -9,42 +9,6 @@ open FSharp.Data
 open System
 open System.Text.RegularExpressions
 
-[<Literal>]
-let htmlSample = """<div id=\"downloads\"><h2>Meine Hörbücher</h2><h4><a href=\"#oeffne\" onclick=\"openCat(0)\">PERRY RHODAN > Bonus (3 Downloads)</a></h4><ul id=\"cat0\" style=\"display:none;\"><li>Perry Rhodan Bonus - Zweittod (<a href=\"/index.php?id=16&productID=1609534\">ansehen</a>) - <a href=\"butler.php?action=audio&productID=1609534&productFileTypeID=2\">Multitrack</a> / <a href=\"butler.php?action=audio&productID=1609534&productFileTypeID=3\">Onetrack</a> </li><li>Perry Rhodan 2000: Die ES-Chroniken (Download) (<a href=\"/index.php?id=16&productID=2146857\">ansehen</a>) - <a href=\"butler.php?action=audio&productID=2146857&productFileTypeID=2\">Multitrack</a> / 
-<a href=\"butler.php?action=audio&productID=2146857&productFileTypeID=3\">Onetrack</a> </li><li>Perry Rhodan 1500: Ruf der Unsterblichkeit (Download) (<a href=\"/index.php?id=16&productID=2555019\">ansehen</a>) - <a href=\"butler.php?action=audio&productID=2555019&productFileTypeID=2\">Multitrack</a> / <a href=\"butler.php?action=audio&productID=2555019&productFileTypeID=3\">Onetrack</a> </li></ul><h4><a href=\"#oeffne\" onclick=\"openCat(1)\">PERRY RHODAN > Hörbücher Erstauflage > Ab Nr. 1800 (21 Downloads)</a></h4><ul id=\"cat1\" style=\"display:none;\"><li>Perry Rhodan Nr. 1819: Eine Ladung Vivoc (Download) (<a href=\"/index.php?id=16&productID=1437213\">ansehen</a>) 
-- <a href=\"butler.php?action=audio&productID=1437213&productFileTypeID=2\">Multitrack</a> / <a href=\"butler.php?action=audio&productID=1437213&productFileTypeID=3\">Onetrack</a> </li><li>Perry Rhodan Nr. 1818: Testfall Lafayette (Download)  (<a href=\"/index.php?id=16&productID=1415862\">ansehen</a>) - <a href=\"butler.php?action=audio&productID=1415862&productFileTypeID=2\">Multitrack</a> / <a href=\"butler.php?action=audio&productID=1415862&productFileTypeID=3\">Onetrack</a> </li><li>Perry Rhodan Nr. 1817: Krieger der Gazkar (Download)  (<a href=\"/index.php?id=16&productID=1417304\">ansehen</a>) - <a href=\"butler.php?action=audio&productID=1417304&productFileTypeID=2\">Multitrack</a> 
-/ <a href=\"butler.php?action=audio&productID=1417304&productFileTypeID=3\">Onetrack</a> </li><li>Perry Rhodan Nr. 1816: Hüter der Glückseligkeit (Download)  (<a href=\"/index.php?id=16&productID=1415861\">ansehen</a>) - <a href=\"butler.php?action=audio&productID=1415861&productFileTypeID=2\">Multitrack</a> / <a href=\"butler.php?action=audio&productID=1415861&productFileTypeID=3\">Onetrack</a> </li><li>Perry Rhodan Nr. 1815: Rätselwelt Galorn (Download)  (<a href=\"/index.php?id=16&productID=1437212\">ansehen</a>) - <a href=\"butler.php?action=audio&productID=1437212&productFileTypeID=2\">Multitrack</a> / <a href=\"butler.php?action=audio&productID=1437212&productFileTypeID=3\">Onetrack
-</a> </li><li>Perry Rhodan Nr. 1814: Unter dem Galornenstern (Download)  (<a href=\"/index.php?id=16&productID=1273965\">ansehen</a>) - <a href=\"butler.php?action=audio&productID=1273965&productFileTypeID=2\">Multitrack</a> / <a href=\"butler.php?action=audio&productID=1273965&productFileTypeID=3\">Onetrack</a> </li><li>Perry Rhodan Nr. 1813: Die Mörder von Bröhnder (Download)  (<a href=\"/index.php?id=16&productID=1262103\">ansehen</a>) - <a href=\"butler.php?action=audio&productID=1262103&productFileTypeID=2\">Multitrack</a> / <a href=\"butler.php?action=audio&productID=1262103&productFileTypeID=3\">Onetrack</a> </li><li>Perry Rhodan Nr. 1812: Camelot (Download)  
-(<a href=\"/index.php?id=16&productID=1322907\">ansehen</a>) - <a href=\"butler.php?action=audio&productID=1322907&productFileTypeID=2\">Multitrack</a> / <a href=\"butler.php?action=audio&productID=1322907&productFileTypeID=3\">Onetrack</a> </li><li>Perry Rhodan Nr. 1811: Konferenz der Galaktiker (Download)  (<a href=\"/index.php?id=16&productID=1239129\">ansehen</a>) - <a href=\"butler.php?action=audio&productID=1239129&productFileTypeID=2\">Multitrack</a> / <a href=\"butler.php?action=audio&productID=1239129&productFileTypeID=3\">Onetrack</a> </li><li>Perry Rhodan Nr. 1810: Der Weg nach Camelot (Download) (<a href=\"/index.php?id=16&productID=1239128\">ansehen</a>) 
-- <a href=\"butler.php?action=audio&productID=1239128&productFileTypeID=2\">Multitrack</a> / <a href=\"butler.php?action=audio&productID=1239128&productFileTypeID=3\">Onetrack</a> </li><li>Perry Rhodan Nr. 1809: Hetzjagd durch den Hyperraum (Download)  (<a href=\"/index.php?id=16&productID=1176841\">ansehen</a>) - <a href=\"butler.php?action=audio&productID=1176841&productFileTypeID=2\">Multitrack</a> / <a href=\"butler.php?action=audio&productID=1176841&productFileTypeID=3\">Onetrack</a> </li><li>Perry Rhodan Nr. 1808: Landung auf Lafayette (Download)  (<a href=\"/index.php?id=16&productID=1176840\">ansehen</a>) - <a href=\"butler.php?action=audio&productID=1176840&productFileTypeID=2\">
-Multitrack</a> / <a href=\"butler.php?action=audio&productID=1176840&productFileTypeID=3\">Onetrack</a> </li><li>Perry Rhodan Nr. 1807: Die Haut des Bösen (Download)  (<a href=\"/index.php?id=16&productID=1176839\">ansehen</a>) - <a href=\"butler.php?action=audio&productID=1176839&productFileTypeID=2\">Multitrack</a> / <a href=\"butler.php?action=audio&productID=1176839&productFileTypeID=3\">Onetrack</a> </li><li>Perry Rhodan Nr. 1806: Der Mutant der Cantrell (Download) (<a href=\"/index.php?id=16&productID=1176838\">ansehen</a>) - <a href=\"butler.php?action=audio&productID=1176838&productFileTypeID=2\">Multitrack</a> / 
-<a href=\"butler.php?action=audio&productID=1176838&productFileTypeID=3\">Onetrack</a> </li><li>Perry Rhodan Nr. 1805: Arsenal der Macht (Download)  (<a href=\"/index.php?id=16&productID=1176837\">ansehen</a>) -<a href=\"butler.php?action=audio&productID=1176837&productFileTypeID=2\">Multitrack</a> / <a href=\"butler.php?action=audio&productID=1176837&productFileTypeID=3\">Onetrack</a> </li><li>Perry Rhodan Nr. 1804: Kampf ums Überleben (Download)  (<a href=\"/index.php?id=16&productID=1176836\">ansehen</a>) - <a href=\"butler.php?action=audio&productID=1176836&productFileTypeID=2\">Multitrack</a> / <a href=\"butler.php?action=audio&productID=1176836&productFileTypeID=3\">
-Onetrack</a> </li><li>Perry Rhodan Nr. 1803: Der Riese Schimbaa (Download)  (<a href=\"/index.php?id=16&productID=1176835\">ansehen</a>) - <a href=\"butler.php?action=audio&productID=1176835&productFileTypeID=2\">Multitrack</a> / <a href=\"butler.php?action=audio&productID=1176835&productFileTypeID=3\">Onetrack</a> </li><li>Perry Rhodan Nr. 1802: Stiefkinder der Sonne (Download) (<a href=\"/index.php?id=16&productID=1176834\">ansehen</a>) - <a href=\"butler.php?action=audio&productID=1176834&productFileTypeID=2\">Multitrack</a> / <a href=\"butler.php?action=audio&productID=1176834&productFileTypeID=3\">Onetrack</a> </li><li>Perry Rhodan Nr. 1801: Die Herreach (Download) 
-(<a href=\"/index.php?id=16&productID=1176833\">ansehen</a>) - <a href=\"butler.php?action=audio&productID=1176833&productFileTypeID=2\">Multitrack</a> / <a href=\"butler.php?action=audio&productID=1176833&productFileTypeID=3\">Onetrack</a> </li><li>Perry Rhodan Nr. 1800: Zeitraffer (Download) (<a href=\"/index.php?id=16&productID=570664\">ansehen</a>) - <a href=\"butler.php?action=audio&productID=570664&productFileTypeID=2\">Multitrack</a> / <a href=\"butler.php?action=audio&productID=570664&productFileTypeID=3\">Onetrack</a> </li><li>Perry Rhodan Nr. 1800: Zeitraffer (Download) (<a href=\"/index.php?id=16&productID=570664\">ansehen</a>) - 
-<a href=\"butler.php?action=audio&productID=570664&productFileTypeID=2\">Multitrack</a> / <a href=\"butler.php?action=audio&productID=570664&productFileTypeID=3\">Onetrack</a> </li></ul><h4><a href=\"#oeffne\" onclick=\"openCat(2)\">PERRY RHODAN > Hörbücher Erstauflage > Ab Nr. 2400 (19 Downloads)</a></h4><ul id=\"cat2\" style=\"display:none;\"><li>Perry Rhodan Nr. 2499: Das Opfer (Download) (<a href=\"/index.php?id=16&productID=27552\">ansehen</a>) - <a href=\"butler.php?action=audio&productID=27552&productFileTypeID=2\">Multitrack</a> / <a href=\"butler.php?action=audio&productID=27552&productFileTypeID=3\">Onetrack</a> </li>
-<li>Perry Rhodan Nr. 2497: Das Monokosmium (Download) (<a href=\"/index.php?id=16&productID=27485\">ansehen</a>) - <a href=\"butler.php?action=audio&productID=27485&productFileTypeID=2\">Multitrack</a> / <a href=\"butler.php?action=audio&productID=27485&productFileTypeID=3\">Onetrack</a> </li><li>Perry Rhodan Nr. 2496: Chaotender gegen Sol (Download) (<a href=\"/index.php?id=16&productID=27431\">ansehen</a>) - <a href=\"butler.php?action=audio&productID=27431&productFileTypeID=2\">Multitrack</a> / <a href=\"butler.php?action=audio&productID=27431&productFileTypeID=3\">Onetrack</a> </li>
-<li>Perry Rhodan Nr. 2495: Koltorocs Feuer (Download) (<a href=\"/index.php?id=16&productID=27391\">ansehen</a>) -<a href=\"butler.php?action=audio&productID=27391&productFileTypeID=2\">Multitrack</a> / <a href=\"butler.php?action=audio&productID=27391&productFileTypeID=3\">Onetrack</a> </li><li>Perry Rhodan Nr. 2493: Der Weltweise (Download) (<a href=\"/index.php?id=16&productID=27153\">ansehen</a>) - <a href=\"butler.php?action=audio&productID=27153&productFileTypeID=2\">Multitrack</a> / <a href=\"butler.php?action=audio&productID=27153&productFileTypeID=3\">Onetrack</a> </li>
-<li>Perry Rhodan Nr. 2491: Der dritte Messenger (Download) (<a href=\"/index.php?id=16&productID=26911\">ansehen</a>) - <a href=\"butler.php?action=audio&productID=26911&productFileTypeID=2\">Multitrack</a> / <a href=\"butler.php?action=audio&productID=26911&productFileTypeID=3\">Onetrack</a> </li><li>Perry Rhodan Nr. 2490: Die dunklen Gärten (Download) (<a href=\"/index.php?id=16&productID=26876\">ansehen</a>) - <a href=\"butler.php?action=audio&productID=26876&productFileTypeID=2\">Multitrack</a> / <a href=\"butler.php?action=audio&productID=26876&productFileTypeID=3\">
-Onetrack</a> </li><li>Perry Rhodan Nr. 2489: Schach dem Chaos (Download) (<a href=\"/index.php?id=16&productID=26819\">ansehen</a>) - <a href=\"butler.php?action=audio&productID=26819&productFileTypeID=2\">Multitrack</a> / <a href=\"butler.php?action=audio&productID=26819&productFileTypeID=3\">Onetrack</a> </li><li>Perry Rhodan Nr. 2488: Hinter dem Kernwall (Download) (<a href=\"/index.php?id=16&productID=26668\">ansehen</a>) - <a href=\"butler.php?action=audio&productID=26668&productFileTypeID=2\">Multitrack</a> / 
-<a href=\"butler.php?action=audio&productID=26668&productFileTypeID=3\">Onetrack</a> </li><li>Perry Rhodan Nr. 2487: Die String-Legaten (Download) (<a href=\"/index.php?id=16&productID=26648\">ansehen</a>) - <a href=\"butler.php?action=audio&productID=26648&productFileTypeID=2\">Multitrack</a> / <a href=\"butler.php?action=audio&productID=26648&productFileTypeID=3\">Onetrack</a> </li><li>Perry Rhodan Nr. 2486: Wispern des Hyperraums (Download) (<a href=\"/index.php?id=16&productID=26549\">ansehen</a>) - 
-<a href=\"butler.php?action=audio&productID=26549&productFileTypeID=2\">Multitrack</a> / <a href=\"butler.php?action=audio&productID=26549&productFileTypeID=3\">Onetrack</a> </li><li>Perry Rhodan Nr. 2483: Die Nadel des Chaos (Download) (<a href=\"/index.php?id=16&productID=26244\">ansehen</a>) - <a href=\"butler.php?action=audio&productID=26244&productFileTypeID=2\">Multitrack</a> / <a href=\"butler.php?action=audio&productID=26244&productFileTypeID=3\">Onetrack</a> </li>
-<li>Perry Rhodan Nr. 2482: Der ewige Kerker (Download) (<a href=\"/index.php?id=16&productID=26218\">ansehen</a>) - <a href=\"butler.php?action=audio&productID=26218&productFileTypeID=2\">Multitrack</a> / <a href=\"butler.php?action=audio&productID=26218&productFileTypeID=3\">Onetrack</a> </li><li>Perry Rhodan Nr. 2481: Günstlinge des Hyperraums (Download) (<a href=\"/index.php?id=16&productID=26183\">ansehen</a>) - <a href=\"butler.php?action=audio&productID=26183&product
-FileTypeID=2\">Multitrack</a> / <a href=\"butler.php?action=audio&productID=26183&productFileTypeID=3\">Onetrack</a> </li><li>Perry Rhodan Nr. 2480: Die Prognostiker (Download) (<a href=\"/index.php?id=16&productID=26116\">ansehen</a>) - <a href=\"butler.php?action=audio&productID=26116&productFileTypeID=2\">Multitrack</a> / <a href=\"butler.php?action=audio&productID=26116&productFileTypeID=3\">Onetrack</a> </li><li>Perry Rhodan Nr. 2479: Technomorphose (Download) (<a href
-=\"/index.php?id=16&productID=26032\">ansehen</a>) - <a href=\"butler.php?action=audio&productID=26032&productFileTypeID=2\">Multitrack</a> / <a href=\"butler.php?action=audio&productID=26032&productFileTypeID=3\">Onetrack</a> </li><li>Perry Rhodan Nr. 2475: Opfergang (Download) (<a href=\"/index.php?id=16&productID=25505\">ansehen</a>) - <a href=\"butler.php?action=audio&productID=25505&productFileTypeID=2\">Multitrack</a> / <a href=\"butler.php?action=audio&productID=
-25505&productFileTypeID=3\">Onetrack</a> </li><li>Perry Rhodan Nr. 2471: Das Geschenk der Metaläufer (Download) (<a href=\"/index.php?id=16&productID=25356\">ansehen</a>) - <a href=\"butler.php?action=audio&productID=25356&productFileTypeID=2\">Multitrack</a> / <a href=\"butler.php?action=audio&productID=25356&productFileTypeID=3\">Onetrack</a> </li><li>Perry Rhodan Nr. 2446: Die Negane Stadt (Download) (<a href=\"/index.php?id=16&productID=22775\">ansehen</a>) - 
-<a href=\"butler.php?action=audio&productID=22775&productFileTypeID=2\">Multitrack</a> / <a href=\"butler.php?action=audio&productID=22775&productFileTypeID=3\">Onetrack</a> </li></ul><h4><a href=\"#oeffne\" onclick=\"openCat(3)\">PERRY RHODAN > Hörbücher Erstauflage > Ab Nr. 2500 (61 Downloads)</a></h4><ul id=\"cat3\" style=\"display:none;\"><li>Perry Rhodan Nr. 2568: Einsatzkommando Infiltration (Download) (<a href=\"/index.php?id=16&productID=36005\">ansehen
-</a>) - <a href=\"butler.php?action=audio&productID=36005&productFileTypeID=2\">Multitrack</a> / <a href=\"butler.php?action=audio&productID=36005&productFileTypeID=3\">Onetrack</a> </li><li>Perry Rhodan Nr. 2567: Duell an der Schneise (Download) (<a href=\"/index.php?id=16&productID=35845\">ansehen</a>) - <a href=\"butler.php?action=audio&productID=35845&productFileTypeID=2\">Multitrack</a> / <a href=\"butler.php?action=audio&productID=35845&productFileTypeID
-=3\">Onetrack</a> </li><li>Perry Rhodan Nr. 2565: Vastrears Odyssee (Download) (<a href=\"/index.php?id=16&productID=35686\">ansehen</a>) - <a href=\"butler.php?action=audio&productID=35686&productFileTypeID=2\">Multitrack</a> / <a href=\"butler.php?action=audio&productID=35686&productFileTypeID=3\">Onetrack</a> </li><li>Perry Rhodan Nr. 2564: Die verlorene Stimme (Download) (<a href=\"/index.php?id=16&productID=35412\">ansehen</a>) - <a href=\"butler.php?acti
-on=audio&productID=35412&productFileTypeID=2\">Multitrack</a> / <a href=\"butler.php?action=audio&productID=35412&productFileTypeID=3\">Onetrack</a> </li><li>Perry Rhodan Nr. 2561: Insel der goldenen Funken (Download) (<a href=\"/index.php?id=16&productID=35103\">ansehen</a>) - <a href=\"butler.php?action=audio&productID=35103&productFileTypeID=2\">Multitrack</a> / <a href=\"butler.php?action=audio&productID=35103&productFileTypeID=3\">Onetrack</a> </li><li>Pe
-rry Rhodan Nr. 2560: Das Raunen des Vamu (Download) (<a href=\"/index.php?id=16&productID=35026\">ansehen</a>) - <a href=\"butler.php?action=audio&productID=35026&productFileTypeID=2\">Multitrack</a> / <a href=\"butler.php?action=audio&productID=35026&productFileTypeID=3\">Onetrack</a> </li><li>Perry Rhodan Nr. 2559: Splitter des Bösen (Download) (<a href=\"/index.php?id=16&productID=34969\">ansehen</a>) - <a href=\"butler.php?action=audio&productID=34969&prod
-uctFileTypeID=2\">Multitrack</a> / <a href=\"butler.php?action=audio&productID=34969&productFileTypeID=3\">Onetrack</a> </li><li>Perry Rhodan Nr. 2558: Die Stadt am Ende des Weges (Download) (<a href=\"/index.php?id=16&productID=34946\">ansehen</a>) - <a href=\"butler.php?action=audio&productID=34946&productFileTypeID=2\">Multitrack</a> / <a href=\"butler.php?action=audio&productID=34946&productFileTypeID=3\">Onetrack</a> </li><li>Perry Rhodan Nr. 2557: Der Me
-ntalpilot (Download) (<a href=\"/index.php?id=16&productID=34857\">ansehen</a>) - <a href=\"butler.php?action=audio&productID=34857&productFileTypeID=2\">Multitrack</a> / <a href=\"butler.php?action=audio&productID=34857&productFileTypeID=3\">Onetrack</a> </li><li>Perry Rhodan Nr. 2556: Im Innern des Wunders (Download) (<a href=\"/index.php?id=16&productID=34817\">ansehen</a>) - <a href=\"butler.php?action=audio&productID=34817&productFileTypeID=2\">Multitrack
-</a> / <a href=\"butler.php?action=audio&productID=34817&productFileTypeID=3\">Onetrack</a> </li></div>"""
-
-
-
-//type DownloadSite = HtmlProvider< htmlSample >
-
 
 let regexMatch pattern input =
     let res = Regex.Match(input,pattern)
@@ -105,71 +69,243 @@ let (|OrdinalContains|_|) (str:string) (arg:string) =
     if arg.IndexOf(str, StringComparison.OrdinalIgnoreCase) > -1
     then Some() else None
 
-let downloadNameRegex = Regex(@"([A-Za-z .-]*)(\d*)(:| - )([\w\säöüÄÖÜ.:!\-]*[\(\)Teil \d]*)(.*)(( - Multitrack \/ Onetrack)|( - Multitrack)|( - Onetrack))")
+let downloadNameRegexOld = Regex(@"^([A-Za-z .-]*([0-9]+[.][0-9]+)?)([0-9]*)(:| - )([\w\säöüÄÖÜ.:!\-\/]*[\(\)Teil \d]*)(.*)(( - Multitrack \/ Onetrack)|( - Multitrack)|( - Onetrack))")
 
-tst 
-|> Seq.filter (fun i -> 
-        match i.InnerText() with
-        | InvariantContains "Multitrack" -> true
-        | InvariantContains "Onetrack" -> true
-        | _ -> false
-    )
-|> Seq.groupBy (fun i ->
-        let innerText = i.InnerText()
-        if not (downloadNameRegex.IsMatch(innerText)) then "Other"
+let meh = Regex(@"^([A-Za-z .-]*([0-9]+[.][0-9]+)?)([0-9]*)(:| - )([\w\säöüÄÖÜ.:!\-\/]*[\(\)Teil \d]*)(.*)")
+let muh = Regex(@"^([A-Za-z .:-]*[0-9.]*[A-Za-z .:-]*)([0-9]*)( - )([\w\säöüÄÖÜ.:!\-\/]*[\(\)Teil \d]*)(.*)")
+
+let tst1 = """Warhammer 40.000: Eisenhorn 4 - Magos Teil 2/Der Roman (Hörbuch-Download) (ansehen) - Multitrack"""
+let tst2 = """The Horus Heresy 01: Der Aufstieg des Horus (Hörbuch-Download)"""
+let tst3 = """Perry Rhodan Arkon 05: Der Smiler und der Hund (Download) (<a href="/index.php?id=16&productID=2146871">ansehen</a>) - <a href="butler.php?action=audio&productID=2146871&productFileTypeID=2">Multitrack</a> / <a href="butler.php?action=audio&productID=2146871&productFileTypeID=3">Onetrack"""
+let tst4 = """Perry Rhodan Neo Nr. 008: Die Terraner (Download) (<a href="/index.php?id=16&productID=38646">ansehen</a>) - <a href="butler.php?action=audio&productID=38646&productFileTypeID=2">Multitrack</a> / <a href="butler.php?action=audio&productID=38646&productFileTypeID=3">Onetrack"""
+let tst5 = """Perry Rhodan Nr. 3021: Eyshus Geschenk (Hörbuch-Download) (<a href="/index.php?id=16&productID=4009442">ansehen</a>) - <a href="butler.php?action=audio&productID=4009442&productFileTypeID=2">Multitrack</a> / <a href="butler.php?action=audio&productID=4009442&productFileTypeID=3">Onetrack"""
+
+muh.Match(tst1).Groups.[4].Value
+
+downloadNameRegexOld.IsMatch(tst1)
+downloadNameRegexOld.Match(tst1).Groups.[1].Value
+downloadNameRegexOld.Match(tst1).Groups.[2].Value
+downloadNameRegexOld.Match(tst1).Groups.[3].Value
+downloadNameRegexOld.Match(tst1).Groups.[4].Value
+downloadNameRegexOld.Match(tst1).Groups.[5].Value
+
+downloadNameRegexOld.Match(tst2).Groups.[1]
+downloadNameRegexOld.Match(tst3).Groups.[1]
+
+meh.Match(tst1).Groups.[3]
+meh.Match(tst2).Groups.[3]
+meh.Match(tst3).Groups.[3]
+meh.Match(tst4).Groups.[3]
+meh.Match(tst5).Groups.[3]
+
+
+
+
+
+let htmlData =
+    File.ReadAllText(@"D:\temp\perryRhodanApp\mega.txt")
+
+module RegExHelper =
+
+    open System.Text.RegularExpressions
+
+    let regexMatch pattern input =
+        let res = Regex.Match(input,pattern)
+        if res.Success then
+            Some res.Value
         else
-            let matchTitle = downloadNameRegex.Match(innerText)
-            matchTitle.Groups.[1].Value.Replace("Nr.", "").Trim()
+            None
+
+    let regexMatchOpt pattern input =
+        input
+        |> Option.bind (regexMatch pattern)
+
+    let regexMatchGroup pattern group input =
+        let res = Regex.Match(input,pattern)
+        if res.Success && res.Groups.Count >= group then
+            Some res.Groups.[group].Value
+        else
+            None
+
+    let regexMatchGroupOpt pattern group input =
+        input
+        |> Option.bind (regexMatchGroup group pattern)
+
+
+let getDownloadNameRegex (innerText:string) = 
+    let indexFirst = innerText.IndexOf("(")
+    let part = innerText.[..indexFirst]
+    if (part.Contains(" - ") && part.Contains(": ")) then
+        Regex(@"^([A-Za-z .:-]*[0-9.]*[A-Za-z .:-]*)([0-9]*)( - )([\w\säöüÄÖÜ.:!\-\/]*[\(\)Teil \d]*)(.*)")
+    else
+        Regex(@"^([A-Za-z .-]*)([0-9]*)(:| - )([\w\säöüÄÖÜ.:!\-\/]*[\(\)Teil \d]*)(.*)")
+
+
+let regexReplace searchRegex newText input =
+    let regex = Regex(searchRegex)
+    if (regex.IsMatch(input)) then
+        let searchVal = regex.Match(input).Groups.[0].Value
+        input.Replace(searchVal, newText)
+    else
+        input
+
+
+let getKey (downloadNameRegex:Regex) innerText =
+    if not (downloadNameRegex.IsMatch(innerText)) then "Other"
+    else
+        let matchTitle = downloadNameRegex.Match(innerText)
+        matchTitle.Groups.[1].Value.Replace("Nr.", "").Trim()
+
+
+let tryGetEpisodenNumber (downloadNameRegex:Regex) innerText =
+    
+    let fallBackEpNum () =
+        let innerText = 
+            innerText
+            |> regexReplace "40\.000" ""
+
+        let ep1Regex = Regex("\d+")
+        if ep1Regex.IsMatch(innerText) then
+            let (isNum,num) = Int32.TryParse(ep1Regex.Match(innerText).Groups.[0].Value)
+            if isNum then Some num else None
+        else
+            None
+
+    if (downloadNameRegex.IsMatch(innerText)) then
+        let epNumRes = Int32.TryParse(downloadNameRegex.Match(innerText).Groups.[2].Value)
+        match epNumRes with
+        | true, x -> Some x
+        | _ -> fallBackEpNum ()
+    else
+        fallBackEpNum ()
+            
+
+
+let getEpisodenTitle (downloadNameRegex:Regex) innerText =
+    if not (downloadNameRegex.IsMatch(innerText)) then innerText.Trim()
+    else 
+        let ept = downloadNameRegex.Match(innerText).Groups.[4].Value.Trim()
+        ept.Substring(0,(ept.Length-2)).ToString().Trim().Replace(":"," -")
+
+
+let tryGetLinkForMultiDownload (i:HtmlNode) =
+    i.Descendants["a"]
+    |> Seq.filter (fun i ->  i.Attribute("href").Value().ToLower().Contains("productfiletypeid=2"))
+    |> Seq.map (fun i -> i.Attribute("href").Value())
+    |> Seq.tryHead
+
+
+let tryGetProductionPage (i:HtmlNode) =
+    i.Descendants["a"]
+    |> Seq.filter (fun i -> i.InnerText() = "ansehen")
+    |> Seq.map (fun i -> i.Attribute("href").Value())
+    |> Seq.tryHead
+
+
+let buildFullName episodeNumber key episodeTitle =
+    match episodeNumber with
+    | None -> sprintf "%s - %s" key episodeTitle
+    | Some no -> sprintf "%s %i - %s" key no episodeTitle
+
+
+let tryParseInt str =
+    let (is,v) = Int32.TryParse(str)
+    if is then Some v else None
+
+let tryGetProductId linkProductSite =
+    linkProductSite
+    |> RegExHelper.regexMatchGroupOpt 2 "(productID=)(\d*)"
+    |> Option.bind (tryParseInt)
+
+
+
+
+let compansateManually input =
+    input
+    |> regexReplace "\([A-Z ]*\d+\)" ""
+    
+
+let res =    
+    HtmlDocument.Parse(htmlData).Descendants("div")
+    |> Seq.toArray 
+    |> Array.filter (fun i -> i.AttributeValue("id") = "downloads")
+    |> Array.tryHead
+    // only the audiobooks
+    |> Option.map (
+        fun i -> 
+            i.Descendants("li") 
+            |> Seq.filter (fun i -> not (i.InnerText().Contains("Impressum"))) 
+            |> Seq.filter (fun i -> 
+                i.Descendants("a") 
+                |> Seq.exists (fun i -> 
+                    i.TryGetAttribute("href") 
+                    |> Option.map(fun m -> m.Value().Contains("butler.php?action=audio")) 
+                    |> Option.defaultValue false) 
+                )
+            |> Seq.toArray
     )
-|> Seq.map (fun (key,items) -> 
-        key,
-        items        
-        |> Seq.map ( fun i ->
-                let innerText = i.InnerText()
-                let episodeNumber = 
-                    if not (downloadNameRegex.IsMatch(innerText)) then None
-                    else
-                        let epNumRes = Int32.TryParse(downloadNameRegex.Match(innerText).Groups.[2].Value)
-                        match epNumRes with
-                        | true, x -> Some x
-                        | _ -> None
-                let episodeTitle = 
-                    if not (downloadNameRegex.IsMatch(innerText)) then innerText.Trim()
-                    else 
-                        let ept = downloadNameRegex.Match(innerText).Groups.[4].Value.Trim()
-                        ept.Substring(0,(ept.Length-2)).ToString().Trim()
+    |> Option.defaultValue ([||])
+    |> Array.Parallel.map (
+        fun i ->
+            let innerText = i.InnerText()
+            let downloadRegex = getDownloadNameRegex innerText
 
-                let linkForMultiDownload = 
-                    i.Descendants["a"]
-                    |> Seq.filter (fun i ->  i.Attribute("href").Value().ToLower().Contains("productfiletypeid=2"))
-                    |> Seq.map (fun i -> i.Attribute("href").Value())
-                    |> Seq.tryHead
+            let innerText = innerText |> compansateManually 
+            
+            //   little title work
+            let key = innerText |> getKey downloadRegex
+            let epNum = innerText |> tryGetEpisodenNumber downloadRegex   
+            let episodeNumber =
+                if epNum = None then
+                    i.InnerText() |> tryGetEpisodenNumber downloadRegex 
+                else
+                    epNum
 
-                let linkProductSite = 
-                    i.Descendants["a"]
-                    |> Seq.filter (fun i -> i.InnerText() = "ansehen")
-                    |> Seq.map (fun i -> i.Attribute("href").Value())
-                    |> Seq.tryHead
 
-                let productId = 
-                    linkProductSite
-                    |> regexMatchGroupOpt 2 "(productID=)(\d*)"
-                    
-                    
-
-                (episodeNumber,episodeTitle,linkForMultiDownload,linkProductSite, productId, i)
-            )
-        |> Seq.sortBy (fun (epNumber,_,_,_,_,_) -> 
-                match epNumber with
-                | None -> -1
-                | Some x -> x
-            )
-    )     
-|> Seq.iter ( fun (key,items) -> 
-        printfn "---- %s ----" key
-        items |> Seq.iter (fun (epNumber,epTitel,link,plink,pid,i) -> printfn "%A - %s (%A) (%A) (%A)" epNumber epTitel link plink pid)
+            let episodeTitle = innerText |> getEpisodenTitle downloadRegex
+            let linkForMultiDownload = i |> tryGetLinkForMultiDownload
+            let linkProductSite = i |> tryGetProductionPage
+            let fullName = buildFullName episodeNumber key episodeTitle
+            let productId = 
+                linkProductSite 
+                |> tryGetProductId
+                |> Option.defaultValue -1
+                        
+            {|   
+                Id = productId
+                FullName = fullName 
+                EpisodeNo = episodeNumber
+                EpisodenTitel = episodeTitle
+                Group = key
+                DownloadUrl = linkForMultiDownload 
+                ProductSiteUrl = linkProductSite
+                |}
+    )
+    |> Array.filter (fun i -> i.Id <> -1)
+    |> Array.sortBy (fun ab -> 
+            match ab.EpisodeNo with
+            | None -> -1
+            | Some x -> x
+    )
+    |> Array.distinct
+    |> Array.iter (fun i ->
+        printfn "%s - %i - %s - %s" 
+            i.Group
+            (i.EpisodeNo |> Option.defaultValue -1)
+            i.FullName
+            i.EpisodenTitel
+    
     )
 
+
+
+
+let innerText = """Perry Rhodan Storys (DVJ 6): Die Leben des Blaise O'Donnell (Hörbuch-Download) (<a href="/index.php?id=16&productID=4210107">ansehen</a>) - <a href="butler.php?action=audio&productID=4210107&productFileTypeID=2">Multitrack</a> / <a href="butler.php?action=audio&productID=4210107&productFileTypeID=3">Onetrack  """
+
+let ep1Regex = Regex("\d+")
+ep1Regex.IsMatch(innerText)
+let (isNum,num) = Int32.TryParse(ep1Regex.Match(innerText).Groups.[0].Value)
+    
 
 
 [<Literal>]
@@ -268,6 +404,5 @@ thumb.Mutate(fun x ->
 let fileStream = new FileStream(@"E:\Downloads\PERRY_RHODAN_3025_Ich_erinnere_mich\PERRY RHODAN 3025 - Ich erinnere mich\test.jpg",FileMode.Create)
 thumb.SaveAsJpeg(fileStream)
 fileStream.Close()
-    
-            
+
 

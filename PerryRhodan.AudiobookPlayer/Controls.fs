@@ -322,7 +322,13 @@ let primaryColorSymbolLabelWithTapCommandRightAlign command size solid text =
         )
 
 
-let contentPageWithBottomOverlay (pageRef:ViewRef<CustomContentPage>) (bottomOverlay:ViewElement option) (content:ViewElement) isBusy title =
+let contentPageWithBottomOverlay 
+    (pageRef:ViewRef<CustomContentPage>) 
+    (bottomOverlay:ViewElement option) 
+    (content:ViewElement) 
+    isBusy 
+    title
+    uniqueId =
     View.ContentPage(
         title=title,
         backgroundColor = Consts.backgroundColor,
@@ -336,7 +342,8 @@ let contentPageWithBottomOverlay (pageRef:ViewRef<CustomContentPage>) (bottomOve
                     if bottomOverlay.IsSome then
                         yield bottomOverlay.Value.Row(1)
                 ]
-        )
+        ),
+        automationId = uniqueId
     )
 
 
@@ -384,6 +391,46 @@ let navPageWithBottomOverlay (pageRef:ViewRef<NavigationPage>) (bottomOverlay:Vi
     )
 
 
+
+let tickerBand fontSize text =
+    View.ScrollView(
+        orientation=ScrollOrientation.Horizontal,
+        horizontalScrollBarVisibility = ScrollBarVisibility.Never,
+        horizontalOptions=LayoutOptions.Fill,
+        content=View.Label(text=text,
+            fontSize=FontSize fontSize,
+            textColor=Consts.primaryTextColor,
+            verticalOptions=LayoutOptions.Fill,
+            horizontalOptions=LayoutOptions.Fill,
+            horizontalTextAlignment=TextAlignment.Start,
+            verticalTextAlignment=TextAlignment.Center,
+            lineBreakMode = LineBreakMode.NoWrap,
+            maxLines = 1
+        ),
+        created=(fun e ->
+            
+            async {
+                
+                while (e.ContentSize.Width <= 0.0) do
+                    do! Async.Sleep 200
+
+                let visibleWidth = e.Bounds.Width
+                let contentWidth = e.ContentSize.Width
+                let scrollWidth = contentWidth - visibleWidth
+                if scrollWidth > 0.0 then
+                    let waitingTime = 3.5
+                    let durationSec = scrollWidth / 32.0
+                    let duration = (durationSec + waitingTime) * 1000.0
+                    let additionWidthForWaitingRepeat = waitingTime * 32.0
+                    do! Device.InvokeOnMainThreadAsync(fun () ->
+                            let anim = Animation((fun v -> e.ScrollToAsync(v, 0.0, false) |> ignore), start=(0.0 - additionWidthForWaitingRepeat), ``end``= (scrollWidth + additionWidthForWaitingRepeat))
+                            anim.Commit(e,"mini-player-ticker",rate=24u,length=(duration |> uint32),easing=Easing.Linear,repeat=(fun ()-> true))
+                        ) |> Async.AwaitTask
+                
+            }
+            |> Async.Start
+        )
+    )
 
 
 type MyContentPage (cp:ContentPage, onBackButton) as self =
