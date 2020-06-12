@@ -660,15 +660,30 @@ open AudioPlayer
                 " ... "
 
         View.ContentPage(
-          title=Translations.current.AudioPlayerPage,useSafeArea=true,
+          title=Translations.current.AudioPlayerPage,
           backgroundColor = Consts.backgroundColor,
           content = 
             View.Grid(padding = Thickness 20.,
                 horizontalOptions = LayoutOptions.Fill,
                 verticalOptions = LayoutOptions.Fill,                
-                rowdefs = [ Star; Star; Star; Auto ],
+                rowdefs = [ Star; Auto; Auto; Auto ],
                 
                 children = [
+
+                    yield dependsOn model.AudioBook.Picture (fun model picture ->
+                        View.Image(
+                            source= 
+                                match picture with
+                                | None -> ImagePath "AudioBookPlaceholder_Dark.png"
+                                | Some p -> ImagePath p
+                                ,
+                            horizontalOptions=LayoutOptions.Fill,
+                            verticalOptions=LayoutOptions.Fill,
+                            aspect=Aspect.AspectFit
+                            
+                            ).Row(0)
+                    )
+                        
 
                     yield dependsOn 
                         (title,currentTrackString,currentTimeString) 
@@ -678,24 +693,14 @@ open AudioPlayer
                                 verticalOptions = LayoutOptions.Fill,                
                                 rowdefs = [ Auto; Auto; Auto ],
                                 children = [
-                                    yield (Controls.primaryTextColorLabel 25. (title)).Row(0)
-                                    yield (Controls.primaryTextColorLabel 30. (currentTrackString)).Row(1).HorizontalOptions(LayoutOptions.Center)
-                                    yield (Controls.primaryTextColorLabel 30. (currentTimeString)).Row(2).HorizontalOptions(LayoutOptions.Center)
+                                    yield (Controls.primaryTextColorLabel 17. (title)).Row(0)
+                                    yield (Controls.primaryTextColorLabel 20. (currentTrackString)).Row(1).HorizontalOptions(LayoutOptions.Center)
+                                    yield (Controls.primaryTextColorLabel 20. (currentTimeString)).Row(2).HorizontalOptions(LayoutOptions.Center)
                                 ]
-                            ).Row(0)
+                            ).Row(1)
                     )
                     
-                    yield View.Image(
-                        source= 
-                            match model.AudioBook.Picture with
-                            | None -> ImagePath "AudioBookPlaceholder_Dark.png"
-                            | Some p -> ImagePath p
-                            ,
-                        horizontalOptions=LayoutOptions.Fill,
-                        verticalOptions=LayoutOptions.Fill,
-                        aspect=Aspect.AspectFit
-                        
-                        ).Row(1)
+                    
                     
                     let runIfNotBusy (cmd:(unit->unit)) =
                         if not model.AudioPlayerBusy 
@@ -706,30 +711,27 @@ open AudioPlayer
 
                     yield View.Grid(
                         coldefs=[Star;Star;Star;Star;Star],
-                        rowdefs=[Star;Star ],
+                        rowdefs=[Auto;Auto ],
                         children=[
-                            yield (Controls.primaryColorSymbolLabelWithTapCommand ((fun () -> dispatch PreviousAudioFile) |> runIfNotBusy) 30. true "\uf048").Column(0).Row(0)
-                            yield (Controls.primaryColorSymbolLabelWithTapCommand ((fun () -> dispatch JumpBackwards) |> runIfNotBusy) 30. true "\uf04a").Column(1).Row(0)
+                            yield (Controls.primaryColorSymbolLabelWithTapCommand ((fun () -> dispatch PreviousAudioFile) |> runIfNotBusy) 25. true "\uf048").Column(0).Row(0)
+                            yield (Controls.primaryColorSymbolLabelWithTapCommand ((fun () -> dispatch JumpBackwards) |> runIfNotBusy) 25. true "\uf04a").Column(1).Row(0)
 
                             match model.CurrentState with
                             | Stopped ->
-                                yield (Controls.primaryColorSymbolLabelWithTapCommand (fun () -> dispatch Play) 60. false "\uf144").Column(2).Row(0)
+                                yield (Controls.primaryColorSymbolLabelWithTapCommand (fun () -> dispatch Play) 50. false "\uf144").Column(2).Row(0)
                             | Playing ->
-                                yield (Controls.primaryColorSymbolLabelWithTapCommand (fun () -> dispatch Stop) 60. false "\uf28b").Column(2).Row(0)
+                                yield (Controls.primaryColorSymbolLabelWithTapCommand (fun () -> dispatch Stop) 50. false "\uf28b").Column(2).Row(0)
 
                                 
                             
-                            yield (Controls.primaryColorSymbolLabelWithTapCommand ((fun () -> dispatch JumpForward) |> runIfNotBusy) 30. true "\uf04e").Column(3).Row(0)
-                            yield (Controls.primaryColorSymbolLabelWithTapCommand ((fun () -> dispatch NextAudioFile) |> runIfNotBusy) 30. true "\uf051").Column(4).Row(0)
+                            yield (Controls.primaryColorSymbolLabelWithTapCommand ((fun () -> dispatch JumpForward) |> runIfNotBusy) 25. true "\uf04e").Column(3).Row(0)
+                            yield (Controls.primaryColorSymbolLabelWithTapCommand ((fun () -> dispatch NextAudioFile) |> runIfNotBusy) 25. true "\uf051").Column(4).Row(0)
                             
                             yield (View.Slider(
                                     value=model.TrackPositionProcess,
                                     minimumMaximum = (0.,1.),
-                                    //minimum = 0., maximum = 1., 
                                     horizontalOptions = LayoutOptions.Fill,                                    
                                     valueChanged= (fun e -> dispatch (ProgressBarChanged e.NewValue)),
-                                    //dragStarted=(fun () -> dispatch SliderDragStarted),
-                                    //dragCompleted=(fun () -> dispatch SliderDragFinished),
                                     created = (fun slider ->
                                         slider.DragStarted.Add(fun _ -> dispatch SliderDragStarted)
                                         slider.DragCompleted.Add(fun _ -> dispatch SliderDragFinished)
@@ -741,7 +743,7 @@ open AudioPlayer
                     
                     yield View.StackLayout(orientation=StackOrientation.Horizontal,
                             children=[
-                                yield (Controls.primaryColorSymbolLabelWithTapCommand (fun () -> dispatch OpenSleepTimerActionMenu) 35. true "\uf017")
+                                yield (Controls.primaryColorSymbolLabelWithTapCommand (fun () -> dispatch OpenSleepTimerActionMenu) 30. true "\uf017")
 
                                 match model.TimeUntilSleeps with
                                 | None -> ()
@@ -759,8 +761,8 @@ open AudioPlayer
                         children=[
                             let formatedSpeed =
                                 sprintf "%sx" (model.PlaybackSpeed.ToString("0.00"))
-                            yield (Controls.primaryTextColorLabel 25. formatedSpeed)
-                            yield (Controls.primaryColorSymbolLabelWithTapCommand (fun () -> dispatch OpenPlaybackSpeedActionMenu) 35. true "\uf3fd")
+                            yield (Controls.primaryTextColorLabel 20. formatedSpeed)
+                            yield (Controls.primaryColorSymbolLabelWithTapCommand (fun () -> dispatch OpenPlaybackSpeedActionMenu) 30. true "\uf3fd")
                             
                             
                         ]
