@@ -50,6 +50,7 @@ module Consts =
         Path.Combine(baseFolder,"PerryRhodan.AudioBookPlayer","data")
     let stateFileFolder = Path.Combine(currentLocalDataFolder,"states")
     let audioBooksStateDataFile = Path.Combine(stateFileFolder,"audiobooks.db")
+    let audioBookAudioFileDb = Path.Combine(stateFileFolder,"audiobookfiles.db")
     let audioBookDownloadFolderBase = Path.Combine(currentLocalDataFolder,"audiobooks")
 
 
@@ -85,6 +86,11 @@ module DataBase =
         | RemoveAudiobookFromDatabase of AudioBook * AsyncReplyChannel<Result<unit,string>>
         | DeleteDatabase 
 
+        | GetAudioBookFileInfo of int * AsyncReplyChannel<AudioBookAudioFilesInfo option>
+        | InsertAudioBookFileInfos of AudioBookAudioFilesInfo [] * AsyncReplyChannel<Result<unit,string>>
+        | UpdateAudioBookFileInfo of AudioBookAudioFilesInfo * AsyncReplyChannel<Result<unit,string>>
+        | DeleteAudioBookFileInfo of int * AsyncReplyChannel<Result<unit,string>>
+
 
     let initAppFolders () =
         if not (Directory.Exists(currentLocalDataFolder)) then
@@ -105,7 +111,6 @@ module DataBase =
         | _ as e -> Error e.Message
 
 
-
     let private updateAudioBookDb (audioBook:AudioBook) =
         use db = new LiteDatabase(audioBooksStateDataFile, mapper)
         let audioBooks = db.GetCollection<AudioBook>("audiobooks")
@@ -119,7 +124,7 @@ module DataBase =
         use db = new LiteDatabase(audioBooksStateDataFile, mapper)
         let audioBooks = db.GetCollection<AudioBook>("audiobooks")
 
-        let query = Query.Where("FullName", (fun name -> name.AsString = audioBook.FullName))
+        let query = Query.Where("Id", (fun name -> name.AsInt32 = audioBook.Id))
         let check = audioBooks.Find(query)
 
         let res = 
@@ -159,19 +164,62 @@ module DataBase =
 
         audioBooks
 
-    let storageProcessorErrorEvent = CountedEvent<exn>()
-    let storageProcessorAudioBookUpdatedEvent = CountedEvent<AudioBook>()
-    let storageProcessorAudioBookAdded = CountedEvent<AudioBook[]>()
-    let storageProcessorAudioBookDeletedEvent = CountedEvent<AudioBook>()
-    
-    module Events =
 
-        let storageProcessorOnError = storageProcessorErrorEvent.Publish
-        let storageProcessorOnAudiobookUpdated = storageProcessorAudioBookUpdatedEvent.Publish
-        let storageProcessorOnAudiobookAdded = storageProcessorAudioBookAdded.Publish
-        let storageProcessorOnAudiobookDeleted= storageProcessorAudioBookDeletedEvent.Publish
+    module private AudioBookFiles =
+
+        let loadAudioBookAudioFileInfosFromDb () =
+            use db = new LiteDatabase(audioBookAudioFileDb, mapper)
+            let infos = 
+                db.GetCollection<AudioBookAudioFilesInfo>("audiobookfileinfos")
+                    .FindAll()                             
+                    |> Seq.toArray
+
+            infos
 
 
+        let addAudioFilesInfoToAudioBook (audioFileInfos:AudioBookAudioFilesInfo []) =
+            try
+                use db = new LiteDatabase(audioBookAudioFileDb, mapper)
+                let audioBooksCol = 
+                    db.GetCollection<AudioBookAudioFilesInfo>("audiobookfileinfos")
+
+                audioBooksCol.InsertBulk(audioFileInfos) |> ignore                    
+                Ok ()
+            with
+            | _ as e -> Error e.Message
+
+
+        let updateAudioBookFileInfo (audioFileInfo:AudioBookAudioFilesInfo) =
+            use db = new LiteDatabase(audioBookAudioFileDb, mapper)
+            let audioBooks = db.GetCollection<AudioBookAudioFilesInfo>("audiobookfileinfos")
+
+            if audioBooks.Update(audioFileInfo)
+            then (Ok ())
+            else (Error Translations.current.ErrorDbWriteAccess)
+
+
+        let deleteAudioBookInfoFromDb (audioFileInfo:AudioBookAudioFilesInfo) =
+            use db = new LiteDatabase(audioBookAudioFileDb, mapper)
+            let audioBooks = db.GetCollection<AudioBookAudioFilesInfo>("audiobookfileinfos")
+
+            let query = Query.Where("AudioBookId", (fun name -> name.AsInt32 = audioFileInfo.Id))
+            let check = audioBooks.Find(query)
+
+            let res = 
+                if check |> Seq.length > 0 then               
+                    audioBooks.Delete(query)
+                else
+                    -1
+
+            if  res > -1
+            then (Ok ())
+            else (Error Translations.current.ErrorDbWriteAccess)
+
+
+    type private StorageState = {
+        AudioBooks: AudioBook []
+        AudioBookAudioFilesInfos: AudioBookAudioFilesInfo []
+    }
 
     // lazy evaluation, to avoid try loading data without permission
     let private storageProcessor = 
@@ -184,10 +232,21 @@ module DataBase =
                         // init stuff
                         initAppFolders ()
 
-                        let audioBooks =
-                            loadAudioBooksFromDb ()
+                        let loadStateFromDb () =
+                            let audioBooks =
+                                loadAudioBooksFromDb ()
+
+                            let audioFileInfos =
+                                AudioBookFiles.loadAudioBookAudioFileInfosFromDb ()
+
+                            {
+                                AudioBooks = audioBooks
+                                AudioBookAudioFilesInfos = audioFileInfos 
+                            }
+
+                        let initState = loadStateFromDb ()    
                     
-                        let rec loop state =
+                        let rec loop (state:StorageState) =
                             async {
                                 let! msg = inbox.Receive()
                                 match msg with
@@ -196,16 +255,16 @@ module DataBase =
                                     match dbRes with
                                     | Ok _ ->
                                         let newState =
-                                            state
+                                            state.AudioBooks
                                             |> Array.Parallel.map (fun i ->
                                                 if i.Id = audiobook.Id then
                                                     audiobook
                                                 else
                                                     i
                                             )
-                                        storageProcessorAudioBookUpdatedEvent.Trigger(audiobook)
+                                        
                                         replyChannel.Reply(Ok ())
-                                        return! (loop newState)
+                                        return! (loop { state with AudioBooks = newState })
                                     | Error e ->
                                         replyChannel.Reply(Error e)
                                         return! (loop state)
@@ -215,24 +274,23 @@ module DataBase =
                                     match dbRes with
                                     | Ok _ ->
                                         let newState =
-                                            state |> Array.append audiobooks
-
-                                        storageProcessorAudioBookAdded.Trigger(audiobooks)
+                                            state.AudioBooks |> Array.append audiobooks
+                                        
                                         replyChannel.Reply(Ok ())
-                                        return! (loop newState)
+                                        return! (loop { state with AudioBooks = newState })
                                     | Error e ->
                                         if reloadedAfterFailedInsert then
                                             replyChannel.Reply(Error e)
                                             return! (loop state)
                                         else
                                             // reload database and try again to insert
-                                            let state = loadAudioBooksFromDb ()
+                                            let state = loadStateFromDb ()
                                             inbox.Post <| InsertAudioBooks (audiobooks,replyChannel)
                                             return! (loop state)
 
 
                                 | GetAudioBooks replyChannel ->
-                                    replyChannel.Reply(state |> Array.sortBy (fun i -> i.FullName))
+                                    replyChannel.Reply(state.AudioBooks |> Array.sortBy (fun i -> i.FullName))
                                     return! (loop state)
 
                                 | RemoveAudiobookFromDatabase (audiobook,replyChannel) ->
@@ -240,26 +298,99 @@ module DataBase =
                                     match dbRes with
                                     | Ok _ ->
                                         let newState =
-                                            state |> Array.filter (fun i -> i.Id <> audiobook.Id)
+                                            state.AudioBooks |> Array.filter (fun i -> i.Id <> audiobook.Id)
 
-                                        storageProcessorAudioBookDeletedEvent.Trigger(audiobook)
+                                        
                                         replyChannel.Reply(Ok ())
-                                        return! (loop newState)
+                                        return! (loop { state with AudioBooks = newState })
                                     | Error e ->
                                         replyChannel.Reply(Error e)
                                         return! (loop state)
 
                                 | DeleteDatabase ->
                                     deleteDatabase ()
+                                    return! (loop <| loadStateFromDb ())
 
-                                return! (loop <| loadAudioBooksFromDb ())
-                                        
+
+                                | GetAudioBookFileInfo (id,replyChannel) ->
+                                    let item =
+                                        state.AudioBookAudioFilesInfos
+                                        |> Array.tryFind (fun i -> i.Id = id)
+
+                                    replyChannel.Reply(item)
+                                    return! loop state
+
+                                | InsertAudioBookFileInfos (infos,replyChannel) ->
+                                    let newState =
+                                        {
+                                            state with
+                                                AudioBookAudioFilesInfos = 
+                                                    state.AudioBookAudioFilesInfos
+                                                    |> Array.append infos
+                                        }
+
+                                    let res = AudioBookFiles.addAudioFilesInfoToAudioBook infos
+                                    replyChannel.Reply(res)
+                                    match res with
+                                    | Error _ ->
+                                        return! loop state
+                                    | Ok _ ->
+                                        return! loop newState
+
+
+                                    
+                                | UpdateAudioBookFileInfo (info,replyChannel) ->
+                                    let newState =
+                                        {
+                                            state with
+                                                AudioBookAudioFilesInfos = 
+                                                    state.AudioBookAudioFilesInfos
+                                                    |> Array.map (fun i ->
+                                                        if info.Id = i.Id then
+                                                            info
+                                                        else
+                                                            i
+                                                    )
+                                        }
+
+                                    let res = AudioBookFiles.updateAudioBookFileInfo info
+                                    replyChannel.Reply(res)
+                                    match res with
+                                    | Error _ ->
+                                        return! loop state
+                                    | Ok _ ->
+                                        return! loop newState
+                                    
+                                | DeleteAudioBookFileInfo (id,replyChannel) ->
+                                    let newState =
+                                        {
+                                            state with
+                                                AudioBookAudioFilesInfos = 
+                                                    state.AudioBookAudioFilesInfos
+                                                    |> Array.filter (fun i -> i.Id <> id)
+                                        }
+
+                                    let info = 
+                                        state.AudioBookAudioFilesInfos
+                                        |> Array.tryFind (fun i -> i.Id = id)
+
+                                    match info with
+                                    | None ->
+                                        return! loop state
+                                    | Some info ->
+                                        let res = AudioBookFiles.deleteAudioBookInfoFromDb info 
+                                        replyChannel.Reply(res)
+                                        match res with
+                                        | Error _ ->
+                                            return! loop state
+                                        | Ok _ ->
+                                            return! loop newState
                             }
                         
-                        return! (loop audioBooks)
+                        return! (loop initState)
                     with
                     | _ as ex ->
-                        storageProcessorErrorEvent.Trigger(ex)
+                        //storageProcessorErrorEvent.Trigger(ex)
                         failwith "machine down!"
                 }
                 
@@ -285,7 +416,6 @@ module DataBase =
         let msg replyChannel = 
             InsertAudioBooks (audioBooks,replyChannel)
         storageProcessor.Force().PostAndAsyncReply(msg)
-        
 
 
     let updateAudioBookInStateFile (audioBook:AudioBook) =
@@ -299,20 +429,56 @@ module DataBase =
             RemoveAudiobookFromDatabase (audiobook,replyChannel)
         storageProcessor.Force().PostAndAsyncReply(msg)
 
+
     let deleteAudiobookDatabase () =
         storageProcessor.Force().Post(DeleteDatabase)
 
 
-    let removeAudiobook audiobook = 
-        try
-            match audiobook.State.DownloadedFolder with
-            | None -> Error (Translations.current.ErrorRemoveAudioBook)
-            | Some folder ->
-                Directory.Delete(folder,true)
-                Ok ()
-        with
-        | _ as e -> Error (e.Message)
+    
+        
 
+
+    let getAudioBookFileInfo id =
+        let msg replyChannel = 
+            GetAudioBookFileInfo (id,replyChannel)
+        storageProcessor.Force().PostAndAsyncReply(msg)
+
+    let getAudioBookFileInfoTimeout timeout id =
+        let msg replyChannel = 
+            GetAudioBookFileInfo (id,replyChannel)
+        storageProcessor.Force().PostAndReply(msg,timeout)
+        
+    let insertAudioBookFileInfos infos =
+        let msg replyChannel = 
+            InsertAudioBookFileInfos (infos,replyChannel)
+        storageProcessor.Force().PostAndAsyncReply(msg)
+
+    let updateAudioBookFileInfo info =
+        let msg replyChannel = 
+            UpdateAudioBookFileInfo (info,replyChannel)
+        storageProcessor.Force().PostAndAsyncReply(msg)
+    
+    let deleteAudioBookFileInfo id =
+        let msg replyChannel = 
+            DeleteAudioBookFileInfo (id,replyChannel)
+        storageProcessor.Force().PostAndAsyncReply(msg)
+
+
+
+    let removeAudiobook audiobook = 
+        async {
+            try
+                match audiobook.State.DownloadedFolder with
+                | None -> 
+                    return Error (Translations.current.ErrorRemoveAudioBook)
+                | Some folder ->
+                    Directory.Delete(folder,true)
+                    let! res = deleteAudioBookFileInfo audiobook.Id
+                    return res
+            with
+            | _ as e -> 
+                return Error (e.Message)
+        }
 
     
     let parseDownloadFolderForAlreadyDownloadedAudioBooks () =
@@ -814,7 +980,7 @@ module Files =
                     |> List.map (
                         fun i ->
                             use tfile = TagLib.File.Create(i)
-                            (i,tfile.Properties.Duration |> fromTimeSpan)
+                            { FileName = i; Duration = tfile.Properties.Duration |> fromTimeSpan }
                     )
                 )
 
@@ -1305,6 +1471,20 @@ module DownloadService =
                                             CurrentDownload = None 
                                             Downloads = state.Downloads |> List.map (fun i -> if i.AudioBook.Id = download.AudioBook.Id then download else i) 
                                         }
+                                    
+                                    // store file infos
+                                    match info.AudioBook.State.DownloadedFolder with
+                                    | None ->
+                                        ()
+                                    | Some folder ->
+                                        let! files = Files.getMp3FileList folder
+                                        let fileInfo = {
+                                            Id = download.AudioBook.Id
+                                            AudioFiles = files |> List.sortBy (fun f -> f.FileName)
+                                        }
+                                        let! _ = DataBase.insertAudioBookFileInfos [| fileInfo |]
+                                        ()
+                                    
 
 
                                     // send info that the download is complete
@@ -1437,12 +1617,14 @@ module DownloadService =
                                     }
 
                                 let! saveResult = DataBase.updateAudioBookInStateFile newAb
-
+                                let newInfo = {
+                                    info with AudioBook = newAb
+                                }
                                 match saveResult with
                                 | Error msg ->
                                     inbox.Post <| DownloadError (ComError.Other msg)
                                 | Ok _ ->
-                                    inbox.Post <| FinishedDownload (info,result)
+                                    inbox.Post <| FinishedDownload (newInfo,result)
                     }
 
 
