@@ -361,8 +361,11 @@
                     match newState.TimeUntilSleep with
                     | None ->
                         newState
-                    | Some _ ->                            
-                        inbox |> PostWithDelay DecreaseSleepTimer 1000
+                    | Some _ ->
+                        // if there was no previous time set for sleep
+                        // than start running with the decrease timer loop
+                        if state.TimeUntilSleep = None then
+                            inbox |> PostWithDelay DecreaseSleepTimer 1000
                         newState
                    
 
