@@ -8,6 +8,7 @@
     open Services
     open Global
     open System
+    open System.IO
 
 
     type DownloadState =
@@ -27,6 +28,7 @@
         AudioBook: AudioBook
         DownloadState: DownloadState
         ListenState: ListenState
+        AudioFileInfos:AudioBookAudioFilesInfo option
     }
 
 
@@ -128,7 +130,7 @@
 
         let deleteAudiobook (model:Model) =
             async {
-                match DataBase.removeAudiobook model.AudioBook with
+                match! DataBase.removeAudiobook model.AudioBook with
                 | Error e ->
                     do! Common.Helpers.displayAlert(Translations.current.ErrorRemoveAudioBook,e,"OK")
                     return None
@@ -157,6 +159,7 @@
                 | true, _           -> Listend
                 | false, Some pos   -> InProgress pos
                 | false, None       -> Unlistend
+            AudioFileInfos = Services.DataBase.getAudioBookFileInfoTimeout 100 audiobook.Id
         }
 
 
@@ -253,6 +256,37 @@
             let newModel = {model with AudioBook = newAudioBook; ListenState = Unlistend }
             newModel, newModel |> Commands.updateAudiobookInStateFile
         
+    let audioBookDuration model =
+        model.AudioFileInfos
+        |> Option.map (fun fileInfo ->
+            fileInfo.AudioFiles |> List.sumBy (fun i -> i.Duration)
+        )
+        |> Option.defaultValue 0
+
+    let percentageFinished (model: Model) =
+        if model.DownloadState <> Downloaded then
+            0
+        else
+            match model.AudioFileInfos, model.AudioBook.State.CurrentPosition with
+            | Some fileInfo, Some position ->
+
+                let audioBookDuration = fileInfo.AudioFiles |> List.sumBy (fun i -> i.Duration) |> float  
+
+                let trackIndex =
+                    fileInfo.AudioFiles
+                    |> List.tryFindIndex (fun i -> i.FileName = position.Filename)
+                    |> Option.defaultValue 0
+
+                let durationUntilCurrentTrack =
+                    fileInfo.AudioFiles
+                    |> List.take trackIndex
+                    |> List.sumBy (fun i -> i.Duration)
+
+                let currentTimeInMs = position.Position.TotalMilliseconds + (durationUntilCurrentTrack |> float)
+
+                (currentTimeInMs / audioBookDuration * 100.0) |> int
+            | _ ->
+                0
 
     let view (model: Model) dispatch =
         View.Grid(
@@ -295,6 +329,18 @@
                             | Downloaded ->
                                 Controls.playerSymbolLabel.Column(1).Row(1)
 
+                            let percentage = percentageFinished model 
+                            if percentage <= 100 then
+                                View.Grid(
+                                    coldefs = [ Dimension.Stars (percentage |> float) ; Stars ((100 - percentage) |> float) ],
+                                    children = [
+                                        View.BoxView(color=Color.LightGreen, opacity = 0.4).Column(0)
+                                    ]
+                                ).ColumnSpan(3).Row(2)
+                            else
+                                let a = percentage
+                                let b =1
+                                ()
 
                             match model.ListenState with
                             | Unlistend ->

@@ -361,8 +361,11 @@
                     match newState.TimeUntilSleep with
                     | None ->
                         newState
-                    | Some _ ->                            
-                        inbox |> PostWithDelay DecreaseSleepTimer 1000
+                    | Some _ ->
+                        // if there was no previous time set for sleep
+                        // than start running with the decrease timer loop
+                        if state.TimeUntilSleep = None then
+                            inbox |> PostWithDelay DecreaseSleepTimer 1000
                         newState
                    
 
@@ -632,16 +635,6 @@
                                         res |> onStartPlayer filename pos
                                     )
                                 newState
-                                //let newState = newState |> onStartPlayer filename pos
-                                //let (file,durationPrevTrack) = (state.CurrentTrackNumber - 2) |> Helpers.getFileFromIndex state.Mp3FileList
-                                //// are we already on the first track
-                                //if file = state.Filename then 
-                                //    (state |> setPosOnCurrentTrack 0) |> async.Return
-                                //else
-                                //    // wenn track wechsel, dann min 5 sek abstand.
-                                //    let pos = if pos > -5000 then -5000 else pos
-                                //    let posPrevTrack = durationPrevTrack + pos
-                                //    state |> onMovePreviousTrack posPrevTrack
                             | _ ->
                                let newState = {state with Position = pos}
                                newState |> audioService.SetPosition 

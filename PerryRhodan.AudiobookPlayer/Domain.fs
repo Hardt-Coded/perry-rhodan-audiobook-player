@@ -52,6 +52,17 @@ type AudioBookListType =
     | AudioBookList of string * AudioBook[]
 
 
+type AudioBookAudioFile = {
+    FileName:string
+    Duration:int
+}
+
+type AudioBookAudioFilesInfo = {
+    Id: int
+    AudioFiles: AudioBookAudioFile list
+}
+
+
 
 module Helpers =
 
