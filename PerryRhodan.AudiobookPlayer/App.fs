@@ -59,6 +59,7 @@ module App =
         | AudioBookItemsChanged of AudioBookItemNew.AudioBookItem []
         | AudioBookItemMsg of (AudioBookItemNew.Model * AudioBookItemNew.Msg)
         | AudioBookItemsUpdated
+        | UpdateAudioBookItemFromAudioBook of AudioBook
 
         | AskForAppPermission
         | MainPageMsg of MainPage.Msg 
@@ -299,6 +300,53 @@ module App =
 
             |> Cmd.ofSub
 
+
+        let createAudioBookFileListIfNecessayCmd model : Cmd<Msg> =
+            fun dispatch  ->
+                async {
+                    let! audioBooksWithFileInfo =
+                        model.AudioBookItems
+                        |> Array.filter (fun i -> i.Model.DownloadState = AudioBookItemNew.Downloaded)
+                        |> Array.map (fun i -> 
+                            async { 
+                                let! files = Services.DataBase.getAudioBookFileInfo i.Model.AudioBook.Id
+                                return (i,files) 
+                            } 
+                        )
+                        |> Async.Sequential
+                        
+                    let! audioFileInfos =
+                        audioBooksWithFileInfo
+                        |> Array.filter (fun (i,files) -> files.IsNone)
+                        |> Array.map (fun (i,_) ->
+                            async {
+                                match i.Model.AudioBook.State.DownloadedFolder with
+                                | None ->
+                                    return None
+                                | Some folder ->
+                                    let! files = 
+                                        Services.Files.getMp3FileList folder
+
+                                    let fileInfo = {
+                                        Id = i.Model.AudioBook.Id
+                                        AudioFiles = files |> List.sortBy (fun f -> f.FileName)
+                                    }   
+                                    return Some fileInfo
+                            }
+                        )
+                        |> Async.Sequential
+
+                    let! res = Services.DataBase.insertAudioBookFileInfos (audioFileInfos |> Array.choose id)
+
+                    match res with
+                    | Error e ->
+                        do! Common.Helpers.displayAlert ("Fehler!","Beim erstellen den AduiFile-Liste ist ein Fehler aufgetreten.","OK!")
+                    | Ok _ ->
+                        ()
+                }
+                |> Async.Start
+
+            |> Cmd.ofSub
 
         
 
@@ -704,6 +752,7 @@ module App =
                     checkDownloadServiceCmd
                     Commands.synchonizeCurrentAudiobooksWithDeviceCmd newModel
                     Commands.displayLatestInfoMessageCmd
+                    Commands.createAudioBookFileListIfNecessayCmd newModel
                 ]
 
             newModel, cmds
@@ -745,6 +794,25 @@ module App =
 
             newModel, cmds
 
+        | UpdateAudioBookItemFromAudioBook audioBook ->
+            let cmd =
+                fun dispatch ->
+                    let newItems = 
+                        model.AudioBookItems
+                        |> Array.map (fun i ->
+                            if i.Model.AudioBook.Id = audioBook.Id then
+                                let mdl = AudioBookItemNew.init audioBook
+                                AudioBookItemHelper.createAudioBookItem dispatch mdl
+                            else
+                                i
+                        
+                        )
+                    dispatch <| AudioBookItemsChanged newItems
+
+                |> Cmd.ofSub
+            model, cmd
+            
+
 
         | AudioBookItemMsg (abModel, AudioBookItemNew.AddToDownloadQueue) ->
             let (model,cmd) =
@@ -773,6 +841,18 @@ module App =
         | AudioBookItemMsg (abModel, AudioBookItemNew.OpenAudioBookPlayer) ->
             let cmd = Cmd.ofMsg <| GotoAudioPlayerPage abModel.AudioBook
             model, cmd
+
+        | AudioBookItemMsg (abModel, AudioBookItemNew.DownloadCompleted result) ->
+            let (model,cmd) =
+                model |> onProcessAudioBookItemMsg (abModel, AudioBookItemNew.DownloadCompleted result)
+            let (newAbMdl,_) = AudioBookItemNew.update (AudioBookItemNew.DownloadCompleted result) abModel
+            let cmds = 
+                Cmd.batch [
+                    cmd
+                    // update all audiobook Items after download
+                    Cmd.ofMsg <| UpdateAudioBookItemFromAudioBook newAbMdl.AudioBook
+                ]
+            model, cmds
 
         | AudioBookItemMsg msg ->
             model |> onProcessAudioBookItemMsg msg
@@ -825,8 +905,34 @@ module App =
             { model with BrowserPageModels = newModels }, Cmd.none
 
 
+        | AudioPlayerPageMsg (AudioPlayerPage.UpdatePostion (filename, position, duration)) ->
+            match model.AudioPlayerPageModel with
+            | None ->
+                model, Cmd.none
+            | Some apModel ->
+                
+                let newAudioBook = {
+                    apModel.AudioBook with 
+                        State = {
+                            apModel.AudioBook.State with
+                                CurrentPosition = Some {
+                                    Filename = filename
+                                    Position = position |> float |> System.TimeSpan.FromMilliseconds
+                                }
+                        }
+                }
+
+                let cmds = [
+                    Cmd.ofMsg <| UpdateAudioBookItemFromAudioBook newAudioBook
+                ]
+
+                model |> onProcessAudioPlayerMsg cmds (AudioPlayerPage.UpdatePostion (filename, position, duration))
+
         | AudioPlayerPageMsg msg ->
-            model |> onProcessAudioPlayerMsg msg
+            model |> onProcessAudioPlayerMsg [] msg
+
+
+
         | AudioBookDetailPageMsg msg ->
             model |> onProcessAudioBookDetailPageMsg msg
         | SettingsPageMsg (SettingsPage.DeleteDatabase) ->
@@ -947,10 +1053,10 @@ module App =
                 )
 
             let cmds =
-                Cmd.batch [
+                [
                     cmd
                     Cmd.ofMsg AudioBookItemsUpdated
-                ]
+                ] |> Cmd.batch
 
             { model with AudioBookItems = audioBooks }, cmds
     
@@ -996,24 +1102,7 @@ module App =
         | None -> model, Cmd.none   
 
 
-    //and browserExternalMsgToCommand externalMsg =
-    //    match externalMsg with
-    //    | None -> Cmd.none
-    //    | Some excmd -> 
-    //        match excmd with
-    //        | BrowserPage.ExternalMsg.OpenLoginPage cameFrom ->
-    //            Cmd.ofMsg (GotoLoginPage cameFrom)
-    //        | BrowserPage.ExternalMsg.OpenAudioBookPlayer ab ->
-    //            Cmd.ofMsg (GotoAudioPlayerPage ab)
-    //        | BrowserPage.ExternalMsg.UpdateAudioBookGlobal (ab,cameFrom) ->
-    //            Cmd.ofMsg (UpdateAudioBook (ab,cameFrom))
-    //        | BrowserPage.ExternalMsg.OpenAudioBookDetail ab ->
-    //            Cmd.ofMsg (OpenAudioBookDetailPage ab)
-    //        | BrowserPage.ExternalMsg.DownloadQueueMsg dqMsg ->
-    //            Cmd.ofMsg (DownloadQueueMsg dqMsg)
-    //        | BrowserPage.ExternalMsg.StartDownloadQueue ->
-    //            Cmd.ofMsg (DownloadQueueMsg DownloadQueue.Msg.StartProcessing)
-        
+   
 
     and onProcessBrowserPageMsg (groups, msg) model =
 
@@ -1036,22 +1125,20 @@ module App =
             {model with BrowserPageModels = models}, cmd
 
 
-    and onProcessAudioPlayerMsg msg model =
-
-        let audioPlayerExternalMsgToCommand externalMsg =
-            match externalMsg with
-            | None -> Cmd.none
-            | Some excmd -> 
-                Cmd.none    
+    and onProcessAudioPlayerMsg additionalCmds msg model =
 
         match model.AudioPlayerPageModel with
         | Some audioPlayerPageModel ->
-            let m,cmd,externalMsg = AudioPlayerPage.update msg audioPlayerPageModel
+            let m,cmd = AudioPlayerPage.update msg audioPlayerPageModel
 
-            let externalCmds = 
-                externalMsg |> audioPlayerExternalMsgToCommand
+            let cmds = 
+                [
+                    Cmd.map AudioPlayerPageMsg cmd
+                    Cmd.ofMsg AudioBookItemsUpdated
+                ] @ additionalCmds 
+                |> Cmd.batch
 
-            {model with AudioPlayerPageModel = Some m}, Cmd.batch [(Cmd.map AudioPlayerPageMsg cmd); externalCmds]
+            {model with AudioPlayerPageModel = Some m}, cmds
 
         | None -> model, Cmd.none
 
@@ -1582,21 +1669,21 @@ type MainApp () as app =
     do 
         AppCenter.Start(sprintf "ios=(...);android=%s" Global.appcenterAndroidId, typeof<Analytics>, typeof<Crashes>)
         // Display Error when somthing is with the storage processor
-        if not Services.DataBase.storageProcessorErrorEvent.HasListeners then
-            Services.DataBase.Events.storageProcessorOnError.Add(fun e ->
-                async {
-                    let message = 
-                        sprintf "Es ist ein Fehler mit der Datenbank aufgetreten. (%s). Das Programm wird jetzt beendet. Versuchen Sie es noch einmal oder melden Sie sich bin Support." e.Message
+        //if not Services.DataBase.storageProcessorErrorEvent.HasListeners then
+        //    Services.DataBase.Events.storageProcessorOnError.Add(fun e ->
+        //        async {
+        //            let message = 
+        //                sprintf "Es ist ein Fehler mit der Datenbank aufgetreten. (%s). Das Programm wird jetzt beendet. Versuchen Sie es noch einmal oder melden Sie sich bin Support." e.Message
 
-                    do! Common.Helpers.displayAlert(Translations.current.Error,message, "OK") 
-                    try
-                        Process.GetCurrentProcess().CloseMainWindow() |> ignore
-                    with
-                    | _ as ex ->
-                        Crashes.TrackError ex
-                    return ()
-                } |> Async.StartImmediate
-            )
+        //            do! Common.Helpers.displayAlert(Translations.current.Error,message, "OK") 
+        //            try
+        //                Process.GetCurrentProcess().CloseMainWindow() |> ignore
+        //            with
+        //            | _ as ex ->
+        //                Crashes.TrackError ex
+        //            return ()
+        //        } |> Async.StartImmediate
+        //    )
         
 
     
