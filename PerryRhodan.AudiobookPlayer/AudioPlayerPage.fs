@@ -643,26 +643,34 @@ open AudioPlayer
 
 
     let getPositionAudioBookTotal (model:Model) =
-        let totalDuration =
-            model.AudioFileList
-            |> List.sumBy (snd)
+        if model.AudioFileList = [] || model.CurrentAudioFileIndex < 0 then
+            {| Total = 0; CurrentPos = 0; Rest = 0 |}
+        else
+            let totalDuration =
+                model.AudioFileList
+                |> List.sumBy (snd)
 
-        let durationUntilCurrentTrack =
-            model.AudioFileList
-            |> List.take model.CurrentAudioFileIndex
-            |> List.sumBy (snd)
+            let durationUntilCurrentTrack =
+                model.AudioFileList
+                |> List.take model.CurrentAudioFileIndex
+                |> List.sumBy (snd)
 
-        let currentPos = (model.CurrentPositionMs |> Option.defaultValue 0)
+            let currentPos = (model.CurrentPositionMs |> Option.defaultValue 0)
 
-        let currentTimeInMs = currentPos + durationUntilCurrentTrack
+            let currentTimeInMs = currentPos + durationUntilCurrentTrack
 
-        {| Total = totalDuration; CurrentPos = currentTimeInMs; Rest = totalDuration - currentTimeInMs |}
+            {| Total = totalDuration; CurrentPos = currentTimeInMs; Rest = totalDuration - currentTimeInMs |}
 
 
     let getMinutesAndSeconds ms =
         let ts = TimeSpan.FromMilliseconds(ms |> float)
         let minutes = Math.Floor(ts.TotalMinutes) |> int
         minutes, ts.Seconds
+
+    let getHoursAndMinutes ms =
+        let ts = TimeSpan.FromMilliseconds(ms |> float)
+        let minutes = Math.Floor(ts.TotalHours) |> int
+        minutes, ts.Minutes
 
     let view (model: Model) dispatch =
         
@@ -710,8 +718,8 @@ open AudioPlayer
                     )
                     
                     let totalTimes = getPositionAudioBookTotal model
-                    let (m,s) = totalTimes.Rest |> getMinutesAndSeconds
-                    let restStr = sprintf "insgesamt noch %i min %i sek übrig" m s
+                    let (m,s) = totalTimes.Rest |> getHoursAndMinutes
+                    let restStr = sprintf "insgesamt noch %i h %i min übrig" m s
 
                     yield dependsOn 
                         (title,currentTrackString,currentTimeString,restStr) 
@@ -844,8 +852,8 @@ open AudioPlayer
 
                         if not model.IsLoading then
                             let totalTimes = getPositionAudioBookTotal model
-                            let (m,s) = totalTimes.Rest |> getMinutesAndSeconds
-                            let restStr = sprintf "insgesamt noch %i min %i sek übrig" m s
+                            let (m,s) = totalTimes.Rest |> getHoursAndMinutes
+                            let restStr = sprintf "insgesamt noch %i h %i min übrig" m s
                             (Controls.primaryTextColorLabel 12. restStr)
                                 .Column(0)
                                 .Row(1)

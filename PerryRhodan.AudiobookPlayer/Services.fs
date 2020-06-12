@@ -124,16 +124,10 @@ module DataBase =
         use db = new LiteDatabase(audioBooksStateDataFile, mapper)
         let audioBooks = db.GetCollection<AudioBook>("audiobooks")
 
-        let query = Query.Where("Id", (fun name -> name.AsInt32 = audioBook.Id))
-        let check = audioBooks.Find(query)
-
         let res = 
-            if check |> Seq.length > 0 then               
-                audioBooks.Delete(query)
-            else
-                -1
+            audioBooks.Delete(fun x -> x.Id = audioBook.Id)
 
-        if  res > -1
+        if res > -1
         then (Ok ())
         else (Error Translations.current.ErrorDbWriteAccess)
 
@@ -141,6 +135,8 @@ module DataBase =
     let private deleteDatabase () =
         use db = new LiteDatabase(audioBooksStateDataFile, mapper)
         let _result = db.DropCollection("audiobooks")
+        use db2 = new LiteDatabase(audioBookAudioFileDb, mapper)
+        let _result = db.DropCollection("audiobookfileinfos")
         ()
 
 
@@ -202,14 +198,8 @@ module DataBase =
             use db = new LiteDatabase(audioBookAudioFileDb, mapper)
             let audioBooks = db.GetCollection<AudioBookAudioFilesInfo>("audiobookfileinfos")
 
-            let query = Query.Where("AudioBookId", (fun name -> name.AsInt32 = audioFileInfo.Id))
-            let check = audioBooks.Find(query)
-
             let res = 
-                if check |> Seq.length > 0 then               
-                    audioBooks.Delete(query)
-                else
-                    -1
+                audioBooks.Delete(fun x -> x.Id = audioFileInfo.Id)
 
             if  res > -1
             then (Ok ())
@@ -321,6 +311,13 @@ module DataBase =
                                     return! loop state
 
                                 | InsertAudioBookFileInfos (infos,replyChannel) ->
+                                    
+                                    // remove already saved
+                                    let infos =
+                                        infos
+                                        |> Array.filter (fun i -> state.AudioBookAudioFilesInfos |> Array.exists (fun x -> x.Id = i.Id) |> not)
+                                        |> Array.filter (fun i -> i.AudioFiles.Length > 0)
+
                                     let newState =
                                         {
                                             state with
@@ -376,6 +373,7 @@ module DataBase =
 
                                     match info with
                                     | None ->
+                                        replyChannel.Reply(Ok())
                                         return! loop state
                                     | Some info ->
                                         let res = AudioBookFiles.deleteAudioBookInfoFromDb info 
@@ -388,6 +386,9 @@ module DataBase =
                             }
                         
                         return! (loop initState)
+
+                        let weschoulndenduphere = 0
+                        ()
                     with
                     | _ as ex ->
                         //storageProcessorErrorEvent.Trigger(ex)
@@ -446,7 +447,8 @@ module DataBase =
     let getAudioBookFileInfoTimeout timeout id =
         let msg replyChannel = 
             GetAudioBookFileInfo (id,replyChannel)
-        storageProcessor.Force().PostAndReply(msg,timeout)
+        storageProcessor.Force().TryPostAndReply(msg,timeout)
+        |> Option.bind (fun i -> i)
         
     let insertAudioBookFileInfos infos =
         let msg replyChannel = 
@@ -501,7 +503,9 @@ module DataBase =
                         let hasAudioBook =
                             if Directory.Exists(audioPath) then
                                 let audioFiles = Directory.EnumerateFiles(audioPath,"*.mp3")
-                                (audioFiles |> Seq.length) > 0
+                                let downloadingFlagFile = Path.Combine(audioPath,"downloading")
+                                let hasCorruptDownloadingFlagFile = File.Exists(downloadingFlagFile)
+                                (audioFiles |> Seq.length) > 0 && not hasCorruptDownloadingFlagFile
                             else false
                         let audioBookPath = if hasAudioBook then Some audioPath else None
                         Some (audioBookName, pic, thumb, hasAudioBook, audioBookPath)
@@ -796,6 +800,8 @@ module WebAccess =
 
                             | Ok url -> 
                                 try
+                                    
+
                                     let! resp = Http.AsyncRequestStream(url,httpMethod=HttpMethod.Get)
 
                                     if (resp.StatusCode <> 200) then 
@@ -803,8 +809,17 @@ module WebAccess =
                                     else
                                 
                                         let unzipTargetFolder = Path.Combine(audioBookFolder,"audio")
+                                        
+
+
                                         if not (Directory.Exists(unzipTargetFolder)) then
                                             Directory.CreateDirectory(unzipTargetFolder) |> ignore
+
+
+                                        let downloadingFlagFile = Path.Combine(unzipTargetFolder,"downloading")
+                                        // create flag file, to determinate download was maybe interrupted!
+                                        File.WriteAllText(downloadingFlagFile,"downloading")
+
                                 
                                         let fileSize = 
                                             (resp.Headers
@@ -858,6 +873,9 @@ module WebAccess =
                                             if File.Exists(imageFullName) && File.Exists(thumbFullName) then
                                                 Some <| { Image = imageFullName; Thumbnail = thumbFullName }
                                             else None
+
+                                        // delete downloading flag file
+                                        File.Delete(downloadingFlagFile)
 
                                         return Ok {
                                             TargetFolder = unzipTargetFolder
@@ -970,7 +988,11 @@ module Files =
         async {
             let! files = 
                 asyncFunc( 
-                    fun () ->  Directory.EnumerateFiles(folder, "*.mp3")
+                    fun () ->  
+                        try
+                            Directory.EnumerateFiles(folder, "*.mp3")
+                        with
+                        | _ -> Seq.empty
                 )
             
             let! res =

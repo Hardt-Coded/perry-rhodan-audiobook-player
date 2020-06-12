@@ -842,6 +842,18 @@ module App =
             let cmd = Cmd.ofMsg <| GotoAudioPlayerPage abModel.AudioBook
             model, cmd
 
+        | AudioBookItemMsg (abModel, AudioBookItemNew.DownloadCompleted result) ->
+            let (model,cmd) =
+                model |> onProcessAudioBookItemMsg (abModel, AudioBookItemNew.DownloadCompleted result)
+            let (newAbMdl,_) = AudioBookItemNew.update (AudioBookItemNew.DownloadCompleted result) abModel
+            let cmds = 
+                Cmd.batch [
+                    cmd
+                    // update all audiobook Items after download
+                    Cmd.ofMsg <| UpdateAudioBookItemFromAudioBook newAbMdl.AudioBook
+                ]
+            model, cmds
+
         | AudioBookItemMsg msg ->
             model |> onProcessAudioBookItemMsg msg
 
@@ -1041,10 +1053,10 @@ module App =
                 )
 
             let cmds =
-                Cmd.batch [
+                [
                     cmd
                     Cmd.ofMsg AudioBookItemsUpdated
-                ]
+                ] |> Cmd.batch
 
             { model with AudioBookItems = audioBooks }, cmds
     
