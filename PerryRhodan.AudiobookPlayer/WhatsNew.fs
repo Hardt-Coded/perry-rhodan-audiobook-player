@@ -8,7 +8,7 @@ open Fabulous
     module Text =
 
         let messages = [
-            ("2020.06.06-dsdfe",
+            ("13.06.2020",
                 """
 Hallo Liebe Mitfans =)
 
