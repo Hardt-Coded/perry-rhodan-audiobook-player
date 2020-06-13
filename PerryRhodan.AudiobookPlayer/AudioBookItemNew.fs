@@ -265,7 +265,7 @@
 
     let percentageFinished (model: Model) =
         if model.DownloadState <> Downloaded then
-            0
+            None
         else
             match model.AudioFileInfos, model.AudioBook.State.CurrentPosition with
             | Some fileInfo, Some position ->
@@ -284,9 +284,146 @@
 
                 let currentTimeInMs = position.Position.TotalMilliseconds + (durationUntilCurrentTrack |> float)
 
-                (currentTimeInMs / audioBookDuration * 100.0) |> int
+                Some (currentTimeInMs / audioBookDuration)
             | _ ->
-                0
+                None
+
+    module Draw =
+
+        open global.SkiaSharp
+        open global.SkiaSharp.Views.Forms
+
+        let loadingPie factor =
+            let f32 = float32
+            Fabulous.XamarinForms.SkiaSharp.View.SKCanvasView(
+                invalidate = true,
+                margin = Thickness(5.),                 
+                paintSurface = 
+                    fun args ->
+                        let info = args.Info
+                        let surface = args.Surface
+                        let canvas = surface.Canvas
+                        canvas.Clear()
+
+                        let center = new SKPoint((info.Width |> f32) / 2.0f, (info.Height |> f32) / 2.0f);
+                        let explodeOffset = 0;
+                        let margin = 20;
+                        let radius = (Math.Min(info.Width / 2, info.Height  / 2) - (2 * explodeOffset + 2 * margin)) |> f32
+                        let rect = new SKRect(center.X - radius, center.Y - radius, center.X + radius, center.Y + radius);
+
+                        let drawPie transparent (color:Color) startAngle sweepAngle =
+                            use path = new SKPath()
+                            use fillPaint = new SKPaint()
+                            use outlinePaint = new SKPaint()
+                            
+                    
+                            path.MoveTo(center);
+                            path.ArcTo(rect, startAngle, sweepAngle, false);
+                            path.Close();
+
+                            let alphaDiffBase = (factor * 1000.0) |> int
+                            let alphaDiff = alphaDiffBase % 50
+                            let swapIndicator = alphaDiffBase % 100
+                            let multiplicator = if swapIndicator > 50 then -1 else 0
+                            let alpha = (103 + alphaDiff + (alphaDiff * multiplicator)) |> uint8
+
+                            fillPaint.Style <- SKPaintStyle.Fill
+                            fillPaint.Color <- color.ToSKColor().WithAlpha(alpha)
+                            fillPaint.BlendMode <- SKBlendMode.Plus
+                            fillPaint.IsAntialias <- false
+
+                            outlinePaint.Style <- SKPaintStyle.Stroke;
+                            outlinePaint.StrokeWidth <- 6.0f;
+                            outlinePaint.Color <- color.ToSKColor().WithAlpha(alpha)
+                            outlinePaint.IsAntialias <- false
+
+                            
+                            
+                            // Calculate "explode" transform
+                            let angle = startAngle + 0.5f * sweepAngle |> float;
+                            let x = (explodeOffset |> float) * Math.Cos(Math.PI * angle / 180.0) |> float32;
+                            let y = (explodeOffset |> float) * Math.Sin(Math.PI * angle / 180.0) |> float32;
+
+                            canvas.Save() |> ignore
+                            canvas.Translate(x, y);
+
+                            // Fill and stroke the path
+                            if not transparent then
+                                canvas.DrawPath(path, fillPaint);
+                            canvas.DrawPath(path, outlinePaint);
+                            canvas.Restore();
+
+                        use textPaint = new SKPaint()
+                        textPaint.TextSize <- 75.0f
+                        textPaint.Color <- Color.White.ToSKColor()
+                        textPaint.BlendMode <- SKBlendMode.Plus
+                        textPaint.IsAntialias <- false
+                        textPaint.TextAlign <- SKTextAlign.Center
+                        
+                        let text = sprintf "%i %%" ((factor * 100.0) |> int) 
+                        let y = ((info.Height  / 2) |> f32) + (textPaint.TextSize / 2.0f)
+                        canvas.DrawText(text, (info.Width / 2) |> f32,y , textPaint)
+
+                        canvas.ResetMatrix()
+                        
+
+                        let startAngle = -90.0f
+                        let sweepAngle = 
+                            let x = 360.0 * factor |> float32;
+                            if x >= 360.0f then 359.99f else x
+
+                        drawPie false (Color.FromHex("C1272E")) startAngle sweepAngle
+                    )
+
+
+        let progressPie factor =
+            let f32 = float32
+            Fabulous.XamarinForms.SkiaSharp.View.SKCanvasView(
+                automationId="progressPie",
+                invalidate = true,
+                margin=Thickness(4.),
+                width = 20.,
+                height = 20.,
+                paintSurface = 
+                    fun args ->
+                        let info = args.Info
+                        let surface = args.Surface
+                        let canvas = surface.Canvas
+                        canvas.Clear()
+
+
+
+                        let center = new SKPoint((info.Width |> f32) / 2.0f, (info.Height |> f32) / 2.0f);
+                        let margin = 0;
+                        let radius = (Math.Min(info.Width / 2, info.Height  / 2) - (2 * margin)) |> f32
+                        let rect = new SKRect(center.X - radius, center.Y - radius, center.X + radius, center.Y + radius);
+
+                        let drawPie transparent (color:Color) startAngle sweepAngle =
+                            use path = new SKPath()
+                            use fillPaint = new SKPaint()
+                            
+                            path.MoveTo(center);
+                            path.ArcTo(rect, startAngle, sweepAngle, false);
+                            path.Close();
+
+                            fillPaint.Style <- SKPaintStyle.Fill
+                            fillPaint.Color <- color.ToSKColor()
+                            fillPaint.IsAntialias <- false
+                            
+                            canvas.DrawPath(path, fillPaint);
+                           
+                    
+
+                        let startAngle = -90.0f;
+                        let sweepAngle = 
+                            let x = 360.0 * factor |> float32;
+                            if x >= 360.0f then 359.99f else x
+
+                        drawPie false Color.Yellow startAngle sweepAngle
+                    )
+        
+       
+        
 
     let view (model: Model) dispatch =
         View.Grid(
@@ -325,28 +462,29 @@
                             | Queued ->
                                 Controls.inDownloadQueueLabel.Column(1).Row(1)
                             | Downloading (c,a) ->
-                                ((c,a) |> Controls.showDownloadProgress).ColumnSpan(3).Row(2).Column(0)
+                                //((c,a) |> Controls.showDownloadProgress).ColumnSpan(3).Row(2).Column(0)
+                                let factor = (c |> float) / (a |> float)
+                                View.Grid(
+                                    children = [
+                                        Draw.loadingPie factor
+                                    ]
+                                ).ColumnSpan(3).RowSpan(3)
                             | Downloaded ->
                                 Controls.playerSymbolLabel.Column(1).Row(1)
-
-                            let percentage = percentageFinished model 
-                            if percentage <= 100 then
-                                View.Grid(
-                                    coldefs = [ Dimension.Stars (percentage |> float) ; Stars ((100 - percentage) |> float) ],
-                                    children = [
-                                        View.BoxView(color=Color.LightGreen, opacity = 0.4).Column(0)
-                                    ]
-                                ).ColumnSpan(3).Row(2)
-                            else
-                                let a = percentage
-                                let b =1
-                                ()
-
+                            
                             match model.ListenState with
                             | Unlistend ->
                                 ()
                             | InProgress pos ->
-                                ()
+                                match percentageFinished model with
+                                | None -> ()
+                                | Some progress ->
+                                    View.Grid(
+                                        children = [
+                                            (Draw.progressPie progress)
+                                        ]
+                                    ).Column(0).Row(2)
+                                    
                             | Listend ->
                                 Controls.listendCheckLabel.Column(2).Row(2)
                         ]
