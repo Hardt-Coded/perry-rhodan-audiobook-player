@@ -75,6 +75,8 @@ module Helpers =
 
         if (minusIdx > doubleIdx) then
             Regex(@"^([A-Za-z .:-]*[0-9.]*[A-Za-z .:-]*)([0-9]*)( - )([\w\säöüÄÖÜ.:!\-\/]*[\(\)Teil \d]*)(.*)")
+        elif innerText.IndexOf("Episode") > -1 && innerText.IndexOf("Episode") < innerText.IndexOf(":")  then
+            Regex(@"^([A-Za-z .:-]*[0-9.]*[A-Za-z .:-]*)Episode\s*([0-9]*)(: )([\w\säöüÄÖÜ.:!\-\/]*[\(\)Teil \d]*)(.*)")
         else
             Regex(@"^([A-Za-z .-]*)([0-9]*)(:| - )([\w\säöüÄÖÜ.:!\-\/]*[\(\)Teil \d]*)(.*)")
 
@@ -157,10 +159,12 @@ module Helpers =
         |> Option.bind (tryParseInt)
         
     
-    let compansateManually input =
-        input
-        // Perry Rhodan Story Compansation
-        |> regexReplace "\([A-Z ]*\d+\)" ""    
+    let compansateManually (input:string) =
+        if (input.Contains("Perry Rhodan Storys")) then
+            input
+            |> regexReplace "\([A-Z ]*\d+\)" ""
+        else
+            input   
 
 
     type CompansationItem = {
