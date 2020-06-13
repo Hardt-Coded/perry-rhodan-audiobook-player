@@ -419,7 +419,7 @@
                             let x = 360.0 * factor |> float32;
                             if x >= 360.0f then 359.99f else x
 
-                        drawPie false Color.Yellow startAngle sweepAngle
+                        drawPie false Color.DarkCyan startAngle sweepAngle
                     )
         
        
