@@ -285,7 +285,7 @@
 
                 let currentTimeInMs = position.Position.TotalMilliseconds + (durationUntilCurrentTrack |> float)
 
-                Some {| CurrentProgress = currentTimeInMs; TotalDuration = audioBookDuration |}
+                Some {| CurrentProgress = currentTimeInMs; TotalDuration = audioBookDuration; Rest = audioBookDuration - currentTimeInMs |}
             | _ ->
                 None
     
@@ -368,7 +368,7 @@
                         textPaint.TextAlign <- SKTextAlign.Center
                         
                         let text = sprintf "%i %%" ((factor * 100.0) |> int) 
-                        let y = ((info.Height  / 2) |> f32) + (textPaint.TextSize / 2.0f)
+                        let y = ((info.Height  / 2) |> f32) + (textPaint.TextSize / 2.0f) - 15.0f
                         canvas.DrawText(text, (info.Width / 2) |> f32,y , textPaint)
 
                         canvas.ResetMatrix()
@@ -539,7 +539,7 @@
                             | Some totalTimes ->
                                 
 
-                                let (m,s) = totalTimes.CurrentProgress |> getHoursAndMinutes
+                                let (m,s) = totalTimes.Rest |> getHoursAndMinutes
                                 let progressStr = sprintf "insgesamt noch %i h %i min übrig" m s
 
                                 View.Label(text=progressStr, 
