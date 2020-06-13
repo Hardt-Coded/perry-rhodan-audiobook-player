@@ -38,6 +38,8 @@
 		<None Include="repl_stuff.fsx" />
 	</ItemGroup>
 	<ItemGroup>
+		<PackageReference Include="Fabulous.XamarinForms.SkiaSharp" Version="0.54.1" />
+		<PackageReference Include="SkiaSharp.Views.Forms" Version="1.68.3" />
 		<PackageReference Include="Xamarin.Forms" Version="4.6.0.772" />
 		<PackageReference Include="Xamarin.Essentials" Version="1.5.1" />
 		<PackageReference Include="Fabulous.XamarinForms" Version="0.54.1" />
@@ -56,8 +58,8 @@
 		<PackageReference Include="Microsoft.AppCenter.Push" Version="2.1.1" />
 		<PackageReference Include="Plugin.Permissions" Version="3.0.0.12" />
 		<PackageReference Include="SharpZipLib" Version="1.1.0" />
-		<PackageReference Include="SkiaSharp" Version="1.68.0" />
-		<PackageReference Include="System.Memory" Version="4.5.2" />
+		<PackageReference Include="SkiaSharp" Version="1.68.3" />
+		<PackageReference Include="System.Memory" Version="4.5.3" />
 		<PackageReference Include="taglib-sharp-netstandard2.0" Version="2.1.0" />
 		
 	</ItemGroup>
