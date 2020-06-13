@@ -263,7 +263,8 @@
         )
         |> Option.defaultValue 0
 
-    let percentageFinished (model: Model) =
+    
+    let getProgressAndTotalDuration (model:Model) =
         if model.DownloadState <> Downloaded then
             None
         else
@@ -284,9 +285,15 @@
 
                 let currentTimeInMs = position.Position.TotalMilliseconds + (durationUntilCurrentTrack |> float)
 
-                Some (currentTimeInMs / audioBookDuration)
+                Some {| CurrentProgress = currentTimeInMs; TotalDuration = audioBookDuration |}
             | _ ->
                 None
+    
+    let percentageFinished (model: Model) =
+        model
+        |> getProgressAndTotalDuration 
+        |> Option.map (fun x -> (x.CurrentProgress / x.TotalDuration))
+        
 
     module Draw =
 
@@ -398,20 +405,26 @@
                         let radius = (Math.Min(info.Width / 2, info.Height  / 2) - (2 * margin)) |> f32
                         let rect = new SKRect(center.X - radius, center.Y - radius, center.X + radius, center.Y + radius);
 
-                        let drawPie transparent (color:Color) startAngle sweepAngle =
+                        let drawPie (color:Color) startAngle sweepAngle =
                             use path = new SKPath()
                             use fillPaint = new SKPaint()
+                            use outlinePaint = new SKPaint()
                             
                             path.MoveTo(center);
                             path.ArcTo(rect, startAngle, sweepAngle, false);
                             path.Close();
 
-                            fillPaint.Style <- SKPaintStyle.Fill
+                            fillPaint.Style <- SKPaintStyle.StrokeAndFill
                             fillPaint.Color <- color.ToSKColor()
                             fillPaint.IsAntialias <- false
                             
+                            outlinePaint.Style <- SKPaintStyle.Stroke;
+                            outlinePaint.StrokeWidth <- 2.0f;
+                            outlinePaint.Color <- Color.Black.ToSKColor()
+                            outlinePaint.IsAntialias <- false
+
                             canvas.DrawPath(path, fillPaint);
-                           
+                            canvas.DrawPath(path, outlinePaint);
                     
 
                         let startAngle = -90.0f;
@@ -419,11 +432,14 @@
                             let x = 360.0 * factor |> float32;
                             if x >= 360.0f then 359.99f else x
 
-                        drawPie false Color.DarkCyan startAngle sweepAngle
+                        drawPie Color.Yellow startAngle sweepAngle
                     )
         
        
-        
+    let getHoursAndMinutes ms =
+        let ts = TimeSpan.FromMilliseconds(ms |> float)
+        let minutes = Math.Floor(ts.TotalHours) |> int
+        minutes, ts.Minutes   
 
     let view (model: Model) dispatch =
         View.Grid(
@@ -435,13 +451,13 @@
             children = [
                 match model.AudioBook.Thumbnail with
                 | None ->
-                    yield View.Image(source=ImagePath "AudioBookPlaceholder_Dark.png"
+                    View.Image(source=ImagePath "AudioBookPlaceholder_Dark.png"
                         , aspect = Aspect.AspectFit
                         , height=100.
                         , width=100.
                         , margin=Thickness 10.).Column(0).Row(0)
                 | Some thumb ->
-                    yield View.Image(source=ImagePath thumb
+                    View.Image(source=ImagePath thumb
                         , aspect = Aspect.AspectFit
                         , height=100.
                         , width=100.
@@ -449,7 +465,7 @@
                         ).Column(0).Row(0)
                 
                 // audioBook state
-                yield (
+                (
                     View.Grid(
                         backgroundColor = Color.Transparent,
                         margin=Thickness 10.,
@@ -462,7 +478,6 @@
                             | Queued ->
                                 Controls.inDownloadQueueLabel.Column(1).Row(1)
                             | Downloading (c,a) ->
-                                //((c,a) |> Controls.showDownloadProgress).ColumnSpan(3).Row(2).Column(0)
                                 let factor = (c |> float) / (a |> float)
                                 View.Grid(
                                     children = [
@@ -501,16 +516,49 @@
                 
                 ).Column(0).Row(0)
 
-                yield View.Label(text=model.AudioBook.FullName, 
-                    fontSize = FontSize 15., 
-                    verticalOptions = LayoutOptions.Fill, 
+
+
+                View.Grid(
+                    rowdefs = [Auto; Auto],
+                    verticalOptions = LayoutOptions.Center, 
                     horizontalOptions = LayoutOptions.Fill, 
-                    verticalTextAlignment = TextAlignment.Center,
-                    horizontalTextAlignment = TextAlignment.Center,
-                    textColor = Consts.secondaryTextColor,
-                    lineBreakMode = LineBreakMode.WordWrap
-                    ).Column(1).Row(0)
-                yield View.Grid(
+                    children= [
+                        View.Label(text=model.AudioBook.FullName, 
+                            fontSize = FontSize 15., 
+                            verticalOptions = LayoutOptions.Fill, 
+                            horizontalOptions = LayoutOptions.Fill, 
+                            verticalTextAlignment = TextAlignment.Center,
+                            horizontalTextAlignment = TextAlignment.Center,
+                            textColor = Consts.primaryTextColor,
+                            lineBreakMode = LineBreakMode.WordWrap
+                        ).Row(0)
+
+                        match model.ListenState with
+                        | InProgress _ ->
+                            match getProgressAndTotalDuration model with
+                            | Some totalTimes ->
+                                
+
+                                let (m,s) = totalTimes.CurrentProgress |> getHoursAndMinutes
+                                let progressStr = sprintf "insgesamt noch %i h %i min übrig" m s
+
+                                View.Label(text=progressStr, 
+                                    fontSize = FontSize 12., 
+                                    verticalOptions = LayoutOptions.Fill, 
+                                    horizontalOptions = LayoutOptions.Fill, 
+                                    verticalTextAlignment = TextAlignment.Center,
+                                    horizontalTextAlignment = TextAlignment.Center,
+                                    textColor = Consts.secondaryTextColor,
+                                    lineBreakMode = LineBreakMode.WordWrap
+                                ).Row(1)
+                            | None ->
+                                ()
+                        | _ ->
+                            ()
+                    ]
+                ).Column(1).Row(0)
+
+                View.Grid(
                     verticalOptions = LayoutOptions.Fill, 
                     horizontalOptions = LayoutOptions.Fill,
                     gestureRecognizers = [
