@@ -28,7 +28,7 @@
     <RestorePackages>true</RestorePackages>
     <OtherFlags>/warnon:1182</OtherFlags>
     <WarningLevel>4</WarningLevel>
-    <SelectedDevice>android_accelerated_x64_90</SelectedDevice>
+    <SelectedDevice>pixel_2_oreo_8_0_-_api_26</SelectedDevice>
     <DefaultDevice>android_accelerated_x64_90</DefaultDevice>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
