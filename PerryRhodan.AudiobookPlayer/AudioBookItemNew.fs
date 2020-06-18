@@ -464,8 +464,6 @@
                         , margin=Thickness 10.
                         ).Column(0).Row(0)
                 
-                // audioBook state
-                (
                     View.Grid(
                         backgroundColor = Color.Transparent,
                         margin=Thickness 10.,
@@ -512,14 +510,12 @@
                                     )
                                 )
                         ]
-                    )
-                
-                ).Column(0).Row(0)
+                    ).Column(0).Row(0)
 
 
 
                 View.Grid(
-                    rowdefs = [Auto; Auto],
+                    rowdefs = [Star; Auto; Auto; Star],
                     verticalOptions = LayoutOptions.Center, 
                     horizontalOptions = LayoutOptions.Fill, 
                     children= [
@@ -531,7 +527,7 @@
                             horizontalTextAlignment = TextAlignment.Center,
                             textColor = Consts.primaryTextColor,
                             lineBreakMode = LineBreakMode.WordWrap
-                        ).Row(0)
+                        ).Row(1)
 
                         match model.ListenState with
                         | InProgress _ ->
@@ -543,14 +539,14 @@
                                 let progressStr = sprintf "insgesamt noch %i h %i min übrig" m s
 
                                 View.Label(text=progressStr, 
-                                    fontSize = FontSize 12., 
+                                    fontSize = FontSize 11., 
                                     verticalOptions = LayoutOptions.Fill, 
                                     horizontalOptions = LayoutOptions.Fill, 
                                     verticalTextAlignment = TextAlignment.Center,
                                     horizontalTextAlignment = TextAlignment.Center,
                                     textColor = Consts.secondaryTextColor,
                                     lineBreakMode = LineBreakMode.WordWrap
-                                ).Row(1)
+                                ).Row(2)
                             | None ->
                                 ()
                         | _ ->
