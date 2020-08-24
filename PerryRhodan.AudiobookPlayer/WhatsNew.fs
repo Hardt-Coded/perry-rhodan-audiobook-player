@@ -8,6 +8,29 @@ open Fabulous
     module Text =
 
         let messages = [
+
+            ("24.08.2020",
+            """
+Hallo Liebe Mitfans,
+
+Was gibts neues in dieser Version?
+
+- den Einschränkungen von Android 10 sind erstmal Genüge getan
+
+- Download-Fortschitt wird jetzt richtig in der App angezeigt (Prozent in der Kachel)
+
+- Bei Android 10 Geräten, wird in der Sperrscreen-Ansicht der Fortschritt nach Android 10 Art, angezeigt (Danke Thomas)
+
+
+Außerdem möchte ich her auch nochmal Peter danken, der, wenn es Probleme mit der App gibt, für mich als Tester bereit steht.
+
+
+Über Anregungen und Feedback würde ich mich freuen. Unter "Support-Feedback" in den Optionen oder direkt an info@hardt-solutions.de.
+
+Über eine Bewertung würde ich mich freuen.
+            """
+            )
+
             ("13.06.2020",
                 """
 Hallo Liebe Mitfans =)
