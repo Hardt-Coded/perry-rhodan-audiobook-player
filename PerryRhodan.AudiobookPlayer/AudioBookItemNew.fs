@@ -451,13 +451,13 @@
             children = [
                 match model.AudioBook.Thumbnail with
                 | None ->
-                    View.Image(source=ImagePath "AudioBookPlaceholder_Dark.png"
+                    View.Image(source=Image.fromPath "AudioBookPlaceholder_Dark.png"
                         , aspect = Aspect.AspectFit
                         , height=100.
                         , width=100.
                         , margin=Thickness 10.).Column(0).Row(0)
                 | Some thumb ->
-                    View.Image(source=ImagePath thumb
+                    View.Image(source=Image.fromPath thumb
                         , aspect = Aspect.AspectFit
                         , height=100.
                         , width=100.
@@ -520,7 +520,7 @@
                     horizontalOptions = LayoutOptions.Fill, 
                     children= [
                         View.Label(text=model.AudioBook.FullName, 
-                            fontSize = FontSize 15., 
+                            fontSize = FontSize.fromValue 15., 
                             verticalOptions = LayoutOptions.Fill, 
                             horizontalOptions = LayoutOptions.Fill, 
                             verticalTextAlignment = TextAlignment.Center,
@@ -539,7 +539,7 @@
                                 let progressStr = sprintf "insgesamt noch %i h %i min übrig" m s
 
                                 View.Label(text=progressStr, 
-                                    fontSize = FontSize 11., 
+                                    fontSize = FontSize.fromValue 11., 
                                     verticalOptions = LayoutOptions.Fill, 
                                     horizontalOptions = LayoutOptions.Fill, 
                                     verticalTextAlignment = TextAlignment.Center,
@@ -562,7 +562,7 @@
                     ],
                     children = [
                         View.Label(text="\uf142",fontFamily = Controls.faFontFamilyName true,
-                            fontSize=FontSize 35., 
+                            fontSize=FontSize.fromValue 35., 
                             margin = Thickness(10., 0. ,10. ,0.),                    
                             verticalOptions = LayoutOptions.Fill, 
                             horizontalOptions = LayoutOptions.Fill, 

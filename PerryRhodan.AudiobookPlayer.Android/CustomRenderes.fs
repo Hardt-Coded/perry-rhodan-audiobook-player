@@ -6,7 +6,6 @@ open Android.OS
 open Android.Runtime
 open Android.Views
 open Android.Widget
-open Android.Support.Design.Widget
 open Xamarin.Forms.Platform.Android
 
 module CustomRender =

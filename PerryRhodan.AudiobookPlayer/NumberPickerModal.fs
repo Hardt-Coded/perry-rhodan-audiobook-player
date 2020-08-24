@@ -47,7 +47,7 @@ let view model (dispatch:Msg->unit) =
                     
                 View.Picker(items=(model.Range |> List.map (string)),
                 
-                    fontSize=FontSize Common.FontSizeHelper.largePicker,
+                    fontSize=FontSize.fromValue Common.FontSizeHelper.largePicker,
                     selectedIndex=(model.Range |> List.tryFindIndex (fun x-> x=model.Value) |> Option.defaultValue 0),
                     selectedIndexChanged=(
                         fun (idx,e) -> 

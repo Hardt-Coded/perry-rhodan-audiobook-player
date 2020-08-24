@@ -31,7 +31,7 @@ let view (model:Model) =
                     orientation = StackOrientation.Vertical,
                     children = [
                         View.Label(text="aktuelle Downloads", fontAttributes = FontAttributes.Bold,
-                            fontSize=FontSize 25.,
+                            fontSize=FontSize.fromValue 25.,
                             verticalOptions=LayoutOptions.Fill,
                             horizontalOptions=LayoutOptions.Fill,
                             horizontalTextAlignment=TextAlignment.Center,

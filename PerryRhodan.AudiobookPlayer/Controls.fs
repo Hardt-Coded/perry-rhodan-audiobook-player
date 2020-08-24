@@ -61,7 +61,7 @@ let audioBookEntryActionSheet
 let listendCheckLabel = 
     View.Label(text="\uf058",
         fontFamily=faFontFamilyName true,
-        fontSize=FontSize 25.,
+        fontSize=FontSize.fromValue 25.,
         textColor=Color.White,
         verticalOptions = LayoutOptions.Fill, 
         horizontalOptions = LayoutOptions.Fill, 
@@ -72,7 +72,7 @@ let listendCheckLabel =
 let arrowDownLabel = 
     View.Label(text="\uf358",
         fontFamily=faFontFamilyName false,
-        fontSize=FontSize 25.,
+        fontSize=FontSize.fromValue 25.,
         textColor=Consts.primaryTextColor,
         verticalOptions = LayoutOptions.Fill, 
         horizontalOptions = LayoutOptions.Fill, 
@@ -83,7 +83,7 @@ let arrowDownLabel =
 let inDownloadQueueLabel =
     View.Label(text="\uf0c9",
         fontFamily=faFontFamilyName true,
-        fontSize=FontSize 25.,
+        fontSize=FontSize.fromValue 25.,
         textColor=Consts.primaryTextColor,
         verticalOptions = LayoutOptions.Fill, 
         horizontalOptions = LayoutOptions.Fill, 
@@ -94,7 +94,7 @@ let inDownloadQueueLabel =
 let playerSymbolLabel =
     View.Label(text="\uf144",
         fontFamily=faFontFamilyName false,
-        fontSize=FontSize 25.,
+        fontSize=FontSize.fromValue 25.,
         textColor=Consts.primaryTextColor,
         verticalOptions = LayoutOptions.Fill, 
         horizontalOptions = LayoutOptions.Fill, 
@@ -118,7 +118,7 @@ let showDownloadProgress (f:int,t:int) =
             )
             View.Label(text=(sprintf "%i %%" ((factor * 100.0) |> int)),
                 //fontFamily=faFontFamilyName true,
-                fontSize=FontSize 11.,
+                fontSize=FontSize.fromValue 11.,
                 margin=Thickness 3.,
                 textColor=Consts.primaryTextColor,
                 verticalOptions = LayoutOptions.Fill, 
@@ -195,13 +195,13 @@ let renderAudiobookEntry
             children = [
                 match audiobook.Thumbnail with
                 | None ->
-                    yield View.Image(source=ImagePath "AudioBookPlaceholder_Dark.png"
+                    yield View.Image(source=Image.fromPath "AudioBookPlaceholder_Dark.png"
                         , aspect = Aspect.AspectFit
                         , height=100.
                         , width=100.
                         , margin=Thickness 10.).Column(0).Row(0)
                 | Some thumb ->
-                    yield View.Image(source=ImagePath thumb
+                    yield View.Image(source=Image.fromPath thumb
                         , aspect = Aspect.AspectFit
                         , height=100.
                         , width=100.
@@ -219,7 +219,7 @@ let renderAudiobookEntry
                     ).Column(0).Row(0)
 
                 yield View.Label(text=audiobook.FullName, 
-                    fontSize = FontSize 15., 
+                    fontSize = FontSize.fromValue 15., 
                     verticalOptions = LayoutOptions.Fill, 
                     horizontalOptions = LayoutOptions.Fill, 
                     verticalTextAlignment = TextAlignment.Center,
@@ -235,7 +235,7 @@ let renderAudiobookEntry
                     ],
                     children = [
                         View.Label(text="\uf142",fontFamily = faFontFamilyName true,
-                            fontSize=FontSize 35., 
+                            fontSize=FontSize.fromValue 35., 
                             margin = Thickness(10., 0. ,10. ,0.),                    
                             verticalOptions = LayoutOptions.Fill, 
                             horizontalOptions = LayoutOptions.Fill, 
@@ -257,7 +257,7 @@ let tapLabelWithFaIcon faIcon faBold onTab textColor fontSize text =
             View.Label(text=faIcon,
                 textColor=textColor,
                 fontFamily = faFontFamilyName faBold,
-                fontSize=FontSize fontSize,
+                fontSize=FontSize.fromValue fontSize,
                 verticalOptions = LayoutOptions.Center,
                 verticalTextAlignment = TextAlignment.Center,
                 margin = Thickness(0., 0., 4., 0.)
@@ -266,7 +266,7 @@ let tapLabelWithFaIcon faIcon faBold onTab textColor fontSize text =
                 textColor=textColor,                
                 verticalOptions = LayoutOptions.Center,
                 verticalTextAlignment = TextAlignment.Center,
-                fontSize=FontSize (fontSize + 2.)
+                fontSize=FontSize.fromValue (fontSize + 2.)
             )
         ],
         gestureRecognizers = [
@@ -275,7 +275,7 @@ let tapLabelWithFaIcon faIcon faBold onTab textColor fontSize text =
 
 let primaryTextColorLabel size text = 
     View.Label(text=text,
-        fontSize=FontSize size,
+        fontSize=FontSize.fromValue size,
         textColor=Consts.primaryTextColor,
         verticalOptions=LayoutOptions.Fill,
         horizontalOptions=LayoutOptions.Fill,
@@ -285,7 +285,7 @@ let primaryTextColorLabel size text =
 
 let secondaryTextColorLabel size text = 
     View.Label(text=text,
-        fontSize=FontSize size,
+        fontSize=FontSize.fromValue size,
         textColor=Consts.secondaryTextColor,
         verticalOptions=LayoutOptions.Fill,
         horizontalOptions=LayoutOptions.Fill,
@@ -295,7 +295,7 @@ let secondaryTextColorLabel size text =
 
 let primaryColorSymbolLabelWithTapCommand command size solid text = 
     View.Label(text=text,
-        fontSize=FontSize size,
+        fontSize=FontSize.fromValue size,
         fontFamily=faFontFamilyName solid,
         textColor=Consts.primaryTextColor,
         verticalOptions=LayoutOptions.Fill,
@@ -309,7 +309,7 @@ let primaryColorSymbolLabelWithTapCommand command size solid text =
 
 let primaryColorSymbolLabelWithTapCommandRightAlign command size solid text = 
     View.Label(text=text,
-        fontSize=FontSize size,
+        fontSize=FontSize.fromValue size,
         fontFamily=faFontFamilyName solid,
         textColor=Consts.primaryTextColor,
         verticalOptions=LayoutOptions.Fill,
@@ -392,13 +392,13 @@ let navPageWithBottomOverlay (pageRef:ViewRef<NavigationPage>) (bottomOverlay:Vi
 
 
 
-let tickerBand fontSize text =
+let tickerBand (fontSize:float) text =
     View.ScrollView(
         orientation=ScrollOrientation.Horizontal,
         horizontalScrollBarVisibility = ScrollBarVisibility.Never,
         horizontalOptions=LayoutOptions.Fill,
         content=View.Label(text=text,
-            fontSize=FontSize fontSize,
+            fontSize=FontSize.fromValue fontSize,
             textColor=Consts.primaryTextColor,
             verticalOptions=LayoutOptions.Fill,
             horizontalOptions=LayoutOptions.Fill,
