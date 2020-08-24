@@ -39,14 +39,27 @@
                     let pendingIntent = PendingIntent.GetActivity(Android.App.Application.Context, pendingIntentId, intent,PendingIntentFlags.UpdateCurrent)
                    
                     let builder = 
-                        (new NotificationCompat.Builder(Android.App.Application.Context, downloadServiceChannelId))
-                            .SetContentIntent(pendingIntent)
-                            .SetContentTitle(title)
-                            .SetContentText(text)
-                            .SetSmallIcon(smallIcon)
-                            .SetLargeIcon(logo)
-                            .SetSound(null)
-                            .SetVibrate(null)
+                        if (Build.VERSION.SdkInt >= BuildVersionCodes.O) then
+                            (new Notification.Builder(Android.App.Application.Context, downloadServiceChannelId))
+                                .SetContentIntent(pendingIntent)
+                                .SetContentTitle(title)
+                                .SetContentText(text)
+                                .SetSmallIcon(smallIcon)
+                                .SetLargeIcon(logo)
+                                
+                        else
+                            (new Notification.Builder(Android.App.Application.Context, downloadServiceChannelId))
+                                .SetContentIntent(pendingIntent)
+                                .SetContentTitle(title)
+                                .SetContentText(text)
+                                .SetSmallIcon(smallIcon)
+                                .SetLargeIcon(logo)
+                                .SetSound(null)
+                                .SetVibrate(null)
+
+
+
+
                                
                     builder.Build()
 
@@ -59,6 +72,7 @@
                             let channelNameJava = new Java.Lang.String(downloadServiceChannelName)
                             let channel = new NotificationChannel(downloadServiceChannelId, channelNameJava, NotificationImportance.Default, Description = downloadServiceChannelDescription)
                             channel.SetSound(null,null)
+                            channel.SetVibrationPattern(null)
                             manager.CreateNotificationChannel(channel) |> ignore
                         ()
 

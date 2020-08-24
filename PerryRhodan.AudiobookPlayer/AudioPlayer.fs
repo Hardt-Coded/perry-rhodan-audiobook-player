@@ -144,7 +144,7 @@
             let res = (Services.DataBase.updateAudioBookInStateFile newAb) |> Async.RunSynchronously
             match res with
             | Error e ->
-                Microsoft.AppCenter.Crashes.Crashes.TrackError(exn("narf pos nicht gespeichert! Msg:" + e))
+                Microsoft.AppCenter.Crashes.Crashes.TrackError(exn("narf pos nicht gespeichert! Msg:" + e), Map.empty)
             | Ok () ->
                 ()
 
@@ -255,8 +255,8 @@
                                 
 
                         with
-                        | _ as ex ->
-                            Microsoft.AppCenter.Crashes.Crashes.TrackError(ex)
+                        | ex ->
+                            Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
                             return! loop state
                     }
 

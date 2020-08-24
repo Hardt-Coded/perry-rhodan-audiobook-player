@@ -38,6 +38,8 @@ module NotificationService =
                 let channelNameJava = new Java.Lang.String(channelName)
                 let channel = new NotificationChannel(channelId,channelNameJava,NotificationImportance.Default, Description = channelDescription)
                 channel.SetSound(null,null)
+                channel.SetVibrationPattern(null)
+                
                 manager
                 |> Option.map (fun m ->
                     m.CreateNotificationChannel(channel)
@@ -57,15 +59,24 @@ module NotificationService =
                     
                     let pendingIntent = PendingIntent.GetActivity(Android.App.Application.Context, pendingIntentId, intent,PendingIntentFlags.OneShot)
                     let builder = 
-                        (new NotificationCompat.Builder(Android.App.Application.Context, channelId))
-                            .SetContentIntent(pendingIntent)
-                            .SetContentTitle(title)
-                            .SetContentText(message)
-                            .SetSmallIcon(smallIcon)
-                            .SetLargeIcon(logo)
-                            .SetSound(null)
-                            .SetVibrate(null)
+                        if (Build.VERSION.SdkInt >= BuildVersionCodes.O) then
+                            (new Notification.Builder(Android.App.Application.Context, channelId))
+                                .SetContentIntent(pendingIntent)
+                                .SetContentTitle(title)
+                                .SetContentText(message)
+                                .SetSmallIcon(smallIcon)
+                                .SetLargeIcon(logo)
                             
+                        else
+                            (new Notification.Builder(Android.App.Application.Context, channelId))
+                                    .SetContentIntent(pendingIntent)
+                                    .SetContentTitle(title)
+                                    .SetContentText(message)
+                                    .SetSmallIcon(smallIcon)
+                                    .SetLargeIcon(logo)
+                                    .SetSound(null)
+                                    .SetVibrate(null)
+
                     let notification = builder.Build()
                     manager.Notify(messageId,notification)
                     

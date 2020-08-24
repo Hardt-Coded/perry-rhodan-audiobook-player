@@ -102,7 +102,7 @@
                                 resolve ()
                             with
                             | _ as ex ->
-                                Crashes.TrackError(ex)
+                                Crashes.TrackError(ex, Map.empty)
                                 resolve ()
                         } |> Async.StartImmediate
                     )
@@ -118,8 +118,8 @@
                                 let! res = Application.Current.MainPage.DisplayAlert(title, message, accept, cancel) |> Async.AwaitTask
                                 resolve res
                             with
-                            | _ as ex ->
-                                Crashes.TrackError(ex)
+                            | ex ->
+                                Crashes.TrackError(ex, Map.empty)
                                 resolve false
                         } |> Async.StartImmediate
                     )

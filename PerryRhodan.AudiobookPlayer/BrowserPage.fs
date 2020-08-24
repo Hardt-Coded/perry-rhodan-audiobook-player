@@ -575,7 +575,7 @@ open Global
                         
 
                 yield View.Label(text=browseTitle, fontAttributes = FontAttributes.Bold,
-                                    fontSize = FontSize 25.,
+                                    fontSize = FontSize.fromValue 25.,
                                     verticalOptions=LayoutOptions.Fill,
                                     horizontalOptions=LayoutOptions.Fill,
                                     horizontalTextAlignment=TextAlignment.Center,
@@ -611,7 +611,7 @@ open Global
                                                     yield 
                                                         View.Label(text=item
                                                             , margin = Thickness 2.
-                                                            , fontSize = FontSize 20.
+                                                            , fontSize = FontSize.fromValue 20.
                                                             , textColor = Consts.secondaryTextColor
                                                             , horizontalOptions = LayoutOptions.Fill
                                                             , horizontalTextAlignment= if (model.SelectedGroups = []) then TextAlignment.Start else TextAlignment.Center

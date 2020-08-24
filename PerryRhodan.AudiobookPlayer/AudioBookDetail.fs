@@ -86,7 +86,7 @@
                                            
                                         if (model.Image.IsSome) then
                                             yield View.Image(
-                                                source=ImagePath model.Image.Value,
+                                                source=Image.fromPath model.Image.Value,
                                                 aspect=Aspect.AspectFit,
                                                 horizontalOptions=LayoutOptions.Fill,
                                                 verticalOptions=LayoutOptions.Fill
@@ -94,7 +94,7 @@
                                                 .Margin(Thickness(10.,10.,10.,10.))
                                         if (model.Description.IsSome) then
                                             yield View.Label(
-                                                fontSize=FontSize 20.,
+                                                fontSize=FontSize.fromValue 20.,
                                                 text=model.Description.Value,
                                                 horizontalTextAlignment=TextAlignment.Start,
                                                 textColor=Common.Consts.secondaryTextColor,

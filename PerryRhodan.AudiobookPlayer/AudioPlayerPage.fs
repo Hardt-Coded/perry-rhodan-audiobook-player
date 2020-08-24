@@ -707,8 +707,8 @@ open AudioPlayer
                         View.Image(
                             source= 
                                 match picture with
-                                | None -> ImagePath "AudioBookPlaceholder_Dark.png"
-                                | Some p -> ImagePath p
+                                | None -> Image.fromPath "AudioBookPlaceholder_Dark.png"
+                                | Some p -> Image.fromPath p
                                 ,
                             horizontalOptions=LayoutOptions.Fill,
                             verticalOptions=LayoutOptions.Fill,
@@ -828,8 +828,8 @@ open AudioPlayer
                 yield View.Image(
                     source=
                         match model.AudioBook.Picture with
-                        | None -> ImagePath "AudioBookPlaceholder_Dark.png"
-                        | Some p -> ImagePath p
+                        | None -> Image.fromPath "AudioBookPlaceholder_Dark.png"
+                        | Some p -> Image.fromPath p
                         ,
                     horizontalOptions=LayoutOptions.Fill,
                     verticalOptions=LayoutOptions.Fill,

@@ -179,7 +179,7 @@ open Global
                                 , horizontalTextAlignment=TextAlignment.Center
                                 , textColor = Consts.primaryTextColor
                                 , backgroundColor = Consts.cardColor
-                                , fontSize=FontSize 16.)
+                                , fontSize=FontSize.fromValue 16.)
                             // TextChange Event cause actually a invite look, the debouncer doen't help
                             // Move to complete and lost focus event
                             yield View.Entry(text = model.Username
@@ -212,7 +212,7 @@ open Global
                             yield View.Button(text = Translations.current.Login, command = (fun () -> dispatch TryLogin), horizontalOptions = LayoutOptions.Center)
                             //yield View.Button(text = "Abbrechen", command = (fun () -> dispatch Cancel), horizontalOptions = LayoutOptions.Center)
                             if model.LoginFailed then
-                                yield View.Label(text=Translations.current.LoginFailed, textColor = Color.Red, horizontalOptions = LayoutOptions.Center, width=200., horizontalTextAlignment=TextAlignment.Center,fontSize=FontSize 20.)
+                                yield View.Label(text=Translations.current.LoginFailed, textColor = Color.Red, horizontalOptions = LayoutOptions.Center, width=200., horizontalTextAlignment=TextAlignment.Center,fontSize=FontSize.fromValue 20.)
 
                             ]    
                         )
