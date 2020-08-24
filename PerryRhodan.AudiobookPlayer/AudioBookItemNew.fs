@@ -300,6 +300,12 @@
         open global.SkiaSharp
         open global.SkiaSharp.Views.Forms
 
+        let calcAlpha factor =
+            let alphaDiffBase = (factor * 1000.0) |> int
+            let alphaDiff = Math.Cos(factor * 31.4) * 100.0 |> int
+            let alpha = 127 + alphaDiff |> uint8
+            alpha
+
         let loadingPie factor =
             let f32 = float32
             Fabulous.XamarinForms.SkiaSharp.View.SKCanvasView(
@@ -328,20 +334,14 @@
                             path.ArcTo(rect, startAngle, sweepAngle, false);
                             path.Close();
 
-                            let alphaDiffBase = (factor * 1000.0) |> int
-                            let alphaDiff = alphaDiffBase % 50
-                            let swapIndicator = alphaDiffBase % 100
-                            let multiplicator = if swapIndicator > 50 then -1 else 0
-                            let alpha = (103 + alphaDiff + (alphaDiff * multiplicator)) |> uint8
-
                             fillPaint.Style <- SKPaintStyle.Fill
-                            fillPaint.Color <- color.ToSKColor().WithAlpha(alpha)
+                            fillPaint.Color <- color.ToSKColor().WithAlpha(calcAlpha factor)
                             fillPaint.BlendMode <- SKBlendMode.Plus
                             fillPaint.IsAntialias <- false
 
                             outlinePaint.Style <- SKPaintStyle.Stroke;
                             outlinePaint.StrokeWidth <- 6.0f;
-                            outlinePaint.Color <- color.ToSKColor().WithAlpha(alpha)
+                            outlinePaint.Color <- color.ToSKColor() //.WithAlpha(alpha)
                             outlinePaint.IsAntialias <- false
 
                             
@@ -379,7 +379,7 @@
                             let x = 360.0 * factor |> float32;
                             if x >= 360.0f then 359.99f else x
 
-                        drawPie false (Color.FromHex("C1272E")) startAngle sweepAngle
+                        drawPie false (Color.FromHex("96FF33")) startAngle sweepAngle
                     )
 
 
@@ -464,53 +464,53 @@
                         , margin=Thickness 10.
                         ).Column(0).Row(0)
                 
-                    View.Grid(
-                        backgroundColor = Color.Transparent,
-                        margin=Thickness 10.,
-                        coldefs = [Star; Star; Star],
-                        rowdefs = [Star; Star; Star],
-                        children = [
-                            match model.DownloadState with
-                            | NotDownloaded ->
-                                Controls.arrowDownLabel.Column(1).Row(1)
-                            | Queued ->
-                                Controls.inDownloadQueueLabel.Column(1).Row(1)
-                            | Downloading (c,a) ->
-                                let factor = (c |> float) / (a |> float)
+                View.Grid(
+                    backgroundColor = Color.Transparent,
+                    margin=Thickness 10.,
+                    coldefs = [Star; Star; Star],
+                    rowdefs = [Star; Star; Star],
+                    children = [
+                        match model.DownloadState with
+                        | NotDownloaded ->
+                            Controls.arrowDownLabel.Column(1).Row(1)
+                        | Queued ->
+                            Controls.inDownloadQueueLabel.Column(1).Row(1)
+                        | Downloading (c,a) ->
+                            let factor = (c |> float) / (a |> float)
+                            View.Grid(
+                                children = [
+                                    Draw.loadingPie factor
+                                ]
+                            ).ColumnSpan(3).RowSpan(3)
+                        | Downloaded ->
+                            Controls.playerSymbolLabel.Column(1).Row(1)
+                            
+                        match model.ListenState with
+                        | Unlistend ->
+                            ()
+                        | InProgress pos ->
+                            match percentageFinished model with
+                            | None -> ()
+                            | Some progress ->
                                 View.Grid(
                                     children = [
-                                        Draw.loadingPie factor
+                                        (Draw.progressPie progress)
                                     ]
-                                ).ColumnSpan(3).RowSpan(3)
-                            | Downloaded ->
-                                Controls.playerSymbolLabel.Column(1).Row(1)
-                            
-                            match model.ListenState with
-                            | Unlistend ->
-                                ()
-                            | InProgress pos ->
-                                match percentageFinished model with
-                                | None -> ()
-                                | Some progress ->
-                                    View.Grid(
-                                        children = [
-                                            (Draw.progressPie progress)
-                                        ]
-                                    ).Column(0).Row(2)
+                                ).Column(0).Row(2)
                                     
-                            | Listend ->
-                                Controls.listendCheckLabel.Column(2).Row(2)
-                        ]
-                        , gestureRecognizers = 
-                            [
-                                View.TapGestureRecognizer(
-                                    command = (fun () -> 
-                                        if model.DownloadState=Downloaded then 
-                                            dispatch OpenAudioBookPlayer
-                                    )
+                        | Listend ->
+                            Controls.listendCheckLabel.Column(2).Row(2)
+                    ]
+                    , gestureRecognizers = 
+                        [
+                            View.TapGestureRecognizer(
+                                command = (fun () -> 
+                                    if model.DownloadState=Downloaded then 
+                                        dispatch OpenAudioBookPlayer
                                 )
-                        ]
-                    ).Column(0).Row(0)
+                            )
+                    ]
+                ).Column(0).Row(0)
 
 
 

@@ -399,7 +399,7 @@ module rec AudioPlayerServiceImplementation =
 
 
             stateBuilder.SetActions(stateAction) |> ignore            
-            stateBuilder.SetState((if info.State = Stopped then PlaybackStateCode.Stopped else PlaybackStateCode.Playing), PlaybackState.PlaybackPositionUnknown, 1.0f) |> ignore
+            stateBuilder.SetState((if info.State = Stopped then PlaybackStateCode.Stopped else PlaybackStateCode.Playing),info.Position |> int64 , 1.0f) |> ignore
             
             mediaSession.SetPlaybackState(stateBuilder.Build());
             
@@ -416,12 +416,14 @@ module rec AudioPlayerServiceImplementation =
                     .PutString(MediaMetadata.MetadataKeyDisplayTitle,info.AudioBook.FullName)
                     .PutString(MediaMetadata.MetadataKeyTitle,info.AudioBook.FullName)
                     .PutBitmap(MediaMetadata.MetadataKeyArt, albumPic)
-                    
+                    .PutLong(MediaMetadata.MetadataKeyDuration, info.Duration |> int64)
                     
                     .PutString(MediaMetadata.MetadataKeyAlbum,info.AudioBook.FullName)
                     .PutLong(MediaMetadata.MetadataKeyTrackNumber,info.CurrentTrackNumber |> int64)  
                     .PutLong(MediaMetadata.MetadataKeyNumTracks,info.Mp3FileList.Length |> int64)  
-                    .PutLong(MediaMetadata.MetadataKeyDuration,info.Mp3FileList.Length |> int64) 
+                    .PutLong(MediaMetadata.MetadataKeyTrackNumber,info.CurrentTrackNumber |> int64)
+                    
+                    
           
                     
                     .Build();
@@ -434,10 +436,13 @@ module rec AudioPlayerServiceImplementation =
             
             
             let currenInfoString = 
-                sprintf "%i - %s / %s"
-                    info.CurrentTrackNumber
-                    ((info.Position |> Common.TimeSpanHelpers.toTimeSpan).ToString("mm\:ss"))
-                    ((info.Duration |> Common.TimeSpanHelpers.toTimeSpan).ToString("mm\:ss"))
+                if Build.VERSION.SdkInt < BuildVersionCodes.Q then
+                    sprintf "%i - %s / %s"
+                        info.CurrentTrackNumber
+                        ((info.Position |> Common.TimeSpanHelpers.toTimeSpan).ToString("mm\:ss"))
+                        ((info.Duration |> Common.TimeSpanHelpers.toTimeSpan).ToString("mm\:ss"))
+                else
+                    ""
             
             let notify = 
                 let builder =

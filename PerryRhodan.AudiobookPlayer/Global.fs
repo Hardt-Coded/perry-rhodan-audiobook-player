@@ -1,7 +1,7 @@
 ﻿module Global
 
-    let appcenterAndroidId = "***REMOVED***"
-    let supportMessageApi = "***REMOVED***"
+    let appcenterAndroidId = ""
+    let supportMessageApi = ""
 
 
 
