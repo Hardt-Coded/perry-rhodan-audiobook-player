@@ -108,7 +108,7 @@ module DataBase =
             audioBooksCol.InsertBulk(audioBooks) |> ignore                    
             Ok ()
         with
-        | _ as e -> Error e.Message
+        | e -> Error e.Message
 
 
     let private updateAudioBookDb (audioBook:AudioBook) =
@@ -182,7 +182,7 @@ module DataBase =
                 audioBooksCol.InsertBulk(audioFileInfos) |> ignore                    
                 Ok ()
             with
-            | _ as e -> Error e.Message
+            | e -> Error e.Message
 
 
         let updateAudioBookFileInfo (audioFileInfo:AudioBookAudioFilesInfo) =
@@ -390,7 +390,7 @@ module DataBase =
                         let weschoulndenduphere = 0
                         ()
                     with
-                    | _ as ex ->
+                    | ex ->
                         //storageProcessorErrorEvent.Trigger(ex)
                         failwith "machine down!"
                 }
@@ -478,7 +478,7 @@ module DataBase =
                     let! res = deleteAudioBookFileInfo audiobook.Id
                     return res
             with
-            | _ as e -> 
+            | e -> 
                 return Error (e.Message)
         }
 
@@ -546,7 +546,7 @@ module WebAccess =
             with
             | exn ->
                 let ex = exn.GetBaseException()
-                Crashes.TrackError(ex)
+                Crashes.TrackError(ex, Map.empty)
                 match ex with
                 | :? WebException | :? SocketException ->
                     return Error (Network Translations.current.NetworkError)
@@ -755,7 +755,7 @@ module WebAccess =
                 //use thumbInputStream = File.OpenRead()
                 use orig = SKBitmap.Decode(imageFullName)
                 use thumb = orig.Resize(SKImageInfo(200, 200),SKFilterQuality.Medium)
-                if thumb = null then
+                if isNull thumb then
                     ()
                 else
                     use thumbImage = SKImage.FromBitmap(thumb)
@@ -892,7 +892,7 @@ module WebAccess =
                 with
                 | exn ->
                     let ex = exn.GetBaseException()
-                    Crashes.TrackError(ex)
+                    Crashes.TrackError(ex, Map.empty)
                     match ex with
                     | :? WebException | :? SocketException ->
                         return Error (Network Translations.current.NetworkError)
@@ -940,7 +940,7 @@ module SecureStorageHelper =
     let getSecuredValue key =
         async {
             let! value =  SecureStorage.GetAsync(key) |> Async.AwaitTask
-            return if value  = null then None else Some value
+            return if value |> isNull then None else Some value
         }
 
     let setSecuredValue value key =
@@ -964,7 +964,7 @@ module SecureLoginStorage =
                 do! secStoreRememberLoginKey |> setSecuredValue (if rememberLogin then "Jupp" else "")
                 return Ok true
             with
-            | _ as e -> return (Error (e.Message))
+            | e -> return (Error (e.Message))
         }
     
     let loadLoginCredentials () =
@@ -975,7 +975,7 @@ module SecureLoginStorage =
                 let! rememberLoginStr = secStoreRememberLoginKey |> getSecuredValue
                 return Ok (username,password,(rememberLoginStr = Some "Jupp"))
             with
-            | _ as e -> return (Error (e.Message))
+            | e -> return (Error (e.Message))
         }
 
 
@@ -1111,8 +1111,8 @@ module SupportFeedback =
                 else
                     return Ok ()
             with
-            | _ as ex ->
-                Microsoft.AppCenter.Crashes.Crashes.TrackError(ex)
+            | ex ->
+                Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
                 return Error "Fehlerbeim Senden der Nachricht. Probieren Sie es noch einmal."
 
         }
@@ -1261,7 +1261,7 @@ module DownloadService =
                                 return! loop { state with ServiceListener = Some listener }
 
                             | SignalServiceCrashed ex ->
-                                Microsoft.AppCenter.Crashes.Crashes.TrackError(ex)
+                                Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
                                 return! loop { state with ServiceListener = None }
 
                             | SignalError (info,error) ->

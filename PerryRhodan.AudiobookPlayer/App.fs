@@ -104,7 +104,7 @@ module App =
         View.ShellContent(
             title=title,
             route=route,
-            icon=ImagePath icon,
+            icon=Image.fromPath icon,
             content=content,
             shellBackgroundColor=Consts.backgroundColor,
             shellForegroundColor=Consts.primaryTextColor
@@ -114,7 +114,7 @@ module App =
     let createShellSection title route icon content =
         View.ShellSection(
             title=title,
-            icon=ImagePath icon,
+            icon=Image.fromPath icon,
             items = [
                 createShellContent title route icon content
             ]
@@ -1007,8 +1007,8 @@ module App =
             try
                 Process.GetCurrentProcess().CloseMainWindow() |> ignore
             with
-            | _ as ex ->
-                Crashes.TrackError ex
+            | ex ->
+                Crashes.TrackError (ex, Map.empty)
 
         let quitAppWithMessage () =
             async {
@@ -1326,7 +1326,7 @@ module App =
                 Process.GetCurrentProcess().CloseMainWindow() |> ignore
             with
             | _ as ex ->
-                Crashes.TrackError ex
+                Crashes.TrackError (ex, Map.empty)
             return ()
         } |> Async.StartImmediate
         

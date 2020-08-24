@@ -505,7 +505,7 @@ module rec AudioPlayerServiceImplementation =
                         ()
                     with
                     | ex ->
-                        Crashes.TrackError(ex)
+                        Crashes.TrackError(ex, Map.empty)
 
 
         [<BroadcastReceiver>]
@@ -624,7 +624,7 @@ module rec AudioPlayerServiceImplementation =
                         | Playing ->
                             return info
                     | _ ->
-                        Microsoft.AppCenter.Crashes.Crashes.TrackError(exn("whaaat? invalid audioFocusRequest Enum."))|> ignore
+                        Microsoft.AppCenter.Crashes.Crashes.TrackError(exn("whaaat? invalid audioFocusRequest Enum."), Map.empty)|> ignore
                         return info
                 }
                 
@@ -1084,7 +1084,7 @@ module rec AudioPlayerServiceImplementation =
                         let speed = intent.GetFloatExtra("speed",1.0f) |> float
                         stateMailBox.Post(SetPlaybackSpeed speed)
                     | _ ->
-                        Crashes.TrackError(exn(sprintf "AudioPlayerService: unknown intent action. '%s'" intent.Action))
+                        Crashes.TrackError(exn(sprintf "AudioPlayerService: unknown intent action. '%s'" intent.Action), Map.empty)
 
                     StartCommandResult.Sticky
 

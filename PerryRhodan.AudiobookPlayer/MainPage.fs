@@ -76,7 +76,7 @@ open Services
                 | None ->()
                 | Some abItem ->
                     View.Label(text=Translations.current.LastListendAudioBookTitle, fontAttributes = FontAttributes.Bold,
-                        fontSize = FontSize 25.,
+                        fontSize = FontSize.fromValue 25.,
                         horizontalOptions = LayoutOptions.Fill,
                         horizontalTextAlignment = TextAlignment.Center,
                         textColor = Consts.primaryTextColor,
@@ -86,7 +86,7 @@ open Services
                     (AudioBookItemNew.view abItem.Model abItem.Dispatch).Margin(Thickness 10.).Row(1)
 
                 View.Label(text=Translations.current.AudiobookOnDevice, fontAttributes = FontAttributes.Bold,
-                                                fontSize = FontSize 25.,
+                                                fontSize = FontSize.fromValue 25.,
                                                 horizontalOptions = LayoutOptions.Fill,
                                                 horizontalTextAlignment = TextAlignment.Center,
                                                 textColor = Consts.primaryTextColor,
@@ -99,9 +99,9 @@ open Services
                         if not model.IsLoading then
                             match model.Audiobooks,model.LastTimeListendAudioBook with
                             | [||], None  ->
-                                View.Label(text=Translations.current.NoAudiobooksOnDevice, fontSize=FontSize 25., textColor=Consts.secondaryTextColor)
+                                View.Label(text=Translations.current.NoAudiobooksOnDevice, fontSize=FontSize.fromValue 25., textColor=Consts.secondaryTextColor)
                             | [||], Some _  ->
-                                View.Label(text="...", fontSize=FontSize 25., textColor=Consts.secondaryTextColor)
+                                View.Label(text="...", fontSize=FontSize.fromValue 25., textColor=Consts.secondaryTextColor)
                             | _, _ ->
                                 View.ScrollView(horizontalOptions = LayoutOptions.Fill,
                                     verticalOptions = LayoutOptions.Fill,
