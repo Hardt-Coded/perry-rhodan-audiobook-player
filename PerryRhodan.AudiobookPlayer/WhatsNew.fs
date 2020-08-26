@@ -9,8 +9,8 @@ open Fabulous
 
         let messages = [
 
-            ("24.08.2020",
-            """
+            ("26.08.2020",
+                """
 Hallo Liebe Mitfans,
 
 Was gibts neues in dieser Version?
@@ -28,7 +28,7 @@ Außerdem möchte ich her auch nochmal Peter danken, der, wenn es Probleme mit d
 Über Anregungen und Feedback würde ich mich freuen. Unter "Support-Feedback" in den Optionen oder direkt an info@hardt-solutions.de.
 
 Über eine Bewertung würde ich mich freuen.
-            """
+                """
             )
 
             ("13.06.2020",

@@ -452,70 +452,57 @@
                     
                     children = [
                         yield View.ScrollView(
+                                verticalScrollBarVisibility=ScrollBarVisibility.Always,
+                                horizontalOptions=LayoutOptions.FillAndExpand,
+                                verticalOptions=LayoutOptions.FillAndExpand,
                                 content=
-                                    View.StackLayout(
-                                        gestureRecognizers= [View.TapGestureRecognizer(command=(fun () -> dispatch (SetDeveloperModeSwitchCounter (model.DeveloperModeSwitchCounter + 1))))],
-                                        orientation=StackOrientation.Vertical,
-                                        margin=Thickness 5.0,
+                                    View.Grid(
+                                        coldefs=[ Star ],
+                                        rowdefs=[ Auto; Auto; Auto; Auto; Auto; Auto; Auto; Auto; Auto ],
                                         children=[
-                                            
-                                            yield View.Grid(
-                                                coldefs=[ Star ],
-                                                rowdefs=[ Auto; Auto; Auto;Auto; Auto; Auto ],
-                                                children=[
 
-                                                    yield (settingsEntry 
-                                                        Translations.current.RewindWhenStartAfterShortPeriodInSec 
-                                                        (sprintf "%i %s" mdl.RewindWhenStartAfterShortPeriodInSec Translations.current.Seconds)
-                                                        (fun ()->dispatch OpenRewindWhenStartAfterShortPeriodInSecPicker)).Row(0)
+                                            yield (settingsEntry 
+                                                Translations.current.RewindWhenStartAfterShortPeriodInSec 
+                                                (sprintf "%i %s" mdl.RewindWhenStartAfterShortPeriodInSec Translations.current.Seconds)
+                                                (fun ()->dispatch OpenRewindWhenStartAfterShortPeriodInSecPicker)).Row(0)
 
-                                                    yield (settingsEntry 
-                                                        Translations.current.RewindWhenStartAfterLongPeriodInSec 
-                                                        (sprintf "%i %s" mdl.RewindWhenStartAfterLongPeriodInSec Translations.current.Seconds)
-                                                        (fun ()->dispatch OpenRewindWhenStartAfterLongPeriodInSecPicker)).Row(1)
+                                            yield (settingsEntry 
+                                                Translations.current.RewindWhenStartAfterLongPeriodInSec 
+                                                (sprintf "%i %s" mdl.RewindWhenStartAfterLongPeriodInSec Translations.current.Seconds)
+                                                (fun ()->dispatch OpenRewindWhenStartAfterLongPeriodInSecPicker)).Row(1)
 
-                                                    yield (settingsEntry 
-                                                        Translations.current.LongPeriodBeginsAfterInMinutes 
-                                                        (sprintf "%i %s" mdl.LongPeriodBeginsAfterInMinutes Translations.current.Minutes)
-                                                        (fun ()->dispatch OpenLongPeriodBeginsAfterInMinutesPicker)).Row(2)
+                                            yield (settingsEntry 
+                                                Translations.current.LongPeriodBeginsAfterInMinutes 
+                                                (sprintf "%i %s" mdl.LongPeriodBeginsAfterInMinutes Translations.current.Minutes)
+                                                (fun ()->dispatch OpenLongPeriodBeginsAfterInMinutesPicker)).Row(2)
 
-                                                    yield (settingsEntry 
-                                                        Translations.current.JumpDistance 
-                                                        (sprintf "%i %s" mdl.JumpDistance Translations.current.Seconds)
-                                                        (fun () -> dispatch OpenJumpDistancePicker)).Row(3)
+                                            yield (settingsEntry 
+                                                Translations.current.JumpDistance 
+                                                (sprintf "%i %s" mdl.JumpDistance Translations.current.Seconds)
+                                                (fun () -> dispatch OpenJumpDistancePicker)).Row(3)
 
-                                                    if mdl.DeveloperMode then
-                                                        yield (settingsEntry 
-                                                            "DeveloperMode" 
-                                                            "Unter anderem kann man Einträge aus der DB löschen"
-                                                            (fun () -> ())).Row(4)
+                                            if mdl.DeveloperMode then
+                                                yield (settingsEntry 
+                                                    "DeveloperMode" 
+                                                    "Unter anderem kann man Einträge aus der DB löschen"
+                                                    (fun () -> ())).Row(4)
 
-                                                        yield (settingsEntry 
-                                                            "Datenbank löschen" 
-                                                            "Hiermit löscht an die ganze Datenbank und initialisiert die Anwendung neu."
-                                                            (fun () -> dispatch DeleteDatabase)).Row(5)
-                                                ]
-                                            )
+                                                yield (settingsEntry 
+                                                    "Datenbank löschen" 
+                                                    "Hiermit löscht an die ganze Datenbank und initialisiert die Anwendung neu."
+                                                    (fun () -> dispatch DeleteDatabase)).Row(5)
 
                                             yield View.Button(
                                                 text="Sende Feedback oder Supportanfrage",                                                                                        
                                                 command=(fun ()-> dispatch OpenFeedbackPage),
                                                 margin=Thickness(0.,10.,0.,0.)
-                                            )
-                                            
+                                            ).Row(6)
+
                                             yield View.Button(
                                                 text=(if mdl.DataProtectionStuff then Translations.current.HideDataProtection else Translations.current.ShowDataProtection),                                                                                        
                                                 command=(fun ()-> dispatch (if mdl.DataProtectionStuff then HideDataProtectionStuff else ShowDataProtectionStuff)),
                                                 margin=Thickness(0.,10.,0.,0.)
-                                            )
-
-                                            //yield View.StackLayout(orientation=StackOrientation.Horizontal,
-                                            //    horizontalOptions = LayoutOptions.Center,
-                                            //    children =[
-                                            //        Controls.secondaryTextColorLabel 18. Translations.current.HideLastListendWhenOnlyOneAudioBookOnDevice
-                                            //        View.Switch(isToggled = model.HideLastListendWhenOnlyOneAudioBookOnDevice, toggled = (fun on -> dispatch (ToggleHideLastListend on.Value)), horizontalOptions = LayoutOptions.Center)
-                                            //    ]
-                                            //)
+                                            ).Row(7)
 
                                             if (mdl.DataProtectionStuff) then
                                                 let viewSource = UrlWebViewSource(Url="https://www.hardt-solutions.com/PrivacyPolicies/EinsAMedienAudioBookPlayer.html")
@@ -524,12 +511,13 @@
                                                     verticalScrollBarVisibility=ScrollBarVisibility.Always,
                                                     horizontalOptions=LayoutOptions.FillAndExpand,
                                                     verticalOptions=LayoutOptions.FillAndExpand,
+                                                    height=500.0,
                                                     content=View.WebView(source=viewSource,
                                                         horizontalOptions=LayoutOptions.FillAndExpand,
-                                                        verticalOptions=LayoutOptions.FillAndExpand
+                                                        verticalOptions=LayoutOptions.FillAndExpand,
+                                                        height=500.0
                                                     )
-                                                )
-                                            
+                                                ).Row(8)
                                         ]
                                     )
                             )                    
