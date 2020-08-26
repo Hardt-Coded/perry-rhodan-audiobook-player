@@ -518,7 +518,7 @@
                                             //)
 
                                             if (mdl.DataProtectionStuff) then
-                                                let viewSource = UrlWebViewSource(Url="https://hardt-solutions.com/PrivacyPolicies/EinsAMedienAudiobookPlayer.html")
+                                                let viewSource = UrlWebViewSource(Url="https://www.hardt-solutions.com/PrivacyPolicies/EinsAMedienAudioBookPlayer.html")
 
                                                 yield View.ScrollView(
                                                     verticalScrollBarVisibility=ScrollBarVisibility.Always,
