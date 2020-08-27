@@ -452,6 +452,7 @@
                     
                     children = [
                         yield View.ScrollView(
+                                gestureRecognizers= [View.TapGestureRecognizer(command=(fun () -> dispatch (SetDeveloperModeSwitchCounter (model.DeveloperModeSwitchCounter + 1))))],
                                 verticalScrollBarVisibility=ScrollBarVisibility.Always,
                                 horizontalOptions=LayoutOptions.FillAndExpand,
                                 verticalOptions=LayoutOptions.FillAndExpand,
