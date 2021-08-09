@@ -109,7 +109,7 @@
                 )
 
 
-        let displayAlertWithConfirm(title, message, accept, cancel) =
+        let displayAlertWithConfirm(title, message, accept, cancel:string) =
             Async.FromContinuations <| fun (resolve, reject, _) ->
                 Device.BeginInvokeOnMainThread(
                     (fun () -> 
@@ -322,7 +322,7 @@
 
     module MailboxExtensions =
 
-        let PostWithDelay msg ms (mailbox:MailboxProcessor<_>) =
+        let PostWithDelay msg (ms:int) (mailbox:MailboxProcessor<_>) =
             let post () = 
                 async {
                     do! Async.Sleep ms
