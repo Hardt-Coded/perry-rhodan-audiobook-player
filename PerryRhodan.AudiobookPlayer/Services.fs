@@ -1534,8 +1534,8 @@ module DownloadService =
                                     return! loop state
                                 | Some item ->
                                     match item.State with
-                                    | Running
-                                    | Finished ->
+                                    | Running _
+                                    | Finished _ ->
                                         return! loop state
                                     | Open _ 
                                     | Failed _ ->
@@ -1553,7 +1553,7 @@ module DownloadService =
 
                             | UpdateNotification (info,percent) ->
                                 let openCount = 
-                                    state.Downloads |> List.filter (fun i -> match i.State with | Open | Failed -> true | _ -> false) |> List.length 
+                                    state.Downloads |> List.filter (fun i -> match i.State with | Open | Failed _ -> true | _ -> false) |> List.length 
                                 let allCount = state.Downloads  |> List.length// |> List.filter (fun i -> match i.State with | Finished -> true | _ -> false)
 
                                 let stateText  =

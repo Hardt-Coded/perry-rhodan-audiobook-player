@@ -247,2566 +247,6 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			global::Plugin.Permissions.Resource.Styleable.GradientColor_android_tileMode = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.GradientColor_android_tileMode;
 			global::Plugin.Permissions.Resource.Styleable.GradientColor_android_type = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.GradientColor_android_type;
 			global::Plugin.Permissions.Resource.Xml.xamarin_essentials_fileprovider_file_paths = global::PerryRhodan.AudiobookPlayer.Android.Resource.Xml.xamarin_essentials_fileprovider_file_paths;
-			global::SkiaSharp.Views.Forms.Resource.Animation.abc_fade_in = global::PerryRhodan.AudiobookPlayer.Android.Resource.Animation.abc_fade_in;
-			global::SkiaSharp.Views.Forms.Resource.Animation.abc_fade_out = global::PerryRhodan.AudiobookPlayer.Android.Resource.Animation.abc_fade_out;
-			global::SkiaSharp.Views.Forms.Resource.Animation.abc_grow_fade_in_from_bottom = global::PerryRhodan.AudiobookPlayer.Android.Resource.Animation.abc_grow_fade_in_from_bottom;
-			global::SkiaSharp.Views.Forms.Resource.Animation.abc_popup_enter = global::PerryRhodan.AudiobookPlayer.Android.Resource.Animation.abc_popup_enter;
-			global::SkiaSharp.Views.Forms.Resource.Animation.abc_popup_exit = global::PerryRhodan.AudiobookPlayer.Android.Resource.Animation.abc_popup_exit;
-			global::SkiaSharp.Views.Forms.Resource.Animation.abc_shrink_fade_out_from_bottom = global::PerryRhodan.AudiobookPlayer.Android.Resource.Animation.abc_shrink_fade_out_from_bottom;
-			global::SkiaSharp.Views.Forms.Resource.Animation.abc_slide_in_bottom = global::PerryRhodan.AudiobookPlayer.Android.Resource.Animation.abc_slide_in_bottom;
-			global::SkiaSharp.Views.Forms.Resource.Animation.abc_slide_in_top = global::PerryRhodan.AudiobookPlayer.Android.Resource.Animation.abc_slide_in_top;
-			global::SkiaSharp.Views.Forms.Resource.Animation.abc_slide_out_bottom = global::PerryRhodan.AudiobookPlayer.Android.Resource.Animation.abc_slide_out_bottom;
-			global::SkiaSharp.Views.Forms.Resource.Animation.abc_slide_out_top = global::PerryRhodan.AudiobookPlayer.Android.Resource.Animation.abc_slide_out_top;
-			global::SkiaSharp.Views.Forms.Resource.Animation.abc_tooltip_enter = global::PerryRhodan.AudiobookPlayer.Android.Resource.Animation.abc_tooltip_enter;
-			global::SkiaSharp.Views.Forms.Resource.Animation.abc_tooltip_exit = global::PerryRhodan.AudiobookPlayer.Android.Resource.Animation.abc_tooltip_exit;
-			global::SkiaSharp.Views.Forms.Resource.Animation.design_bottom_sheet_slide_in = global::PerryRhodan.AudiobookPlayer.Android.Resource.Animation.design_bottom_sheet_slide_in;
-			global::SkiaSharp.Views.Forms.Resource.Animation.design_bottom_sheet_slide_out = global::PerryRhodan.AudiobookPlayer.Android.Resource.Animation.design_bottom_sheet_slide_out;
-			global::SkiaSharp.Views.Forms.Resource.Animation.design_snackbar_in = global::PerryRhodan.AudiobookPlayer.Android.Resource.Animation.design_snackbar_in;
-			global::SkiaSharp.Views.Forms.Resource.Animation.design_snackbar_out = global::PerryRhodan.AudiobookPlayer.Android.Resource.Animation.design_snackbar_out;
-			global::SkiaSharp.Views.Forms.Resource.Animation.EnterFromLeft = global::PerryRhodan.AudiobookPlayer.Android.Resource.Animation.EnterFromLeft;
-			global::SkiaSharp.Views.Forms.Resource.Animation.EnterFromRight = global::PerryRhodan.AudiobookPlayer.Android.Resource.Animation.EnterFromRight;
-			global::SkiaSharp.Views.Forms.Resource.Animation.ExitToLeft = global::PerryRhodan.AudiobookPlayer.Android.Resource.Animation.ExitToLeft;
-			global::SkiaSharp.Views.Forms.Resource.Animation.ExitToRight = global::PerryRhodan.AudiobookPlayer.Android.Resource.Animation.ExitToRight;
-			global::SkiaSharp.Views.Forms.Resource.Animator.design_appbar_state_list_animator = global::PerryRhodan.AudiobookPlayer.Android.Resource.Animator.design_appbar_state_list_animator;
-			global::SkiaSharp.Views.Forms.Resource.Animator.design_fab_hide_motion_spec = global::PerryRhodan.AudiobookPlayer.Android.Resource.Animator.design_fab_hide_motion_spec;
-			global::SkiaSharp.Views.Forms.Resource.Animator.design_fab_show_motion_spec = global::PerryRhodan.AudiobookPlayer.Android.Resource.Animator.design_fab_show_motion_spec;
-			global::SkiaSharp.Views.Forms.Resource.Animator.mtrl_btn_state_list_anim = global::PerryRhodan.AudiobookPlayer.Android.Resource.Animator.mtrl_btn_state_list_anim;
-			global::SkiaSharp.Views.Forms.Resource.Animator.mtrl_btn_unelevated_state_list_anim = global::PerryRhodan.AudiobookPlayer.Android.Resource.Animator.mtrl_btn_unelevated_state_list_anim;
-			global::SkiaSharp.Views.Forms.Resource.Animator.mtrl_chip_state_list_anim = global::PerryRhodan.AudiobookPlayer.Android.Resource.Animator.mtrl_chip_state_list_anim;
-			global::SkiaSharp.Views.Forms.Resource.Animator.mtrl_fab_hide_motion_spec = global::PerryRhodan.AudiobookPlayer.Android.Resource.Animator.mtrl_fab_hide_motion_spec;
-			global::SkiaSharp.Views.Forms.Resource.Animator.mtrl_fab_show_motion_spec = global::PerryRhodan.AudiobookPlayer.Android.Resource.Animator.mtrl_fab_show_motion_spec;
-			global::SkiaSharp.Views.Forms.Resource.Animator.mtrl_fab_transformation_sheet_collapse_spec = global::PerryRhodan.AudiobookPlayer.Android.Resource.Animator.mtrl_fab_transformation_sheet_collapse_spec;
-			global::SkiaSharp.Views.Forms.Resource.Animator.mtrl_fab_transformation_sheet_expand_spec = global::PerryRhodan.AudiobookPlayer.Android.Resource.Animator.mtrl_fab_transformation_sheet_expand_spec;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.actionBarDivider = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.actionBarDivider;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.actionBarItemBackground = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.actionBarItemBackground;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.actionBarPopupTheme = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.actionBarPopupTheme;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.actionBarSize = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.actionBarSize;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.actionBarSplitStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.actionBarSplitStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.actionBarStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.actionBarStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.actionBarTabBarStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.actionBarTabBarStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.actionBarTabStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.actionBarTabStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.actionBarTabTextStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.actionBarTabTextStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.actionBarTheme = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.actionBarTheme;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.actionBarWidgetTheme = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.actionBarWidgetTheme;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.actionButtonStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.actionButtonStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.actionDropDownStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.actionDropDownStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.actionLayout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.actionLayout;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.actionMenuTextAppearance = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.actionMenuTextAppearance;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.actionMenuTextColor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.actionMenuTextColor;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.actionModeBackground = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.actionModeBackground;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.actionModeCloseButtonStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.actionModeCloseButtonStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.actionModeCloseDrawable = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.actionModeCloseDrawable;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.actionModeCopyDrawable = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.actionModeCopyDrawable;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.actionModeCutDrawable = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.actionModeCutDrawable;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.actionModeFindDrawable = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.actionModeFindDrawable;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.actionModePasteDrawable = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.actionModePasteDrawable;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.actionModePopupWindowStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.actionModePopupWindowStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.actionModeSelectAllDrawable = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.actionModeSelectAllDrawable;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.actionModeShareDrawable = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.actionModeShareDrawable;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.actionModeSplitBackground = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.actionModeSplitBackground;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.actionModeStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.actionModeStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.actionModeWebSearchDrawable = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.actionModeWebSearchDrawable;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.actionOverflowButtonStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.actionOverflowButtonStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.actionOverflowMenuStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.actionOverflowMenuStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.actionProviderClass = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.actionProviderClass;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.actionViewClass = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.actionViewClass;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.activityChooserViewStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.activityChooserViewStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.alertDialogButtonGroupStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.alertDialogButtonGroupStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.alertDialogCenterButtons = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.alertDialogCenterButtons;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.alertDialogStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.alertDialogStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.alertDialogTheme = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.alertDialogTheme;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.allowStacking = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.allowStacking;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.alpha = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.alpha;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.alphabeticModifiers = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.alphabeticModifiers;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.arrowHeadLength = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.arrowHeadLength;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.arrowShaftLength = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.arrowShaftLength;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.autoCompleteTextViewStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.autoCompleteTextViewStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.autoSizeMaxTextSize = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.autoSizeMaxTextSize;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.autoSizeMinTextSize = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.autoSizeMinTextSize;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.autoSizePresetSizes = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.autoSizePresetSizes;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.autoSizeStepGranularity = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.autoSizeStepGranularity;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.autoSizeTextType = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.autoSizeTextType;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.background = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.background;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.backgroundSplit = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.backgroundSplit;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.backgroundStacked = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.backgroundStacked;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.backgroundTint = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.backgroundTint;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.backgroundTintMode = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.backgroundTintMode;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.barLength = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.barLength;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.behavior_autoHide = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.behavior_autoHide;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.behavior_fitToContents = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.behavior_fitToContents;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.behavior_hideable = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.behavior_hideable;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.behavior_overlapTop = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.behavior_overlapTop;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.behavior_peekHeight = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.behavior_peekHeight;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.behavior_skipCollapsed = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.behavior_skipCollapsed;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.borderlessButtonStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.borderlessButtonStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.borderWidth = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.borderWidth;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.bottomAppBarStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.bottomAppBarStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.bottomNavigationStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.bottomNavigationStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.bottomSheetDialogTheme = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.bottomSheetDialogTheme;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.bottomSheetStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.bottomSheetStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.boxBackgroundColor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.boxBackgroundColor;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.boxBackgroundMode = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.boxBackgroundMode;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.boxCollapsedPaddingTop = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.boxCollapsedPaddingTop;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.boxCornerRadiusBottomEnd = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.boxCornerRadiusBottomEnd;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.boxCornerRadiusBottomStart = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.boxCornerRadiusBottomStart;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.boxCornerRadiusTopEnd = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.boxCornerRadiusTopEnd;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.boxCornerRadiusTopStart = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.boxCornerRadiusTopStart;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.boxStrokeColor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.boxStrokeColor;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.boxStrokeWidth = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.boxStrokeWidth;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.buttonBarButtonStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.buttonBarButtonStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.buttonBarNegativeButtonStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.buttonBarNegativeButtonStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.buttonBarNeutralButtonStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.buttonBarNeutralButtonStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.buttonBarPositiveButtonStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.buttonBarPositiveButtonStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.buttonBarStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.buttonBarStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.buttonGravity = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.buttonGravity;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.buttonIconDimen = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.buttonIconDimen;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.buttonPanelSideLayout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.buttonPanelSideLayout;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.buttonStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.buttonStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.buttonStyleSmall = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.buttonStyleSmall;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.buttonTint = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.buttonTint;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.buttonTintMode = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.buttonTintMode;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.cardBackgroundColor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.cardBackgroundColor;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.cardCornerRadius = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.cardCornerRadius;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.cardElevation = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.cardElevation;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.cardMaxElevation = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.cardMaxElevation;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.cardPreventCornerOverlap = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.cardPreventCornerOverlap;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.cardUseCompatPadding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.cardUseCompatPadding;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.cardViewStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.cardViewStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.checkboxStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.checkboxStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.checkedChip = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.checkedChip;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.checkedIcon = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.checkedIcon;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.checkedIconEnabled = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.checkedIconEnabled;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.checkedIconVisible = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.checkedIconVisible;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.checkedTextViewStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.checkedTextViewStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.chipBackgroundColor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.chipBackgroundColor;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.chipCornerRadius = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.chipCornerRadius;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.chipEndPadding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.chipEndPadding;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.chipGroupStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.chipGroupStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.chipIcon = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.chipIcon;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.chipIconEnabled = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.chipIconEnabled;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.chipIconSize = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.chipIconSize;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.chipIconTint = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.chipIconTint;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.chipIconVisible = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.chipIconVisible;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.chipMinHeight = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.chipMinHeight;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.chipSpacing = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.chipSpacing;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.chipSpacingHorizontal = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.chipSpacingHorizontal;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.chipSpacingVertical = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.chipSpacingVertical;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.chipStandaloneStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.chipStandaloneStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.chipStartPadding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.chipStartPadding;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.chipStrokeColor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.chipStrokeColor;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.chipStrokeWidth = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.chipStrokeWidth;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.chipStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.chipStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.closeIcon = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.closeIcon;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.closeIconEnabled = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.closeIconEnabled;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.closeIconEndPadding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.closeIconEndPadding;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.closeIconSize = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.closeIconSize;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.closeIconStartPadding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.closeIconStartPadding;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.closeIconTint = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.closeIconTint;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.closeIconVisible = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.closeIconVisible;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.closeItemLayout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.closeItemLayout;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.collapseContentDescription = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.collapseContentDescription;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.collapsedTitleGravity = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.collapsedTitleGravity;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.collapsedTitleTextAppearance = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.collapsedTitleTextAppearance;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.collapseIcon = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.collapseIcon;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.color = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.color;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.colorAccent = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.colorAccent;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.colorBackgroundFloating = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.colorBackgroundFloating;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.colorButtonNormal = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.colorButtonNormal;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.colorControlActivated = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.colorControlActivated;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.colorControlHighlight = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.colorControlHighlight;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.colorControlNormal = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.colorControlNormal;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.colorError = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.colorError;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.colorPrimary = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.colorPrimary;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.colorPrimaryDark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.colorPrimaryDark;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.colorSecondary = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.colorSecondary;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.colorSwitchThumbNormal = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.colorSwitchThumbNormal;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.commitIcon = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.commitIcon;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.contentDescription = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.contentDescription;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.contentInsetEnd = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.contentInsetEnd;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.contentInsetEndWithActions = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.contentInsetEndWithActions;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.contentInsetLeft = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.contentInsetLeft;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.contentInsetRight = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.contentInsetRight;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.contentInsetStart = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.contentInsetStart;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.contentInsetStartWithNavigation = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.contentInsetStartWithNavigation;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.contentPadding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.contentPadding;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.contentPaddingBottom = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.contentPaddingBottom;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.contentPaddingLeft = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.contentPaddingLeft;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.contentPaddingRight = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.contentPaddingRight;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.contentPaddingTop = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.contentPaddingTop;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.contentScrim = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.contentScrim;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.controlBackground = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.controlBackground;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.coordinatorLayoutStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.coordinatorLayoutStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.cornerRadius = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.cornerRadius;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.counterEnabled = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.counterEnabled;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.counterMaxLength = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.counterMaxLength;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.counterOverflowTextAppearance = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.counterOverflowTextAppearance;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.counterTextAppearance = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.counterTextAppearance;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.customNavigationLayout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.customNavigationLayout;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.defaultQueryHint = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.defaultQueryHint;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.dialogCornerRadius = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.dialogCornerRadius;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.dialogPreferredPadding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.dialogPreferredPadding;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.dialogTheme = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.dialogTheme;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.displayOptions = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.displayOptions;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.divider = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.divider;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.dividerHorizontal = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.dividerHorizontal;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.dividerPadding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.dividerPadding;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.dividerVertical = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.dividerVertical;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.drawableSize = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.drawableSize;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.drawerArrowStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.drawerArrowStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.dropdownListPreferredItemHeight = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.dropdownListPreferredItemHeight;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.dropDownListViewStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.dropDownListViewStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.editTextBackground = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.editTextBackground;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.editTextColor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.editTextColor;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.editTextStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.editTextStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.elevation = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.elevation;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.enforceMaterialTheme = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.enforceMaterialTheme;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.enforceTextAppearance = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.enforceTextAppearance;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.errorEnabled = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.errorEnabled;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.errorTextAppearance = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.errorTextAppearance;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.expandActivityOverflowButtonDrawable = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.expandActivityOverflowButtonDrawable;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.expanded = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.expanded;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.expandedTitleGravity = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.expandedTitleGravity;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.expandedTitleMargin = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.expandedTitleMargin;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.expandedTitleMarginBottom = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.expandedTitleMarginBottom;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.expandedTitleMarginEnd = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.expandedTitleMarginEnd;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.expandedTitleMarginStart = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.expandedTitleMarginStart;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.expandedTitleMarginTop = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.expandedTitleMarginTop;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.expandedTitleTextAppearance = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.expandedTitleTextAppearance;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.fabAlignmentMode = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.fabAlignmentMode;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.fabCradleMargin = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.fabCradleMargin;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.fabCradleRoundedCornerRadius = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.fabCradleRoundedCornerRadius;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.fabCradleVerticalOffset = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.fabCradleVerticalOffset;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.fabCustomSize = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.fabCustomSize;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.fabSize = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.fabSize;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.fastScrollEnabled = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.fastScrollEnabled;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.fastScrollHorizontalThumbDrawable = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.fastScrollHorizontalThumbDrawable;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.fastScrollHorizontalTrackDrawable = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.fastScrollHorizontalTrackDrawable;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.fastScrollVerticalThumbDrawable = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.fastScrollVerticalThumbDrawable;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.fastScrollVerticalTrackDrawable = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.fastScrollVerticalTrackDrawable;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.firstBaselineToTopHeight = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.firstBaselineToTopHeight;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.floatingActionButtonStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.floatingActionButtonStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.font = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.font;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.fontFamily = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.fontFamily;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.fontProviderAuthority = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.fontProviderAuthority;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.fontProviderCerts = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.fontProviderCerts;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.fontProviderFetchStrategy = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.fontProviderFetchStrategy;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.fontProviderFetchTimeout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.fontProviderFetchTimeout;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.fontProviderPackage = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.fontProviderPackage;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.fontProviderQuery = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.fontProviderQuery;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.fontStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.fontStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.fontVariationSettings = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.fontVariationSettings;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.fontWeight = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.fontWeight;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.foregroundInsidePadding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.foregroundInsidePadding;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.gapBetweenBars = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.gapBetweenBars;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.goIcon = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.goIcon;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.headerLayout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.headerLayout;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.height = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.height;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.helperText = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.helperText;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.helperTextEnabled = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.helperTextEnabled;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.helperTextTextAppearance = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.helperTextTextAppearance;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.hideMotionSpec = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.hideMotionSpec;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.hideOnContentScroll = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.hideOnContentScroll;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.hideOnScroll = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.hideOnScroll;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.hintAnimationEnabled = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.hintAnimationEnabled;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.hintEnabled = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.hintEnabled;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.hintTextAppearance = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.hintTextAppearance;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.homeAsUpIndicator = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.homeAsUpIndicator;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.homeLayout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.homeLayout;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.hoveredFocusedTranslationZ = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.hoveredFocusedTranslationZ;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.icon = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.icon;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.iconEndPadding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.iconEndPadding;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.iconGravity = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.iconGravity;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.iconifiedByDefault = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.iconifiedByDefault;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.iconPadding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.iconPadding;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.iconSize = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.iconSize;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.iconStartPadding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.iconStartPadding;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.iconTint = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.iconTint;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.iconTintMode = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.iconTintMode;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.imageButtonStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.imageButtonStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.indeterminateProgressStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.indeterminateProgressStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.initialActivityCount = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.initialActivityCount;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.insetForeground = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.insetForeground;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.isLightTheme = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.isLightTheme;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.itemBackground = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.itemBackground;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.itemHorizontalPadding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.itemHorizontalPadding;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.itemHorizontalTranslationEnabled = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.itemHorizontalTranslationEnabled;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.itemIconPadding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.itemIconPadding;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.itemIconSize = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.itemIconSize;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.itemIconTint = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.itemIconTint;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.itemPadding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.itemPadding;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.itemSpacing = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.itemSpacing;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.itemTextAppearance = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.itemTextAppearance;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.itemTextAppearanceActive = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.itemTextAppearanceActive;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.itemTextAppearanceInactive = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.itemTextAppearanceInactive;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.itemTextColor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.itemTextColor;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.keylines = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.keylines;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.labelVisibilityMode = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.labelVisibilityMode;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.lastBaselineToBottomHeight = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.lastBaselineToBottomHeight;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.layout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.layout;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.layoutManager = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.layoutManager;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.layout_anchor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.layout_anchor;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.layout_anchorGravity = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.layout_anchorGravity;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.layout_behavior = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.layout_behavior;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.layout_collapseMode = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.layout_collapseMode;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.layout_collapseParallaxMultiplier = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.layout_collapseParallaxMultiplier;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.layout_dodgeInsetEdges = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.layout_dodgeInsetEdges;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.layout_insetEdge = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.layout_insetEdge;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.layout_keyline = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.layout_keyline;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.layout_scrollFlags = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.layout_scrollFlags;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.layout_scrollInterpolator = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.layout_scrollInterpolator;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.liftOnScroll = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.liftOnScroll;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.lineHeight = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.lineHeight;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.lineSpacing = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.lineSpacing;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.listChoiceBackgroundIndicator = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.listChoiceBackgroundIndicator;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.listDividerAlertDialog = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.listDividerAlertDialog;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.listItemLayout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.listItemLayout;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.listLayout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.listLayout;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.listMenuViewStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.listMenuViewStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.listPopupWindowStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.listPopupWindowStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.listPreferredItemHeight = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.listPreferredItemHeight;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.listPreferredItemHeightLarge = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.listPreferredItemHeightLarge;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.listPreferredItemHeightSmall = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.listPreferredItemHeightSmall;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.listPreferredItemPaddingLeft = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.listPreferredItemPaddingLeft;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.listPreferredItemPaddingRight = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.listPreferredItemPaddingRight;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.logo = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.logo;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.logoDescription = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.logoDescription;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.materialButtonStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.materialButtonStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.materialCardViewStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.materialCardViewStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.maxActionInlineWidth = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.maxActionInlineWidth;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.maxButtonHeight = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.maxButtonHeight;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.maxImageSize = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.maxImageSize;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.measureWithLargestChild = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.measureWithLargestChild;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.menu = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.menu;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.multiChoiceItemLayout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.multiChoiceItemLayout;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.navigationContentDescription = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.navigationContentDescription;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.navigationIcon = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.navigationIcon;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.navigationMode = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.navigationMode;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.navigationViewStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.navigationViewStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.numericModifiers = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.numericModifiers;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.overlapAnchor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.overlapAnchor;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.paddingBottomNoButtons = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.paddingBottomNoButtons;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.paddingEnd = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.paddingEnd;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.paddingStart = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.paddingStart;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.paddingTopNoTitle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.paddingTopNoTitle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.panelBackground = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.panelBackground;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.panelMenuListTheme = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.panelMenuListTheme;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.panelMenuListWidth = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.panelMenuListWidth;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.passwordToggleContentDescription = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.passwordToggleContentDescription;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.passwordToggleDrawable = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.passwordToggleDrawable;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.passwordToggleEnabled = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.passwordToggleEnabled;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.passwordToggleTint = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.passwordToggleTint;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.passwordToggleTintMode = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.passwordToggleTintMode;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.popupMenuStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.popupMenuStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.popupTheme = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.popupTheme;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.popupWindowStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.popupWindowStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.preserveIconSpacing = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.preserveIconSpacing;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.pressedTranslationZ = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.pressedTranslationZ;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.progressBarPadding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.progressBarPadding;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.progressBarStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.progressBarStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.queryBackground = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.queryBackground;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.queryHint = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.queryHint;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.radioButtonStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.radioButtonStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.ratingBarStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.ratingBarStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.ratingBarStyleIndicator = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.ratingBarStyleIndicator;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.ratingBarStyleSmall = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.ratingBarStyleSmall;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.reverseLayout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.reverseLayout;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.rippleColor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.rippleColor;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.scrimAnimationDuration = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.scrimAnimationDuration;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.scrimBackground = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.scrimBackground;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.scrimVisibleHeightTrigger = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.scrimVisibleHeightTrigger;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.searchHintIcon = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.searchHintIcon;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.searchIcon = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.searchIcon;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.searchViewStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.searchViewStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.seekBarStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.seekBarStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.selectableItemBackground = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.selectableItemBackground;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.selectableItemBackgroundBorderless = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.selectableItemBackgroundBorderless;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.showAsAction = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.showAsAction;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.showDividers = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.showDividers;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.showMotionSpec = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.showMotionSpec;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.showText = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.showText;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.showTitle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.showTitle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.singleChoiceItemLayout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.singleChoiceItemLayout;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.singleLine = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.singleLine;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.singleSelection = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.singleSelection;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.snackbarButtonStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.snackbarButtonStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.snackbarStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.snackbarStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.spanCount = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.spanCount;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.spinBars = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.spinBars;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.spinnerDropDownItemStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.spinnerDropDownItemStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.spinnerStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.spinnerStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.splitTrack = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.splitTrack;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.srcCompat = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.srcCompat;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.stackFromEnd = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.stackFromEnd;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.state_above_anchor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.state_above_anchor;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.state_collapsed = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.state_collapsed;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.state_collapsible = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.state_collapsible;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.state_liftable = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.state_liftable;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.state_lifted = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.state_lifted;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.statusBarBackground = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.statusBarBackground;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.statusBarScrim = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.statusBarScrim;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.strokeColor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.strokeColor;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.strokeWidth = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.strokeWidth;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.subMenuArrow = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.subMenuArrow;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.submitBackground = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.submitBackground;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.subtitle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.subtitle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.subtitleTextAppearance = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.subtitleTextAppearance;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.subtitleTextColor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.subtitleTextColor;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.subtitleTextStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.subtitleTextStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.suggestionRowLayout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.suggestionRowLayout;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.switchMinWidth = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.switchMinWidth;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.switchPadding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.switchPadding;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.switchStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.switchStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.switchTextAppearance = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.switchTextAppearance;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.tabBackground = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.tabBackground;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.tabContentStart = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.tabContentStart;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.tabGravity = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.tabGravity;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.tabIconTint = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.tabIconTint;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.tabIconTintMode = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.tabIconTintMode;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.tabIndicator = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.tabIndicator;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.tabIndicatorAnimationDuration = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.tabIndicatorAnimationDuration;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.tabIndicatorColor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.tabIndicatorColor;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.tabIndicatorFullWidth = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.tabIndicatorFullWidth;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.tabIndicatorGravity = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.tabIndicatorGravity;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.tabIndicatorHeight = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.tabIndicatorHeight;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.tabInlineLabel = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.tabInlineLabel;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.tabMaxWidth = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.tabMaxWidth;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.tabMinWidth = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.tabMinWidth;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.tabMode = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.tabMode;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.tabPadding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.tabPadding;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.tabPaddingBottom = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.tabPaddingBottom;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.tabPaddingEnd = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.tabPaddingEnd;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.tabPaddingStart = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.tabPaddingStart;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.tabPaddingTop = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.tabPaddingTop;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.tabRippleColor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.tabRippleColor;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.tabSelectedTextColor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.tabSelectedTextColor;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.tabStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.tabStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.tabTextAppearance = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.tabTextAppearance;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.tabTextColor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.tabTextColor;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.tabUnboundedRipple = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.tabUnboundedRipple;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.textAllCaps = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.textAllCaps;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.textAppearanceBody1 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.textAppearanceBody1;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.textAppearanceBody2 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.textAppearanceBody2;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.textAppearanceButton = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.textAppearanceButton;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.textAppearanceCaption = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.textAppearanceCaption;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.textAppearanceHeadline1 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.textAppearanceHeadline1;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.textAppearanceHeadline2 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.textAppearanceHeadline2;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.textAppearanceHeadline3 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.textAppearanceHeadline3;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.textAppearanceHeadline4 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.textAppearanceHeadline4;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.textAppearanceHeadline5 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.textAppearanceHeadline5;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.textAppearanceHeadline6 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.textAppearanceHeadline6;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.textAppearanceLargePopupMenu = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.textAppearanceLargePopupMenu;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.textAppearanceListItem = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.textAppearanceListItem;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.textAppearanceListItemSecondary = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.textAppearanceListItemSecondary;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.textAppearanceListItemSmall = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.textAppearanceListItemSmall;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.textAppearanceOverline = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.textAppearanceOverline;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.textAppearancePopupMenuHeader = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.textAppearancePopupMenuHeader;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.textAppearanceSearchResultSubtitle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.textAppearanceSearchResultSubtitle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.textAppearanceSearchResultTitle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.textAppearanceSearchResultTitle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.textAppearanceSmallPopupMenu = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.textAppearanceSmallPopupMenu;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.textAppearanceSubtitle1 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.textAppearanceSubtitle1;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.textAppearanceSubtitle2 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.textAppearanceSubtitle2;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.textColorAlertDialogListItem = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.textColorAlertDialogListItem;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.textColorSearchUrl = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.textColorSearchUrl;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.textEndPadding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.textEndPadding;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.textInputStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.textInputStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.textStartPadding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.textStartPadding;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.theme = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.theme;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.thickness = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.thickness;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.thumbTextPadding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.thumbTextPadding;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.thumbTint = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.thumbTint;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.thumbTintMode = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.thumbTintMode;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.tickMark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.tickMark;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.tickMarkTint = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.tickMarkTint;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.tickMarkTintMode = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.tickMarkTintMode;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.tint = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.tint;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.tintMode = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.tintMode;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.title = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.title;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.titleEnabled = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.titleEnabled;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.titleMargin = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.titleMargin;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.titleMarginBottom = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.titleMarginBottom;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.titleMarginEnd = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.titleMarginEnd;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.titleMargins = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.titleMargins;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.titleMarginStart = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.titleMarginStart;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.titleMarginTop = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.titleMarginTop;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.titleTextAppearance = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.titleTextAppearance;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.titleTextColor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.titleTextColor;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.titleTextStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.titleTextStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.toolbarId = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.toolbarId;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.toolbarNavigationButtonStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.toolbarNavigationButtonStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.toolbarStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.toolbarStyle;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.tooltipForegroundColor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.tooltipForegroundColor;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.tooltipFrameBackground = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.tooltipFrameBackground;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.tooltipText = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.tooltipText;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.track = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.track;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.trackTint = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.trackTint;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.trackTintMode = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.trackTintMode;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.ttcIndex = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.ttcIndex;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.useCompatPadding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.useCompatPadding;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.viewInflaterClass = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.viewInflaterClass;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.voiceIcon = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.voiceIcon;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.windowActionBar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.windowActionBar;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.windowActionBarOverlay = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.windowActionBarOverlay;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.windowActionModeOverlay = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.windowActionModeOverlay;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.windowFixedHeightMajor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.windowFixedHeightMajor;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.windowFixedHeightMinor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.windowFixedHeightMinor;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.windowFixedWidthMajor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.windowFixedWidthMajor;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.windowFixedWidthMinor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.windowFixedWidthMinor;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.windowMinWidthMajor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.windowMinWidthMajor;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.windowMinWidthMinor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.windowMinWidthMinor;
-			global::SkiaSharp.Views.Forms.Resource.Attribute.windowNoTitle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.windowNoTitle;
-			global::SkiaSharp.Views.Forms.Resource.Boolean.abc_action_bar_embed_tabs = global::PerryRhodan.AudiobookPlayer.Android.Resource.Boolean.abc_action_bar_embed_tabs;
-			global::SkiaSharp.Views.Forms.Resource.Boolean.abc_allow_stacked_button_bar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Boolean.abc_allow_stacked_button_bar;
-			global::SkiaSharp.Views.Forms.Resource.Boolean.abc_config_actionMenuItemAllCaps = global::PerryRhodan.AudiobookPlayer.Android.Resource.Boolean.abc_config_actionMenuItemAllCaps;
-			global::SkiaSharp.Views.Forms.Resource.Boolean.mtrl_btn_textappearance_all_caps = global::PerryRhodan.AudiobookPlayer.Android.Resource.Boolean.mtrl_btn_textappearance_all_caps;
-			global::SkiaSharp.Views.Forms.Resource.Color.abc_background_cache_hint_selector_material_dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.abc_background_cache_hint_selector_material_dark;
-			global::SkiaSharp.Views.Forms.Resource.Color.abc_background_cache_hint_selector_material_light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.abc_background_cache_hint_selector_material_light;
-			global::SkiaSharp.Views.Forms.Resource.Color.abc_btn_colored_borderless_text_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.abc_btn_colored_borderless_text_material;
-			global::SkiaSharp.Views.Forms.Resource.Color.abc_btn_colored_text_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.abc_btn_colored_text_material;
-			global::SkiaSharp.Views.Forms.Resource.Color.abc_color_highlight_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.abc_color_highlight_material;
-			global::SkiaSharp.Views.Forms.Resource.Color.abc_hint_foreground_material_dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.abc_hint_foreground_material_dark;
-			global::SkiaSharp.Views.Forms.Resource.Color.abc_hint_foreground_material_light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.abc_hint_foreground_material_light;
-			global::SkiaSharp.Views.Forms.Resource.Color.abc_input_method_navigation_guard = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.abc_input_method_navigation_guard;
-			global::SkiaSharp.Views.Forms.Resource.Color.abc_primary_text_disable_only_material_dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.abc_primary_text_disable_only_material_dark;
-			global::SkiaSharp.Views.Forms.Resource.Color.abc_primary_text_disable_only_material_light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.abc_primary_text_disable_only_material_light;
-			global::SkiaSharp.Views.Forms.Resource.Color.abc_primary_text_material_dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.abc_primary_text_material_dark;
-			global::SkiaSharp.Views.Forms.Resource.Color.abc_primary_text_material_light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.abc_primary_text_material_light;
-			global::SkiaSharp.Views.Forms.Resource.Color.abc_search_url_text = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.abc_search_url_text;
-			global::SkiaSharp.Views.Forms.Resource.Color.abc_search_url_text_normal = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.abc_search_url_text_normal;
-			global::SkiaSharp.Views.Forms.Resource.Color.abc_search_url_text_pressed = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.abc_search_url_text_pressed;
-			global::SkiaSharp.Views.Forms.Resource.Color.abc_search_url_text_selected = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.abc_search_url_text_selected;
-			global::SkiaSharp.Views.Forms.Resource.Color.abc_secondary_text_material_dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.abc_secondary_text_material_dark;
-			global::SkiaSharp.Views.Forms.Resource.Color.abc_secondary_text_material_light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.abc_secondary_text_material_light;
-			global::SkiaSharp.Views.Forms.Resource.Color.abc_tint_btn_checkable = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.abc_tint_btn_checkable;
-			global::SkiaSharp.Views.Forms.Resource.Color.abc_tint_default = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.abc_tint_default;
-			global::SkiaSharp.Views.Forms.Resource.Color.abc_tint_edittext = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.abc_tint_edittext;
-			global::SkiaSharp.Views.Forms.Resource.Color.abc_tint_seek_thumb = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.abc_tint_seek_thumb;
-			global::SkiaSharp.Views.Forms.Resource.Color.abc_tint_spinner = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.abc_tint_spinner;
-			global::SkiaSharp.Views.Forms.Resource.Color.abc_tint_switch_track = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.abc_tint_switch_track;
-			global::SkiaSharp.Views.Forms.Resource.Color.accent_material_dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.accent_material_dark;
-			global::SkiaSharp.Views.Forms.Resource.Color.accent_material_light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.accent_material_light;
-			global::SkiaSharp.Views.Forms.Resource.Color.background_floating_material_dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.background_floating_material_dark;
-			global::SkiaSharp.Views.Forms.Resource.Color.background_floating_material_light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.background_floating_material_light;
-			global::SkiaSharp.Views.Forms.Resource.Color.background_material_dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.background_material_dark;
-			global::SkiaSharp.Views.Forms.Resource.Color.background_material_light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.background_material_light;
-			global::SkiaSharp.Views.Forms.Resource.Color.bright_foreground_disabled_material_dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.bright_foreground_disabled_material_dark;
-			global::SkiaSharp.Views.Forms.Resource.Color.bright_foreground_disabled_material_light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.bright_foreground_disabled_material_light;
-			global::SkiaSharp.Views.Forms.Resource.Color.bright_foreground_inverse_material_dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.bright_foreground_inverse_material_dark;
-			global::SkiaSharp.Views.Forms.Resource.Color.bright_foreground_inverse_material_light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.bright_foreground_inverse_material_light;
-			global::SkiaSharp.Views.Forms.Resource.Color.bright_foreground_material_dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.bright_foreground_material_dark;
-			global::SkiaSharp.Views.Forms.Resource.Color.bright_foreground_material_light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.bright_foreground_material_light;
-			global::SkiaSharp.Views.Forms.Resource.Color.browser_actions_bg_grey = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.browser_actions_bg_grey;
-			global::SkiaSharp.Views.Forms.Resource.Color.browser_actions_divider_color = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.browser_actions_divider_color;
-			global::SkiaSharp.Views.Forms.Resource.Color.browser_actions_text_color = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.browser_actions_text_color;
-			global::SkiaSharp.Views.Forms.Resource.Color.browser_actions_title_color = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.browser_actions_title_color;
-			global::SkiaSharp.Views.Forms.Resource.Color.button_material_dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.button_material_dark;
-			global::SkiaSharp.Views.Forms.Resource.Color.button_material_light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.button_material_light;
-			global::SkiaSharp.Views.Forms.Resource.Color.cardview_dark_background = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.cardview_dark_background;
-			global::SkiaSharp.Views.Forms.Resource.Color.cardview_light_background = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.cardview_light_background;
-			global::SkiaSharp.Views.Forms.Resource.Color.cardview_shadow_end_color = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.cardview_shadow_end_color;
-			global::SkiaSharp.Views.Forms.Resource.Color.cardview_shadow_start_color = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.cardview_shadow_start_color;
-			global::SkiaSharp.Views.Forms.Resource.Color.design_bottom_navigation_shadow_color = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.design_bottom_navigation_shadow_color;
-			global::SkiaSharp.Views.Forms.Resource.Color.design_default_color_primary = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.design_default_color_primary;
-			global::SkiaSharp.Views.Forms.Resource.Color.design_default_color_primary_dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.design_default_color_primary_dark;
-			global::SkiaSharp.Views.Forms.Resource.Color.design_error = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.design_error;
-			global::SkiaSharp.Views.Forms.Resource.Color.design_fab_shadow_end_color = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.design_fab_shadow_end_color;
-			global::SkiaSharp.Views.Forms.Resource.Color.design_fab_shadow_mid_color = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.design_fab_shadow_mid_color;
-			global::SkiaSharp.Views.Forms.Resource.Color.design_fab_shadow_start_color = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.design_fab_shadow_start_color;
-			global::SkiaSharp.Views.Forms.Resource.Color.design_fab_stroke_end_inner_color = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.design_fab_stroke_end_inner_color;
-			global::SkiaSharp.Views.Forms.Resource.Color.design_fab_stroke_end_outer_color = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.design_fab_stroke_end_outer_color;
-			global::SkiaSharp.Views.Forms.Resource.Color.design_fab_stroke_top_inner_color = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.design_fab_stroke_top_inner_color;
-			global::SkiaSharp.Views.Forms.Resource.Color.design_fab_stroke_top_outer_color = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.design_fab_stroke_top_outer_color;
-			global::SkiaSharp.Views.Forms.Resource.Color.design_snackbar_background_color = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.design_snackbar_background_color;
-			global::SkiaSharp.Views.Forms.Resource.Color.design_tint_password_toggle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.design_tint_password_toggle;
-			global::SkiaSharp.Views.Forms.Resource.Color.dim_foreground_disabled_material_dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.dim_foreground_disabled_material_dark;
-			global::SkiaSharp.Views.Forms.Resource.Color.dim_foreground_disabled_material_light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.dim_foreground_disabled_material_light;
-			global::SkiaSharp.Views.Forms.Resource.Color.dim_foreground_material_dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.dim_foreground_material_dark;
-			global::SkiaSharp.Views.Forms.Resource.Color.dim_foreground_material_light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.dim_foreground_material_light;
-			global::SkiaSharp.Views.Forms.Resource.Color.error_color_material_dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.error_color_material_dark;
-			global::SkiaSharp.Views.Forms.Resource.Color.error_color_material_light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.error_color_material_light;
-			global::SkiaSharp.Views.Forms.Resource.Color.foreground_material_dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.foreground_material_dark;
-			global::SkiaSharp.Views.Forms.Resource.Color.foreground_material_light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.foreground_material_light;
-			global::SkiaSharp.Views.Forms.Resource.Color.highlighted_text_material_dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.highlighted_text_material_dark;
-			global::SkiaSharp.Views.Forms.Resource.Color.highlighted_text_material_light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.highlighted_text_material_light;
-			global::SkiaSharp.Views.Forms.Resource.Color.material_blue_grey_800 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.material_blue_grey_800;
-			global::SkiaSharp.Views.Forms.Resource.Color.material_blue_grey_900 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.material_blue_grey_900;
-			global::SkiaSharp.Views.Forms.Resource.Color.material_blue_grey_950 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.material_blue_grey_950;
-			global::SkiaSharp.Views.Forms.Resource.Color.material_deep_teal_200 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.material_deep_teal_200;
-			global::SkiaSharp.Views.Forms.Resource.Color.material_deep_teal_500 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.material_deep_teal_500;
-			global::SkiaSharp.Views.Forms.Resource.Color.material_grey_100 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.material_grey_100;
-			global::SkiaSharp.Views.Forms.Resource.Color.material_grey_300 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.material_grey_300;
-			global::SkiaSharp.Views.Forms.Resource.Color.material_grey_50 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.material_grey_50;
-			global::SkiaSharp.Views.Forms.Resource.Color.material_grey_600 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.material_grey_600;
-			global::SkiaSharp.Views.Forms.Resource.Color.material_grey_800 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.material_grey_800;
-			global::SkiaSharp.Views.Forms.Resource.Color.material_grey_850 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.material_grey_850;
-			global::SkiaSharp.Views.Forms.Resource.Color.material_grey_900 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.material_grey_900;
-			global::SkiaSharp.Views.Forms.Resource.Color.mtrl_bottom_nav_colored_item_tint = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.mtrl_bottom_nav_colored_item_tint;
-			global::SkiaSharp.Views.Forms.Resource.Color.mtrl_bottom_nav_item_tint = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.mtrl_bottom_nav_item_tint;
-			global::SkiaSharp.Views.Forms.Resource.Color.mtrl_btn_bg_color_disabled = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.mtrl_btn_bg_color_disabled;
-			global::SkiaSharp.Views.Forms.Resource.Color.mtrl_btn_bg_color_selector = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.mtrl_btn_bg_color_selector;
-			global::SkiaSharp.Views.Forms.Resource.Color.mtrl_btn_ripple_color = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.mtrl_btn_ripple_color;
-			global::SkiaSharp.Views.Forms.Resource.Color.mtrl_btn_stroke_color_selector = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.mtrl_btn_stroke_color_selector;
-			global::SkiaSharp.Views.Forms.Resource.Color.mtrl_btn_text_btn_ripple_color = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.mtrl_btn_text_btn_ripple_color;
-			global::SkiaSharp.Views.Forms.Resource.Color.mtrl_btn_text_color_disabled = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.mtrl_btn_text_color_disabled;
-			global::SkiaSharp.Views.Forms.Resource.Color.mtrl_btn_text_color_selector = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.mtrl_btn_text_color_selector;
-			global::SkiaSharp.Views.Forms.Resource.Color.mtrl_btn_transparent_bg_color = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.mtrl_btn_transparent_bg_color;
-			global::SkiaSharp.Views.Forms.Resource.Color.mtrl_chip_background_color = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.mtrl_chip_background_color;
-			global::SkiaSharp.Views.Forms.Resource.Color.mtrl_chip_close_icon_tint = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.mtrl_chip_close_icon_tint;
-			global::SkiaSharp.Views.Forms.Resource.Color.mtrl_chip_ripple_color = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.mtrl_chip_ripple_color;
-			global::SkiaSharp.Views.Forms.Resource.Color.mtrl_chip_text_color = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.mtrl_chip_text_color;
-			global::SkiaSharp.Views.Forms.Resource.Color.mtrl_fab_ripple_color = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.mtrl_fab_ripple_color;
-			global::SkiaSharp.Views.Forms.Resource.Color.mtrl_scrim_color = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.mtrl_scrim_color;
-			global::SkiaSharp.Views.Forms.Resource.Color.mtrl_tabs_colored_ripple_color = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.mtrl_tabs_colored_ripple_color;
-			global::SkiaSharp.Views.Forms.Resource.Color.mtrl_tabs_icon_color_selector = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.mtrl_tabs_icon_color_selector;
-			global::SkiaSharp.Views.Forms.Resource.Color.mtrl_tabs_icon_color_selector_colored = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.mtrl_tabs_icon_color_selector_colored;
-			global::SkiaSharp.Views.Forms.Resource.Color.mtrl_tabs_legacy_text_color_selector = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.mtrl_tabs_legacy_text_color_selector;
-			global::SkiaSharp.Views.Forms.Resource.Color.mtrl_tabs_ripple_color = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.mtrl_tabs_ripple_color;
-			global::SkiaSharp.Views.Forms.Resource.Color.mtrl_textinput_default_box_stroke_color = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.mtrl_textinput_default_box_stroke_color;
-			global::SkiaSharp.Views.Forms.Resource.Color.mtrl_textinput_disabled_color = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.mtrl_textinput_disabled_color;
-			global::SkiaSharp.Views.Forms.Resource.Color.mtrl_textinput_filled_box_default_background_color = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.mtrl_textinput_filled_box_default_background_color;
-			global::SkiaSharp.Views.Forms.Resource.Color.mtrl_textinput_hovered_box_stroke_color = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.mtrl_textinput_hovered_box_stroke_color;
-			global::SkiaSharp.Views.Forms.Resource.Color.mtrl_text_btn_text_color_selector = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.mtrl_text_btn_text_color_selector;
-			global::SkiaSharp.Views.Forms.Resource.Color.notification_action_color_filter = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.notification_action_color_filter;
-			global::SkiaSharp.Views.Forms.Resource.Color.notification_icon_bg_color = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.notification_icon_bg_color;
-			global::SkiaSharp.Views.Forms.Resource.Color.notification_material_background_media_default_color = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.notification_material_background_media_default_color;
-			global::SkiaSharp.Views.Forms.Resource.Color.primary_dark_material_dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.primary_dark_material_dark;
-			global::SkiaSharp.Views.Forms.Resource.Color.primary_dark_material_light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.primary_dark_material_light;
-			global::SkiaSharp.Views.Forms.Resource.Color.primary_material_dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.primary_material_dark;
-			global::SkiaSharp.Views.Forms.Resource.Color.primary_material_light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.primary_material_light;
-			global::SkiaSharp.Views.Forms.Resource.Color.primary_text_default_material_dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.primary_text_default_material_dark;
-			global::SkiaSharp.Views.Forms.Resource.Color.primary_text_default_material_light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.primary_text_default_material_light;
-			global::SkiaSharp.Views.Forms.Resource.Color.primary_text_disabled_material_dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.primary_text_disabled_material_dark;
-			global::SkiaSharp.Views.Forms.Resource.Color.primary_text_disabled_material_light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.primary_text_disabled_material_light;
-			global::SkiaSharp.Views.Forms.Resource.Color.ripple_material_dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.ripple_material_dark;
-			global::SkiaSharp.Views.Forms.Resource.Color.ripple_material_light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.ripple_material_light;
-			global::SkiaSharp.Views.Forms.Resource.Color.secondary_text_default_material_dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.secondary_text_default_material_dark;
-			global::SkiaSharp.Views.Forms.Resource.Color.secondary_text_default_material_light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.secondary_text_default_material_light;
-			global::SkiaSharp.Views.Forms.Resource.Color.secondary_text_disabled_material_dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.secondary_text_disabled_material_dark;
-			global::SkiaSharp.Views.Forms.Resource.Color.secondary_text_disabled_material_light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.secondary_text_disabled_material_light;
-			global::SkiaSharp.Views.Forms.Resource.Color.switch_thumb_disabled_material_dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.switch_thumb_disabled_material_dark;
-			global::SkiaSharp.Views.Forms.Resource.Color.switch_thumb_disabled_material_light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.switch_thumb_disabled_material_light;
-			global::SkiaSharp.Views.Forms.Resource.Color.switch_thumb_material_dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.switch_thumb_material_dark;
-			global::SkiaSharp.Views.Forms.Resource.Color.switch_thumb_material_light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.switch_thumb_material_light;
-			global::SkiaSharp.Views.Forms.Resource.Color.switch_thumb_normal_material_dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.switch_thumb_normal_material_dark;
-			global::SkiaSharp.Views.Forms.Resource.Color.switch_thumb_normal_material_light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.switch_thumb_normal_material_light;
-			global::SkiaSharp.Views.Forms.Resource.Color.tooltip_background_dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.tooltip_background_dark;
-			global::SkiaSharp.Views.Forms.Resource.Color.tooltip_background_light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.tooltip_background_light;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_action_bar_content_inset_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_action_bar_content_inset_material;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_action_bar_content_inset_with_nav = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_action_bar_content_inset_with_nav;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_action_bar_default_height_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_action_bar_default_height_material;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_action_bar_default_padding_end_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_action_bar_default_padding_end_material;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_action_bar_default_padding_start_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_action_bar_default_padding_start_material;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_action_bar_elevation_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_action_bar_elevation_material;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_action_bar_icon_vertical_padding_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_action_bar_icon_vertical_padding_material;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_action_bar_overflow_padding_end_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_action_bar_overflow_padding_end_material;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_action_bar_overflow_padding_start_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_action_bar_overflow_padding_start_material;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_action_bar_stacked_max_height = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_action_bar_stacked_max_height;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_action_bar_stacked_tab_max_width = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_action_bar_stacked_tab_max_width;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_action_bar_subtitle_bottom_margin_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_action_bar_subtitle_bottom_margin_material;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_action_bar_subtitle_top_margin_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_action_bar_subtitle_top_margin_material;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_action_button_min_height_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_action_button_min_height_material;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_action_button_min_width_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_action_button_min_width_material;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_action_button_min_width_overflow_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_action_button_min_width_overflow_material;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_alert_dialog_button_bar_height = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_alert_dialog_button_bar_height;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_alert_dialog_button_dimen = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_alert_dialog_button_dimen;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_button_inset_horizontal_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_button_inset_horizontal_material;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_button_inset_vertical_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_button_inset_vertical_material;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_button_padding_horizontal_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_button_padding_horizontal_material;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_button_padding_vertical_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_button_padding_vertical_material;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_cascading_menus_min_smallest_width = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_cascading_menus_min_smallest_width;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_config_prefDialogWidth = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_config_prefDialogWidth;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_control_corner_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_control_corner_material;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_control_inset_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_control_inset_material;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_control_padding_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_control_padding_material;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_dialog_corner_radius_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_dialog_corner_radius_material;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_dialog_fixed_height_major = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_dialog_fixed_height_major;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_dialog_fixed_height_minor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_dialog_fixed_height_minor;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_dialog_fixed_width_major = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_dialog_fixed_width_major;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_dialog_fixed_width_minor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_dialog_fixed_width_minor;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_dialog_list_padding_bottom_no_buttons = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_dialog_list_padding_bottom_no_buttons;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_dialog_list_padding_top_no_title = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_dialog_list_padding_top_no_title;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_dialog_min_width_major = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_dialog_min_width_major;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_dialog_min_width_minor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_dialog_min_width_minor;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_dialog_padding_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_dialog_padding_material;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_dialog_padding_top_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_dialog_padding_top_material;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_dialog_title_divider_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_dialog_title_divider_material;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_disabled_alpha_material_dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_disabled_alpha_material_dark;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_disabled_alpha_material_light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_disabled_alpha_material_light;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_dropdownitem_icon_width = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_dropdownitem_icon_width;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_dropdownitem_text_padding_left = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_dropdownitem_text_padding_left;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_dropdownitem_text_padding_right = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_dropdownitem_text_padding_right;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_edit_text_inset_bottom_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_edit_text_inset_bottom_material;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_edit_text_inset_horizontal_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_edit_text_inset_horizontal_material;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_edit_text_inset_top_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_edit_text_inset_top_material;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_floating_window_z = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_floating_window_z;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_list_item_padding_horizontal_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_list_item_padding_horizontal_material;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_panel_menu_list_width = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_panel_menu_list_width;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_progress_bar_height_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_progress_bar_height_material;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_search_view_preferred_height = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_search_view_preferred_height;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_search_view_preferred_width = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_search_view_preferred_width;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_seekbar_track_background_height_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_seekbar_track_background_height_material;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_seekbar_track_progress_height_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_seekbar_track_progress_height_material;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_select_dialog_padding_start_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_select_dialog_padding_start_material;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_switch_padding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_switch_padding;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_text_size_body_1_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_text_size_body_1_material;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_text_size_body_2_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_text_size_body_2_material;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_text_size_button_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_text_size_button_material;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_text_size_caption_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_text_size_caption_material;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_text_size_display_1_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_text_size_display_1_material;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_text_size_display_2_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_text_size_display_2_material;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_text_size_display_3_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_text_size_display_3_material;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_text_size_display_4_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_text_size_display_4_material;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_text_size_headline_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_text_size_headline_material;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_text_size_large_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_text_size_large_material;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_text_size_medium_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_text_size_medium_material;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_text_size_menu_header_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_text_size_menu_header_material;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_text_size_menu_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_text_size_menu_material;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_text_size_small_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_text_size_small_material;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_text_size_subhead_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_text_size_subhead_material;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_text_size_subtitle_material_toolbar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_text_size_subtitle_material_toolbar;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_text_size_title_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_text_size_title_material;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.abc_text_size_title_material_toolbar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.abc_text_size_title_material_toolbar;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.browser_actions_context_menu_max_width = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.browser_actions_context_menu_max_width;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.browser_actions_context_menu_min_padding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.browser_actions_context_menu_min_padding;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.cardview_compat_inset_shadow = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.cardview_compat_inset_shadow;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.cardview_default_elevation = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.cardview_default_elevation;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.cardview_default_radius = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.cardview_default_radius;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.compat_button_inset_horizontal_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.compat_button_inset_horizontal_material;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.compat_button_inset_vertical_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.compat_button_inset_vertical_material;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.compat_button_padding_horizontal_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.compat_button_padding_horizontal_material;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.compat_button_padding_vertical_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.compat_button_padding_vertical_material;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.compat_control_corner_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.compat_control_corner_material;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.compat_notification_large_icon_max_height = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.compat_notification_large_icon_max_height;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.compat_notification_large_icon_max_width = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.compat_notification_large_icon_max_width;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.design_appbar_elevation = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.design_appbar_elevation;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.design_bottom_navigation_active_item_max_width = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.design_bottom_navigation_active_item_max_width;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.design_bottom_navigation_active_item_min_width = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.design_bottom_navigation_active_item_min_width;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.design_bottom_navigation_active_text_size = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.design_bottom_navigation_active_text_size;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.design_bottom_navigation_elevation = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.design_bottom_navigation_elevation;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.design_bottom_navigation_height = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.design_bottom_navigation_height;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.design_bottom_navigation_icon_size = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.design_bottom_navigation_icon_size;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.design_bottom_navigation_item_max_width = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.design_bottom_navigation_item_max_width;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.design_bottom_navigation_item_min_width = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.design_bottom_navigation_item_min_width;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.design_bottom_navigation_margin = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.design_bottom_navigation_margin;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.design_bottom_navigation_shadow_height = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.design_bottom_navigation_shadow_height;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.design_bottom_navigation_text_size = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.design_bottom_navigation_text_size;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.design_bottom_sheet_modal_elevation = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.design_bottom_sheet_modal_elevation;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.design_bottom_sheet_peek_height_min = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.design_bottom_sheet_peek_height_min;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.design_fab_border_width = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.design_fab_border_width;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.design_fab_elevation = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.design_fab_elevation;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.design_fab_image_size = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.design_fab_image_size;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.design_fab_size_mini = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.design_fab_size_mini;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.design_fab_size_normal = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.design_fab_size_normal;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.design_fab_translation_z_hovered_focused = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.design_fab_translation_z_hovered_focused;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.design_fab_translation_z_pressed = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.design_fab_translation_z_pressed;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.design_navigation_elevation = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.design_navigation_elevation;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.design_navigation_icon_padding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.design_navigation_icon_padding;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.design_navigation_icon_size = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.design_navigation_icon_size;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.design_navigation_item_horizontal_padding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.design_navigation_item_horizontal_padding;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.design_navigation_item_icon_padding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.design_navigation_item_icon_padding;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.design_navigation_max_width = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.design_navigation_max_width;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.design_navigation_padding_bottom = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.design_navigation_padding_bottom;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.design_navigation_separator_vertical_padding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.design_navigation_separator_vertical_padding;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.design_snackbar_action_inline_max_width = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.design_snackbar_action_inline_max_width;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.design_snackbar_background_corner_radius = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.design_snackbar_background_corner_radius;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.design_snackbar_elevation = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.design_snackbar_elevation;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.design_snackbar_extra_spacing_horizontal = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.design_snackbar_extra_spacing_horizontal;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.design_snackbar_max_width = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.design_snackbar_max_width;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.design_snackbar_min_width = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.design_snackbar_min_width;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.design_snackbar_padding_horizontal = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.design_snackbar_padding_horizontal;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.design_snackbar_padding_vertical = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.design_snackbar_padding_vertical;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.design_snackbar_padding_vertical_2lines = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.design_snackbar_padding_vertical_2lines;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.design_snackbar_text_size = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.design_snackbar_text_size;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.design_tab_max_width = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.design_tab_max_width;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.design_tab_scrollable_min_width = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.design_tab_scrollable_min_width;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.design_tab_text_size = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.design_tab_text_size;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.design_tab_text_size_2line = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.design_tab_text_size_2line;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.design_textinput_caption_translate_y = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.design_textinput_caption_translate_y;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.disabled_alpha_material_dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.disabled_alpha_material_dark;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.disabled_alpha_material_light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.disabled_alpha_material_light;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.fastscroll_default_thickness = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.fastscroll_default_thickness;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.fastscroll_margin = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.fastscroll_margin;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.fastscroll_minimum_range = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.fastscroll_minimum_range;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.highlight_alpha_material_colored = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.highlight_alpha_material_colored;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.highlight_alpha_material_dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.highlight_alpha_material_dark;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.highlight_alpha_material_light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.highlight_alpha_material_light;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.hint_alpha_material_dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.hint_alpha_material_dark;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.hint_alpha_material_light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.hint_alpha_material_light;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.hint_pressed_alpha_material_dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.hint_pressed_alpha_material_dark;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.hint_pressed_alpha_material_light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.hint_pressed_alpha_material_light;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.item_touch_helper_max_drag_scroll_per_frame = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.item_touch_helper_max_drag_scroll_per_frame;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.item_touch_helper_swipe_escape_max_velocity = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.item_touch_helper_swipe_escape_max_velocity;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.item_touch_helper_swipe_escape_velocity = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.item_touch_helper_swipe_escape_velocity;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.mtrl_bottomappbar_fabOffsetEndMode = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_bottomappbar_fabOffsetEndMode;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.mtrl_bottomappbar_fab_cradle_margin = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_bottomappbar_fab_cradle_margin;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.mtrl_bottomappbar_fab_cradle_rounded_corner_radius = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_bottomappbar_fab_cradle_rounded_corner_radius;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.mtrl_bottomappbar_fab_cradle_vertical_offset = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_bottomappbar_fab_cradle_vertical_offset;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.mtrl_bottomappbar_height = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_bottomappbar_height;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.mtrl_btn_corner_radius = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_btn_corner_radius;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.mtrl_btn_dialog_btn_min_width = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_btn_dialog_btn_min_width;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.mtrl_btn_disabled_elevation = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_btn_disabled_elevation;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.mtrl_btn_disabled_z = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_btn_disabled_z;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.mtrl_btn_elevation = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_btn_elevation;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.mtrl_btn_focused_z = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_btn_focused_z;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.mtrl_btn_hovered_z = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_btn_hovered_z;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.mtrl_btn_icon_btn_padding_left = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_btn_icon_btn_padding_left;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.mtrl_btn_icon_padding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_btn_icon_padding;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.mtrl_btn_inset = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_btn_inset;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.mtrl_btn_letter_spacing = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_btn_letter_spacing;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.mtrl_btn_padding_bottom = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_btn_padding_bottom;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.mtrl_btn_padding_left = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_btn_padding_left;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.mtrl_btn_padding_right = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_btn_padding_right;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.mtrl_btn_padding_top = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_btn_padding_top;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.mtrl_btn_pressed_z = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_btn_pressed_z;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.mtrl_btn_stroke_size = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_btn_stroke_size;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.mtrl_btn_text_btn_icon_padding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_btn_text_btn_icon_padding;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.mtrl_btn_text_btn_padding_left = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_btn_text_btn_padding_left;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.mtrl_btn_text_btn_padding_right = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_btn_text_btn_padding_right;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.mtrl_btn_text_size = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_btn_text_size;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.mtrl_btn_z = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_btn_z;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.mtrl_card_elevation = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_card_elevation;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.mtrl_card_spacing = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_card_spacing;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.mtrl_chip_pressed_translation_z = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_chip_pressed_translation_z;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.mtrl_chip_text_size = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_chip_text_size;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.mtrl_fab_elevation = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_fab_elevation;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.mtrl_fab_translation_z_hovered_focused = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_fab_translation_z_hovered_focused;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.mtrl_fab_translation_z_pressed = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_fab_translation_z_pressed;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.mtrl_navigation_elevation = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_navigation_elevation;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.mtrl_navigation_item_horizontal_padding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_navigation_item_horizontal_padding;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.mtrl_navigation_item_icon_padding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_navigation_item_icon_padding;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.mtrl_snackbar_background_corner_radius = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_snackbar_background_corner_radius;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.mtrl_snackbar_margin = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_snackbar_margin;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.mtrl_textinput_box_bottom_offset = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_textinput_box_bottom_offset;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.mtrl_textinput_box_corner_radius_medium = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_textinput_box_corner_radius_medium;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.mtrl_textinput_box_corner_radius_small = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_textinput_box_corner_radius_small;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.mtrl_textinput_box_label_cutout_padding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_textinput_box_label_cutout_padding;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.mtrl_textinput_box_padding_end = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_textinput_box_padding_end;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.mtrl_textinput_box_stroke_width_default = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_textinput_box_stroke_width_default;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.mtrl_textinput_box_stroke_width_focused = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_textinput_box_stroke_width_focused;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.mtrl_textinput_outline_box_expanded_padding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_textinput_outline_box_expanded_padding;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.mtrl_toolbar_default_height = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_toolbar_default_height;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.notification_action_icon_size = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.notification_action_icon_size;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.notification_action_text_size = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.notification_action_text_size;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.notification_big_circle_margin = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.notification_big_circle_margin;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.notification_content_margin_start = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.notification_content_margin_start;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.notification_large_icon_height = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.notification_large_icon_height;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.notification_large_icon_width = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.notification_large_icon_width;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.notification_main_column_padding_top = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.notification_main_column_padding_top;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.notification_media_narrow_margin = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.notification_media_narrow_margin;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.notification_right_icon_size = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.notification_right_icon_size;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.notification_right_side_padding_top = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.notification_right_side_padding_top;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.notification_small_icon_background_padding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.notification_small_icon_background_padding;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.notification_small_icon_size_as_large = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.notification_small_icon_size_as_large;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.notification_subtext_size = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.notification_subtext_size;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.notification_top_pad = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.notification_top_pad;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.notification_top_pad_large_text = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.notification_top_pad_large_text;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.subtitle_corner_radius = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.subtitle_corner_radius;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.subtitle_outline_width = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.subtitle_outline_width;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.subtitle_shadow_offset = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.subtitle_shadow_offset;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.subtitle_shadow_radius = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.subtitle_shadow_radius;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.tooltip_corner_radius = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.tooltip_corner_radius;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.tooltip_horizontal_padding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.tooltip_horizontal_padding;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.tooltip_margin = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.tooltip_margin;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.tooltip_precise_anchor_extra_offset = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.tooltip_precise_anchor_extra_offset;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.tooltip_precise_anchor_threshold = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.tooltip_precise_anchor_threshold;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.tooltip_vertical_padding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.tooltip_vertical_padding;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.tooltip_y_offset_non_touch = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.tooltip_y_offset_non_touch;
-			global::SkiaSharp.Views.Forms.Resource.Dimension.tooltip_y_offset_touch = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.tooltip_y_offset_touch;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_ab_share_pack_mtrl_alpha = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_ab_share_pack_mtrl_alpha;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_action_bar_item_background_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_action_bar_item_background_material;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_btn_borderless_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_btn_borderless_material;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_btn_check_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_btn_check_material;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_btn_check_to_on_mtrl_000 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_btn_check_to_on_mtrl_000;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_btn_check_to_on_mtrl_015 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_btn_check_to_on_mtrl_015;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_btn_colored_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_btn_colored_material;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_btn_default_mtrl_shape = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_btn_default_mtrl_shape;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_btn_radio_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_btn_radio_material;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_btn_radio_to_on_mtrl_000 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_btn_radio_to_on_mtrl_000;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_btn_radio_to_on_mtrl_015 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_btn_radio_to_on_mtrl_015;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_btn_switch_to_on_mtrl_00001 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_btn_switch_to_on_mtrl_00001;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_btn_switch_to_on_mtrl_00012 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_btn_switch_to_on_mtrl_00012;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_cab_background_internal_bg = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_cab_background_internal_bg;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_cab_background_top_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_cab_background_top_material;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_cab_background_top_mtrl_alpha = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_cab_background_top_mtrl_alpha;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_control_background_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_control_background_material;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_dialog_material_background = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_dialog_material_background;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_edit_text_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_edit_text_material;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_ic_ab_back_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_ic_ab_back_material;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_ic_arrow_drop_right_black_24dp = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_ic_arrow_drop_right_black_24dp;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_ic_clear_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_ic_clear_material;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_ic_commit_search_api_mtrl_alpha = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_ic_commit_search_api_mtrl_alpha;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_ic_go_search_api_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_ic_go_search_api_material;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_ic_menu_copy_mtrl_am_alpha = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_ic_menu_copy_mtrl_am_alpha;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_ic_menu_cut_mtrl_alpha = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_ic_menu_cut_mtrl_alpha;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_ic_menu_overflow_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_ic_menu_overflow_material;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_ic_menu_paste_mtrl_am_alpha = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_ic_menu_paste_mtrl_am_alpha;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_ic_menu_selectall_mtrl_alpha = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_ic_menu_selectall_mtrl_alpha;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_ic_menu_share_mtrl_alpha = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_ic_menu_share_mtrl_alpha;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_ic_search_api_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_ic_search_api_material;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_ic_star_black_16dp = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_ic_star_black_16dp;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_ic_star_black_36dp = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_ic_star_black_36dp;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_ic_star_black_48dp = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_ic_star_black_48dp;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_ic_star_half_black_16dp = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_ic_star_half_black_16dp;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_ic_star_half_black_36dp = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_ic_star_half_black_36dp;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_ic_star_half_black_48dp = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_ic_star_half_black_48dp;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_ic_voice_search_api_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_ic_voice_search_api_material;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_item_background_holo_dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_item_background_holo_dark;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_item_background_holo_light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_item_background_holo_light;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_list_divider_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_list_divider_material;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_list_divider_mtrl_alpha = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_list_divider_mtrl_alpha;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_list_focused_holo = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_list_focused_holo;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_list_longpressed_holo = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_list_longpressed_holo;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_list_pressed_holo_dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_list_pressed_holo_dark;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_list_pressed_holo_light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_list_pressed_holo_light;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_list_selector_background_transition_holo_dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_list_selector_background_transition_holo_dark;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_list_selector_background_transition_holo_light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_list_selector_background_transition_holo_light;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_list_selector_disabled_holo_dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_list_selector_disabled_holo_dark;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_list_selector_disabled_holo_light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_list_selector_disabled_holo_light;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_list_selector_holo_dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_list_selector_holo_dark;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_list_selector_holo_light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_list_selector_holo_light;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_menu_hardkey_panel_mtrl_mult = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_menu_hardkey_panel_mtrl_mult;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_popup_background_mtrl_mult = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_popup_background_mtrl_mult;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_ratingbar_indicator_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_ratingbar_indicator_material;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_ratingbar_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_ratingbar_material;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_ratingbar_small_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_ratingbar_small_material;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_scrubber_control_off_mtrl_alpha = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_scrubber_control_off_mtrl_alpha;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_scrubber_control_to_pressed_mtrl_000 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_scrubber_control_to_pressed_mtrl_000;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_scrubber_control_to_pressed_mtrl_005 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_scrubber_control_to_pressed_mtrl_005;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_scrubber_primary_mtrl_alpha = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_scrubber_primary_mtrl_alpha;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_scrubber_track_mtrl_alpha = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_scrubber_track_mtrl_alpha;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_seekbar_thumb_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_seekbar_thumb_material;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_seekbar_tick_mark_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_seekbar_tick_mark_material;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_seekbar_track_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_seekbar_track_material;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_spinner_mtrl_am_alpha = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_spinner_mtrl_am_alpha;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_spinner_textfield_background_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_spinner_textfield_background_material;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_switch_thumb_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_switch_thumb_material;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_switch_track_mtrl_alpha = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_switch_track_mtrl_alpha;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_tab_indicator_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_tab_indicator_material;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_tab_indicator_mtrl_alpha = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_tab_indicator_mtrl_alpha;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_textfield_activated_mtrl_alpha = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_textfield_activated_mtrl_alpha;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_textfield_default_mtrl_alpha = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_textfield_default_mtrl_alpha;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_textfield_search_activated_mtrl_alpha = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_textfield_search_activated_mtrl_alpha;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_textfield_search_default_mtrl_alpha = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_textfield_search_default_mtrl_alpha;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_textfield_search_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_textfield_search_material;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_text_cursor_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_text_cursor_material;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_text_select_handle_left_mtrl_dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_text_select_handle_left_mtrl_dark;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_text_select_handle_left_mtrl_light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_text_select_handle_left_mtrl_light;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_text_select_handle_middle_mtrl_dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_text_select_handle_middle_mtrl_dark;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_text_select_handle_middle_mtrl_light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_text_select_handle_middle_mtrl_light;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_text_select_handle_right_mtrl_dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_text_select_handle_right_mtrl_dark;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_text_select_handle_right_mtrl_light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_text_select_handle_right_mtrl_light;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.abc_vector_test = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.abc_vector_test;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.avd_hide_password = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.avd_hide_password;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.avd_show_password = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.avd_show_password;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.design_bottom_navigation_item_background = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.design_bottom_navigation_item_background;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.design_fab_background = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.design_fab_background;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.design_ic_visibility = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.design_ic_visibility;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.design_ic_visibility_off = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.design_ic_visibility_off;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.design_password_eye = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.design_password_eye;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.design_snackbar_background = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.design_snackbar_background;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.ic_mtrl_chip_checked_black = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.ic_mtrl_chip_checked_black;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.ic_mtrl_chip_checked_circle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.ic_mtrl_chip_checked_circle;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.ic_mtrl_chip_close_circle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.ic_mtrl_chip_close_circle;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.mtrl_snackbar_background = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.mtrl_snackbar_background;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.mtrl_tabs_default_indicator = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.mtrl_tabs_default_indicator;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.navigation_empty_icon = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.navigation_empty_icon;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.notification_action_background = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.notification_action_background;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.notification_bg = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.notification_bg;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.notification_bg_low = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.notification_bg_low;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.notification_bg_low_normal = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.notification_bg_low_normal;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.notification_bg_low_pressed = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.notification_bg_low_pressed;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.notification_bg_normal = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.notification_bg_normal;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.notification_bg_normal_pressed = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.notification_bg_normal_pressed;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.notification_icon_background = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.notification_icon_background;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.notification_template_icon_bg = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.notification_template_icon_bg;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.notification_template_icon_low_bg = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.notification_template_icon_low_bg;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.notification_tile_bg = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.notification_tile_bg;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.notify_panel_notification_icon_bg = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.notify_panel_notification_icon_bg;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.tooltip_frame_dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.tooltip_frame_dark;
-			global::SkiaSharp.Views.Forms.Resource.Drawable.tooltip_frame_light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.tooltip_frame_light;
-			global::SkiaSharp.Views.Forms.Resource.Id.action0 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.action0;
-			global::SkiaSharp.Views.Forms.Resource.Id.actions = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.actions;
-			global::SkiaSharp.Views.Forms.Resource.Id.action_bar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.action_bar;
-			global::SkiaSharp.Views.Forms.Resource.Id.action_bar_activity_content = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.action_bar_activity_content;
-			global::SkiaSharp.Views.Forms.Resource.Id.action_bar_container = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.action_bar_container;
-			global::SkiaSharp.Views.Forms.Resource.Id.action_bar_root = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.action_bar_root;
-			global::SkiaSharp.Views.Forms.Resource.Id.action_bar_spinner = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.action_bar_spinner;
-			global::SkiaSharp.Views.Forms.Resource.Id.action_bar_subtitle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.action_bar_subtitle;
-			global::SkiaSharp.Views.Forms.Resource.Id.action_bar_title = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.action_bar_title;
-			global::SkiaSharp.Views.Forms.Resource.Id.action_container = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.action_container;
-			global::SkiaSharp.Views.Forms.Resource.Id.action_context_bar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.action_context_bar;
-			global::SkiaSharp.Views.Forms.Resource.Id.action_divider = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.action_divider;
-			global::SkiaSharp.Views.Forms.Resource.Id.action_image = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.action_image;
-			global::SkiaSharp.Views.Forms.Resource.Id.action_menu_divider = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.action_menu_divider;
-			global::SkiaSharp.Views.Forms.Resource.Id.action_menu_presenter = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.action_menu_presenter;
-			global::SkiaSharp.Views.Forms.Resource.Id.action_mode_bar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.action_mode_bar;
-			global::SkiaSharp.Views.Forms.Resource.Id.action_mode_bar_stub = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.action_mode_bar_stub;
-			global::SkiaSharp.Views.Forms.Resource.Id.action_mode_close_button = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.action_mode_close_button;
-			global::SkiaSharp.Views.Forms.Resource.Id.action_text = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.action_text;
-			global::SkiaSharp.Views.Forms.Resource.Id.activity_chooser_view_content = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.activity_chooser_view_content;
-			global::SkiaSharp.Views.Forms.Resource.Id.add = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.add;
-			global::SkiaSharp.Views.Forms.Resource.Id.alertTitle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.alertTitle;
-			global::SkiaSharp.Views.Forms.Resource.Id.all = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.all;
-			global::SkiaSharp.Views.Forms.Resource.Id.ALT = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.ALT;
-			global::SkiaSharp.Views.Forms.Resource.Id.always = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.always;
-			global::SkiaSharp.Views.Forms.Resource.Id.async = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.async;
-			global::SkiaSharp.Views.Forms.Resource.Id.auto = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.auto;
-			global::SkiaSharp.Views.Forms.Resource.Id.beginning = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.beginning;
-			global::SkiaSharp.Views.Forms.Resource.Id.blocking = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.blocking;
-			global::SkiaSharp.Views.Forms.Resource.Id.bottom = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.bottom;
-			global::SkiaSharp.Views.Forms.Resource.Id.bottomtab_navarea = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.bottomtab_navarea;
-			global::SkiaSharp.Views.Forms.Resource.Id.bottomtab_tabbar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.bottomtab_tabbar;
-			global::SkiaSharp.Views.Forms.Resource.Id.browser_actions_header_text = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.browser_actions_header_text;
-			global::SkiaSharp.Views.Forms.Resource.Id.browser_actions_menu_items = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.browser_actions_menu_items;
-			global::SkiaSharp.Views.Forms.Resource.Id.browser_actions_menu_item_icon = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.browser_actions_menu_item_icon;
-			global::SkiaSharp.Views.Forms.Resource.Id.browser_actions_menu_item_text = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.browser_actions_menu_item_text;
-			global::SkiaSharp.Views.Forms.Resource.Id.browser_actions_menu_view = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.browser_actions_menu_view;
-			global::SkiaSharp.Views.Forms.Resource.Id.buttonPanel = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.buttonPanel;
-			global::SkiaSharp.Views.Forms.Resource.Id.cancel_action = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.cancel_action;
-			global::SkiaSharp.Views.Forms.Resource.Id.center = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.center;
-			global::SkiaSharp.Views.Forms.Resource.Id.center_horizontal = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.center_horizontal;
-			global::SkiaSharp.Views.Forms.Resource.Id.center_vertical = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.center_vertical;
-			global::SkiaSharp.Views.Forms.Resource.Id.checkbox = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.checkbox;
-			global::SkiaSharp.Views.Forms.Resource.Id.chronometer = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.chronometer;
-			global::SkiaSharp.Views.Forms.Resource.Id.clip_horizontal = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.clip_horizontal;
-			global::SkiaSharp.Views.Forms.Resource.Id.clip_vertical = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.clip_vertical;
-			global::SkiaSharp.Views.Forms.Resource.Id.collapseActionView = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.collapseActionView;
-			global::SkiaSharp.Views.Forms.Resource.Id.container = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.container;
-			global::SkiaSharp.Views.Forms.Resource.Id.content = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.content;
-			global::SkiaSharp.Views.Forms.Resource.Id.contentPanel = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.contentPanel;
-			global::SkiaSharp.Views.Forms.Resource.Id.coordinator = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.coordinator;
-			global::SkiaSharp.Views.Forms.Resource.Id.CTRL = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.CTRL;
-			global::SkiaSharp.Views.Forms.Resource.Id.custom = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.custom;
-			global::SkiaSharp.Views.Forms.Resource.Id.customPanel = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.customPanel;
-			global::SkiaSharp.Views.Forms.Resource.Id.decor_content_parent = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.decor_content_parent;
-			global::SkiaSharp.Views.Forms.Resource.Id.default_activity_button = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.default_activity_button;
-			global::SkiaSharp.Views.Forms.Resource.Id.design_bottom_sheet = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.design_bottom_sheet;
-			global::SkiaSharp.Views.Forms.Resource.Id.design_menu_item_action_area = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.design_menu_item_action_area;
-			global::SkiaSharp.Views.Forms.Resource.Id.design_menu_item_action_area_stub = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.design_menu_item_action_area_stub;
-			global::SkiaSharp.Views.Forms.Resource.Id.design_menu_item_text = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.design_menu_item_text;
-			global::SkiaSharp.Views.Forms.Resource.Id.design_navigation_view = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.design_navigation_view;
-			global::SkiaSharp.Views.Forms.Resource.Id.disableHome = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.disableHome;
-			global::SkiaSharp.Views.Forms.Resource.Id.edit_query = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.edit_query;
-			global::SkiaSharp.Views.Forms.Resource.Id.end = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.end;
-			global::SkiaSharp.Views.Forms.Resource.Id.end_padder = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.end_padder;
-			global::SkiaSharp.Views.Forms.Resource.Id.enterAlways = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.enterAlways;
-			global::SkiaSharp.Views.Forms.Resource.Id.enterAlwaysCollapsed = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.enterAlwaysCollapsed;
-			global::SkiaSharp.Views.Forms.Resource.Id.exitUntilCollapsed = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.exitUntilCollapsed;
-			global::SkiaSharp.Views.Forms.Resource.Id.expanded_menu = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.expanded_menu;
-			global::SkiaSharp.Views.Forms.Resource.Id.expand_activities_button = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.expand_activities_button;
-			global::SkiaSharp.Views.Forms.Resource.Id.fill = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.fill;
-			global::SkiaSharp.Views.Forms.Resource.Id.filled = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.filled;
-			global::SkiaSharp.Views.Forms.Resource.Id.fill_horizontal = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.fill_horizontal;
-			global::SkiaSharp.Views.Forms.Resource.Id.fill_vertical = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.fill_vertical;
-			global::SkiaSharp.Views.Forms.Resource.Id.@fixed = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.@fixed;
-			global::SkiaSharp.Views.Forms.Resource.Id.flyoutcontent_appbar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.flyoutcontent_appbar;
-			global::SkiaSharp.Views.Forms.Resource.Id.flyoutcontent_recycler = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.flyoutcontent_recycler;
-			global::SkiaSharp.Views.Forms.Resource.Id.forever = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.forever;
-			global::SkiaSharp.Views.Forms.Resource.Id.FUNCTION = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.FUNCTION;
-			global::SkiaSharp.Views.Forms.Resource.Id.ghost_view = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.ghost_view;
-			global::SkiaSharp.Views.Forms.Resource.Id.group_divider = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.group_divider;
-			global::SkiaSharp.Views.Forms.Resource.Id.home = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.home;
-			global::SkiaSharp.Views.Forms.Resource.Id.homeAsUp = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.homeAsUp;
-			global::SkiaSharp.Views.Forms.Resource.Id.icon = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.icon;
-			global::SkiaSharp.Views.Forms.Resource.Id.icon_group = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.icon_group;
-			global::SkiaSharp.Views.Forms.Resource.Id.ifRoom = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.ifRoom;
-			global::SkiaSharp.Views.Forms.Resource.Id.image = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.image;
-			global::SkiaSharp.Views.Forms.Resource.Id.info = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.info;
-			global::SkiaSharp.Views.Forms.Resource.Id.italic = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.italic;
-			global::SkiaSharp.Views.Forms.Resource.Id.item_touch_helper_previous_elevation = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.item_touch_helper_previous_elevation;
-			global::SkiaSharp.Views.Forms.Resource.Id.labeled = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.labeled;
-			global::SkiaSharp.Views.Forms.Resource.Id.largeLabel = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.largeLabel;
-			global::SkiaSharp.Views.Forms.Resource.Id.left = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.left;
-			global::SkiaSharp.Views.Forms.Resource.Id.line1 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.line1;
-			global::SkiaSharp.Views.Forms.Resource.Id.line3 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.line3;
-			global::SkiaSharp.Views.Forms.Resource.Id.listMode = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.listMode;
-			global::SkiaSharp.Views.Forms.Resource.Id.list_item = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.list_item;
-			global::SkiaSharp.Views.Forms.Resource.Id.main_appbar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.main_appbar;
-			global::SkiaSharp.Views.Forms.Resource.Id.main_tablayout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.main_tablayout;
-			global::SkiaSharp.Views.Forms.Resource.Id.main_toolbar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.main_toolbar;
-			global::SkiaSharp.Views.Forms.Resource.Id.main_viewpager = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.main_viewpager;
-			global::SkiaSharp.Views.Forms.Resource.Id.masked = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.masked;
-			global::SkiaSharp.Views.Forms.Resource.Id.media_actions = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.media_actions;
-			global::SkiaSharp.Views.Forms.Resource.Id.message = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.message;
-			global::SkiaSharp.Views.Forms.Resource.Id.META = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.META;
-			global::SkiaSharp.Views.Forms.Resource.Id.middle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.middle;
-			global::SkiaSharp.Views.Forms.Resource.Id.mini = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.mini;
-			global::SkiaSharp.Views.Forms.Resource.Id.mtrl_child_content_container = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.mtrl_child_content_container;
-			global::SkiaSharp.Views.Forms.Resource.Id.mtrl_internal_children_alpha_tag = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.mtrl_internal_children_alpha_tag;
-			global::SkiaSharp.Views.Forms.Resource.Id.multiply = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.multiply;
-			global::SkiaSharp.Views.Forms.Resource.Id.navigation_header_container = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.navigation_header_container;
-			global::SkiaSharp.Views.Forms.Resource.Id.never = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.never;
-			global::SkiaSharp.Views.Forms.Resource.Id.none = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.none;
-			global::SkiaSharp.Views.Forms.Resource.Id.normal = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.normal;
-			global::SkiaSharp.Views.Forms.Resource.Id.notification_background = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.notification_background;
-			global::SkiaSharp.Views.Forms.Resource.Id.notification_main_column = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.notification_main_column;
-			global::SkiaSharp.Views.Forms.Resource.Id.notification_main_column_container = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.notification_main_column_container;
-			global::SkiaSharp.Views.Forms.Resource.Id.outline = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.outline;
-			global::SkiaSharp.Views.Forms.Resource.Id.parallax = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.parallax;
-			global::SkiaSharp.Views.Forms.Resource.Id.parentPanel = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.parentPanel;
-			global::SkiaSharp.Views.Forms.Resource.Id.parent_matrix = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.parent_matrix;
-			global::SkiaSharp.Views.Forms.Resource.Id.pin = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.pin;
-			global::SkiaSharp.Views.Forms.Resource.Id.progress_circular = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.progress_circular;
-			global::SkiaSharp.Views.Forms.Resource.Id.progress_horizontal = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.progress_horizontal;
-			global::SkiaSharp.Views.Forms.Resource.Id.radio = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.radio;
-			global::SkiaSharp.Views.Forms.Resource.Id.right = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.right;
-			global::SkiaSharp.Views.Forms.Resource.Id.right_icon = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.right_icon;
-			global::SkiaSharp.Views.Forms.Resource.Id.right_side = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.right_side;
-			global::SkiaSharp.Views.Forms.Resource.Id.save_non_transition_alpha = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.save_non_transition_alpha;
-			global::SkiaSharp.Views.Forms.Resource.Id.screen = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.screen;
-			global::SkiaSharp.Views.Forms.Resource.Id.scroll = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.scroll;
-			global::SkiaSharp.Views.Forms.Resource.Id.scrollable = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.scrollable;
-			global::SkiaSharp.Views.Forms.Resource.Id.scrollIndicatorDown = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.scrollIndicatorDown;
-			global::SkiaSharp.Views.Forms.Resource.Id.scrollIndicatorUp = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.scrollIndicatorUp;
-			global::SkiaSharp.Views.Forms.Resource.Id.scrollView = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.scrollView;
-			global::SkiaSharp.Views.Forms.Resource.Id.search_badge = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.search_badge;
-			global::SkiaSharp.Views.Forms.Resource.Id.search_bar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.search_bar;
-			global::SkiaSharp.Views.Forms.Resource.Id.search_button = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.search_button;
-			global::SkiaSharp.Views.Forms.Resource.Id.search_close_btn = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.search_close_btn;
-			global::SkiaSharp.Views.Forms.Resource.Id.search_edit_frame = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.search_edit_frame;
-			global::SkiaSharp.Views.Forms.Resource.Id.search_go_btn = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.search_go_btn;
-			global::SkiaSharp.Views.Forms.Resource.Id.search_mag_icon = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.search_mag_icon;
-			global::SkiaSharp.Views.Forms.Resource.Id.search_plate = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.search_plate;
-			global::SkiaSharp.Views.Forms.Resource.Id.search_src_text = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.search_src_text;
-			global::SkiaSharp.Views.Forms.Resource.Id.search_voice_btn = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.search_voice_btn;
-			global::SkiaSharp.Views.Forms.Resource.Id.selected = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.selected;
-			global::SkiaSharp.Views.Forms.Resource.Id.select_dialog_listview = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.select_dialog_listview;
-			global::SkiaSharp.Views.Forms.Resource.Id.shellcontent_appbar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.shellcontent_appbar;
-			global::SkiaSharp.Views.Forms.Resource.Id.shellcontent_toolbar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.shellcontent_toolbar;
-			global::SkiaSharp.Views.Forms.Resource.Id.SHIFT = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.SHIFT;
-			global::SkiaSharp.Views.Forms.Resource.Id.shortcut = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.shortcut;
-			global::SkiaSharp.Views.Forms.Resource.Id.showCustom = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.showCustom;
-			global::SkiaSharp.Views.Forms.Resource.Id.showHome = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.showHome;
-			global::SkiaSharp.Views.Forms.Resource.Id.showTitle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.showTitle;
-			global::SkiaSharp.Views.Forms.Resource.Id.smallLabel = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.smallLabel;
-			global::SkiaSharp.Views.Forms.Resource.Id.snackbar_action = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.snackbar_action;
-			global::SkiaSharp.Views.Forms.Resource.Id.snackbar_text = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.snackbar_text;
-			global::SkiaSharp.Views.Forms.Resource.Id.snap = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.snap;
-			global::SkiaSharp.Views.Forms.Resource.Id.snapMargins = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.snapMargins;
-			global::SkiaSharp.Views.Forms.Resource.Id.spacer = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.spacer;
-			global::SkiaSharp.Views.Forms.Resource.Id.split_action_bar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.split_action_bar;
-			global::SkiaSharp.Views.Forms.Resource.Id.src_atop = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.src_atop;
-			global::SkiaSharp.Views.Forms.Resource.Id.src_in = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.src_in;
-			global::SkiaSharp.Views.Forms.Resource.Id.src_over = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.src_over;
-			global::SkiaSharp.Views.Forms.Resource.Id.start = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.start;
-			global::SkiaSharp.Views.Forms.Resource.Id.status_bar_latest_event_content = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.status_bar_latest_event_content;
-			global::SkiaSharp.Views.Forms.Resource.Id.stretch = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.stretch;
-			global::SkiaSharp.Views.Forms.Resource.Id.submenuarrow = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.submenuarrow;
-			global::SkiaSharp.Views.Forms.Resource.Id.submit_area = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.submit_area;
-			global::SkiaSharp.Views.Forms.Resource.Id.SYM = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.SYM;
-			global::SkiaSharp.Views.Forms.Resource.Id.tabMode = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.tabMode;
-			global::SkiaSharp.Views.Forms.Resource.Id.tag_transition_group = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.tag_transition_group;
-			global::SkiaSharp.Views.Forms.Resource.Id.tag_unhandled_key_event_manager = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.tag_unhandled_key_event_manager;
-			global::SkiaSharp.Views.Forms.Resource.Id.tag_unhandled_key_listeners = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.tag_unhandled_key_listeners;
-			global::SkiaSharp.Views.Forms.Resource.Id.text = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.text;
-			global::SkiaSharp.Views.Forms.Resource.Id.text2 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.text2;
-			global::SkiaSharp.Views.Forms.Resource.Id.textinput_counter = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.textinput_counter;
-			global::SkiaSharp.Views.Forms.Resource.Id.textinput_error = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.textinput_error;
-			global::SkiaSharp.Views.Forms.Resource.Id.textinput_helper_text = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.textinput_helper_text;
-			global::SkiaSharp.Views.Forms.Resource.Id.textSpacerNoButtons = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.textSpacerNoButtons;
-			global::SkiaSharp.Views.Forms.Resource.Id.textSpacerNoTitle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.textSpacerNoTitle;
-			global::SkiaSharp.Views.Forms.Resource.Id.textStart = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.textStart;
-			global::SkiaSharp.Views.Forms.Resource.Id.text_input_password_toggle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.text_input_password_toggle;
-			global::SkiaSharp.Views.Forms.Resource.Id.time = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.time;
-			global::SkiaSharp.Views.Forms.Resource.Id.title = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.title;
-			global::SkiaSharp.Views.Forms.Resource.Id.titleDividerNoCustom = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.titleDividerNoCustom;
-			global::SkiaSharp.Views.Forms.Resource.Id.title_template = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.title_template;
-			global::SkiaSharp.Views.Forms.Resource.Id.top = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.top;
-			global::SkiaSharp.Views.Forms.Resource.Id.topPanel = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.topPanel;
-			global::SkiaSharp.Views.Forms.Resource.Id.touch_outside = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.touch_outside;
-			global::SkiaSharp.Views.Forms.Resource.Id.transition_current_scene = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.transition_current_scene;
-			global::SkiaSharp.Views.Forms.Resource.Id.transition_layout_save = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.transition_layout_save;
-			global::SkiaSharp.Views.Forms.Resource.Id.transition_position = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.transition_position;
-			global::SkiaSharp.Views.Forms.Resource.Id.transition_scene_layoutid_cache = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.transition_scene_layoutid_cache;
-			global::SkiaSharp.Views.Forms.Resource.Id.transition_transform = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.transition_transform;
-			global::SkiaSharp.Views.Forms.Resource.Id.uniform = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.uniform;
-			global::SkiaSharp.Views.Forms.Resource.Id.unlabeled = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.unlabeled;
-			global::SkiaSharp.Views.Forms.Resource.Id.up = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.up;
-			global::SkiaSharp.Views.Forms.Resource.Id.useLogo = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.useLogo;
-			global::SkiaSharp.Views.Forms.Resource.Id.view_offset_helper = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.view_offset_helper;
-			global::SkiaSharp.Views.Forms.Resource.Id.visible = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.visible;
-			global::SkiaSharp.Views.Forms.Resource.Id.withText = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.withText;
-			global::SkiaSharp.Views.Forms.Resource.Id.wrap_content = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.wrap_content;
-			global::SkiaSharp.Views.Forms.Resource.Integer.abc_config_activityDefaultDur = global::PerryRhodan.AudiobookPlayer.Android.Resource.Integer.abc_config_activityDefaultDur;
-			global::SkiaSharp.Views.Forms.Resource.Integer.abc_config_activityShortDur = global::PerryRhodan.AudiobookPlayer.Android.Resource.Integer.abc_config_activityShortDur;
-			global::SkiaSharp.Views.Forms.Resource.Integer.app_bar_elevation_anim_duration = global::PerryRhodan.AudiobookPlayer.Android.Resource.Integer.app_bar_elevation_anim_duration;
-			global::SkiaSharp.Views.Forms.Resource.Integer.bottom_sheet_slide_duration = global::PerryRhodan.AudiobookPlayer.Android.Resource.Integer.bottom_sheet_slide_duration;
-			global::SkiaSharp.Views.Forms.Resource.Integer.cancel_button_image_alpha = global::PerryRhodan.AudiobookPlayer.Android.Resource.Integer.cancel_button_image_alpha;
-			global::SkiaSharp.Views.Forms.Resource.Integer.config_tooltipAnimTime = global::PerryRhodan.AudiobookPlayer.Android.Resource.Integer.config_tooltipAnimTime;
-			global::SkiaSharp.Views.Forms.Resource.Integer.design_snackbar_text_max_lines = global::PerryRhodan.AudiobookPlayer.Android.Resource.Integer.design_snackbar_text_max_lines;
-			global::SkiaSharp.Views.Forms.Resource.Integer.design_tab_indicator_anim_duration_ms = global::PerryRhodan.AudiobookPlayer.Android.Resource.Integer.design_tab_indicator_anim_duration_ms;
-			global::SkiaSharp.Views.Forms.Resource.Integer.hide_password_duration = global::PerryRhodan.AudiobookPlayer.Android.Resource.Integer.hide_password_duration;
-			global::SkiaSharp.Views.Forms.Resource.Integer.mtrl_btn_anim_delay_ms = global::PerryRhodan.AudiobookPlayer.Android.Resource.Integer.mtrl_btn_anim_delay_ms;
-			global::SkiaSharp.Views.Forms.Resource.Integer.mtrl_btn_anim_duration_ms = global::PerryRhodan.AudiobookPlayer.Android.Resource.Integer.mtrl_btn_anim_duration_ms;
-			global::SkiaSharp.Views.Forms.Resource.Integer.mtrl_chip_anim_duration = global::PerryRhodan.AudiobookPlayer.Android.Resource.Integer.mtrl_chip_anim_duration;
-			global::SkiaSharp.Views.Forms.Resource.Integer.mtrl_tab_indicator_anim_duration_ms = global::PerryRhodan.AudiobookPlayer.Android.Resource.Integer.mtrl_tab_indicator_anim_duration_ms;
-			global::SkiaSharp.Views.Forms.Resource.Integer.show_password_duration = global::PerryRhodan.AudiobookPlayer.Android.Resource.Integer.show_password_duration;
-			global::SkiaSharp.Views.Forms.Resource.Integer.status_bar_notification_info_maxnum = global::PerryRhodan.AudiobookPlayer.Android.Resource.Integer.status_bar_notification_info_maxnum;
-			global::SkiaSharp.Views.Forms.Resource.Interpolator.mtrl_fast_out_linear_in = global::PerryRhodan.AudiobookPlayer.Android.Resource.Interpolator.mtrl_fast_out_linear_in;
-			global::SkiaSharp.Views.Forms.Resource.Interpolator.mtrl_fast_out_slow_in = global::PerryRhodan.AudiobookPlayer.Android.Resource.Interpolator.mtrl_fast_out_slow_in;
-			global::SkiaSharp.Views.Forms.Resource.Interpolator.mtrl_linear = global::PerryRhodan.AudiobookPlayer.Android.Resource.Interpolator.mtrl_linear;
-			global::SkiaSharp.Views.Forms.Resource.Interpolator.mtrl_linear_out_slow_in = global::PerryRhodan.AudiobookPlayer.Android.Resource.Interpolator.mtrl_linear_out_slow_in;
-			global::SkiaSharp.Views.Forms.Resource.Layout.abc_action_bar_title_item = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.abc_action_bar_title_item;
-			global::SkiaSharp.Views.Forms.Resource.Layout.abc_action_bar_up_container = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.abc_action_bar_up_container;
-			global::SkiaSharp.Views.Forms.Resource.Layout.abc_action_menu_item_layout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.abc_action_menu_item_layout;
-			global::SkiaSharp.Views.Forms.Resource.Layout.abc_action_menu_layout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.abc_action_menu_layout;
-			global::SkiaSharp.Views.Forms.Resource.Layout.abc_action_mode_bar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.abc_action_mode_bar;
-			global::SkiaSharp.Views.Forms.Resource.Layout.abc_action_mode_close_item_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.abc_action_mode_close_item_material;
-			global::SkiaSharp.Views.Forms.Resource.Layout.abc_activity_chooser_view = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.abc_activity_chooser_view;
-			global::SkiaSharp.Views.Forms.Resource.Layout.abc_activity_chooser_view_list_item = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.abc_activity_chooser_view_list_item;
-			global::SkiaSharp.Views.Forms.Resource.Layout.abc_alert_dialog_button_bar_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.abc_alert_dialog_button_bar_material;
-			global::SkiaSharp.Views.Forms.Resource.Layout.abc_alert_dialog_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.abc_alert_dialog_material;
-			global::SkiaSharp.Views.Forms.Resource.Layout.abc_alert_dialog_title_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.abc_alert_dialog_title_material;
-			global::SkiaSharp.Views.Forms.Resource.Layout.abc_cascading_menu_item_layout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.abc_cascading_menu_item_layout;
-			global::SkiaSharp.Views.Forms.Resource.Layout.abc_dialog_title_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.abc_dialog_title_material;
-			global::SkiaSharp.Views.Forms.Resource.Layout.abc_expanded_menu_layout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.abc_expanded_menu_layout;
-			global::SkiaSharp.Views.Forms.Resource.Layout.abc_list_menu_item_checkbox = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.abc_list_menu_item_checkbox;
-			global::SkiaSharp.Views.Forms.Resource.Layout.abc_list_menu_item_icon = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.abc_list_menu_item_icon;
-			global::SkiaSharp.Views.Forms.Resource.Layout.abc_list_menu_item_layout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.abc_list_menu_item_layout;
-			global::SkiaSharp.Views.Forms.Resource.Layout.abc_list_menu_item_radio = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.abc_list_menu_item_radio;
-			global::SkiaSharp.Views.Forms.Resource.Layout.abc_popup_menu_header_item_layout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.abc_popup_menu_header_item_layout;
-			global::SkiaSharp.Views.Forms.Resource.Layout.abc_popup_menu_item_layout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.abc_popup_menu_item_layout;
-			global::SkiaSharp.Views.Forms.Resource.Layout.abc_screen_content_include = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.abc_screen_content_include;
-			global::SkiaSharp.Views.Forms.Resource.Layout.abc_screen_simple = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.abc_screen_simple;
-			global::SkiaSharp.Views.Forms.Resource.Layout.abc_screen_simple_overlay_action_mode = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.abc_screen_simple_overlay_action_mode;
-			global::SkiaSharp.Views.Forms.Resource.Layout.abc_screen_toolbar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.abc_screen_toolbar;
-			global::SkiaSharp.Views.Forms.Resource.Layout.abc_search_dropdown_item_icons_2line = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.abc_search_dropdown_item_icons_2line;
-			global::SkiaSharp.Views.Forms.Resource.Layout.abc_search_view = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.abc_search_view;
-			global::SkiaSharp.Views.Forms.Resource.Layout.abc_select_dialog_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.abc_select_dialog_material;
-			global::SkiaSharp.Views.Forms.Resource.Layout.abc_tooltip = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.abc_tooltip;
-			global::SkiaSharp.Views.Forms.Resource.Layout.BottomTabLayout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.BottomTabLayout;
-			global::SkiaSharp.Views.Forms.Resource.Layout.browser_actions_context_menu_page = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.browser_actions_context_menu_page;
-			global::SkiaSharp.Views.Forms.Resource.Layout.browser_actions_context_menu_row = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.browser_actions_context_menu_row;
-			global::SkiaSharp.Views.Forms.Resource.Layout.design_bottom_navigation_item = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.design_bottom_navigation_item;
-			global::SkiaSharp.Views.Forms.Resource.Layout.design_bottom_sheet_dialog = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.design_bottom_sheet_dialog;
-			global::SkiaSharp.Views.Forms.Resource.Layout.design_layout_snackbar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.design_layout_snackbar;
-			global::SkiaSharp.Views.Forms.Resource.Layout.design_layout_snackbar_include = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.design_layout_snackbar_include;
-			global::SkiaSharp.Views.Forms.Resource.Layout.design_layout_tab_icon = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.design_layout_tab_icon;
-			global::SkiaSharp.Views.Forms.Resource.Layout.design_layout_tab_text = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.design_layout_tab_text;
-			global::SkiaSharp.Views.Forms.Resource.Layout.design_menu_item_action_area = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.design_menu_item_action_area;
-			global::SkiaSharp.Views.Forms.Resource.Layout.design_navigation_item = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.design_navigation_item;
-			global::SkiaSharp.Views.Forms.Resource.Layout.design_navigation_item_header = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.design_navigation_item_header;
-			global::SkiaSharp.Views.Forms.Resource.Layout.design_navigation_item_separator = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.design_navigation_item_separator;
-			global::SkiaSharp.Views.Forms.Resource.Layout.design_navigation_item_subheader = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.design_navigation_item_subheader;
-			global::SkiaSharp.Views.Forms.Resource.Layout.design_navigation_menu = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.design_navigation_menu;
-			global::SkiaSharp.Views.Forms.Resource.Layout.design_navigation_menu_item = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.design_navigation_menu_item;
-			global::SkiaSharp.Views.Forms.Resource.Layout.design_text_input_password_icon = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.design_text_input_password_icon;
-			global::SkiaSharp.Views.Forms.Resource.Layout.FlyoutContent = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.FlyoutContent;
-			global::SkiaSharp.Views.Forms.Resource.Layout.mtrl_layout_snackbar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.mtrl_layout_snackbar;
-			global::SkiaSharp.Views.Forms.Resource.Layout.mtrl_layout_snackbar_include = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.mtrl_layout_snackbar_include;
-			global::SkiaSharp.Views.Forms.Resource.Layout.notification_action = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.notification_action;
-			global::SkiaSharp.Views.Forms.Resource.Layout.notification_action_tombstone = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.notification_action_tombstone;
-			global::SkiaSharp.Views.Forms.Resource.Layout.notification_media_action = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.notification_media_action;
-			global::SkiaSharp.Views.Forms.Resource.Layout.notification_media_cancel_action = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.notification_media_cancel_action;
-			global::SkiaSharp.Views.Forms.Resource.Layout.notification_template_big_media = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.notification_template_big_media;
-			global::SkiaSharp.Views.Forms.Resource.Layout.notification_template_big_media_custom = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.notification_template_big_media_custom;
-			global::SkiaSharp.Views.Forms.Resource.Layout.notification_template_big_media_narrow = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.notification_template_big_media_narrow;
-			global::SkiaSharp.Views.Forms.Resource.Layout.notification_template_big_media_narrow_custom = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.notification_template_big_media_narrow_custom;
-			global::SkiaSharp.Views.Forms.Resource.Layout.notification_template_custom_big = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.notification_template_custom_big;
-			global::SkiaSharp.Views.Forms.Resource.Layout.notification_template_icon_group = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.notification_template_icon_group;
-			global::SkiaSharp.Views.Forms.Resource.Layout.notification_template_lines_media = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.notification_template_lines_media;
-			global::SkiaSharp.Views.Forms.Resource.Layout.notification_template_media = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.notification_template_media;
-			global::SkiaSharp.Views.Forms.Resource.Layout.notification_template_media_custom = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.notification_template_media_custom;
-			global::SkiaSharp.Views.Forms.Resource.Layout.notification_template_part_chronometer = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.notification_template_part_chronometer;
-			global::SkiaSharp.Views.Forms.Resource.Layout.notification_template_part_time = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.notification_template_part_time;
-			global::SkiaSharp.Views.Forms.Resource.Layout.RootLayout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.RootLayout;
-			global::SkiaSharp.Views.Forms.Resource.Layout.select_dialog_item_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.select_dialog_item_material;
-			global::SkiaSharp.Views.Forms.Resource.Layout.select_dialog_multichoice_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.select_dialog_multichoice_material;
-			global::SkiaSharp.Views.Forms.Resource.Layout.select_dialog_singlechoice_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.select_dialog_singlechoice_material;
-			global::SkiaSharp.Views.Forms.Resource.Layout.ShellContent = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.ShellContent;
-			global::SkiaSharp.Views.Forms.Resource.Layout.support_simple_spinner_dropdown_item = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.support_simple_spinner_dropdown_item;
-			global::SkiaSharp.Views.Forms.Resource.String.abc_action_bar_home_description = global::PerryRhodan.AudiobookPlayer.Android.Resource.String.abc_action_bar_home_description;
-			global::SkiaSharp.Views.Forms.Resource.String.abc_action_bar_up_description = global::PerryRhodan.AudiobookPlayer.Android.Resource.String.abc_action_bar_up_description;
-			global::SkiaSharp.Views.Forms.Resource.String.abc_action_menu_overflow_description = global::PerryRhodan.AudiobookPlayer.Android.Resource.String.abc_action_menu_overflow_description;
-			global::SkiaSharp.Views.Forms.Resource.String.abc_action_mode_done = global::PerryRhodan.AudiobookPlayer.Android.Resource.String.abc_action_mode_done;
-			global::SkiaSharp.Views.Forms.Resource.String.abc_activitychooserview_choose_application = global::PerryRhodan.AudiobookPlayer.Android.Resource.String.abc_activitychooserview_choose_application;
-			global::SkiaSharp.Views.Forms.Resource.String.abc_activity_chooser_view_see_all = global::PerryRhodan.AudiobookPlayer.Android.Resource.String.abc_activity_chooser_view_see_all;
-			global::SkiaSharp.Views.Forms.Resource.String.abc_capital_off = global::PerryRhodan.AudiobookPlayer.Android.Resource.String.abc_capital_off;
-			global::SkiaSharp.Views.Forms.Resource.String.abc_capital_on = global::PerryRhodan.AudiobookPlayer.Android.Resource.String.abc_capital_on;
-			global::SkiaSharp.Views.Forms.Resource.String.abc_menu_alt_shortcut_label = global::PerryRhodan.AudiobookPlayer.Android.Resource.String.abc_menu_alt_shortcut_label;
-			global::SkiaSharp.Views.Forms.Resource.String.abc_menu_ctrl_shortcut_label = global::PerryRhodan.AudiobookPlayer.Android.Resource.String.abc_menu_ctrl_shortcut_label;
-			global::SkiaSharp.Views.Forms.Resource.String.abc_menu_delete_shortcut_label = global::PerryRhodan.AudiobookPlayer.Android.Resource.String.abc_menu_delete_shortcut_label;
-			global::SkiaSharp.Views.Forms.Resource.String.abc_menu_enter_shortcut_label = global::PerryRhodan.AudiobookPlayer.Android.Resource.String.abc_menu_enter_shortcut_label;
-			global::SkiaSharp.Views.Forms.Resource.String.abc_menu_function_shortcut_label = global::PerryRhodan.AudiobookPlayer.Android.Resource.String.abc_menu_function_shortcut_label;
-			global::SkiaSharp.Views.Forms.Resource.String.abc_menu_meta_shortcut_label = global::PerryRhodan.AudiobookPlayer.Android.Resource.String.abc_menu_meta_shortcut_label;
-			global::SkiaSharp.Views.Forms.Resource.String.abc_menu_shift_shortcut_label = global::PerryRhodan.AudiobookPlayer.Android.Resource.String.abc_menu_shift_shortcut_label;
-			global::SkiaSharp.Views.Forms.Resource.String.abc_menu_space_shortcut_label = global::PerryRhodan.AudiobookPlayer.Android.Resource.String.abc_menu_space_shortcut_label;
-			global::SkiaSharp.Views.Forms.Resource.String.abc_menu_sym_shortcut_label = global::PerryRhodan.AudiobookPlayer.Android.Resource.String.abc_menu_sym_shortcut_label;
-			global::SkiaSharp.Views.Forms.Resource.String.abc_prepend_shortcut_label = global::PerryRhodan.AudiobookPlayer.Android.Resource.String.abc_prepend_shortcut_label;
-			global::SkiaSharp.Views.Forms.Resource.String.abc_searchview_description_clear = global::PerryRhodan.AudiobookPlayer.Android.Resource.String.abc_searchview_description_clear;
-			global::SkiaSharp.Views.Forms.Resource.String.abc_searchview_description_query = global::PerryRhodan.AudiobookPlayer.Android.Resource.String.abc_searchview_description_query;
-			global::SkiaSharp.Views.Forms.Resource.String.abc_searchview_description_search = global::PerryRhodan.AudiobookPlayer.Android.Resource.String.abc_searchview_description_search;
-			global::SkiaSharp.Views.Forms.Resource.String.abc_searchview_description_submit = global::PerryRhodan.AudiobookPlayer.Android.Resource.String.abc_searchview_description_submit;
-			global::SkiaSharp.Views.Forms.Resource.String.abc_searchview_description_voice = global::PerryRhodan.AudiobookPlayer.Android.Resource.String.abc_searchview_description_voice;
-			global::SkiaSharp.Views.Forms.Resource.String.abc_search_hint = global::PerryRhodan.AudiobookPlayer.Android.Resource.String.abc_search_hint;
-			global::SkiaSharp.Views.Forms.Resource.String.abc_shareactionprovider_share_with = global::PerryRhodan.AudiobookPlayer.Android.Resource.String.abc_shareactionprovider_share_with;
-			global::SkiaSharp.Views.Forms.Resource.String.abc_shareactionprovider_share_with_application = global::PerryRhodan.AudiobookPlayer.Android.Resource.String.abc_shareactionprovider_share_with_application;
-			global::SkiaSharp.Views.Forms.Resource.String.abc_toolbar_collapse_description = global::PerryRhodan.AudiobookPlayer.Android.Resource.String.abc_toolbar_collapse_description;
-			global::SkiaSharp.Views.Forms.Resource.String.appbar_scrolling_view_behavior = global::PerryRhodan.AudiobookPlayer.Android.Resource.String.appbar_scrolling_view_behavior;
-			global::SkiaSharp.Views.Forms.Resource.String.bottom_sheet_behavior = global::PerryRhodan.AudiobookPlayer.Android.Resource.String.bottom_sheet_behavior;
-			global::SkiaSharp.Views.Forms.Resource.String.character_counter_content_description = global::PerryRhodan.AudiobookPlayer.Android.Resource.String.character_counter_content_description;
-			global::SkiaSharp.Views.Forms.Resource.String.character_counter_pattern = global::PerryRhodan.AudiobookPlayer.Android.Resource.String.character_counter_pattern;
-			global::SkiaSharp.Views.Forms.Resource.String.fab_transformation_scrim_behavior = global::PerryRhodan.AudiobookPlayer.Android.Resource.String.fab_transformation_scrim_behavior;
-			global::SkiaSharp.Views.Forms.Resource.String.fab_transformation_sheet_behavior = global::PerryRhodan.AudiobookPlayer.Android.Resource.String.fab_transformation_sheet_behavior;
-			global::SkiaSharp.Views.Forms.Resource.String.hide_bottom_view_on_scroll_behavior = global::PerryRhodan.AudiobookPlayer.Android.Resource.String.hide_bottom_view_on_scroll_behavior;
-			global::SkiaSharp.Views.Forms.Resource.String.mtrl_chip_close_icon_content_description = global::PerryRhodan.AudiobookPlayer.Android.Resource.String.mtrl_chip_close_icon_content_description;
-			global::SkiaSharp.Views.Forms.Resource.String.password_toggle_content_description = global::PerryRhodan.AudiobookPlayer.Android.Resource.String.password_toggle_content_description;
-			global::SkiaSharp.Views.Forms.Resource.String.path_password_eye = global::PerryRhodan.AudiobookPlayer.Android.Resource.String.path_password_eye;
-			global::SkiaSharp.Views.Forms.Resource.String.path_password_eye_mask_strike_through = global::PerryRhodan.AudiobookPlayer.Android.Resource.String.path_password_eye_mask_strike_through;
-			global::SkiaSharp.Views.Forms.Resource.String.path_password_eye_mask_visible = global::PerryRhodan.AudiobookPlayer.Android.Resource.String.path_password_eye_mask_visible;
-			global::SkiaSharp.Views.Forms.Resource.String.path_password_strike_through = global::PerryRhodan.AudiobookPlayer.Android.Resource.String.path_password_strike_through;
-			global::SkiaSharp.Views.Forms.Resource.String.search_menu_title = global::PerryRhodan.AudiobookPlayer.Android.Resource.String.search_menu_title;
-			global::SkiaSharp.Views.Forms.Resource.String.status_bar_notification_info_overflow = global::PerryRhodan.AudiobookPlayer.Android.Resource.String.status_bar_notification_info_overflow;
-			global::SkiaSharp.Views.Forms.Resource.Style.AlertDialog_AppCompat = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.AlertDialog_AppCompat;
-			global::SkiaSharp.Views.Forms.Resource.Style.AlertDialog_AppCompat_Light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.AlertDialog_AppCompat_Light;
-			global::SkiaSharp.Views.Forms.Resource.Style.Animation_AppCompat_Dialog = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Animation_AppCompat_Dialog;
-			global::SkiaSharp.Views.Forms.Resource.Style.Animation_AppCompat_DropDownUp = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Animation_AppCompat_DropDownUp;
-			global::SkiaSharp.Views.Forms.Resource.Style.Animation_AppCompat_Tooltip = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Animation_AppCompat_Tooltip;
-			global::SkiaSharp.Views.Forms.Resource.Style.Animation_Design_BottomSheetDialog = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Animation_Design_BottomSheetDialog;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_AlertDialog_AppCompat = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_AlertDialog_AppCompat;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_AlertDialog_AppCompat_Light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_AlertDialog_AppCompat_Light;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Animation_AppCompat_Dialog = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Animation_AppCompat_Dialog;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Animation_AppCompat_DropDownUp = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Animation_AppCompat_DropDownUp;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Animation_AppCompat_Tooltip = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Animation_AppCompat_Tooltip;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_CardView = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_CardView;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_DialogWindowTitleBackground_AppCompat = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_DialogWindowTitleBackground_AppCompat;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_DialogWindowTitle_AppCompat = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_DialogWindowTitle_AppCompat;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_TextAppearance_AppCompat = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_TextAppearance_AppCompat;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_TextAppearance_AppCompat_Body1 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_TextAppearance_AppCompat_Body1;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_TextAppearance_AppCompat_Body2 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_TextAppearance_AppCompat_Body2;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_TextAppearance_AppCompat_Button = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_TextAppearance_AppCompat_Button;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_TextAppearance_AppCompat_Caption = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_TextAppearance_AppCompat_Caption;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_TextAppearance_AppCompat_Display1 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_TextAppearance_AppCompat_Display1;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_TextAppearance_AppCompat_Display2 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_TextAppearance_AppCompat_Display2;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_TextAppearance_AppCompat_Display3 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_TextAppearance_AppCompat_Display3;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_TextAppearance_AppCompat_Display4 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_TextAppearance_AppCompat_Display4;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_TextAppearance_AppCompat_Headline = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_TextAppearance_AppCompat_Headline;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_TextAppearance_AppCompat_Inverse = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_TextAppearance_AppCompat_Inverse;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_TextAppearance_AppCompat_Large = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_TextAppearance_AppCompat_Large;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_TextAppearance_AppCompat_Large_Inverse = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_TextAppearance_AppCompat_Large_Inverse;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_TextAppearance_AppCompat_Light_Widget_PopupMenu_Large = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_TextAppearance_AppCompat_Light_Widget_PopupMenu_Large;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_TextAppearance_AppCompat_Light_Widget_PopupMenu_Small = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_TextAppearance_AppCompat_Light_Widget_PopupMenu_Small;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_TextAppearance_AppCompat_Medium = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_TextAppearance_AppCompat_Medium;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_TextAppearance_AppCompat_Medium_Inverse = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_TextAppearance_AppCompat_Medium_Inverse;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_TextAppearance_AppCompat_Menu = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_TextAppearance_AppCompat_Menu;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_TextAppearance_AppCompat_SearchResult = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_TextAppearance_AppCompat_SearchResult;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_TextAppearance_AppCompat_SearchResult_Subtitle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_TextAppearance_AppCompat_SearchResult_Subtitle;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_TextAppearance_AppCompat_SearchResult_Title = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_TextAppearance_AppCompat_SearchResult_Title;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_TextAppearance_AppCompat_Small = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_TextAppearance_AppCompat_Small;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_TextAppearance_AppCompat_Small_Inverse = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_TextAppearance_AppCompat_Small_Inverse;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_TextAppearance_AppCompat_Subhead = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_TextAppearance_AppCompat_Subhead;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_TextAppearance_AppCompat_Subhead_Inverse = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_TextAppearance_AppCompat_Subhead_Inverse;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_TextAppearance_AppCompat_Title = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_TextAppearance_AppCompat_Title;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_TextAppearance_AppCompat_Title_Inverse = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_TextAppearance_AppCompat_Title_Inverse;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_TextAppearance_AppCompat_Tooltip = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_TextAppearance_AppCompat_Tooltip;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionBar_Menu = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionBar_Menu;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionBar_Subtitle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionBar_Subtitle;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionBar_Subtitle_Inverse = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionBar_Subtitle_Inverse;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionBar_Title = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionBar_Title;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionBar_Title_Inverse = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionBar_Title_Inverse;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionMode_Subtitle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionMode_Subtitle;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionMode_Title = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionMode_Title;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_TextAppearance_AppCompat_Widget_Button = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_TextAppearance_AppCompat_Widget_Button;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_TextAppearance_AppCompat_Widget_Button_Borderless_Colored = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_TextAppearance_AppCompat_Widget_Button_Borderless_Colored;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_TextAppearance_AppCompat_Widget_Button_Colored = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_TextAppearance_AppCompat_Widget_Button_Colored;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_TextAppearance_AppCompat_Widget_Button_Inverse = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_TextAppearance_AppCompat_Widget_Button_Inverse;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_TextAppearance_AppCompat_Widget_DropDownItem = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_TextAppearance_AppCompat_Widget_DropDownItem;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_TextAppearance_AppCompat_Widget_PopupMenu_Header = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_TextAppearance_AppCompat_Widget_PopupMenu_Header;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_TextAppearance_AppCompat_Widget_PopupMenu_Large = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_TextAppearance_AppCompat_Widget_PopupMenu_Large;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_TextAppearance_AppCompat_Widget_PopupMenu_Small = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_TextAppearance_AppCompat_Widget_PopupMenu_Small;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_TextAppearance_AppCompat_Widget_Switch = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_TextAppearance_AppCompat_Widget_Switch;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_TextAppearance_AppCompat_Widget_TextView_SpinnerItem = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_TextAppearance_AppCompat_Widget_TextView_SpinnerItem;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_TextAppearance_Widget_AppCompat_ExpandedMenu_Item = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_TextAppearance_Widget_AppCompat_ExpandedMenu_Item;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_TextAppearance_Widget_AppCompat_Toolbar_Subtitle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_TextAppearance_Widget_AppCompat_Toolbar_Subtitle;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_TextAppearance_Widget_AppCompat_Toolbar_Title = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_TextAppearance_Widget_AppCompat_Toolbar_Title;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_ThemeOverlay_AppCompat = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_ThemeOverlay_AppCompat;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_ThemeOverlay_AppCompat_ActionBar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_ThemeOverlay_AppCompat_ActionBar;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_ThemeOverlay_AppCompat_Dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_ThemeOverlay_AppCompat_Dark;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_ThemeOverlay_AppCompat_Dark_ActionBar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_ThemeOverlay_AppCompat_Dark_ActionBar;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_ThemeOverlay_AppCompat_Dialog = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_ThemeOverlay_AppCompat_Dialog;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_ThemeOverlay_AppCompat_Dialog_Alert = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_ThemeOverlay_AppCompat_Dialog_Alert;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_ThemeOverlay_AppCompat_Light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_ThemeOverlay_AppCompat_Light;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_ThemeOverlay_MaterialComponents_Dialog = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_ThemeOverlay_MaterialComponents_Dialog;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_ThemeOverlay_MaterialComponents_Dialog_Alert = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_ThemeOverlay_MaterialComponents_Dialog_Alert;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Theme_AppCompat = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Theme_AppCompat;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Theme_AppCompat_CompactMenu = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Theme_AppCompat_CompactMenu;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Theme_AppCompat_Dialog = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Theme_AppCompat_Dialog;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Theme_AppCompat_DialogWhenLarge = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Theme_AppCompat_DialogWhenLarge;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Theme_AppCompat_Dialog_Alert = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Theme_AppCompat_Dialog_Alert;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Theme_AppCompat_Dialog_FixedSize = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Theme_AppCompat_Dialog_FixedSize;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Theme_AppCompat_Dialog_MinWidth = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Theme_AppCompat_Dialog_MinWidth;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Theme_AppCompat_Light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Theme_AppCompat_Light;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Theme_AppCompat_Light_DarkActionBar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Theme_AppCompat_Light_DarkActionBar;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Theme_AppCompat_Light_Dialog = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Theme_AppCompat_Light_Dialog;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Theme_AppCompat_Light_DialogWhenLarge = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Theme_AppCompat_Light_DialogWhenLarge;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Theme_AppCompat_Light_Dialog_Alert = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Theme_AppCompat_Light_Dialog_Alert;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Theme_AppCompat_Light_Dialog_FixedSize = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Theme_AppCompat_Light_Dialog_FixedSize;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Theme_AppCompat_Light_Dialog_MinWidth = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Theme_AppCompat_Light_Dialog_MinWidth;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Theme_MaterialComponents = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Theme_MaterialComponents;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Theme_MaterialComponents_Bridge = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Theme_MaterialComponents_Bridge;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Theme_MaterialComponents_CompactMenu = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Theme_MaterialComponents_CompactMenu;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Theme_MaterialComponents_Dialog = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Theme_MaterialComponents_Dialog;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Theme_MaterialComponents_DialogWhenLarge = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Theme_MaterialComponents_DialogWhenLarge;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Theme_MaterialComponents_Dialog_Alert = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Theme_MaterialComponents_Dialog_Alert;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Theme_MaterialComponents_Dialog_FixedSize = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Theme_MaterialComponents_Dialog_FixedSize;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Theme_MaterialComponents_Dialog_MinWidth = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Theme_MaterialComponents_Dialog_MinWidth;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Theme_MaterialComponents_Light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Theme_MaterialComponents_Light;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Theme_MaterialComponents_Light_Bridge = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Theme_MaterialComponents_Light_Bridge;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Theme_MaterialComponents_Light_DarkActionBar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Theme_MaterialComponents_Light_DarkActionBar;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Theme_MaterialComponents_Light_DarkActionBar_Bridge = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Theme_MaterialComponents_Light_DarkActionBar_Bridge;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Theme_MaterialComponents_Light_Dialog = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Theme_MaterialComponents_Light_Dialog;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Theme_MaterialComponents_Light_DialogWhenLarge = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Theme_MaterialComponents_Light_DialogWhenLarge;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Theme_MaterialComponents_Light_Dialog_Alert = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Theme_MaterialComponents_Light_Dialog_Alert;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Theme_MaterialComponents_Light_Dialog_FixedSize = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Theme_MaterialComponents_Light_Dialog_FixedSize;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Theme_MaterialComponents_Light_Dialog_MinWidth = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Theme_MaterialComponents_Light_Dialog_MinWidth;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_V14_ThemeOverlay_MaterialComponents_Dialog = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_V14_ThemeOverlay_MaterialComponents_Dialog;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_V14_ThemeOverlay_MaterialComponents_Dialog_Alert = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_V14_ThemeOverlay_MaterialComponents_Dialog_Alert;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_V14_Theme_MaterialComponents = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_V14_Theme_MaterialComponents;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_V14_Theme_MaterialComponents_Bridge = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_V14_Theme_MaterialComponents_Bridge;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_V14_Theme_MaterialComponents_Dialog = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_V14_Theme_MaterialComponents_Dialog;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_V14_Theme_MaterialComponents_Light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_V14_Theme_MaterialComponents_Light;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_V14_Theme_MaterialComponents_Light_Bridge = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_V14_Theme_MaterialComponents_Light_Bridge;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_V14_Theme_MaterialComponents_Light_DarkActionBar_Bridge = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_V14_Theme_MaterialComponents_Light_DarkActionBar_Bridge;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_V14_Theme_MaterialComponents_Light_Dialog = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_V14_Theme_MaterialComponents_Light_Dialog;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_V21_ThemeOverlay_AppCompat_Dialog = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_V21_ThemeOverlay_AppCompat_Dialog;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_V21_Theme_AppCompat = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_V21_Theme_AppCompat;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_V21_Theme_AppCompat_Dialog = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_V21_Theme_AppCompat_Dialog;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_V21_Theme_AppCompat_Light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_V21_Theme_AppCompat_Light;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_V21_Theme_AppCompat_Light_Dialog = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_V21_Theme_AppCompat_Light_Dialog;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_V22_Theme_AppCompat = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_V22_Theme_AppCompat;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_V22_Theme_AppCompat_Light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_V22_Theme_AppCompat_Light;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_V23_Theme_AppCompat = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_V23_Theme_AppCompat;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_V23_Theme_AppCompat_Light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_V23_Theme_AppCompat_Light;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_V26_Theme_AppCompat = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_V26_Theme_AppCompat;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_V26_Theme_AppCompat_Light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_V26_Theme_AppCompat_Light;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_V26_Widget_AppCompat_Toolbar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_V26_Widget_AppCompat_Toolbar;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_V28_Theme_AppCompat = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_V28_Theme_AppCompat;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_V28_Theme_AppCompat_Light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_V28_Theme_AppCompat_Light;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_V7_ThemeOverlay_AppCompat_Dialog = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_V7_ThemeOverlay_AppCompat_Dialog;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_V7_Theme_AppCompat = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_V7_Theme_AppCompat;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_V7_Theme_AppCompat_Dialog = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_V7_Theme_AppCompat_Dialog;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_V7_Theme_AppCompat_Light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_V7_Theme_AppCompat_Light;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_V7_Theme_AppCompat_Light_Dialog = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_V7_Theme_AppCompat_Light_Dialog;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_V7_Widget_AppCompat_AutoCompleteTextView = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_V7_Widget_AppCompat_AutoCompleteTextView;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_V7_Widget_AppCompat_EditText = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_V7_Widget_AppCompat_EditText;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_V7_Widget_AppCompat_Toolbar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_V7_Widget_AppCompat_Toolbar;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_ActionBar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_ActionBar;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_ActionBar_Solid = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_ActionBar_Solid;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_ActionBar_TabBar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_ActionBar_TabBar;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_ActionBar_TabText = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_ActionBar_TabText;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_ActionBar_TabView = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_ActionBar_TabView;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_ActionButton = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_ActionButton;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_ActionButton_CloseMode = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_ActionButton_CloseMode;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_ActionButton_Overflow = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_ActionButton_Overflow;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_ActionMode = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_ActionMode;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_ActivityChooserView = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_ActivityChooserView;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_AutoCompleteTextView = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_AutoCompleteTextView;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_Button = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_Button;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_ButtonBar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_ButtonBar;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_ButtonBar_AlertDialog = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_ButtonBar_AlertDialog;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_Button_Borderless = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_Button_Borderless;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_Button_Borderless_Colored = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_Button_Borderless_Colored;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_Button_ButtonBar_AlertDialog = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_Button_ButtonBar_AlertDialog;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_Button_Colored = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_Button_Colored;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_Button_Small = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_Button_Small;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_CompoundButton_CheckBox = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_CompoundButton_CheckBox;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_CompoundButton_RadioButton = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_CompoundButton_RadioButton;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_CompoundButton_Switch = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_CompoundButton_Switch;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_DrawerArrowToggle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_DrawerArrowToggle;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_DrawerArrowToggle_Common = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_DrawerArrowToggle_Common;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_DropDownItem_Spinner = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_DropDownItem_Spinner;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_EditText = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_EditText;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_ImageButton = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_ImageButton;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_Light_ActionBar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_Light_ActionBar;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_Light_ActionBar_Solid = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_Light_ActionBar_Solid;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_Light_ActionBar_TabBar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_Light_ActionBar_TabBar;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_Light_ActionBar_TabText = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_Light_ActionBar_TabText;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_Light_ActionBar_TabText_Inverse = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_Light_ActionBar_TabText_Inverse;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_Light_ActionBar_TabView = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_Light_ActionBar_TabView;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_Light_PopupMenu = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_Light_PopupMenu;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_Light_PopupMenu_Overflow = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_Light_PopupMenu_Overflow;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_ListMenuView = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_ListMenuView;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_ListPopupWindow = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_ListPopupWindow;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_ListView = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_ListView;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_ListView_DropDown = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_ListView_DropDown;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_ListView_Menu = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_ListView_Menu;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_PopupMenu = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_PopupMenu;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_PopupMenu_Overflow = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_PopupMenu_Overflow;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_PopupWindow = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_PopupWindow;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_ProgressBar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_ProgressBar;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_ProgressBar_Horizontal = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_ProgressBar_Horizontal;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_RatingBar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_RatingBar;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_RatingBar_Indicator = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_RatingBar_Indicator;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_RatingBar_Small = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_RatingBar_Small;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_SearchView = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_SearchView;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_SearchView_ActionBar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_SearchView_ActionBar;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_SeekBar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_SeekBar;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_SeekBar_Discrete = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_SeekBar_Discrete;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_Spinner = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_Spinner;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_Spinner_Underlined = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_Spinner_Underlined;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_TextView_SpinnerItem = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_TextView_SpinnerItem;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_Toolbar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_Toolbar;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_AppCompat_Toolbar_Button_Navigation = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_AppCompat_Toolbar_Button_Navigation;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_Design_TabLayout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_Design_TabLayout;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_MaterialComponents_Chip = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_MaterialComponents_Chip;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_MaterialComponents_TextInputEditText = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_MaterialComponents_TextInputEditText;
-			global::SkiaSharp.Views.Forms.Resource.Style.Base_Widget_MaterialComponents_TextInputLayout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Base_Widget_MaterialComponents_TextInputLayout;
-			global::SkiaSharp.Views.Forms.Resource.Style.CardView = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.CardView;
-			global::SkiaSharp.Views.Forms.Resource.Style.CardView_Dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.CardView_Dark;
-			global::SkiaSharp.Views.Forms.Resource.Style.CardView_Light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.CardView_Light;
-			global::SkiaSharp.Views.Forms.Resource.Style.Platform_AppCompat = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Platform_AppCompat;
-			global::SkiaSharp.Views.Forms.Resource.Style.Platform_AppCompat_Light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Platform_AppCompat_Light;
-			global::SkiaSharp.Views.Forms.Resource.Style.Platform_MaterialComponents = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Platform_MaterialComponents;
-			global::SkiaSharp.Views.Forms.Resource.Style.Platform_MaterialComponents_Dialog = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Platform_MaterialComponents_Dialog;
-			global::SkiaSharp.Views.Forms.Resource.Style.Platform_MaterialComponents_Light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Platform_MaterialComponents_Light;
-			global::SkiaSharp.Views.Forms.Resource.Style.Platform_MaterialComponents_Light_Dialog = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Platform_MaterialComponents_Light_Dialog;
-			global::SkiaSharp.Views.Forms.Resource.Style.Platform_ThemeOverlay_AppCompat = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Platform_ThemeOverlay_AppCompat;
-			global::SkiaSharp.Views.Forms.Resource.Style.Platform_ThemeOverlay_AppCompat_Dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Platform_ThemeOverlay_AppCompat_Dark;
-			global::SkiaSharp.Views.Forms.Resource.Style.Platform_ThemeOverlay_AppCompat_Light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Platform_ThemeOverlay_AppCompat_Light;
-			global::SkiaSharp.Views.Forms.Resource.Style.Platform_V21_AppCompat = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Platform_V21_AppCompat;
-			global::SkiaSharp.Views.Forms.Resource.Style.Platform_V21_AppCompat_Light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Platform_V21_AppCompat_Light;
-			global::SkiaSharp.Views.Forms.Resource.Style.Platform_V25_AppCompat = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Platform_V25_AppCompat;
-			global::SkiaSharp.Views.Forms.Resource.Style.Platform_V25_AppCompat_Light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Platform_V25_AppCompat_Light;
-			global::SkiaSharp.Views.Forms.Resource.Style.Platform_Widget_AppCompat_Spinner = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Platform_Widget_AppCompat_Spinner;
-			global::SkiaSharp.Views.Forms.Resource.Style.RtlOverlay_DialogWindowTitle_AppCompat = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.RtlOverlay_DialogWindowTitle_AppCompat;
-			global::SkiaSharp.Views.Forms.Resource.Style.RtlOverlay_Widget_AppCompat_ActionBar_TitleItem = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.RtlOverlay_Widget_AppCompat_ActionBar_TitleItem;
-			global::SkiaSharp.Views.Forms.Resource.Style.RtlOverlay_Widget_AppCompat_DialogTitle_Icon = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.RtlOverlay_Widget_AppCompat_DialogTitle_Icon;
-			global::SkiaSharp.Views.Forms.Resource.Style.RtlOverlay_Widget_AppCompat_PopupMenuItem = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.RtlOverlay_Widget_AppCompat_PopupMenuItem;
-			global::SkiaSharp.Views.Forms.Resource.Style.RtlOverlay_Widget_AppCompat_PopupMenuItem_InternalGroup = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.RtlOverlay_Widget_AppCompat_PopupMenuItem_InternalGroup;
-			global::SkiaSharp.Views.Forms.Resource.Style.RtlOverlay_Widget_AppCompat_PopupMenuItem_Shortcut = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.RtlOverlay_Widget_AppCompat_PopupMenuItem_Shortcut;
-			global::SkiaSharp.Views.Forms.Resource.Style.RtlOverlay_Widget_AppCompat_PopupMenuItem_SubmenuArrow = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.RtlOverlay_Widget_AppCompat_PopupMenuItem_SubmenuArrow;
-			global::SkiaSharp.Views.Forms.Resource.Style.RtlOverlay_Widget_AppCompat_PopupMenuItem_Text = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.RtlOverlay_Widget_AppCompat_PopupMenuItem_Text;
-			global::SkiaSharp.Views.Forms.Resource.Style.RtlOverlay_Widget_AppCompat_PopupMenuItem_Title = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.RtlOverlay_Widget_AppCompat_PopupMenuItem_Title;
-			global::SkiaSharp.Views.Forms.Resource.Style.RtlOverlay_Widget_AppCompat_SearchView_MagIcon = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.RtlOverlay_Widget_AppCompat_SearchView_MagIcon;
-			global::SkiaSharp.Views.Forms.Resource.Style.RtlOverlay_Widget_AppCompat_Search_DropDown = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.RtlOverlay_Widget_AppCompat_Search_DropDown;
-			global::SkiaSharp.Views.Forms.Resource.Style.RtlOverlay_Widget_AppCompat_Search_DropDown_Icon1 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.RtlOverlay_Widget_AppCompat_Search_DropDown_Icon1;
-			global::SkiaSharp.Views.Forms.Resource.Style.RtlOverlay_Widget_AppCompat_Search_DropDown_Icon2 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.RtlOverlay_Widget_AppCompat_Search_DropDown_Icon2;
-			global::SkiaSharp.Views.Forms.Resource.Style.RtlOverlay_Widget_AppCompat_Search_DropDown_Query = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.RtlOverlay_Widget_AppCompat_Search_DropDown_Query;
-			global::SkiaSharp.Views.Forms.Resource.Style.RtlOverlay_Widget_AppCompat_Search_DropDown_Text = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.RtlOverlay_Widget_AppCompat_Search_DropDown_Text;
-			global::SkiaSharp.Views.Forms.Resource.Style.RtlUnderlay_Widget_AppCompat_ActionButton = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.RtlUnderlay_Widget_AppCompat_ActionButton;
-			global::SkiaSharp.Views.Forms.Resource.Style.RtlUnderlay_Widget_AppCompat_ActionButton_Overflow = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.RtlUnderlay_Widget_AppCompat_ActionButton_Overflow;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_AppCompat = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_AppCompat;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_AppCompat_Body1 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_AppCompat_Body1;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_AppCompat_Body2 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_AppCompat_Body2;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_AppCompat_Button = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_AppCompat_Button;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_AppCompat_Caption = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_AppCompat_Caption;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_AppCompat_Display1 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_AppCompat_Display1;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_AppCompat_Display2 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_AppCompat_Display2;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_AppCompat_Display3 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_AppCompat_Display3;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_AppCompat_Display4 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_AppCompat_Display4;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_AppCompat_Headline = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_AppCompat_Headline;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_AppCompat_Inverse = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_AppCompat_Inverse;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_AppCompat_Large = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_AppCompat_Large;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_AppCompat_Large_Inverse = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_AppCompat_Large_Inverse;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_AppCompat_Light_SearchResult_Subtitle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_AppCompat_Light_SearchResult_Subtitle;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_AppCompat_Light_SearchResult_Title = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_AppCompat_Light_SearchResult_Title;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_AppCompat_Light_Widget_PopupMenu_Large = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_AppCompat_Light_Widget_PopupMenu_Large;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_AppCompat_Light_Widget_PopupMenu_Small = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_AppCompat_Light_Widget_PopupMenu_Small;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_AppCompat_Medium = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_AppCompat_Medium;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_AppCompat_Medium_Inverse = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_AppCompat_Medium_Inverse;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_AppCompat_Menu = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_AppCompat_Menu;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_AppCompat_SearchResult_Subtitle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_AppCompat_SearchResult_Subtitle;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_AppCompat_SearchResult_Title = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_AppCompat_SearchResult_Title;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_AppCompat_Small = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_AppCompat_Small;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_AppCompat_Small_Inverse = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_AppCompat_Small_Inverse;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_AppCompat_Subhead = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_AppCompat_Subhead;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_AppCompat_Subhead_Inverse = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_AppCompat_Subhead_Inverse;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_AppCompat_Title = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_AppCompat_Title;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_AppCompat_Title_Inverse = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_AppCompat_Title_Inverse;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_AppCompat_Tooltip = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_AppCompat_Tooltip;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_AppCompat_Widget_ActionBar_Menu = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_AppCompat_Widget_ActionBar_Menu;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_AppCompat_Widget_ActionBar_Subtitle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_AppCompat_Widget_ActionBar_Subtitle;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_AppCompat_Widget_ActionBar_Subtitle_Inverse = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_AppCompat_Widget_ActionBar_Subtitle_Inverse;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_AppCompat_Widget_ActionBar_Title = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_AppCompat_Widget_ActionBar_Title;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_AppCompat_Widget_ActionBar_Title_Inverse = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_AppCompat_Widget_ActionBar_Title_Inverse;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_AppCompat_Widget_ActionMode_Subtitle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_AppCompat_Widget_ActionMode_Subtitle;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_AppCompat_Widget_ActionMode_Subtitle_Inverse = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_AppCompat_Widget_ActionMode_Subtitle_Inverse;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_AppCompat_Widget_ActionMode_Title = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_AppCompat_Widget_ActionMode_Title;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_AppCompat_Widget_ActionMode_Title_Inverse = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_AppCompat_Widget_ActionMode_Title_Inverse;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_AppCompat_Widget_Button = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_AppCompat_Widget_Button;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_AppCompat_Widget_Button_Borderless_Colored = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_AppCompat_Widget_Button_Borderless_Colored;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_AppCompat_Widget_Button_Colored = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_AppCompat_Widget_Button_Colored;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_AppCompat_Widget_Button_Inverse = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_AppCompat_Widget_Button_Inverse;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_AppCompat_Widget_DropDownItem = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_AppCompat_Widget_DropDownItem;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_AppCompat_Widget_PopupMenu_Header = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_AppCompat_Widget_PopupMenu_Header;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_AppCompat_Widget_PopupMenu_Large = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_AppCompat_Widget_PopupMenu_Large;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_AppCompat_Widget_PopupMenu_Small = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_AppCompat_Widget_PopupMenu_Small;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_AppCompat_Widget_Switch = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_AppCompat_Widget_Switch;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_AppCompat_Widget_TextView_SpinnerItem = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_AppCompat_Widget_TextView_SpinnerItem;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_Compat_Notification = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_Compat_Notification;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_Compat_Notification_Info = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_Compat_Notification_Info;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_Compat_Notification_Info_Media = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_Compat_Notification_Info_Media;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_Compat_Notification_Line2 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_Compat_Notification_Line2;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_Compat_Notification_Line2_Media = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_Compat_Notification_Line2_Media;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_Compat_Notification_Media = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_Compat_Notification_Media;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_Compat_Notification_Time = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_Compat_Notification_Time;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_Compat_Notification_Time_Media = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_Compat_Notification_Time_Media;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_Compat_Notification_Title = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_Compat_Notification_Title;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_Compat_Notification_Title_Media = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_Compat_Notification_Title_Media;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_Design_CollapsingToolbar_Expanded = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_Design_CollapsingToolbar_Expanded;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_Design_Counter = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_Design_Counter;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_Design_Counter_Overflow = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_Design_Counter_Overflow;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_Design_Error = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_Design_Error;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_Design_HelperText = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_Design_HelperText;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_Design_Hint = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_Design_Hint;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_Design_Snackbar_Message = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_Design_Snackbar_Message;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_Design_Tab = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_Design_Tab;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_MaterialComponents_Body1 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_MaterialComponents_Body1;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_MaterialComponents_Body2 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_MaterialComponents_Body2;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_MaterialComponents_Button = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_MaterialComponents_Button;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_MaterialComponents_Caption = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_MaterialComponents_Caption;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_MaterialComponents_Chip = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_MaterialComponents_Chip;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_MaterialComponents_Headline1 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_MaterialComponents_Headline1;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_MaterialComponents_Headline2 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_MaterialComponents_Headline2;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_MaterialComponents_Headline3 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_MaterialComponents_Headline3;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_MaterialComponents_Headline4 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_MaterialComponents_Headline4;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_MaterialComponents_Headline5 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_MaterialComponents_Headline5;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_MaterialComponents_Headline6 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_MaterialComponents_Headline6;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_MaterialComponents_Overline = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_MaterialComponents_Overline;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_MaterialComponents_Subtitle1 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_MaterialComponents_Subtitle1;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_MaterialComponents_Subtitle2 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_MaterialComponents_Subtitle2;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_MaterialComponents_Tab = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_MaterialComponents_Tab;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_Widget_AppCompat_ExpandedMenu_Item = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_Widget_AppCompat_ExpandedMenu_Item;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_Widget_AppCompat_Toolbar_Subtitle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_Widget_AppCompat_Toolbar_Subtitle;
-			global::SkiaSharp.Views.Forms.Resource.Style.TextAppearance_Widget_AppCompat_Toolbar_Title = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_Widget_AppCompat_Toolbar_Title;
-			global::SkiaSharp.Views.Forms.Resource.Style.ThemeOverlay_AppCompat = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.ThemeOverlay_AppCompat;
-			global::SkiaSharp.Views.Forms.Resource.Style.ThemeOverlay_AppCompat_ActionBar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.ThemeOverlay_AppCompat_ActionBar;
-			global::SkiaSharp.Views.Forms.Resource.Style.ThemeOverlay_AppCompat_Dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.ThemeOverlay_AppCompat_Dark;
-			global::SkiaSharp.Views.Forms.Resource.Style.ThemeOverlay_AppCompat_Dark_ActionBar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.ThemeOverlay_AppCompat_Dark_ActionBar;
-			global::SkiaSharp.Views.Forms.Resource.Style.ThemeOverlay_AppCompat_Dialog = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.ThemeOverlay_AppCompat_Dialog;
-			global::SkiaSharp.Views.Forms.Resource.Style.ThemeOverlay_AppCompat_Dialog_Alert = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.ThemeOverlay_AppCompat_Dialog_Alert;
-			global::SkiaSharp.Views.Forms.Resource.Style.ThemeOverlay_AppCompat_Light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.ThemeOverlay_AppCompat_Light;
-			global::SkiaSharp.Views.Forms.Resource.Style.ThemeOverlay_MaterialComponents = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.ThemeOverlay_MaterialComponents;
-			global::SkiaSharp.Views.Forms.Resource.Style.ThemeOverlay_MaterialComponents_ActionBar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.ThemeOverlay_MaterialComponents_ActionBar;
-			global::SkiaSharp.Views.Forms.Resource.Style.ThemeOverlay_MaterialComponents_Dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.ThemeOverlay_MaterialComponents_Dark;
-			global::SkiaSharp.Views.Forms.Resource.Style.ThemeOverlay_MaterialComponents_Dark_ActionBar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.ThemeOverlay_MaterialComponents_Dark_ActionBar;
-			global::SkiaSharp.Views.Forms.Resource.Style.ThemeOverlay_MaterialComponents_Dialog = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.ThemeOverlay_MaterialComponents_Dialog;
-			global::SkiaSharp.Views.Forms.Resource.Style.ThemeOverlay_MaterialComponents_Dialog_Alert = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.ThemeOverlay_MaterialComponents_Dialog_Alert;
-			global::SkiaSharp.Views.Forms.Resource.Style.ThemeOverlay_MaterialComponents_Light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.ThemeOverlay_MaterialComponents_Light;
-			global::SkiaSharp.Views.Forms.Resource.Style.ThemeOverlay_MaterialComponents_TextInputEditText = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.ThemeOverlay_MaterialComponents_TextInputEditText;
-			global::SkiaSharp.Views.Forms.Resource.Style.ThemeOverlay_MaterialComponents_TextInputEditText_FilledBox = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.ThemeOverlay_MaterialComponents_TextInputEditText_FilledBox;
-			global::SkiaSharp.Views.Forms.Resource.Style.ThemeOverlay_MaterialComponents_TextInputEditText_FilledBox_Dense = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.ThemeOverlay_MaterialComponents_TextInputEditText_FilledBox_Dense;
-			global::SkiaSharp.Views.Forms.Resource.Style.ThemeOverlay_MaterialComponents_TextInputEditText_OutlinedBox = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.ThemeOverlay_MaterialComponents_TextInputEditText_OutlinedBox;
-			global::SkiaSharp.Views.Forms.Resource.Style.ThemeOverlay_MaterialComponents_TextInputEditText_OutlinedBox_Dense = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.ThemeOverlay_MaterialComponents_TextInputEditText_OutlinedBox_Dense;
-			global::SkiaSharp.Views.Forms.Resource.Style.Theme_AppCompat = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Theme_AppCompat;
-			global::SkiaSharp.Views.Forms.Resource.Style.Theme_AppCompat_CompactMenu = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Theme_AppCompat_CompactMenu;
-			global::SkiaSharp.Views.Forms.Resource.Style.Theme_AppCompat_DayNight = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Theme_AppCompat_DayNight;
-			global::SkiaSharp.Views.Forms.Resource.Style.Theme_AppCompat_DayNight_DarkActionBar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Theme_AppCompat_DayNight_DarkActionBar;
-			global::SkiaSharp.Views.Forms.Resource.Style.Theme_AppCompat_DayNight_Dialog = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Theme_AppCompat_DayNight_Dialog;
-			global::SkiaSharp.Views.Forms.Resource.Style.Theme_AppCompat_DayNight_DialogWhenLarge = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Theme_AppCompat_DayNight_DialogWhenLarge;
-			global::SkiaSharp.Views.Forms.Resource.Style.Theme_AppCompat_DayNight_Dialog_Alert = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Theme_AppCompat_DayNight_Dialog_Alert;
-			global::SkiaSharp.Views.Forms.Resource.Style.Theme_AppCompat_DayNight_Dialog_MinWidth = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Theme_AppCompat_DayNight_Dialog_MinWidth;
-			global::SkiaSharp.Views.Forms.Resource.Style.Theme_AppCompat_DayNight_NoActionBar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Theme_AppCompat_DayNight_NoActionBar;
-			global::SkiaSharp.Views.Forms.Resource.Style.Theme_AppCompat_Dialog = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Theme_AppCompat_Dialog;
-			global::SkiaSharp.Views.Forms.Resource.Style.Theme_AppCompat_DialogWhenLarge = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Theme_AppCompat_DialogWhenLarge;
-			global::SkiaSharp.Views.Forms.Resource.Style.Theme_AppCompat_Dialog_Alert = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Theme_AppCompat_Dialog_Alert;
-			global::SkiaSharp.Views.Forms.Resource.Style.Theme_AppCompat_Dialog_MinWidth = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Theme_AppCompat_Dialog_MinWidth;
-			global::SkiaSharp.Views.Forms.Resource.Style.Theme_AppCompat_Light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Theme_AppCompat_Light;
-			global::SkiaSharp.Views.Forms.Resource.Style.Theme_AppCompat_Light_DarkActionBar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Theme_AppCompat_Light_DarkActionBar;
-			global::SkiaSharp.Views.Forms.Resource.Style.Theme_AppCompat_Light_Dialog = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Theme_AppCompat_Light_Dialog;
-			global::SkiaSharp.Views.Forms.Resource.Style.Theme_AppCompat_Light_DialogWhenLarge = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Theme_AppCompat_Light_DialogWhenLarge;
-			global::SkiaSharp.Views.Forms.Resource.Style.Theme_AppCompat_Light_Dialog_Alert = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Theme_AppCompat_Light_Dialog_Alert;
-			global::SkiaSharp.Views.Forms.Resource.Style.Theme_AppCompat_Light_Dialog_MinWidth = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Theme_AppCompat_Light_Dialog_MinWidth;
-			global::SkiaSharp.Views.Forms.Resource.Style.Theme_AppCompat_Light_NoActionBar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Theme_AppCompat_Light_NoActionBar;
-			global::SkiaSharp.Views.Forms.Resource.Style.Theme_AppCompat_NoActionBar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Theme_AppCompat_NoActionBar;
-			global::SkiaSharp.Views.Forms.Resource.Style.Theme_Design = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Theme_Design;
-			global::SkiaSharp.Views.Forms.Resource.Style.Theme_Design_BottomSheetDialog = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Theme_Design_BottomSheetDialog;
-			global::SkiaSharp.Views.Forms.Resource.Style.Theme_Design_Light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Theme_Design_Light;
-			global::SkiaSharp.Views.Forms.Resource.Style.Theme_Design_Light_BottomSheetDialog = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Theme_Design_Light_BottomSheetDialog;
-			global::SkiaSharp.Views.Forms.Resource.Style.Theme_Design_Light_NoActionBar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Theme_Design_Light_NoActionBar;
-			global::SkiaSharp.Views.Forms.Resource.Style.Theme_Design_NoActionBar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Theme_Design_NoActionBar;
-			global::SkiaSharp.Views.Forms.Resource.Style.Theme_MaterialComponents = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Theme_MaterialComponents;
-			global::SkiaSharp.Views.Forms.Resource.Style.Theme_MaterialComponents_BottomSheetDialog = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Theme_MaterialComponents_BottomSheetDialog;
-			global::SkiaSharp.Views.Forms.Resource.Style.Theme_MaterialComponents_Bridge = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Theme_MaterialComponents_Bridge;
-			global::SkiaSharp.Views.Forms.Resource.Style.Theme_MaterialComponents_CompactMenu = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Theme_MaterialComponents_CompactMenu;
-			global::SkiaSharp.Views.Forms.Resource.Style.Theme_MaterialComponents_Dialog = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Theme_MaterialComponents_Dialog;
-			global::SkiaSharp.Views.Forms.Resource.Style.Theme_MaterialComponents_DialogWhenLarge = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Theme_MaterialComponents_DialogWhenLarge;
-			global::SkiaSharp.Views.Forms.Resource.Style.Theme_MaterialComponents_Dialog_Alert = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Theme_MaterialComponents_Dialog_Alert;
-			global::SkiaSharp.Views.Forms.Resource.Style.Theme_MaterialComponents_Dialog_MinWidth = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Theme_MaterialComponents_Dialog_MinWidth;
-			global::SkiaSharp.Views.Forms.Resource.Style.Theme_MaterialComponents_Light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Theme_MaterialComponents_Light;
-			global::SkiaSharp.Views.Forms.Resource.Style.Theme_MaterialComponents_Light_BottomSheetDialog = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Theme_MaterialComponents_Light_BottomSheetDialog;
-			global::SkiaSharp.Views.Forms.Resource.Style.Theme_MaterialComponents_Light_Bridge = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Theme_MaterialComponents_Light_Bridge;
-			global::SkiaSharp.Views.Forms.Resource.Style.Theme_MaterialComponents_Light_DarkActionBar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Theme_MaterialComponents_Light_DarkActionBar;
-			global::SkiaSharp.Views.Forms.Resource.Style.Theme_MaterialComponents_Light_DarkActionBar_Bridge = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Theme_MaterialComponents_Light_DarkActionBar_Bridge;
-			global::SkiaSharp.Views.Forms.Resource.Style.Theme_MaterialComponents_Light_Dialog = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Theme_MaterialComponents_Light_Dialog;
-			global::SkiaSharp.Views.Forms.Resource.Style.Theme_MaterialComponents_Light_DialogWhenLarge = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Theme_MaterialComponents_Light_DialogWhenLarge;
-			global::SkiaSharp.Views.Forms.Resource.Style.Theme_MaterialComponents_Light_Dialog_Alert = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Theme_MaterialComponents_Light_Dialog_Alert;
-			global::SkiaSharp.Views.Forms.Resource.Style.Theme_MaterialComponents_Light_Dialog_MinWidth = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Theme_MaterialComponents_Light_Dialog_MinWidth;
-			global::SkiaSharp.Views.Forms.Resource.Style.Theme_MaterialComponents_Light_NoActionBar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Theme_MaterialComponents_Light_NoActionBar;
-			global::SkiaSharp.Views.Forms.Resource.Style.Theme_MaterialComponents_Light_NoActionBar_Bridge = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Theme_MaterialComponents_Light_NoActionBar_Bridge;
-			global::SkiaSharp.Views.Forms.Resource.Style.Theme_MaterialComponents_NoActionBar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Theme_MaterialComponents_NoActionBar;
-			global::SkiaSharp.Views.Forms.Resource.Style.Theme_MaterialComponents_NoActionBar_Bridge = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Theme_MaterialComponents_NoActionBar_Bridge;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_ActionBar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_ActionBar;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_ActionBar_Solid = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_ActionBar_Solid;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_ActionBar_TabBar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_ActionBar_TabBar;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_ActionBar_TabText = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_ActionBar_TabText;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_ActionBar_TabView = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_ActionBar_TabView;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_ActionButton = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_ActionButton;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_ActionButton_CloseMode = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_ActionButton_CloseMode;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_ActionButton_Overflow = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_ActionButton_Overflow;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_ActionMode = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_ActionMode;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_ActivityChooserView = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_ActivityChooserView;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_AutoCompleteTextView = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_AutoCompleteTextView;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_Button = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_Button;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_ButtonBar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_ButtonBar;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_ButtonBar_AlertDialog = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_ButtonBar_AlertDialog;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_Button_Borderless = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_Button_Borderless;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_Button_Borderless_Colored = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_Button_Borderless_Colored;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_Button_ButtonBar_AlertDialog = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_Button_ButtonBar_AlertDialog;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_Button_Colored = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_Button_Colored;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_Button_Small = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_Button_Small;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_CompoundButton_CheckBox = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_CompoundButton_CheckBox;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_CompoundButton_RadioButton = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_CompoundButton_RadioButton;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_CompoundButton_Switch = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_CompoundButton_Switch;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_DrawerArrowToggle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_DrawerArrowToggle;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_DropDownItem_Spinner = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_DropDownItem_Spinner;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_EditText = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_EditText;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_ImageButton = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_ImageButton;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_Light_ActionBar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_Light_ActionBar;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_Light_ActionBar_Solid = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_Light_ActionBar_Solid;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_Light_ActionBar_Solid_Inverse = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_Light_ActionBar_Solid_Inverse;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_Light_ActionBar_TabBar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_Light_ActionBar_TabBar;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_Light_ActionBar_TabBar_Inverse = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_Light_ActionBar_TabBar_Inverse;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_Light_ActionBar_TabText = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_Light_ActionBar_TabText;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_Light_ActionBar_TabText_Inverse = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_Light_ActionBar_TabText_Inverse;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_Light_ActionBar_TabView = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_Light_ActionBar_TabView;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_Light_ActionBar_TabView_Inverse = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_Light_ActionBar_TabView_Inverse;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_Light_ActionButton = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_Light_ActionButton;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_Light_ActionButton_CloseMode = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_Light_ActionButton_CloseMode;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_Light_ActionButton_Overflow = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_Light_ActionButton_Overflow;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_Light_ActionMode_Inverse = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_Light_ActionMode_Inverse;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_Light_ActivityChooserView = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_Light_ActivityChooserView;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_Light_AutoCompleteTextView = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_Light_AutoCompleteTextView;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_Light_DropDownItem_Spinner = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_Light_DropDownItem_Spinner;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_Light_ListPopupWindow = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_Light_ListPopupWindow;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_Light_ListView_DropDown = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_Light_ListView_DropDown;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_Light_PopupMenu = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_Light_PopupMenu;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_Light_PopupMenu_Overflow = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_Light_PopupMenu_Overflow;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_Light_SearchView = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_Light_SearchView;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_Light_Spinner_DropDown_ActionBar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_Light_Spinner_DropDown_ActionBar;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_ListMenuView = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_ListMenuView;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_ListPopupWindow = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_ListPopupWindow;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_ListView = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_ListView;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_ListView_DropDown = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_ListView_DropDown;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_ListView_Menu = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_ListView_Menu;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_PopupMenu = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_PopupMenu;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_PopupMenu_Overflow = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_PopupMenu_Overflow;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_PopupWindow = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_PopupWindow;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_ProgressBar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_ProgressBar;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_ProgressBar_Horizontal = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_ProgressBar_Horizontal;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_RatingBar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_RatingBar;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_RatingBar_Indicator = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_RatingBar_Indicator;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_RatingBar_Small = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_RatingBar_Small;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_SearchView = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_SearchView;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_SearchView_ActionBar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_SearchView_ActionBar;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_SeekBar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_SeekBar;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_SeekBar_Discrete = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_SeekBar_Discrete;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_Spinner = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_Spinner;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_Spinner_DropDown = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_Spinner_DropDown;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_Spinner_DropDown_ActionBar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_Spinner_DropDown_ActionBar;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_Spinner_Underlined = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_Spinner_Underlined;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_TextView_SpinnerItem = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_TextView_SpinnerItem;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_Toolbar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_Toolbar;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_AppCompat_Toolbar_Button_Navigation = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_AppCompat_Toolbar_Button_Navigation;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_Compat_NotificationActionContainer = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_Compat_NotificationActionContainer;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_Compat_NotificationActionText = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_Compat_NotificationActionText;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_Design_AppBarLayout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_Design_AppBarLayout;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_Design_BottomNavigationView = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_Design_BottomNavigationView;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_Design_BottomSheet_Modal = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_Design_BottomSheet_Modal;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_Design_CollapsingToolbar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_Design_CollapsingToolbar;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_Design_FloatingActionButton = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_Design_FloatingActionButton;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_Design_NavigationView = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_Design_NavigationView;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_Design_ScrimInsetsFrameLayout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_Design_ScrimInsetsFrameLayout;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_Design_Snackbar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_Design_Snackbar;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_Design_TabLayout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_Design_TabLayout;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_Design_TextInputLayout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_Design_TextInputLayout;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_MaterialComponents_BottomAppBar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_MaterialComponents_BottomAppBar;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_MaterialComponents_BottomAppBar_Colored = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_MaterialComponents_BottomAppBar_Colored;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_MaterialComponents_BottomNavigationView = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_MaterialComponents_BottomNavigationView;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_MaterialComponents_BottomNavigationView_Colored = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_MaterialComponents_BottomNavigationView_Colored;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_MaterialComponents_BottomSheet_Modal = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_MaterialComponents_BottomSheet_Modal;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_MaterialComponents_Button = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_MaterialComponents_Button;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_MaterialComponents_Button_Icon = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_MaterialComponents_Button_Icon;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_MaterialComponents_Button_OutlinedButton = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_MaterialComponents_Button_OutlinedButton;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_MaterialComponents_Button_OutlinedButton_Icon = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_MaterialComponents_Button_OutlinedButton_Icon;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_MaterialComponents_Button_TextButton = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_MaterialComponents_Button_TextButton;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_MaterialComponents_Button_TextButton_Dialog = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_MaterialComponents_Button_TextButton_Dialog;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_MaterialComponents_Button_TextButton_Dialog_Icon = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_MaterialComponents_Button_TextButton_Dialog_Icon;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_MaterialComponents_Button_TextButton_Icon = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_MaterialComponents_Button_TextButton_Icon;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_MaterialComponents_Button_UnelevatedButton = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_MaterialComponents_Button_UnelevatedButton;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_MaterialComponents_Button_UnelevatedButton_Icon = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_MaterialComponents_Button_UnelevatedButton_Icon;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_MaterialComponents_CardView = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_MaterialComponents_CardView;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_MaterialComponents_ChipGroup = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_MaterialComponents_ChipGroup;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_MaterialComponents_Chip_Action = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_MaterialComponents_Chip_Action;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_MaterialComponents_Chip_Choice = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_MaterialComponents_Chip_Choice;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_MaterialComponents_Chip_Entry = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_MaterialComponents_Chip_Entry;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_MaterialComponents_Chip_Filter = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_MaterialComponents_Chip_Filter;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_MaterialComponents_FloatingActionButton = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_MaterialComponents_FloatingActionButton;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_MaterialComponents_NavigationView = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_MaterialComponents_NavigationView;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_MaterialComponents_Snackbar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_MaterialComponents_Snackbar;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_MaterialComponents_Snackbar_FullWidth = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_MaterialComponents_Snackbar_FullWidth;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_MaterialComponents_TabLayout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_MaterialComponents_TabLayout;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_MaterialComponents_TabLayout_Colored = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_MaterialComponents_TabLayout_Colored;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_MaterialComponents_TextInputEditText_FilledBox = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_MaterialComponents_TextInputEditText_FilledBox;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_MaterialComponents_TextInputEditText_FilledBox_Dense = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_MaterialComponents_TextInputEditText_FilledBox_Dense;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_MaterialComponents_TextInputEditText_OutlinedBox = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_MaterialComponents_TextInputEditText_OutlinedBox;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_MaterialComponents_TextInputEditText_OutlinedBox_Dense = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_MaterialComponents_TextInputEditText_OutlinedBox_Dense;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_MaterialComponents_TextInputLayout_FilledBox = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_MaterialComponents_TextInputLayout_FilledBox;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_MaterialComponents_TextInputLayout_FilledBox_Dense = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_MaterialComponents_TextInputLayout_FilledBox_Dense;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_MaterialComponents_TextInputLayout_OutlinedBox = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_MaterialComponents_TextInputLayout_OutlinedBox;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_MaterialComponents_TextInputLayout_OutlinedBox_Dense = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_MaterialComponents_TextInputLayout_OutlinedBox_Dense;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_MaterialComponents_Toolbar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_MaterialComponents_Toolbar;
-			global::SkiaSharp.Views.Forms.Resource.Style.Widget_Support_CoordinatorLayout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.Widget_Support_CoordinatorLayout;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ActionBar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ActionBar;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ActionBarLayout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ActionBarLayout;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ActionBarLayout_android_layout_gravity = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ActionBarLayout_android_layout_gravity;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ActionBar_background = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ActionBar_background;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ActionBar_backgroundSplit = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ActionBar_backgroundSplit;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ActionBar_backgroundStacked = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ActionBar_backgroundStacked;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ActionBar_contentInsetEnd = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ActionBar_contentInsetEnd;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ActionBar_contentInsetEndWithActions = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ActionBar_contentInsetEndWithActions;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ActionBar_contentInsetLeft = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ActionBar_contentInsetLeft;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ActionBar_contentInsetRight = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ActionBar_contentInsetRight;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ActionBar_contentInsetStart = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ActionBar_contentInsetStart;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ActionBar_contentInsetStartWithNavigation = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ActionBar_contentInsetStartWithNavigation;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ActionBar_customNavigationLayout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ActionBar_customNavigationLayout;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ActionBar_displayOptions = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ActionBar_displayOptions;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ActionBar_divider = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ActionBar_divider;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ActionBar_elevation = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ActionBar_elevation;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ActionBar_height = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ActionBar_height;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ActionBar_hideOnContentScroll = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ActionBar_hideOnContentScroll;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ActionBar_homeAsUpIndicator = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ActionBar_homeAsUpIndicator;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ActionBar_homeLayout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ActionBar_homeLayout;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ActionBar_icon = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ActionBar_icon;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ActionBar_indeterminateProgressStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ActionBar_indeterminateProgressStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ActionBar_itemPadding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ActionBar_itemPadding;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ActionBar_logo = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ActionBar_logo;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ActionBar_navigationMode = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ActionBar_navigationMode;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ActionBar_popupTheme = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ActionBar_popupTheme;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ActionBar_progressBarPadding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ActionBar_progressBarPadding;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ActionBar_progressBarStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ActionBar_progressBarStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ActionBar_subtitle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ActionBar_subtitle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ActionBar_subtitleTextStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ActionBar_subtitleTextStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ActionBar_title = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ActionBar_title;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ActionBar_titleTextStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ActionBar_titleTextStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ActionMenuItemView = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ActionMenuItemView;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ActionMenuItemView_android_minWidth = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ActionMenuItemView_android_minWidth;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ActionMenuView = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ActionMenuView;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ActionMode = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ActionMode;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ActionMode_background = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ActionMode_background;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ActionMode_backgroundSplit = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ActionMode_backgroundSplit;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ActionMode_closeItemLayout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ActionMode_closeItemLayout;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ActionMode_height = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ActionMode_height;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ActionMode_subtitleTextStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ActionMode_subtitleTextStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ActionMode_titleTextStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ActionMode_titleTextStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ActivityChooserView = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ActivityChooserView;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ActivityChooserView_expandActivityOverflowButtonDrawable = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ActivityChooserView_expandActivityOverflowButtonDrawable;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ActivityChooserView_initialActivityCount = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ActivityChooserView_initialActivityCount;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AlertDialog = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AlertDialog;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AlertDialog_android_layout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AlertDialog_android_layout;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AlertDialog_buttonIconDimen = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AlertDialog_buttonIconDimen;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AlertDialog_buttonPanelSideLayout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AlertDialog_buttonPanelSideLayout;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AlertDialog_listItemLayout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AlertDialog_listItemLayout;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AlertDialog_listLayout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AlertDialog_listLayout;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AlertDialog_multiChoiceItemLayout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AlertDialog_multiChoiceItemLayout;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AlertDialog_showTitle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AlertDialog_showTitle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AlertDialog_singleChoiceItemLayout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AlertDialog_singleChoiceItemLayout;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AnimatedStateListDrawableCompat = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AnimatedStateListDrawableCompat;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AnimatedStateListDrawableCompat_android_constantSize = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AnimatedStateListDrawableCompat_android_constantSize;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AnimatedStateListDrawableCompat_android_dither = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AnimatedStateListDrawableCompat_android_dither;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AnimatedStateListDrawableCompat_android_enterFadeDuration = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AnimatedStateListDrawableCompat_android_enterFadeDuration;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AnimatedStateListDrawableCompat_android_exitFadeDuration = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AnimatedStateListDrawableCompat_android_exitFadeDuration;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AnimatedStateListDrawableCompat_android_variablePadding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AnimatedStateListDrawableCompat_android_variablePadding;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AnimatedStateListDrawableCompat_android_visible = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AnimatedStateListDrawableCompat_android_visible;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AnimatedStateListDrawableItem = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AnimatedStateListDrawableItem;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AnimatedStateListDrawableItem_android_drawable = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AnimatedStateListDrawableItem_android_drawable;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AnimatedStateListDrawableItem_android_id = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AnimatedStateListDrawableItem_android_id;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AnimatedStateListDrawableTransition = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AnimatedStateListDrawableTransition;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AnimatedStateListDrawableTransition_android_drawable = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AnimatedStateListDrawableTransition_android_drawable;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AnimatedStateListDrawableTransition_android_fromId = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AnimatedStateListDrawableTransition_android_fromId;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AnimatedStateListDrawableTransition_android_reversible = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AnimatedStateListDrawableTransition_android_reversible;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AnimatedStateListDrawableTransition_android_toId = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AnimatedStateListDrawableTransition_android_toId;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppBarLayout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppBarLayout;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppBarLayoutStates = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppBarLayoutStates;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppBarLayoutStates_state_collapsed = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppBarLayoutStates_state_collapsed;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppBarLayoutStates_state_collapsible = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppBarLayoutStates_state_collapsible;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppBarLayoutStates_state_liftable = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppBarLayoutStates_state_liftable;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppBarLayoutStates_state_lifted = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppBarLayoutStates_state_lifted;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppBarLayout_android_background = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppBarLayout_android_background;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppBarLayout_android_keyboardNavigationCluster = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppBarLayout_android_keyboardNavigationCluster;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppBarLayout_android_touchscreenBlocksFocus = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppBarLayout_android_touchscreenBlocksFocus;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppBarLayout_elevation = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppBarLayout_elevation;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppBarLayout_expanded = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppBarLayout_expanded;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppBarLayout_Layout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppBarLayout_Layout;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppBarLayout_Layout_layout_scrollFlags = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppBarLayout_Layout_layout_scrollFlags;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppBarLayout_Layout_layout_scrollInterpolator = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppBarLayout_Layout_layout_scrollInterpolator;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppBarLayout_liftOnScroll = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppBarLayout_liftOnScroll;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatImageView = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatImageView;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatImageView_android_src = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatImageView_android_src;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatImageView_srcCompat = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatImageView_srcCompat;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatImageView_tint = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatImageView_tint;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatImageView_tintMode = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatImageView_tintMode;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatSeekBar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatSeekBar;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatSeekBar_android_thumb = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatSeekBar_android_thumb;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatSeekBar_tickMark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatSeekBar_tickMark;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatSeekBar_tickMarkTint = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatSeekBar_tickMarkTint;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatSeekBar_tickMarkTintMode = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatSeekBar_tickMarkTintMode;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTextHelper = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTextHelper;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTextHelper_android_drawableBottom = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTextHelper_android_drawableBottom;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTextHelper_android_drawableEnd = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTextHelper_android_drawableEnd;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTextHelper_android_drawableLeft = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTextHelper_android_drawableLeft;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTextHelper_android_drawableRight = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTextHelper_android_drawableRight;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTextHelper_android_drawableStart = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTextHelper_android_drawableStart;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTextHelper_android_drawableTop = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTextHelper_android_drawableTop;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTextHelper_android_textAppearance = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTextHelper_android_textAppearance;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTextView = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTextView;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTextView_android_textAppearance = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTextView_android_textAppearance;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTextView_autoSizeMaxTextSize = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTextView_autoSizeMaxTextSize;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTextView_autoSizeMinTextSize = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTextView_autoSizeMinTextSize;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTextView_autoSizePresetSizes = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTextView_autoSizePresetSizes;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTextView_autoSizeStepGranularity = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTextView_autoSizeStepGranularity;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTextView_autoSizeTextType = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTextView_autoSizeTextType;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTextView_firstBaselineToTopHeight = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTextView_firstBaselineToTopHeight;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTextView_fontFamily = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTextView_fontFamily;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTextView_lastBaselineToBottomHeight = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTextView_lastBaselineToBottomHeight;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTextView_lineHeight = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTextView_lineHeight;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTextView_textAllCaps = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTextView_textAllCaps;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_actionBarDivider = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_actionBarDivider;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_actionBarItemBackground = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_actionBarItemBackground;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_actionBarPopupTheme = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_actionBarPopupTheme;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_actionBarSize = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_actionBarSize;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_actionBarSplitStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_actionBarSplitStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_actionBarStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_actionBarStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_actionBarTabBarStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_actionBarTabBarStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_actionBarTabStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_actionBarTabStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_actionBarTabTextStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_actionBarTabTextStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_actionBarTheme = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_actionBarTheme;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_actionBarWidgetTheme = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_actionBarWidgetTheme;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_actionButtonStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_actionButtonStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_actionDropDownStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_actionDropDownStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_actionMenuTextAppearance = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_actionMenuTextAppearance;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_actionMenuTextColor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_actionMenuTextColor;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_actionModeBackground = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_actionModeBackground;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_actionModeCloseButtonStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_actionModeCloseButtonStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_actionModeCloseDrawable = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_actionModeCloseDrawable;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_actionModeCopyDrawable = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_actionModeCopyDrawable;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_actionModeCutDrawable = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_actionModeCutDrawable;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_actionModeFindDrawable = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_actionModeFindDrawable;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_actionModePasteDrawable = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_actionModePasteDrawable;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_actionModePopupWindowStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_actionModePopupWindowStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_actionModeSelectAllDrawable = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_actionModeSelectAllDrawable;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_actionModeShareDrawable = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_actionModeShareDrawable;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_actionModeSplitBackground = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_actionModeSplitBackground;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_actionModeStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_actionModeStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_actionModeWebSearchDrawable = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_actionModeWebSearchDrawable;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_actionOverflowButtonStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_actionOverflowButtonStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_actionOverflowMenuStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_actionOverflowMenuStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_activityChooserViewStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_activityChooserViewStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_alertDialogButtonGroupStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_alertDialogButtonGroupStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_alertDialogCenterButtons = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_alertDialogCenterButtons;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_alertDialogStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_alertDialogStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_alertDialogTheme = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_alertDialogTheme;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_android_windowAnimationStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_android_windowAnimationStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_android_windowIsFloating = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_android_windowIsFloating;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_autoCompleteTextViewStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_autoCompleteTextViewStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_borderlessButtonStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_borderlessButtonStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_buttonBarButtonStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_buttonBarButtonStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_buttonBarNegativeButtonStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_buttonBarNegativeButtonStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_buttonBarNeutralButtonStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_buttonBarNeutralButtonStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_buttonBarPositiveButtonStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_buttonBarPositiveButtonStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_buttonBarStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_buttonBarStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_buttonStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_buttonStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_buttonStyleSmall = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_buttonStyleSmall;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_checkboxStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_checkboxStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_checkedTextViewStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_checkedTextViewStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_colorAccent = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_colorAccent;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_colorBackgroundFloating = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_colorBackgroundFloating;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_colorButtonNormal = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_colorButtonNormal;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_colorControlActivated = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_colorControlActivated;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_colorControlHighlight = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_colorControlHighlight;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_colorControlNormal = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_colorControlNormal;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_colorError = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_colorError;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_colorPrimary = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_colorPrimary;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_colorPrimaryDark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_colorPrimaryDark;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_colorSwitchThumbNormal = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_colorSwitchThumbNormal;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_controlBackground = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_controlBackground;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_dialogCornerRadius = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_dialogCornerRadius;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_dialogPreferredPadding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_dialogPreferredPadding;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_dialogTheme = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_dialogTheme;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_dividerHorizontal = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_dividerHorizontal;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_dividerVertical = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_dividerVertical;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_dropdownListPreferredItemHeight = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_dropdownListPreferredItemHeight;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_dropDownListViewStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_dropDownListViewStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_editTextBackground = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_editTextBackground;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_editTextColor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_editTextColor;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_editTextStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_editTextStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_homeAsUpIndicator = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_homeAsUpIndicator;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_imageButtonStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_imageButtonStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_listChoiceBackgroundIndicator = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_listChoiceBackgroundIndicator;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_listDividerAlertDialog = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_listDividerAlertDialog;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_listMenuViewStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_listMenuViewStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_listPopupWindowStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_listPopupWindowStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_listPreferredItemHeight = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_listPreferredItemHeight;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_listPreferredItemHeightLarge = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_listPreferredItemHeightLarge;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_listPreferredItemHeightSmall = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_listPreferredItemHeightSmall;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_listPreferredItemPaddingLeft = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_listPreferredItemPaddingLeft;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_listPreferredItemPaddingRight = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_listPreferredItemPaddingRight;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_panelBackground = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_panelBackground;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_panelMenuListTheme = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_panelMenuListTheme;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_panelMenuListWidth = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_panelMenuListWidth;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_popupMenuStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_popupMenuStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_popupWindowStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_popupWindowStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_radioButtonStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_radioButtonStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_ratingBarStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_ratingBarStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_ratingBarStyleIndicator = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_ratingBarStyleIndicator;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_ratingBarStyleSmall = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_ratingBarStyleSmall;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_searchViewStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_searchViewStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_seekBarStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_seekBarStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_selectableItemBackground = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_selectableItemBackground;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_selectableItemBackgroundBorderless = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_selectableItemBackgroundBorderless;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_spinnerDropDownItemStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_spinnerDropDownItemStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_spinnerStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_spinnerStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_switchStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_switchStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_textAppearanceLargePopupMenu = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_textAppearanceLargePopupMenu;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_textAppearanceListItem = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_textAppearanceListItem;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_textAppearanceListItemSecondary = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_textAppearanceListItemSecondary;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_textAppearanceListItemSmall = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_textAppearanceListItemSmall;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_textAppearancePopupMenuHeader = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_textAppearancePopupMenuHeader;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_textAppearanceSearchResultSubtitle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_textAppearanceSearchResultSubtitle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_textAppearanceSearchResultTitle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_textAppearanceSearchResultTitle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_textAppearanceSmallPopupMenu = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_textAppearanceSmallPopupMenu;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_textColorAlertDialogListItem = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_textColorAlertDialogListItem;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_textColorSearchUrl = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_textColorSearchUrl;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_toolbarNavigationButtonStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_toolbarNavigationButtonStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_toolbarStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_toolbarStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_tooltipForegroundColor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_tooltipForegroundColor;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_tooltipFrameBackground = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_tooltipFrameBackground;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_viewInflaterClass = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_viewInflaterClass;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_windowActionBar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_windowActionBar;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_windowActionBarOverlay = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_windowActionBarOverlay;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_windowActionModeOverlay = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_windowActionModeOverlay;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_windowFixedHeightMajor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_windowFixedHeightMajor;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_windowFixedHeightMinor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_windowFixedHeightMinor;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_windowFixedWidthMajor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_windowFixedWidthMajor;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_windowFixedWidthMinor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_windowFixedWidthMinor;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_windowMinWidthMajor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_windowMinWidthMajor;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_windowMinWidthMinor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_windowMinWidthMinor;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.AppCompatTheme_windowNoTitle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.AppCompatTheme_windowNoTitle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.BottomAppBar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.BottomAppBar;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.BottomAppBar_backgroundTint = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.BottomAppBar_backgroundTint;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.BottomAppBar_fabAlignmentMode = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.BottomAppBar_fabAlignmentMode;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.BottomAppBar_fabCradleMargin = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.BottomAppBar_fabCradleMargin;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.BottomAppBar_fabCradleRoundedCornerRadius = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.BottomAppBar_fabCradleRoundedCornerRadius;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.BottomAppBar_fabCradleVerticalOffset = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.BottomAppBar_fabCradleVerticalOffset;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.BottomAppBar_hideOnScroll = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.BottomAppBar_hideOnScroll;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.BottomNavigationView = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.BottomNavigationView;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.BottomNavigationView_elevation = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.BottomNavigationView_elevation;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.BottomNavigationView_itemBackground = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.BottomNavigationView_itemBackground;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.BottomNavigationView_itemHorizontalTranslationEnabled = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.BottomNavigationView_itemHorizontalTranslationEnabled;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.BottomNavigationView_itemIconSize = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.BottomNavigationView_itemIconSize;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.BottomNavigationView_itemIconTint = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.BottomNavigationView_itemIconTint;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.BottomNavigationView_itemTextAppearanceActive = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.BottomNavigationView_itemTextAppearanceActive;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.BottomNavigationView_itemTextAppearanceInactive = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.BottomNavigationView_itemTextAppearanceInactive;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.BottomNavigationView_itemTextColor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.BottomNavigationView_itemTextColor;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.BottomNavigationView_labelVisibilityMode = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.BottomNavigationView_labelVisibilityMode;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.BottomNavigationView_menu = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.BottomNavigationView_menu;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.BottomSheetBehavior_Layout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.BottomSheetBehavior_Layout;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.BottomSheetBehavior_Layout_behavior_fitToContents = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.BottomSheetBehavior_Layout_behavior_fitToContents;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.BottomSheetBehavior_Layout_behavior_hideable = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.BottomSheetBehavior_Layout_behavior_hideable;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.BottomSheetBehavior_Layout_behavior_peekHeight = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.BottomSheetBehavior_Layout_behavior_peekHeight;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.BottomSheetBehavior_Layout_behavior_skipCollapsed = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.BottomSheetBehavior_Layout_behavior_skipCollapsed;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ButtonBarLayout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ButtonBarLayout;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ButtonBarLayout_allowStacking = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ButtonBarLayout_allowStacking;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.CardView = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.CardView;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.CardView_android_minHeight = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.CardView_android_minHeight;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.CardView_android_minWidth = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.CardView_android_minWidth;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.CardView_cardBackgroundColor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.CardView_cardBackgroundColor;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.CardView_cardCornerRadius = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.CardView_cardCornerRadius;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.CardView_cardElevation = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.CardView_cardElevation;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.CardView_cardMaxElevation = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.CardView_cardMaxElevation;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.CardView_cardPreventCornerOverlap = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.CardView_cardPreventCornerOverlap;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.CardView_cardUseCompatPadding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.CardView_cardUseCompatPadding;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.CardView_contentPadding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.CardView_contentPadding;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.CardView_contentPaddingBottom = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.CardView_contentPaddingBottom;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.CardView_contentPaddingLeft = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.CardView_contentPaddingLeft;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.CardView_contentPaddingRight = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.CardView_contentPaddingRight;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.CardView_contentPaddingTop = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.CardView_contentPaddingTop;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Chip = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Chip;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ChipGroup = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ChipGroup;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ChipGroup_checkedChip = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ChipGroup_checkedChip;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ChipGroup_chipSpacing = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ChipGroup_chipSpacing;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ChipGroup_chipSpacingHorizontal = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ChipGroup_chipSpacingHorizontal;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ChipGroup_chipSpacingVertical = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ChipGroup_chipSpacingVertical;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ChipGroup_singleLine = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ChipGroup_singleLine;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ChipGroup_singleSelection = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ChipGroup_singleSelection;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Chip_android_checkable = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Chip_android_checkable;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Chip_android_ellipsize = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Chip_android_ellipsize;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Chip_android_maxWidth = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Chip_android_maxWidth;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Chip_android_text = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Chip_android_text;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Chip_android_textAppearance = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Chip_android_textAppearance;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Chip_checkedIcon = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Chip_checkedIcon;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Chip_checkedIconEnabled = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Chip_checkedIconEnabled;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Chip_checkedIconVisible = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Chip_checkedIconVisible;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Chip_chipBackgroundColor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Chip_chipBackgroundColor;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Chip_chipCornerRadius = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Chip_chipCornerRadius;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Chip_chipEndPadding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Chip_chipEndPadding;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Chip_chipIcon = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Chip_chipIcon;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Chip_chipIconEnabled = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Chip_chipIconEnabled;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Chip_chipIconSize = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Chip_chipIconSize;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Chip_chipIconTint = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Chip_chipIconTint;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Chip_chipIconVisible = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Chip_chipIconVisible;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Chip_chipMinHeight = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Chip_chipMinHeight;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Chip_chipStartPadding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Chip_chipStartPadding;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Chip_chipStrokeColor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Chip_chipStrokeColor;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Chip_chipStrokeWidth = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Chip_chipStrokeWidth;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Chip_closeIcon = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Chip_closeIcon;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Chip_closeIconEnabled = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Chip_closeIconEnabled;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Chip_closeIconEndPadding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Chip_closeIconEndPadding;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Chip_closeIconSize = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Chip_closeIconSize;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Chip_closeIconStartPadding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Chip_closeIconStartPadding;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Chip_closeIconTint = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Chip_closeIconTint;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Chip_closeIconVisible = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Chip_closeIconVisible;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Chip_hideMotionSpec = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Chip_hideMotionSpec;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Chip_iconEndPadding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Chip_iconEndPadding;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Chip_iconStartPadding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Chip_iconStartPadding;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Chip_rippleColor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Chip_rippleColor;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Chip_showMotionSpec = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Chip_showMotionSpec;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Chip_textEndPadding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Chip_textEndPadding;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Chip_textStartPadding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Chip_textStartPadding;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.CollapsingToolbarLayout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.CollapsingToolbarLayout;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.CollapsingToolbarLayout_collapsedTitleGravity = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.CollapsingToolbarLayout_collapsedTitleGravity;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.CollapsingToolbarLayout_collapsedTitleTextAppearance = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.CollapsingToolbarLayout_collapsedTitleTextAppearance;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.CollapsingToolbarLayout_contentScrim = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.CollapsingToolbarLayout_contentScrim;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.CollapsingToolbarLayout_expandedTitleGravity = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.CollapsingToolbarLayout_expandedTitleGravity;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.CollapsingToolbarLayout_expandedTitleMargin = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.CollapsingToolbarLayout_expandedTitleMargin;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.CollapsingToolbarLayout_expandedTitleMarginBottom = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.CollapsingToolbarLayout_expandedTitleMarginBottom;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.CollapsingToolbarLayout_expandedTitleMarginEnd = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.CollapsingToolbarLayout_expandedTitleMarginEnd;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.CollapsingToolbarLayout_expandedTitleMarginStart = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.CollapsingToolbarLayout_expandedTitleMarginStart;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.CollapsingToolbarLayout_expandedTitleMarginTop = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.CollapsingToolbarLayout_expandedTitleMarginTop;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.CollapsingToolbarLayout_expandedTitleTextAppearance = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.CollapsingToolbarLayout_expandedTitleTextAppearance;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.CollapsingToolbarLayout_Layout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.CollapsingToolbarLayout_Layout;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.CollapsingToolbarLayout_Layout_layout_collapseMode = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.CollapsingToolbarLayout_Layout_layout_collapseMode;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.CollapsingToolbarLayout_Layout_layout_collapseParallaxMultiplier = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.CollapsingToolbarLayout_Layout_layout_collapseParallaxMultiplier;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.CollapsingToolbarLayout_scrimAnimationDuration = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.CollapsingToolbarLayout_scrimAnimationDuration;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.CollapsingToolbarLayout_scrimVisibleHeightTrigger = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.CollapsingToolbarLayout_scrimVisibleHeightTrigger;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.CollapsingToolbarLayout_statusBarScrim = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.CollapsingToolbarLayout_statusBarScrim;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.CollapsingToolbarLayout_title = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.CollapsingToolbarLayout_title;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.CollapsingToolbarLayout_titleEnabled = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.CollapsingToolbarLayout_titleEnabled;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.CollapsingToolbarLayout_toolbarId = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.CollapsingToolbarLayout_toolbarId;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ColorStateListItem = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ColorStateListItem;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ColorStateListItem_alpha = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ColorStateListItem_alpha;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ColorStateListItem_android_alpha = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ColorStateListItem_android_alpha;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ColorStateListItem_android_color = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ColorStateListItem_android_color;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.CompoundButton = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.CompoundButton;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.CompoundButton_android_button = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.CompoundButton_android_button;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.CompoundButton_buttonTint = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.CompoundButton_buttonTint;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.CompoundButton_buttonTintMode = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.CompoundButton_buttonTintMode;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.CoordinatorLayout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.CoordinatorLayout;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.CoordinatorLayout_keylines = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.CoordinatorLayout_keylines;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.CoordinatorLayout_Layout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.CoordinatorLayout_Layout;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.CoordinatorLayout_Layout_android_layout_gravity = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.CoordinatorLayout_Layout_android_layout_gravity;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.CoordinatorLayout_Layout_layout_anchor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.CoordinatorLayout_Layout_layout_anchor;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.CoordinatorLayout_Layout_layout_anchorGravity = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.CoordinatorLayout_Layout_layout_anchorGravity;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.CoordinatorLayout_Layout_layout_behavior = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.CoordinatorLayout_Layout_layout_behavior;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.CoordinatorLayout_Layout_layout_dodgeInsetEdges = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.CoordinatorLayout_Layout_layout_dodgeInsetEdges;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.CoordinatorLayout_Layout_layout_insetEdge = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.CoordinatorLayout_Layout_layout_insetEdge;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.CoordinatorLayout_Layout_layout_keyline = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.CoordinatorLayout_Layout_layout_keyline;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.CoordinatorLayout_statusBarBackground = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.CoordinatorLayout_statusBarBackground;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.DesignTheme = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.DesignTheme;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.DesignTheme_bottomSheetDialogTheme = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.DesignTheme_bottomSheetDialogTheme;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.DesignTheme_bottomSheetStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.DesignTheme_bottomSheetStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.DrawerArrowToggle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.DrawerArrowToggle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.DrawerArrowToggle_arrowHeadLength = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.DrawerArrowToggle_arrowHeadLength;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.DrawerArrowToggle_arrowShaftLength = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.DrawerArrowToggle_arrowShaftLength;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.DrawerArrowToggle_barLength = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.DrawerArrowToggle_barLength;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.DrawerArrowToggle_color = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.DrawerArrowToggle_color;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.DrawerArrowToggle_drawableSize = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.DrawerArrowToggle_drawableSize;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.DrawerArrowToggle_gapBetweenBars = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.DrawerArrowToggle_gapBetweenBars;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.DrawerArrowToggle_spinBars = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.DrawerArrowToggle_spinBars;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.DrawerArrowToggle_thickness = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.DrawerArrowToggle_thickness;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.FloatingActionButton = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.FloatingActionButton;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.FloatingActionButton_backgroundTint = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.FloatingActionButton_backgroundTint;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.FloatingActionButton_backgroundTintMode = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.FloatingActionButton_backgroundTintMode;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.FloatingActionButton_Behavior_Layout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.FloatingActionButton_Behavior_Layout;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.FloatingActionButton_Behavior_Layout_behavior_autoHide = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.FloatingActionButton_Behavior_Layout_behavior_autoHide;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.FloatingActionButton_borderWidth = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.FloatingActionButton_borderWidth;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.FloatingActionButton_elevation = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.FloatingActionButton_elevation;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.FloatingActionButton_fabCustomSize = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.FloatingActionButton_fabCustomSize;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.FloatingActionButton_fabSize = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.FloatingActionButton_fabSize;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.FloatingActionButton_hideMotionSpec = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.FloatingActionButton_hideMotionSpec;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.FloatingActionButton_hoveredFocusedTranslationZ = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.FloatingActionButton_hoveredFocusedTranslationZ;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.FloatingActionButton_maxImageSize = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.FloatingActionButton_maxImageSize;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.FloatingActionButton_pressedTranslationZ = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.FloatingActionButton_pressedTranslationZ;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.FloatingActionButton_rippleColor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.FloatingActionButton_rippleColor;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.FloatingActionButton_showMotionSpec = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.FloatingActionButton_showMotionSpec;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.FloatingActionButton_useCompatPadding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.FloatingActionButton_useCompatPadding;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.FlowLayout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.FlowLayout;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.FlowLayout_itemSpacing = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.FlowLayout_itemSpacing;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.FlowLayout_lineSpacing = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.FlowLayout_lineSpacing;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.FontFamily = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.FontFamily;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.FontFamilyFont = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.FontFamilyFont;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.FontFamilyFont_android_font = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.FontFamilyFont_android_font;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.FontFamilyFont_android_fontStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.FontFamilyFont_android_fontStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.FontFamilyFont_android_fontVariationSettings = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.FontFamilyFont_android_fontVariationSettings;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.FontFamilyFont_android_fontWeight = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.FontFamilyFont_android_fontWeight;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.FontFamilyFont_android_ttcIndex = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.FontFamilyFont_android_ttcIndex;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.FontFamilyFont_font = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.FontFamilyFont_font;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.FontFamilyFont_fontStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.FontFamilyFont_fontStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.FontFamilyFont_fontVariationSettings = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.FontFamilyFont_fontVariationSettings;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.FontFamilyFont_fontWeight = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.FontFamilyFont_fontWeight;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.FontFamilyFont_ttcIndex = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.FontFamilyFont_ttcIndex;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.FontFamily_fontProviderAuthority = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.FontFamily_fontProviderAuthority;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.FontFamily_fontProviderCerts = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.FontFamily_fontProviderCerts;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.FontFamily_fontProviderFetchStrategy = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.FontFamily_fontProviderFetchStrategy;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.FontFamily_fontProviderFetchTimeout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.FontFamily_fontProviderFetchTimeout;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.FontFamily_fontProviderPackage = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.FontFamily_fontProviderPackage;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.FontFamily_fontProviderQuery = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.FontFamily_fontProviderQuery;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ForegroundLinearLayout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ForegroundLinearLayout;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ForegroundLinearLayout_android_foreground = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ForegroundLinearLayout_android_foreground;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ForegroundLinearLayout_android_foregroundGravity = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ForegroundLinearLayout_android_foregroundGravity;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ForegroundLinearLayout_foregroundInsidePadding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ForegroundLinearLayout_foregroundInsidePadding;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.GradientColor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.GradientColor;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.GradientColorItem = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.GradientColorItem;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.GradientColorItem_android_color = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.GradientColorItem_android_color;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.GradientColorItem_android_offset = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.GradientColorItem_android_offset;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.GradientColor_android_centerColor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.GradientColor_android_centerColor;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.GradientColor_android_centerX = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.GradientColor_android_centerX;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.GradientColor_android_centerY = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.GradientColor_android_centerY;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.GradientColor_android_endColor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.GradientColor_android_endColor;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.GradientColor_android_endX = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.GradientColor_android_endX;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.GradientColor_android_endY = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.GradientColor_android_endY;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.GradientColor_android_gradientRadius = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.GradientColor_android_gradientRadius;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.GradientColor_android_startColor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.GradientColor_android_startColor;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.GradientColor_android_startX = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.GradientColor_android_startX;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.GradientColor_android_startY = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.GradientColor_android_startY;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.GradientColor_android_tileMode = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.GradientColor_android_tileMode;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.GradientColor_android_type = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.GradientColor_android_type;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.LinearLayoutCompat = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.LinearLayoutCompat;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.LinearLayoutCompat_android_baselineAligned = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.LinearLayoutCompat_android_baselineAligned;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.LinearLayoutCompat_android_baselineAlignedChildIndex = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.LinearLayoutCompat_android_baselineAlignedChildIndex;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.LinearLayoutCompat_android_gravity = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.LinearLayoutCompat_android_gravity;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.LinearLayoutCompat_android_orientation = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.LinearLayoutCompat_android_orientation;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.LinearLayoutCompat_android_weightSum = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.LinearLayoutCompat_android_weightSum;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.LinearLayoutCompat_divider = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.LinearLayoutCompat_divider;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.LinearLayoutCompat_dividerPadding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.LinearLayoutCompat_dividerPadding;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.LinearLayoutCompat_Layout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.LinearLayoutCompat_Layout;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.LinearLayoutCompat_Layout_android_layout_gravity = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.LinearLayoutCompat_Layout_android_layout_gravity;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.LinearLayoutCompat_Layout_android_layout_height = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.LinearLayoutCompat_Layout_android_layout_height;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.LinearLayoutCompat_Layout_android_layout_weight = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.LinearLayoutCompat_Layout_android_layout_weight;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.LinearLayoutCompat_Layout_android_layout_width = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.LinearLayoutCompat_Layout_android_layout_width;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.LinearLayoutCompat_measureWithLargestChild = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.LinearLayoutCompat_measureWithLargestChild;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.LinearLayoutCompat_showDividers = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.LinearLayoutCompat_showDividers;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ListPopupWindow = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ListPopupWindow;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ListPopupWindow_android_dropDownHorizontalOffset = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ListPopupWindow_android_dropDownHorizontalOffset;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ListPopupWindow_android_dropDownVerticalOffset = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ListPopupWindow_android_dropDownVerticalOffset;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MaterialButton = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialButton;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MaterialButton_android_insetBottom = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialButton_android_insetBottom;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MaterialButton_android_insetLeft = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialButton_android_insetLeft;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MaterialButton_android_insetRight = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialButton_android_insetRight;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MaterialButton_android_insetTop = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialButton_android_insetTop;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MaterialButton_backgroundTint = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialButton_backgroundTint;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MaterialButton_backgroundTintMode = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialButton_backgroundTintMode;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MaterialButton_cornerRadius = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialButton_cornerRadius;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MaterialButton_icon = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialButton_icon;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MaterialButton_iconGravity = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialButton_iconGravity;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MaterialButton_iconPadding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialButton_iconPadding;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MaterialButton_iconSize = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialButton_iconSize;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MaterialButton_iconTint = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialButton_iconTint;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MaterialButton_iconTintMode = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialButton_iconTintMode;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MaterialButton_rippleColor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialButton_rippleColor;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MaterialButton_strokeColor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialButton_strokeColor;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MaterialButton_strokeWidth = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialButton_strokeWidth;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MaterialCardView = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialCardView;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MaterialCardView_strokeColor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialCardView_strokeColor;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MaterialCardView_strokeWidth = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialCardView_strokeWidth;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MaterialComponentsTheme = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MaterialComponentsTheme_bottomSheetDialogTheme = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_bottomSheetDialogTheme;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MaterialComponentsTheme_bottomSheetStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_bottomSheetStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MaterialComponentsTheme_chipGroupStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_chipGroupStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MaterialComponentsTheme_chipStandaloneStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_chipStandaloneStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MaterialComponentsTheme_chipStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_chipStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MaterialComponentsTheme_colorAccent = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_colorAccent;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MaterialComponentsTheme_colorBackgroundFloating = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_colorBackgroundFloating;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MaterialComponentsTheme_colorPrimary = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_colorPrimary;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MaterialComponentsTheme_colorPrimaryDark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_colorPrimaryDark;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MaterialComponentsTheme_colorSecondary = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_colorSecondary;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MaterialComponentsTheme_editTextStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_editTextStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MaterialComponentsTheme_floatingActionButtonStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_floatingActionButtonStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MaterialComponentsTheme_materialButtonStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_materialButtonStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MaterialComponentsTheme_materialCardViewStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_materialCardViewStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MaterialComponentsTheme_navigationViewStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_navigationViewStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MaterialComponentsTheme_scrimBackground = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_scrimBackground;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MaterialComponentsTheme_snackbarButtonStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_snackbarButtonStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MaterialComponentsTheme_tabStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_tabStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MaterialComponentsTheme_textAppearanceBody1 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_textAppearanceBody1;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MaterialComponentsTheme_textAppearanceBody2 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_textAppearanceBody2;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MaterialComponentsTheme_textAppearanceButton = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_textAppearanceButton;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MaterialComponentsTheme_textAppearanceCaption = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_textAppearanceCaption;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MaterialComponentsTheme_textAppearanceHeadline1 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_textAppearanceHeadline1;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MaterialComponentsTheme_textAppearanceHeadline2 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_textAppearanceHeadline2;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MaterialComponentsTheme_textAppearanceHeadline3 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_textAppearanceHeadline3;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MaterialComponentsTheme_textAppearanceHeadline4 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_textAppearanceHeadline4;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MaterialComponentsTheme_textAppearanceHeadline5 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_textAppearanceHeadline5;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MaterialComponentsTheme_textAppearanceHeadline6 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_textAppearanceHeadline6;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MaterialComponentsTheme_textAppearanceOverline = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_textAppearanceOverline;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MaterialComponentsTheme_textAppearanceSubtitle1 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_textAppearanceSubtitle1;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MaterialComponentsTheme_textAppearanceSubtitle2 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_textAppearanceSubtitle2;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MaterialComponentsTheme_textInputStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_textInputStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MenuGroup = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MenuGroup;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MenuGroup_android_checkableBehavior = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MenuGroup_android_checkableBehavior;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MenuGroup_android_enabled = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MenuGroup_android_enabled;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MenuGroup_android_id = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MenuGroup_android_id;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MenuGroup_android_menuCategory = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MenuGroup_android_menuCategory;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MenuGroup_android_orderInCategory = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MenuGroup_android_orderInCategory;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MenuGroup_android_visible = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MenuGroup_android_visible;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MenuItem = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MenuItem;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MenuItem_actionLayout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MenuItem_actionLayout;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MenuItem_actionProviderClass = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MenuItem_actionProviderClass;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MenuItem_actionViewClass = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MenuItem_actionViewClass;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MenuItem_alphabeticModifiers = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MenuItem_alphabeticModifiers;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MenuItem_android_alphabeticShortcut = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MenuItem_android_alphabeticShortcut;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MenuItem_android_checkable = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MenuItem_android_checkable;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MenuItem_android_checked = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MenuItem_android_checked;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MenuItem_android_enabled = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MenuItem_android_enabled;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MenuItem_android_icon = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MenuItem_android_icon;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MenuItem_android_id = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MenuItem_android_id;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MenuItem_android_menuCategory = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MenuItem_android_menuCategory;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MenuItem_android_numericShortcut = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MenuItem_android_numericShortcut;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MenuItem_android_onClick = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MenuItem_android_onClick;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MenuItem_android_orderInCategory = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MenuItem_android_orderInCategory;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MenuItem_android_title = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MenuItem_android_title;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MenuItem_android_titleCondensed = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MenuItem_android_titleCondensed;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MenuItem_android_visible = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MenuItem_android_visible;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MenuItem_contentDescription = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MenuItem_contentDescription;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MenuItem_iconTint = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MenuItem_iconTint;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MenuItem_iconTintMode = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MenuItem_iconTintMode;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MenuItem_numericModifiers = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MenuItem_numericModifiers;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MenuItem_showAsAction = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MenuItem_showAsAction;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MenuItem_tooltipText = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MenuItem_tooltipText;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MenuView = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MenuView;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MenuView_android_headerBackground = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MenuView_android_headerBackground;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MenuView_android_horizontalDivider = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MenuView_android_horizontalDivider;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MenuView_android_itemBackground = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MenuView_android_itemBackground;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MenuView_android_itemIconDisabledAlpha = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MenuView_android_itemIconDisabledAlpha;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MenuView_android_itemTextAppearance = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MenuView_android_itemTextAppearance;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MenuView_android_verticalDivider = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MenuView_android_verticalDivider;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MenuView_android_windowAnimationStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MenuView_android_windowAnimationStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MenuView_preserveIconSpacing = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MenuView_preserveIconSpacing;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.MenuView_subMenuArrow = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MenuView_subMenuArrow;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.NavigationView = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.NavigationView;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.NavigationView_android_background = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.NavigationView_android_background;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.NavigationView_android_fitsSystemWindows = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.NavigationView_android_fitsSystemWindows;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.NavigationView_android_maxWidth = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.NavigationView_android_maxWidth;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.NavigationView_elevation = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.NavigationView_elevation;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.NavigationView_headerLayout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.NavigationView_headerLayout;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.NavigationView_itemBackground = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.NavigationView_itemBackground;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.NavigationView_itemHorizontalPadding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.NavigationView_itemHorizontalPadding;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.NavigationView_itemIconPadding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.NavigationView_itemIconPadding;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.NavigationView_itemIconTint = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.NavigationView_itemIconTint;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.NavigationView_itemTextAppearance = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.NavigationView_itemTextAppearance;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.NavigationView_itemTextColor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.NavigationView_itemTextColor;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.NavigationView_menu = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.NavigationView_menu;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.PopupWindow = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.PopupWindow;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.PopupWindowBackgroundState = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.PopupWindowBackgroundState;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.PopupWindowBackgroundState_state_above_anchor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.PopupWindowBackgroundState_state_above_anchor;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.PopupWindow_android_popupAnimationStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.PopupWindow_android_popupAnimationStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.PopupWindow_android_popupBackground = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.PopupWindow_android_popupBackground;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.PopupWindow_overlapAnchor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.PopupWindow_overlapAnchor;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.RecycleListView = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.RecycleListView;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.RecycleListView_paddingBottomNoButtons = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.RecycleListView_paddingBottomNoButtons;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.RecycleListView_paddingTopNoTitle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.RecycleListView_paddingTopNoTitle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.RecyclerView = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.RecyclerView;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.RecyclerView_android_descendantFocusability = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.RecyclerView_android_descendantFocusability;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.RecyclerView_android_orientation = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.RecyclerView_android_orientation;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.RecyclerView_fastScrollEnabled = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.RecyclerView_fastScrollEnabled;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.RecyclerView_fastScrollHorizontalThumbDrawable = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.RecyclerView_fastScrollHorizontalThumbDrawable;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.RecyclerView_fastScrollHorizontalTrackDrawable = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.RecyclerView_fastScrollHorizontalTrackDrawable;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.RecyclerView_fastScrollVerticalThumbDrawable = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.RecyclerView_fastScrollVerticalThumbDrawable;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.RecyclerView_fastScrollVerticalTrackDrawable = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.RecyclerView_fastScrollVerticalTrackDrawable;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.RecyclerView_layoutManager = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.RecyclerView_layoutManager;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.RecyclerView_reverseLayout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.RecyclerView_reverseLayout;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.RecyclerView_spanCount = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.RecyclerView_spanCount;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.RecyclerView_stackFromEnd = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.RecyclerView_stackFromEnd;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ScrimInsetsFrameLayout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ScrimInsetsFrameLayout;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ScrimInsetsFrameLayout_insetForeground = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ScrimInsetsFrameLayout_insetForeground;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ScrollingViewBehavior_Layout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ScrollingViewBehavior_Layout;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ScrollingViewBehavior_Layout_behavior_overlapTop = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ScrollingViewBehavior_Layout_behavior_overlapTop;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.SearchView = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.SearchView;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.SearchView_android_focusable = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.SearchView_android_focusable;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.SearchView_android_imeOptions = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.SearchView_android_imeOptions;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.SearchView_android_inputType = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.SearchView_android_inputType;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.SearchView_android_maxWidth = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.SearchView_android_maxWidth;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.SearchView_closeIcon = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.SearchView_closeIcon;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.SearchView_commitIcon = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.SearchView_commitIcon;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.SearchView_defaultQueryHint = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.SearchView_defaultQueryHint;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.SearchView_goIcon = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.SearchView_goIcon;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.SearchView_iconifiedByDefault = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.SearchView_iconifiedByDefault;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.SearchView_layout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.SearchView_layout;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.SearchView_queryBackground = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.SearchView_queryBackground;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.SearchView_queryHint = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.SearchView_queryHint;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.SearchView_searchHintIcon = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.SearchView_searchHintIcon;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.SearchView_searchIcon = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.SearchView_searchIcon;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.SearchView_submitBackground = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.SearchView_submitBackground;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.SearchView_suggestionRowLayout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.SearchView_suggestionRowLayout;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.SearchView_voiceIcon = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.SearchView_voiceIcon;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Snackbar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Snackbar;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.SnackbarLayout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.SnackbarLayout;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.SnackbarLayout_android_maxWidth = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.SnackbarLayout_android_maxWidth;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.SnackbarLayout_elevation = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.SnackbarLayout_elevation;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.SnackbarLayout_maxActionInlineWidth = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.SnackbarLayout_maxActionInlineWidth;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Snackbar_snackbarButtonStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Snackbar_snackbarButtonStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Snackbar_snackbarStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Snackbar_snackbarStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Spinner = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Spinner;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Spinner_android_dropDownWidth = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Spinner_android_dropDownWidth;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Spinner_android_entries = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Spinner_android_entries;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Spinner_android_popupBackground = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Spinner_android_popupBackground;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Spinner_android_prompt = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Spinner_android_prompt;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Spinner_popupTheme = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Spinner_popupTheme;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.StateListDrawable = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.StateListDrawable;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.StateListDrawableItem = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.StateListDrawableItem;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.StateListDrawableItem_android_drawable = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.StateListDrawableItem_android_drawable;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.StateListDrawable_android_constantSize = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.StateListDrawable_android_constantSize;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.StateListDrawable_android_dither = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.StateListDrawable_android_dither;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.StateListDrawable_android_enterFadeDuration = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.StateListDrawable_android_enterFadeDuration;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.StateListDrawable_android_exitFadeDuration = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.StateListDrawable_android_exitFadeDuration;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.StateListDrawable_android_variablePadding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.StateListDrawable_android_variablePadding;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.StateListDrawable_android_visible = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.StateListDrawable_android_visible;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.SwitchCompat = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.SwitchCompat;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.SwitchCompat_android_textOff = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.SwitchCompat_android_textOff;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.SwitchCompat_android_textOn = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.SwitchCompat_android_textOn;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.SwitchCompat_android_thumb = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.SwitchCompat_android_thumb;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.SwitchCompat_showText = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.SwitchCompat_showText;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.SwitchCompat_splitTrack = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.SwitchCompat_splitTrack;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.SwitchCompat_switchMinWidth = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.SwitchCompat_switchMinWidth;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.SwitchCompat_switchPadding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.SwitchCompat_switchPadding;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.SwitchCompat_switchTextAppearance = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.SwitchCompat_switchTextAppearance;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.SwitchCompat_thumbTextPadding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.SwitchCompat_thumbTextPadding;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.SwitchCompat_thumbTint = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.SwitchCompat_thumbTint;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.SwitchCompat_thumbTintMode = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.SwitchCompat_thumbTintMode;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.SwitchCompat_track = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.SwitchCompat_track;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.SwitchCompat_trackTint = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.SwitchCompat_trackTint;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.SwitchCompat_trackTintMode = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.SwitchCompat_trackTintMode;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TabItem = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TabItem;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TabItem_android_icon = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TabItem_android_icon;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TabItem_android_layout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TabItem_android_layout;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TabItem_android_text = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TabItem_android_text;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TabLayout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TabLayout;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TabLayout_tabBackground = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TabLayout_tabBackground;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TabLayout_tabContentStart = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TabLayout_tabContentStart;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TabLayout_tabGravity = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TabLayout_tabGravity;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TabLayout_tabIconTint = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TabLayout_tabIconTint;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TabLayout_tabIconTintMode = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TabLayout_tabIconTintMode;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TabLayout_tabIndicator = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TabLayout_tabIndicator;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TabLayout_tabIndicatorAnimationDuration = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TabLayout_tabIndicatorAnimationDuration;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TabLayout_tabIndicatorColor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TabLayout_tabIndicatorColor;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TabLayout_tabIndicatorFullWidth = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TabLayout_tabIndicatorFullWidth;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TabLayout_tabIndicatorGravity = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TabLayout_tabIndicatorGravity;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TabLayout_tabIndicatorHeight = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TabLayout_tabIndicatorHeight;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TabLayout_tabInlineLabel = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TabLayout_tabInlineLabel;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TabLayout_tabMaxWidth = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TabLayout_tabMaxWidth;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TabLayout_tabMinWidth = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TabLayout_tabMinWidth;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TabLayout_tabMode = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TabLayout_tabMode;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TabLayout_tabPadding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TabLayout_tabPadding;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TabLayout_tabPaddingBottom = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TabLayout_tabPaddingBottom;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TabLayout_tabPaddingEnd = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TabLayout_tabPaddingEnd;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TabLayout_tabPaddingStart = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TabLayout_tabPaddingStart;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TabLayout_tabPaddingTop = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TabLayout_tabPaddingTop;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TabLayout_tabRippleColor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TabLayout_tabRippleColor;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TabLayout_tabSelectedTextColor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TabLayout_tabSelectedTextColor;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TabLayout_tabTextAppearance = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TabLayout_tabTextAppearance;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TabLayout_tabTextColor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TabLayout_tabTextColor;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TabLayout_tabUnboundedRipple = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TabLayout_tabUnboundedRipple;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TextAppearance = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TextAppearance;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TextAppearance_android_fontFamily = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TextAppearance_android_fontFamily;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TextAppearance_android_shadowColor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TextAppearance_android_shadowColor;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TextAppearance_android_shadowDx = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TextAppearance_android_shadowDx;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TextAppearance_android_shadowDy = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TextAppearance_android_shadowDy;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TextAppearance_android_shadowRadius = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TextAppearance_android_shadowRadius;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TextAppearance_android_textColor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TextAppearance_android_textColor;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TextAppearance_android_textColorHint = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TextAppearance_android_textColorHint;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TextAppearance_android_textColorLink = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TextAppearance_android_textColorLink;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TextAppearance_android_textSize = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TextAppearance_android_textSize;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TextAppearance_android_textStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TextAppearance_android_textStyle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TextAppearance_android_typeface = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TextAppearance_android_typeface;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TextAppearance_fontFamily = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TextAppearance_fontFamily;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TextAppearance_textAllCaps = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TextAppearance_textAllCaps;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TextInputLayout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TextInputLayout;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TextInputLayout_android_hint = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TextInputLayout_android_hint;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TextInputLayout_android_textColorHint = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TextInputLayout_android_textColorHint;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TextInputLayout_boxBackgroundColor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TextInputLayout_boxBackgroundColor;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TextInputLayout_boxBackgroundMode = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TextInputLayout_boxBackgroundMode;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TextInputLayout_boxCollapsedPaddingTop = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TextInputLayout_boxCollapsedPaddingTop;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TextInputLayout_boxCornerRadiusBottomEnd = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TextInputLayout_boxCornerRadiusBottomEnd;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TextInputLayout_boxCornerRadiusBottomStart = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TextInputLayout_boxCornerRadiusBottomStart;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TextInputLayout_boxCornerRadiusTopEnd = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TextInputLayout_boxCornerRadiusTopEnd;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TextInputLayout_boxCornerRadiusTopStart = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TextInputLayout_boxCornerRadiusTopStart;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TextInputLayout_boxStrokeColor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TextInputLayout_boxStrokeColor;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TextInputLayout_boxStrokeWidth = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TextInputLayout_boxStrokeWidth;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TextInputLayout_counterEnabled = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TextInputLayout_counterEnabled;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TextInputLayout_counterMaxLength = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TextInputLayout_counterMaxLength;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TextInputLayout_counterOverflowTextAppearance = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TextInputLayout_counterOverflowTextAppearance;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TextInputLayout_counterTextAppearance = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TextInputLayout_counterTextAppearance;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TextInputLayout_errorEnabled = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TextInputLayout_errorEnabled;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TextInputLayout_errorTextAppearance = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TextInputLayout_errorTextAppearance;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TextInputLayout_helperText = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TextInputLayout_helperText;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TextInputLayout_helperTextEnabled = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TextInputLayout_helperTextEnabled;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TextInputLayout_helperTextTextAppearance = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TextInputLayout_helperTextTextAppearance;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TextInputLayout_hintAnimationEnabled = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TextInputLayout_hintAnimationEnabled;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TextInputLayout_hintEnabled = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TextInputLayout_hintEnabled;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TextInputLayout_hintTextAppearance = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TextInputLayout_hintTextAppearance;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TextInputLayout_passwordToggleContentDescription = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TextInputLayout_passwordToggleContentDescription;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TextInputLayout_passwordToggleDrawable = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TextInputLayout_passwordToggleDrawable;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TextInputLayout_passwordToggleEnabled = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TextInputLayout_passwordToggleEnabled;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TextInputLayout_passwordToggleTint = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TextInputLayout_passwordToggleTint;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.TextInputLayout_passwordToggleTintMode = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.TextInputLayout_passwordToggleTintMode;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ThemeEnforcement = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ThemeEnforcement;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ThemeEnforcement_android_textAppearance = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ThemeEnforcement_android_textAppearance;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ThemeEnforcement_enforceMaterialTheme = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ThemeEnforcement_enforceMaterialTheme;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ThemeEnforcement_enforceTextAppearance = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ThemeEnforcement_enforceTextAppearance;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Toolbar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Toolbar;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Toolbar_android_gravity = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Toolbar_android_gravity;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Toolbar_android_minHeight = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Toolbar_android_minHeight;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Toolbar_buttonGravity = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Toolbar_buttonGravity;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Toolbar_collapseContentDescription = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Toolbar_collapseContentDescription;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Toolbar_collapseIcon = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Toolbar_collapseIcon;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Toolbar_contentInsetEnd = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Toolbar_contentInsetEnd;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Toolbar_contentInsetEndWithActions = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Toolbar_contentInsetEndWithActions;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Toolbar_contentInsetLeft = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Toolbar_contentInsetLeft;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Toolbar_contentInsetRight = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Toolbar_contentInsetRight;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Toolbar_contentInsetStart = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Toolbar_contentInsetStart;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Toolbar_contentInsetStartWithNavigation = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Toolbar_contentInsetStartWithNavigation;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Toolbar_logo = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Toolbar_logo;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Toolbar_logoDescription = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Toolbar_logoDescription;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Toolbar_maxButtonHeight = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Toolbar_maxButtonHeight;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Toolbar_navigationContentDescription = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Toolbar_navigationContentDescription;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Toolbar_navigationIcon = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Toolbar_navigationIcon;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Toolbar_popupTheme = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Toolbar_popupTheme;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Toolbar_subtitle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Toolbar_subtitle;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Toolbar_subtitleTextAppearance = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Toolbar_subtitleTextAppearance;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Toolbar_subtitleTextColor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Toolbar_subtitleTextColor;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Toolbar_title = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Toolbar_title;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Toolbar_titleMargin = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Toolbar_titleMargin;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Toolbar_titleMarginBottom = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Toolbar_titleMarginBottom;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Toolbar_titleMarginEnd = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Toolbar_titleMarginEnd;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Toolbar_titleMargins = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Toolbar_titleMargins;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Toolbar_titleMarginStart = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Toolbar_titleMarginStart;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Toolbar_titleMarginTop = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Toolbar_titleMarginTop;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Toolbar_titleTextAppearance = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Toolbar_titleTextAppearance;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.Toolbar_titleTextColor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.Toolbar_titleTextColor;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.View = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.View;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ViewBackgroundHelper = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ViewBackgroundHelper;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ViewBackgroundHelper_android_background = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ViewBackgroundHelper_android_background;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ViewBackgroundHelper_backgroundTint = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ViewBackgroundHelper_backgroundTint;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ViewBackgroundHelper_backgroundTintMode = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ViewBackgroundHelper_backgroundTintMode;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ViewStubCompat = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ViewStubCompat;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ViewStubCompat_android_id = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ViewStubCompat_android_id;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ViewStubCompat_android_inflatedId = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ViewStubCompat_android_inflatedId;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.ViewStubCompat_android_layout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ViewStubCompat_android_layout;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.View_android_focusable = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.View_android_focusable;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.View_android_theme = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.View_android_theme;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.View_paddingEnd = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.View_paddingEnd;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.View_paddingStart = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.View_paddingStart;
-			global::SkiaSharp.Views.Forms.Resource.Styleable.View_theme = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.View_theme;
 			global::Xamarin.Essentials.Resource.Attribute.alpha = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.alpha;
 			global::Xamarin.Essentials.Resource.Attribute.coordinatorLayoutStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.coordinatorLayoutStyle;
 			global::Xamarin.Essentials.Resource.Attribute.font = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.font;
@@ -3423,6 +863,7 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			global::Xamarin.Forms.Platform.Android.Resource.Attribute.scrimAnimationDuration = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.scrimAnimationDuration;
 			global::Xamarin.Forms.Platform.Android.Resource.Attribute.scrimBackground = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.scrimBackground;
 			global::Xamarin.Forms.Platform.Android.Resource.Attribute.scrimVisibleHeightTrigger = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.scrimVisibleHeightTrigger;
+			global::Xamarin.Forms.Platform.Android.Resource.Attribute.scrollViewStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.scrollViewStyle;
 			global::Xamarin.Forms.Platform.Android.Resource.Attribute.searchHintIcon = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.searchHintIcon;
 			global::Xamarin.Forms.Platform.Android.Resource.Attribute.searchIcon = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.searchIcon;
 			global::Xamarin.Forms.Platform.Android.Resource.Attribute.searchViewStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.searchViewStyle;
@@ -3575,7 +1016,6 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			global::Xamarin.Forms.Platform.Android.Resource.Color.abc_color_highlight_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.abc_color_highlight_material;
 			global::Xamarin.Forms.Platform.Android.Resource.Color.abc_hint_foreground_material_dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.abc_hint_foreground_material_dark;
 			global::Xamarin.Forms.Platform.Android.Resource.Color.abc_hint_foreground_material_light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.abc_hint_foreground_material_light;
-			global::Xamarin.Forms.Platform.Android.Resource.Color.abc_input_method_navigation_guard = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.abc_input_method_navigation_guard;
 			global::Xamarin.Forms.Platform.Android.Resource.Color.abc_primary_text_disable_only_material_dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.abc_primary_text_disable_only_material_dark;
 			global::Xamarin.Forms.Platform.Android.Resource.Color.abc_primary_text_disable_only_material_light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.abc_primary_text_disable_only_material_light;
 			global::Xamarin.Forms.Platform.Android.Resource.Color.abc_primary_text_material_dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.abc_primary_text_material_dark;
@@ -3622,7 +1062,6 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			global::Xamarin.Forms.Platform.Android.Resource.Color.design_fab_stroke_top_inner_color = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.design_fab_stroke_top_inner_color;
 			global::Xamarin.Forms.Platform.Android.Resource.Color.design_fab_stroke_top_outer_color = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.design_fab_stroke_top_outer_color;
 			global::Xamarin.Forms.Platform.Android.Resource.Color.design_snackbar_background_color = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.design_snackbar_background_color;
-			global::Xamarin.Forms.Platform.Android.Resource.Color.design_tint_password_toggle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.design_tint_password_toggle;
 			global::Xamarin.Forms.Platform.Android.Resource.Color.dim_foreground_disabled_material_dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.dim_foreground_disabled_material_dark;
 			global::Xamarin.Forms.Platform.Android.Resource.Color.dim_foreground_disabled_material_light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.dim_foreground_disabled_material_light;
 			global::Xamarin.Forms.Platform.Android.Resource.Color.dim_foreground_material_dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.dim_foreground_material_dark;
@@ -3647,7 +1086,6 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			global::Xamarin.Forms.Platform.Android.Resource.Color.material_grey_900 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.material_grey_900;
 			global::Xamarin.Forms.Platform.Android.Resource.Color.mtrl_bottom_nav_colored_item_tint = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.mtrl_bottom_nav_colored_item_tint;
 			global::Xamarin.Forms.Platform.Android.Resource.Color.mtrl_bottom_nav_item_tint = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.mtrl_bottom_nav_item_tint;
-			global::Xamarin.Forms.Platform.Android.Resource.Color.mtrl_btn_bg_color_disabled = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.mtrl_btn_bg_color_disabled;
 			global::Xamarin.Forms.Platform.Android.Resource.Color.mtrl_btn_bg_color_selector = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.mtrl_btn_bg_color_selector;
 			global::Xamarin.Forms.Platform.Android.Resource.Color.mtrl_btn_ripple_color = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.mtrl_btn_ripple_color;
 			global::Xamarin.Forms.Platform.Android.Resource.Color.mtrl_btn_stroke_color_selector = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.mtrl_btn_stroke_color_selector;
@@ -3882,11 +1320,9 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			global::Xamarin.Forms.Platform.Android.Resource.Dimension.mtrl_navigation_item_icon_padding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_navigation_item_icon_padding;
 			global::Xamarin.Forms.Platform.Android.Resource.Dimension.mtrl_snackbar_background_corner_radius = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_snackbar_background_corner_radius;
 			global::Xamarin.Forms.Platform.Android.Resource.Dimension.mtrl_snackbar_margin = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_snackbar_margin;
-			global::Xamarin.Forms.Platform.Android.Resource.Dimension.mtrl_textinput_box_bottom_offset = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_textinput_box_bottom_offset;
 			global::Xamarin.Forms.Platform.Android.Resource.Dimension.mtrl_textinput_box_corner_radius_medium = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_textinput_box_corner_radius_medium;
 			global::Xamarin.Forms.Platform.Android.Resource.Dimension.mtrl_textinput_box_corner_radius_small = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_textinput_box_corner_radius_small;
 			global::Xamarin.Forms.Platform.Android.Resource.Dimension.mtrl_textinput_box_label_cutout_padding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_textinput_box_label_cutout_padding;
-			global::Xamarin.Forms.Platform.Android.Resource.Dimension.mtrl_textinput_box_padding_end = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_textinput_box_padding_end;
 			global::Xamarin.Forms.Platform.Android.Resource.Dimension.mtrl_textinput_box_stroke_width_default = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_textinput_box_stroke_width_default;
 			global::Xamarin.Forms.Platform.Android.Resource.Dimension.mtrl_textinput_box_stroke_width_focused = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_textinput_box_stroke_width_focused;
 			global::Xamarin.Forms.Platform.Android.Resource.Dimension.mtrl_textinput_outline_box_expanded_padding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_textinput_outline_box_expanded_padding;
@@ -3906,10 +1342,6 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			global::Xamarin.Forms.Platform.Android.Resource.Dimension.notification_subtext_size = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.notification_subtext_size;
 			global::Xamarin.Forms.Platform.Android.Resource.Dimension.notification_top_pad = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.notification_top_pad;
 			global::Xamarin.Forms.Platform.Android.Resource.Dimension.notification_top_pad_large_text = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.notification_top_pad_large_text;
-			global::Xamarin.Forms.Platform.Android.Resource.Dimension.subtitle_corner_radius = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.subtitle_corner_radius;
-			global::Xamarin.Forms.Platform.Android.Resource.Dimension.subtitle_outline_width = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.subtitle_outline_width;
-			global::Xamarin.Forms.Platform.Android.Resource.Dimension.subtitle_shadow_offset = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.subtitle_shadow_offset;
-			global::Xamarin.Forms.Platform.Android.Resource.Dimension.subtitle_shadow_radius = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.subtitle_shadow_radius;
 			global::Xamarin.Forms.Platform.Android.Resource.Dimension.tooltip_corner_radius = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.tooltip_corner_radius;
 			global::Xamarin.Forms.Platform.Android.Resource.Dimension.tooltip_horizontal_padding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.tooltip_horizontal_padding;
 			global::Xamarin.Forms.Platform.Android.Resource.Dimension.tooltip_margin = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.tooltip_margin;
@@ -4023,7 +1455,6 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			global::Xamarin.Forms.Platform.Android.Resource.Drawable.ic_mtrl_chip_checked_black = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.ic_mtrl_chip_checked_black;
 			global::Xamarin.Forms.Platform.Android.Resource.Drawable.ic_mtrl_chip_checked_circle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.ic_mtrl_chip_checked_circle;
 			global::Xamarin.Forms.Platform.Android.Resource.Drawable.ic_mtrl_chip_close_circle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.ic_mtrl_chip_close_circle;
-			global::Xamarin.Forms.Platform.Android.Resource.Drawable.mtrl_snackbar_background = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.mtrl_snackbar_background;
 			global::Xamarin.Forms.Platform.Android.Resource.Drawable.mtrl_tabs_default_indicator = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.mtrl_tabs_default_indicator;
 			global::Xamarin.Forms.Platform.Android.Resource.Drawable.navigation_empty_icon = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.navigation_empty_icon;
 			global::Xamarin.Forms.Platform.Android.Resource.Drawable.notification_action_background = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.notification_action_background;
@@ -4146,7 +1577,6 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			global::Xamarin.Forms.Platform.Android.Resource.Id.fill_vertical = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.fill_vertical;
 			global::Xamarin.Forms.Platform.Android.Resource.Id.@fixed = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.@fixed;
 			global::Xamarin.Forms.Platform.Android.Resource.Id.flyoutcontent_appbar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.flyoutcontent_appbar;
-			global::Xamarin.Forms.Platform.Android.Resource.Id.flyoutcontent_recycler = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.flyoutcontent_recycler;
 			global::Xamarin.Forms.Platform.Android.Resource.Id.forever = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.forever;
 			global::Xamarin.Forms.Platform.Android.Resource.Id.FUNCTION = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.FUNCTION;
 			global::Xamarin.Forms.Platform.Android.Resource.Id.ghost_view = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.ghost_view;
@@ -4262,7 +1692,6 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			global::Xamarin.Forms.Platform.Android.Resource.Id.textSpacerNoButtons = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.textSpacerNoButtons;
 			global::Xamarin.Forms.Platform.Android.Resource.Id.textSpacerNoTitle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.textSpacerNoTitle;
 			global::Xamarin.Forms.Platform.Android.Resource.Id.textStart = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.textStart;
-			global::Xamarin.Forms.Platform.Android.Resource.Id.text_input_password_toggle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.text_input_password_toggle;
 			global::Xamarin.Forms.Platform.Android.Resource.Id.time = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.time;
 			global::Xamarin.Forms.Platform.Android.Resource.Id.title = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.title;
 			global::Xamarin.Forms.Platform.Android.Resource.Id.titleDividerNoCustom = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.titleDividerNoCustom;
@@ -4354,7 +1783,6 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			global::Xamarin.Forms.Platform.Android.Resource.Layout.design_navigation_item_subheader = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.design_navigation_item_subheader;
 			global::Xamarin.Forms.Platform.Android.Resource.Layout.design_navigation_menu = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.design_navigation_menu;
 			global::Xamarin.Forms.Platform.Android.Resource.Layout.design_navigation_menu_item = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.design_navigation_menu_item;
-			global::Xamarin.Forms.Platform.Android.Resource.Layout.design_text_input_password_icon = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.design_text_input_password_icon;
 			global::Xamarin.Forms.Platform.Android.Resource.Layout.FallbackTabbarDoNotUse = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.FallbackTabbarDoNotUse;
 			global::Xamarin.Forms.Platform.Android.Resource.Layout.FallbackToolbarDoNotUse = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.FallbackToolbarDoNotUse;
 			global::Xamarin.Forms.Platform.Android.Resource.Layout.FlyoutContent = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.FlyoutContent;
@@ -4625,7 +2053,6 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			global::Xamarin.Forms.Platform.Android.Resource.Style.CardView = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.CardView;
 			global::Xamarin.Forms.Platform.Android.Resource.Style.CardView_Dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.CardView_Dark;
 			global::Xamarin.Forms.Platform.Android.Resource.Style.CardView_Light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.CardView_Light;
-			global::Xamarin.Forms.Platform.Android.Resource.Style.collectionViewScrollBars = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.collectionViewScrollBars;
 			global::Xamarin.Forms.Platform.Android.Resource.Style.collectionViewTheme = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.collectionViewTheme;
 			global::Xamarin.Forms.Platform.Android.Resource.Style.MainTheme = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.MainTheme;
 			global::Xamarin.Forms.Platform.Android.Resource.Style.MainTheme_Base = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.MainTheme_Base;
@@ -4660,6 +2087,8 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			global::Xamarin.Forms.Platform.Android.Resource.Style.RtlOverlay_Widget_AppCompat_Search_DropDown_Text = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.RtlOverlay_Widget_AppCompat_Search_DropDown_Text;
 			global::Xamarin.Forms.Platform.Android.Resource.Style.RtlUnderlay_Widget_AppCompat_ActionButton = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.RtlUnderlay_Widget_AppCompat_ActionButton;
 			global::Xamarin.Forms.Platform.Android.Resource.Style.RtlUnderlay_Widget_AppCompat_ActionButton_Overflow = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.RtlUnderlay_Widget_AppCompat_ActionButton_Overflow;
+			global::Xamarin.Forms.Platform.Android.Resource.Style.scrollViewScrollBars = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.scrollViewScrollBars;
+			global::Xamarin.Forms.Platform.Android.Resource.Style.scrollViewTheme = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.scrollViewTheme;
 			global::Xamarin.Forms.Platform.Android.Resource.Style.TextAppearance_AppCompat = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_AppCompat;
 			global::Xamarin.Forms.Platform.Android.Resource.Style.TextAppearance_AppCompat_Body1 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_AppCompat_Body1;
 			global::Xamarin.Forms.Platform.Android.Resource.Style.TextAppearance_AppCompat_Body2 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_AppCompat_Body2;
@@ -4740,7 +2169,6 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			global::Xamarin.Forms.Platform.Android.Resource.Style.TextAppearance_MaterialComponents_Overline = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_MaterialComponents_Overline;
 			global::Xamarin.Forms.Platform.Android.Resource.Style.TextAppearance_MaterialComponents_Subtitle1 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_MaterialComponents_Subtitle1;
 			global::Xamarin.Forms.Platform.Android.Resource.Style.TextAppearance_MaterialComponents_Subtitle2 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_MaterialComponents_Subtitle2;
-			global::Xamarin.Forms.Platform.Android.Resource.Style.TextAppearance_MaterialComponents_Tab = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_MaterialComponents_Tab;
 			global::Xamarin.Forms.Platform.Android.Resource.Style.TextAppearance_Widget_AppCompat_ExpandedMenu_Item = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_Widget_AppCompat_ExpandedMenu_Item;
 			global::Xamarin.Forms.Platform.Android.Resource.Style.TextAppearance_Widget_AppCompat_Toolbar_Subtitle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_Widget_AppCompat_Toolbar_Subtitle;
 			global::Xamarin.Forms.Platform.Android.Resource.Style.TextAppearance_Widget_AppCompat_Toolbar_Title = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_Widget_AppCompat_Toolbar_Title;
@@ -5306,9 +2734,6 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			global::Xamarin.Forms.Platform.Android.Resource.Styleable.CoordinatorLayout_Layout_layout_insetEdge = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.CoordinatorLayout_Layout_layout_insetEdge;
 			global::Xamarin.Forms.Platform.Android.Resource.Styleable.CoordinatorLayout_Layout_layout_keyline = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.CoordinatorLayout_Layout_layout_keyline;
 			global::Xamarin.Forms.Platform.Android.Resource.Styleable.CoordinatorLayout_statusBarBackground = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.CoordinatorLayout_statusBarBackground;
-			global::Xamarin.Forms.Platform.Android.Resource.Styleable.DesignTheme = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.DesignTheme;
-			global::Xamarin.Forms.Platform.Android.Resource.Styleable.DesignTheme_bottomSheetDialogTheme = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.DesignTheme_bottomSheetDialogTheme;
-			global::Xamarin.Forms.Platform.Android.Resource.Styleable.DesignTheme_bottomSheetStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.DesignTheme_bottomSheetStyle;
 			global::Xamarin.Forms.Platform.Android.Resource.Styleable.DrawerArrowToggle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.DrawerArrowToggle;
 			global::Xamarin.Forms.Platform.Android.Resource.Styleable.DrawerArrowToggle_arrowHeadLength = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.DrawerArrowToggle_arrowHeadLength;
 			global::Xamarin.Forms.Platform.Android.Resource.Styleable.DrawerArrowToggle_arrowShaftLength = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.DrawerArrowToggle_arrowShaftLength;
@@ -5415,39 +2840,6 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			global::Xamarin.Forms.Platform.Android.Resource.Styleable.MaterialCardView = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialCardView;
 			global::Xamarin.Forms.Platform.Android.Resource.Styleable.MaterialCardView_strokeColor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialCardView_strokeColor;
 			global::Xamarin.Forms.Platform.Android.Resource.Styleable.MaterialCardView_strokeWidth = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialCardView_strokeWidth;
-			global::Xamarin.Forms.Platform.Android.Resource.Styleable.MaterialComponentsTheme = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme;
-			global::Xamarin.Forms.Platform.Android.Resource.Styleable.MaterialComponentsTheme_bottomSheetDialogTheme = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_bottomSheetDialogTheme;
-			global::Xamarin.Forms.Platform.Android.Resource.Styleable.MaterialComponentsTheme_bottomSheetStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_bottomSheetStyle;
-			global::Xamarin.Forms.Platform.Android.Resource.Styleable.MaterialComponentsTheme_chipGroupStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_chipGroupStyle;
-			global::Xamarin.Forms.Platform.Android.Resource.Styleable.MaterialComponentsTheme_chipStandaloneStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_chipStandaloneStyle;
-			global::Xamarin.Forms.Platform.Android.Resource.Styleable.MaterialComponentsTheme_chipStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_chipStyle;
-			global::Xamarin.Forms.Platform.Android.Resource.Styleable.MaterialComponentsTheme_colorAccent = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_colorAccent;
-			global::Xamarin.Forms.Platform.Android.Resource.Styleable.MaterialComponentsTheme_colorBackgroundFloating = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_colorBackgroundFloating;
-			global::Xamarin.Forms.Platform.Android.Resource.Styleable.MaterialComponentsTheme_colorPrimary = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_colorPrimary;
-			global::Xamarin.Forms.Platform.Android.Resource.Styleable.MaterialComponentsTheme_colorPrimaryDark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_colorPrimaryDark;
-			global::Xamarin.Forms.Platform.Android.Resource.Styleable.MaterialComponentsTheme_colorSecondary = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_colorSecondary;
-			global::Xamarin.Forms.Platform.Android.Resource.Styleable.MaterialComponentsTheme_editTextStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_editTextStyle;
-			global::Xamarin.Forms.Platform.Android.Resource.Styleable.MaterialComponentsTheme_floatingActionButtonStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_floatingActionButtonStyle;
-			global::Xamarin.Forms.Platform.Android.Resource.Styleable.MaterialComponentsTheme_materialButtonStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_materialButtonStyle;
-			global::Xamarin.Forms.Platform.Android.Resource.Styleable.MaterialComponentsTheme_materialCardViewStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_materialCardViewStyle;
-			global::Xamarin.Forms.Platform.Android.Resource.Styleable.MaterialComponentsTheme_navigationViewStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_navigationViewStyle;
-			global::Xamarin.Forms.Platform.Android.Resource.Styleable.MaterialComponentsTheme_scrimBackground = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_scrimBackground;
-			global::Xamarin.Forms.Platform.Android.Resource.Styleable.MaterialComponentsTheme_snackbarButtonStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_snackbarButtonStyle;
-			global::Xamarin.Forms.Platform.Android.Resource.Styleable.MaterialComponentsTheme_tabStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_tabStyle;
-			global::Xamarin.Forms.Platform.Android.Resource.Styleable.MaterialComponentsTheme_textAppearanceBody1 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_textAppearanceBody1;
-			global::Xamarin.Forms.Platform.Android.Resource.Styleable.MaterialComponentsTheme_textAppearanceBody2 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_textAppearanceBody2;
-			global::Xamarin.Forms.Platform.Android.Resource.Styleable.MaterialComponentsTheme_textAppearanceButton = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_textAppearanceButton;
-			global::Xamarin.Forms.Platform.Android.Resource.Styleable.MaterialComponentsTheme_textAppearanceCaption = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_textAppearanceCaption;
-			global::Xamarin.Forms.Platform.Android.Resource.Styleable.MaterialComponentsTheme_textAppearanceHeadline1 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_textAppearanceHeadline1;
-			global::Xamarin.Forms.Platform.Android.Resource.Styleable.MaterialComponentsTheme_textAppearanceHeadline2 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_textAppearanceHeadline2;
-			global::Xamarin.Forms.Platform.Android.Resource.Styleable.MaterialComponentsTheme_textAppearanceHeadline3 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_textAppearanceHeadline3;
-			global::Xamarin.Forms.Platform.Android.Resource.Styleable.MaterialComponentsTheme_textAppearanceHeadline4 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_textAppearanceHeadline4;
-			global::Xamarin.Forms.Platform.Android.Resource.Styleable.MaterialComponentsTheme_textAppearanceHeadline5 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_textAppearanceHeadline5;
-			global::Xamarin.Forms.Platform.Android.Resource.Styleable.MaterialComponentsTheme_textAppearanceHeadline6 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_textAppearanceHeadline6;
-			global::Xamarin.Forms.Platform.Android.Resource.Styleable.MaterialComponentsTheme_textAppearanceOverline = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_textAppearanceOverline;
-			global::Xamarin.Forms.Platform.Android.Resource.Styleable.MaterialComponentsTheme_textAppearanceSubtitle1 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_textAppearanceSubtitle1;
-			global::Xamarin.Forms.Platform.Android.Resource.Styleable.MaterialComponentsTheme_textAppearanceSubtitle2 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_textAppearanceSubtitle2;
-			global::Xamarin.Forms.Platform.Android.Resource.Styleable.MaterialComponentsTheme_textInputStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_textInputStyle;
 			global::Xamarin.Forms.Platform.Android.Resource.Styleable.MenuGroup = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MenuGroup;
 			global::Xamarin.Forms.Platform.Android.Resource.Styleable.MenuGroup_android_checkableBehavior = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MenuGroup_android_checkableBehavior;
 			global::Xamarin.Forms.Platform.Android.Resource.Styleable.MenuGroup_android_enabled = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MenuGroup_android_enabled;
@@ -5528,6 +2920,8 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			global::Xamarin.Forms.Platform.Android.Resource.Styleable.ScrimInsetsFrameLayout_insetForeground = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ScrimInsetsFrameLayout_insetForeground;
 			global::Xamarin.Forms.Platform.Android.Resource.Styleable.ScrollingViewBehavior_Layout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ScrollingViewBehavior_Layout;
 			global::Xamarin.Forms.Platform.Android.Resource.Styleable.ScrollingViewBehavior_Layout_behavior_overlapTop = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ScrollingViewBehavior_Layout_behavior_overlapTop;
+			global::Xamarin.Forms.Platform.Android.Resource.Styleable.ScrollViewRendererTheme = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ScrollViewRendererTheme;
+			global::Xamarin.Forms.Platform.Android.Resource.Styleable.ScrollViewRendererTheme_scrollViewStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ScrollViewRendererTheme_scrollViewStyle;
 			global::Xamarin.Forms.Platform.Android.Resource.Styleable.SearchView = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.SearchView;
 			global::Xamarin.Forms.Platform.Android.Resource.Styleable.SearchView_android_focusable = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.SearchView_android_focusable;
 			global::Xamarin.Forms.Platform.Android.Resource.Styleable.SearchView_android_imeOptions = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.SearchView_android_imeOptions;
@@ -6102,6 +3496,7 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			global::Xamarin.Forms.Platform.Resource.Attribute.scrimAnimationDuration = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.scrimAnimationDuration;
 			global::Xamarin.Forms.Platform.Resource.Attribute.scrimBackground = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.scrimBackground;
 			global::Xamarin.Forms.Platform.Resource.Attribute.scrimVisibleHeightTrigger = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.scrimVisibleHeightTrigger;
+			global::Xamarin.Forms.Platform.Resource.Attribute.scrollViewStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.scrollViewStyle;
 			global::Xamarin.Forms.Platform.Resource.Attribute.searchHintIcon = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.searchHintIcon;
 			global::Xamarin.Forms.Platform.Resource.Attribute.searchIcon = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.searchIcon;
 			global::Xamarin.Forms.Platform.Resource.Attribute.searchViewStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.searchViewStyle;
@@ -6254,7 +3649,6 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			global::Xamarin.Forms.Platform.Resource.Color.abc_color_highlight_material = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.abc_color_highlight_material;
 			global::Xamarin.Forms.Platform.Resource.Color.abc_hint_foreground_material_dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.abc_hint_foreground_material_dark;
 			global::Xamarin.Forms.Platform.Resource.Color.abc_hint_foreground_material_light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.abc_hint_foreground_material_light;
-			global::Xamarin.Forms.Platform.Resource.Color.abc_input_method_navigation_guard = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.abc_input_method_navigation_guard;
 			global::Xamarin.Forms.Platform.Resource.Color.abc_primary_text_disable_only_material_dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.abc_primary_text_disable_only_material_dark;
 			global::Xamarin.Forms.Platform.Resource.Color.abc_primary_text_disable_only_material_light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.abc_primary_text_disable_only_material_light;
 			global::Xamarin.Forms.Platform.Resource.Color.abc_primary_text_material_dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.abc_primary_text_material_dark;
@@ -6301,7 +3695,6 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			global::Xamarin.Forms.Platform.Resource.Color.design_fab_stroke_top_inner_color = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.design_fab_stroke_top_inner_color;
 			global::Xamarin.Forms.Platform.Resource.Color.design_fab_stroke_top_outer_color = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.design_fab_stroke_top_outer_color;
 			global::Xamarin.Forms.Platform.Resource.Color.design_snackbar_background_color = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.design_snackbar_background_color;
-			global::Xamarin.Forms.Platform.Resource.Color.design_tint_password_toggle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.design_tint_password_toggle;
 			global::Xamarin.Forms.Platform.Resource.Color.dim_foreground_disabled_material_dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.dim_foreground_disabled_material_dark;
 			global::Xamarin.Forms.Platform.Resource.Color.dim_foreground_disabled_material_light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.dim_foreground_disabled_material_light;
 			global::Xamarin.Forms.Platform.Resource.Color.dim_foreground_material_dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.dim_foreground_material_dark;
@@ -6326,7 +3719,6 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			global::Xamarin.Forms.Platform.Resource.Color.material_grey_900 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.material_grey_900;
 			global::Xamarin.Forms.Platform.Resource.Color.mtrl_bottom_nav_colored_item_tint = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.mtrl_bottom_nav_colored_item_tint;
 			global::Xamarin.Forms.Platform.Resource.Color.mtrl_bottom_nav_item_tint = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.mtrl_bottom_nav_item_tint;
-			global::Xamarin.Forms.Platform.Resource.Color.mtrl_btn_bg_color_disabled = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.mtrl_btn_bg_color_disabled;
 			global::Xamarin.Forms.Platform.Resource.Color.mtrl_btn_bg_color_selector = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.mtrl_btn_bg_color_selector;
 			global::Xamarin.Forms.Platform.Resource.Color.mtrl_btn_ripple_color = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.mtrl_btn_ripple_color;
 			global::Xamarin.Forms.Platform.Resource.Color.mtrl_btn_stroke_color_selector = global::PerryRhodan.AudiobookPlayer.Android.Resource.Color.mtrl_btn_stroke_color_selector;
@@ -6561,11 +3953,9 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			global::Xamarin.Forms.Platform.Resource.Dimension.mtrl_navigation_item_icon_padding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_navigation_item_icon_padding;
 			global::Xamarin.Forms.Platform.Resource.Dimension.mtrl_snackbar_background_corner_radius = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_snackbar_background_corner_radius;
 			global::Xamarin.Forms.Platform.Resource.Dimension.mtrl_snackbar_margin = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_snackbar_margin;
-			global::Xamarin.Forms.Platform.Resource.Dimension.mtrl_textinput_box_bottom_offset = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_textinput_box_bottom_offset;
 			global::Xamarin.Forms.Platform.Resource.Dimension.mtrl_textinput_box_corner_radius_medium = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_textinput_box_corner_radius_medium;
 			global::Xamarin.Forms.Platform.Resource.Dimension.mtrl_textinput_box_corner_radius_small = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_textinput_box_corner_radius_small;
 			global::Xamarin.Forms.Platform.Resource.Dimension.mtrl_textinput_box_label_cutout_padding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_textinput_box_label_cutout_padding;
-			global::Xamarin.Forms.Platform.Resource.Dimension.mtrl_textinput_box_padding_end = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_textinput_box_padding_end;
 			global::Xamarin.Forms.Platform.Resource.Dimension.mtrl_textinput_box_stroke_width_default = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_textinput_box_stroke_width_default;
 			global::Xamarin.Forms.Platform.Resource.Dimension.mtrl_textinput_box_stroke_width_focused = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_textinput_box_stroke_width_focused;
 			global::Xamarin.Forms.Platform.Resource.Dimension.mtrl_textinput_outline_box_expanded_padding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.mtrl_textinput_outline_box_expanded_padding;
@@ -6585,10 +3975,6 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			global::Xamarin.Forms.Platform.Resource.Dimension.notification_subtext_size = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.notification_subtext_size;
 			global::Xamarin.Forms.Platform.Resource.Dimension.notification_top_pad = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.notification_top_pad;
 			global::Xamarin.Forms.Platform.Resource.Dimension.notification_top_pad_large_text = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.notification_top_pad_large_text;
-			global::Xamarin.Forms.Platform.Resource.Dimension.subtitle_corner_radius = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.subtitle_corner_radius;
-			global::Xamarin.Forms.Platform.Resource.Dimension.subtitle_outline_width = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.subtitle_outline_width;
-			global::Xamarin.Forms.Platform.Resource.Dimension.subtitle_shadow_offset = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.subtitle_shadow_offset;
-			global::Xamarin.Forms.Platform.Resource.Dimension.subtitle_shadow_radius = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.subtitle_shadow_radius;
 			global::Xamarin.Forms.Platform.Resource.Dimension.tooltip_corner_radius = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.tooltip_corner_radius;
 			global::Xamarin.Forms.Platform.Resource.Dimension.tooltip_horizontal_padding = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.tooltip_horizontal_padding;
 			global::Xamarin.Forms.Platform.Resource.Dimension.tooltip_margin = global::PerryRhodan.AudiobookPlayer.Android.Resource.Dimension.tooltip_margin;
@@ -6702,7 +4088,6 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			global::Xamarin.Forms.Platform.Resource.Drawable.ic_mtrl_chip_checked_black = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.ic_mtrl_chip_checked_black;
 			global::Xamarin.Forms.Platform.Resource.Drawable.ic_mtrl_chip_checked_circle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.ic_mtrl_chip_checked_circle;
 			global::Xamarin.Forms.Platform.Resource.Drawable.ic_mtrl_chip_close_circle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.ic_mtrl_chip_close_circle;
-			global::Xamarin.Forms.Platform.Resource.Drawable.mtrl_snackbar_background = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.mtrl_snackbar_background;
 			global::Xamarin.Forms.Platform.Resource.Drawable.mtrl_tabs_default_indicator = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.mtrl_tabs_default_indicator;
 			global::Xamarin.Forms.Platform.Resource.Drawable.navigation_empty_icon = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.navigation_empty_icon;
 			global::Xamarin.Forms.Platform.Resource.Drawable.notification_action_background = global::PerryRhodan.AudiobookPlayer.Android.Resource.Drawable.notification_action_background;
@@ -6825,7 +4210,6 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			global::Xamarin.Forms.Platform.Resource.Id.fill_vertical = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.fill_vertical;
 			global::Xamarin.Forms.Platform.Resource.Id.@fixed = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.@fixed;
 			global::Xamarin.Forms.Platform.Resource.Id.flyoutcontent_appbar = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.flyoutcontent_appbar;
-			global::Xamarin.Forms.Platform.Resource.Id.flyoutcontent_recycler = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.flyoutcontent_recycler;
 			global::Xamarin.Forms.Platform.Resource.Id.forever = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.forever;
 			global::Xamarin.Forms.Platform.Resource.Id.FUNCTION = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.FUNCTION;
 			global::Xamarin.Forms.Platform.Resource.Id.ghost_view = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.ghost_view;
@@ -6941,7 +4325,6 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			global::Xamarin.Forms.Platform.Resource.Id.textSpacerNoButtons = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.textSpacerNoButtons;
 			global::Xamarin.Forms.Platform.Resource.Id.textSpacerNoTitle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.textSpacerNoTitle;
 			global::Xamarin.Forms.Platform.Resource.Id.textStart = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.textStart;
-			global::Xamarin.Forms.Platform.Resource.Id.text_input_password_toggle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.text_input_password_toggle;
 			global::Xamarin.Forms.Platform.Resource.Id.time = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.time;
 			global::Xamarin.Forms.Platform.Resource.Id.title = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.title;
 			global::Xamarin.Forms.Platform.Resource.Id.titleDividerNoCustom = global::PerryRhodan.AudiobookPlayer.Android.Resource.Id.titleDividerNoCustom;
@@ -7033,7 +4416,6 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			global::Xamarin.Forms.Platform.Resource.Layout.design_navigation_item_subheader = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.design_navigation_item_subheader;
 			global::Xamarin.Forms.Platform.Resource.Layout.design_navigation_menu = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.design_navigation_menu;
 			global::Xamarin.Forms.Platform.Resource.Layout.design_navigation_menu_item = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.design_navigation_menu_item;
-			global::Xamarin.Forms.Platform.Resource.Layout.design_text_input_password_icon = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.design_text_input_password_icon;
 			global::Xamarin.Forms.Platform.Resource.Layout.FallbackTabbarDoNotUse = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.FallbackTabbarDoNotUse;
 			global::Xamarin.Forms.Platform.Resource.Layout.FallbackToolbarDoNotUse = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.FallbackToolbarDoNotUse;
 			global::Xamarin.Forms.Platform.Resource.Layout.FlyoutContent = global::PerryRhodan.AudiobookPlayer.Android.Resource.Layout.FlyoutContent;
@@ -7304,7 +4686,6 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			global::Xamarin.Forms.Platform.Resource.Style.CardView = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.CardView;
 			global::Xamarin.Forms.Platform.Resource.Style.CardView_Dark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.CardView_Dark;
 			global::Xamarin.Forms.Platform.Resource.Style.CardView_Light = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.CardView_Light;
-			global::Xamarin.Forms.Platform.Resource.Style.collectionViewScrollBars = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.collectionViewScrollBars;
 			global::Xamarin.Forms.Platform.Resource.Style.collectionViewTheme = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.collectionViewTheme;
 			global::Xamarin.Forms.Platform.Resource.Style.MainTheme = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.MainTheme;
 			global::Xamarin.Forms.Platform.Resource.Style.MainTheme_Base = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.MainTheme_Base;
@@ -7339,6 +4720,8 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			global::Xamarin.Forms.Platform.Resource.Style.RtlOverlay_Widget_AppCompat_Search_DropDown_Text = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.RtlOverlay_Widget_AppCompat_Search_DropDown_Text;
 			global::Xamarin.Forms.Platform.Resource.Style.RtlUnderlay_Widget_AppCompat_ActionButton = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.RtlUnderlay_Widget_AppCompat_ActionButton;
 			global::Xamarin.Forms.Platform.Resource.Style.RtlUnderlay_Widget_AppCompat_ActionButton_Overflow = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.RtlUnderlay_Widget_AppCompat_ActionButton_Overflow;
+			global::Xamarin.Forms.Platform.Resource.Style.scrollViewScrollBars = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.scrollViewScrollBars;
+			global::Xamarin.Forms.Platform.Resource.Style.scrollViewTheme = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.scrollViewTheme;
 			global::Xamarin.Forms.Platform.Resource.Style.TextAppearance_AppCompat = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_AppCompat;
 			global::Xamarin.Forms.Platform.Resource.Style.TextAppearance_AppCompat_Body1 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_AppCompat_Body1;
 			global::Xamarin.Forms.Platform.Resource.Style.TextAppearance_AppCompat_Body2 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_AppCompat_Body2;
@@ -7419,7 +4802,6 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			global::Xamarin.Forms.Platform.Resource.Style.TextAppearance_MaterialComponents_Overline = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_MaterialComponents_Overline;
 			global::Xamarin.Forms.Platform.Resource.Style.TextAppearance_MaterialComponents_Subtitle1 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_MaterialComponents_Subtitle1;
 			global::Xamarin.Forms.Platform.Resource.Style.TextAppearance_MaterialComponents_Subtitle2 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_MaterialComponents_Subtitle2;
-			global::Xamarin.Forms.Platform.Resource.Style.TextAppearance_MaterialComponents_Tab = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_MaterialComponents_Tab;
 			global::Xamarin.Forms.Platform.Resource.Style.TextAppearance_Widget_AppCompat_ExpandedMenu_Item = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_Widget_AppCompat_ExpandedMenu_Item;
 			global::Xamarin.Forms.Platform.Resource.Style.TextAppearance_Widget_AppCompat_Toolbar_Subtitle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_Widget_AppCompat_Toolbar_Subtitle;
 			global::Xamarin.Forms.Platform.Resource.Style.TextAppearance_Widget_AppCompat_Toolbar_Title = global::PerryRhodan.AudiobookPlayer.Android.Resource.Style.TextAppearance_Widget_AppCompat_Toolbar_Title;
@@ -7985,9 +5367,6 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			global::Xamarin.Forms.Platform.Resource.Styleable.CoordinatorLayout_Layout_layout_insetEdge = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.CoordinatorLayout_Layout_layout_insetEdge;
 			global::Xamarin.Forms.Platform.Resource.Styleable.CoordinatorLayout_Layout_layout_keyline = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.CoordinatorLayout_Layout_layout_keyline;
 			global::Xamarin.Forms.Platform.Resource.Styleable.CoordinatorLayout_statusBarBackground = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.CoordinatorLayout_statusBarBackground;
-			global::Xamarin.Forms.Platform.Resource.Styleable.DesignTheme = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.DesignTheme;
-			global::Xamarin.Forms.Platform.Resource.Styleable.DesignTheme_bottomSheetDialogTheme = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.DesignTheme_bottomSheetDialogTheme;
-			global::Xamarin.Forms.Platform.Resource.Styleable.DesignTheme_bottomSheetStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.DesignTheme_bottomSheetStyle;
 			global::Xamarin.Forms.Platform.Resource.Styleable.DrawerArrowToggle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.DrawerArrowToggle;
 			global::Xamarin.Forms.Platform.Resource.Styleable.DrawerArrowToggle_arrowHeadLength = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.DrawerArrowToggle_arrowHeadLength;
 			global::Xamarin.Forms.Platform.Resource.Styleable.DrawerArrowToggle_arrowShaftLength = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.DrawerArrowToggle_arrowShaftLength;
@@ -8094,39 +5473,6 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			global::Xamarin.Forms.Platform.Resource.Styleable.MaterialCardView = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialCardView;
 			global::Xamarin.Forms.Platform.Resource.Styleable.MaterialCardView_strokeColor = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialCardView_strokeColor;
 			global::Xamarin.Forms.Platform.Resource.Styleable.MaterialCardView_strokeWidth = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialCardView_strokeWidth;
-			global::Xamarin.Forms.Platform.Resource.Styleable.MaterialComponentsTheme = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme;
-			global::Xamarin.Forms.Platform.Resource.Styleable.MaterialComponentsTheme_bottomSheetDialogTheme = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_bottomSheetDialogTheme;
-			global::Xamarin.Forms.Platform.Resource.Styleable.MaterialComponentsTheme_bottomSheetStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_bottomSheetStyle;
-			global::Xamarin.Forms.Platform.Resource.Styleable.MaterialComponentsTheme_chipGroupStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_chipGroupStyle;
-			global::Xamarin.Forms.Platform.Resource.Styleable.MaterialComponentsTheme_chipStandaloneStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_chipStandaloneStyle;
-			global::Xamarin.Forms.Platform.Resource.Styleable.MaterialComponentsTheme_chipStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_chipStyle;
-			global::Xamarin.Forms.Platform.Resource.Styleable.MaterialComponentsTheme_colorAccent = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_colorAccent;
-			global::Xamarin.Forms.Platform.Resource.Styleable.MaterialComponentsTheme_colorBackgroundFloating = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_colorBackgroundFloating;
-			global::Xamarin.Forms.Platform.Resource.Styleable.MaterialComponentsTheme_colorPrimary = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_colorPrimary;
-			global::Xamarin.Forms.Platform.Resource.Styleable.MaterialComponentsTheme_colorPrimaryDark = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_colorPrimaryDark;
-			global::Xamarin.Forms.Platform.Resource.Styleable.MaterialComponentsTheme_colorSecondary = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_colorSecondary;
-			global::Xamarin.Forms.Platform.Resource.Styleable.MaterialComponentsTheme_editTextStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_editTextStyle;
-			global::Xamarin.Forms.Platform.Resource.Styleable.MaterialComponentsTheme_floatingActionButtonStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_floatingActionButtonStyle;
-			global::Xamarin.Forms.Platform.Resource.Styleable.MaterialComponentsTheme_materialButtonStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_materialButtonStyle;
-			global::Xamarin.Forms.Platform.Resource.Styleable.MaterialComponentsTheme_materialCardViewStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_materialCardViewStyle;
-			global::Xamarin.Forms.Platform.Resource.Styleable.MaterialComponentsTheme_navigationViewStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_navigationViewStyle;
-			global::Xamarin.Forms.Platform.Resource.Styleable.MaterialComponentsTheme_scrimBackground = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_scrimBackground;
-			global::Xamarin.Forms.Platform.Resource.Styleable.MaterialComponentsTheme_snackbarButtonStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_snackbarButtonStyle;
-			global::Xamarin.Forms.Platform.Resource.Styleable.MaterialComponentsTheme_tabStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_tabStyle;
-			global::Xamarin.Forms.Platform.Resource.Styleable.MaterialComponentsTheme_textAppearanceBody1 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_textAppearanceBody1;
-			global::Xamarin.Forms.Platform.Resource.Styleable.MaterialComponentsTheme_textAppearanceBody2 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_textAppearanceBody2;
-			global::Xamarin.Forms.Platform.Resource.Styleable.MaterialComponentsTheme_textAppearanceButton = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_textAppearanceButton;
-			global::Xamarin.Forms.Platform.Resource.Styleable.MaterialComponentsTheme_textAppearanceCaption = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_textAppearanceCaption;
-			global::Xamarin.Forms.Platform.Resource.Styleable.MaterialComponentsTheme_textAppearanceHeadline1 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_textAppearanceHeadline1;
-			global::Xamarin.Forms.Platform.Resource.Styleable.MaterialComponentsTheme_textAppearanceHeadline2 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_textAppearanceHeadline2;
-			global::Xamarin.Forms.Platform.Resource.Styleable.MaterialComponentsTheme_textAppearanceHeadline3 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_textAppearanceHeadline3;
-			global::Xamarin.Forms.Platform.Resource.Styleable.MaterialComponentsTheme_textAppearanceHeadline4 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_textAppearanceHeadline4;
-			global::Xamarin.Forms.Platform.Resource.Styleable.MaterialComponentsTheme_textAppearanceHeadline5 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_textAppearanceHeadline5;
-			global::Xamarin.Forms.Platform.Resource.Styleable.MaterialComponentsTheme_textAppearanceHeadline6 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_textAppearanceHeadline6;
-			global::Xamarin.Forms.Platform.Resource.Styleable.MaterialComponentsTheme_textAppearanceOverline = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_textAppearanceOverline;
-			global::Xamarin.Forms.Platform.Resource.Styleable.MaterialComponentsTheme_textAppearanceSubtitle1 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_textAppearanceSubtitle1;
-			global::Xamarin.Forms.Platform.Resource.Styleable.MaterialComponentsTheme_textAppearanceSubtitle2 = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_textAppearanceSubtitle2;
-			global::Xamarin.Forms.Platform.Resource.Styleable.MaterialComponentsTheme_textInputStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MaterialComponentsTheme_textInputStyle;
 			global::Xamarin.Forms.Platform.Resource.Styleable.MenuGroup = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MenuGroup;
 			global::Xamarin.Forms.Platform.Resource.Styleable.MenuGroup_android_checkableBehavior = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MenuGroup_android_checkableBehavior;
 			global::Xamarin.Forms.Platform.Resource.Styleable.MenuGroup_android_enabled = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.MenuGroup_android_enabled;
@@ -8207,6 +5553,8 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			global::Xamarin.Forms.Platform.Resource.Styleable.ScrimInsetsFrameLayout_insetForeground = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ScrimInsetsFrameLayout_insetForeground;
 			global::Xamarin.Forms.Platform.Resource.Styleable.ScrollingViewBehavior_Layout = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ScrollingViewBehavior_Layout;
 			global::Xamarin.Forms.Platform.Resource.Styleable.ScrollingViewBehavior_Layout_behavior_overlapTop = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ScrollingViewBehavior_Layout_behavior_overlapTop;
+			global::Xamarin.Forms.Platform.Resource.Styleable.ScrollViewRendererTheme = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ScrollViewRendererTheme;
+			global::Xamarin.Forms.Platform.Resource.Styleable.ScrollViewRendererTheme_scrollViewStyle = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ScrollViewRendererTheme_scrollViewStyle;
 			global::Xamarin.Forms.Platform.Resource.Styleable.SearchView = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.SearchView;
 			global::Xamarin.Forms.Platform.Resource.Styleable.SearchView_android_focusable = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.SearchView_android_focusable;
 			global::Xamarin.Forms.Platform.Resource.Styleable.SearchView_android_imeOptions = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.SearchView_android_imeOptions;
@@ -9601,427 +6949,430 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			public const int scrimVisibleHeightTrigger = 2130903391;
 			
 			// aapt resource value: 0x7F030160
-			public const int searchHintIcon = 2130903392;
+			public const int scrollViewStyle = 2130903392;
 			
 			// aapt resource value: 0x7F030161
-			public const int searchIcon = 2130903393;
+			public const int searchHintIcon = 2130903393;
 			
 			// aapt resource value: 0x7F030162
-			public const int searchViewStyle = 2130903394;
+			public const int searchIcon = 2130903394;
 			
 			// aapt resource value: 0x7F030163
-			public const int seekBarStyle = 2130903395;
+			public const int searchViewStyle = 2130903395;
 			
 			// aapt resource value: 0x7F030164
-			public const int selectableItemBackground = 2130903396;
+			public const int seekBarStyle = 2130903396;
 			
 			// aapt resource value: 0x7F030165
-			public const int selectableItemBackgroundBorderless = 2130903397;
+			public const int selectableItemBackground = 2130903397;
 			
 			// aapt resource value: 0x7F030166
-			public const int showAsAction = 2130903398;
+			public const int selectableItemBackgroundBorderless = 2130903398;
 			
 			// aapt resource value: 0x7F030167
-			public const int showDividers = 2130903399;
+			public const int showAsAction = 2130903399;
 			
 			// aapt resource value: 0x7F030168
-			public const int showMotionSpec = 2130903400;
+			public const int showDividers = 2130903400;
 			
 			// aapt resource value: 0x7F030169
-			public const int showText = 2130903401;
+			public const int showMotionSpec = 2130903401;
 			
 			// aapt resource value: 0x7F03016A
-			public const int showTitle = 2130903402;
+			public const int showText = 2130903402;
 			
 			// aapt resource value: 0x7F03016B
-			public const int singleChoiceItemLayout = 2130903403;
+			public const int showTitle = 2130903403;
 			
 			// aapt resource value: 0x7F03016C
-			public const int singleLine = 2130903404;
+			public const int singleChoiceItemLayout = 2130903404;
 			
 			// aapt resource value: 0x7F03016D
-			public const int singleSelection = 2130903405;
+			public const int singleLine = 2130903405;
 			
 			// aapt resource value: 0x7F03016E
-			public const int snackbarButtonStyle = 2130903406;
+			public const int singleSelection = 2130903406;
 			
 			// aapt resource value: 0x7F03016F
-			public const int snackbarStyle = 2130903407;
+			public const int snackbarButtonStyle = 2130903407;
 			
 			// aapt resource value: 0x7F030170
-			public const int spanCount = 2130903408;
+			public const int snackbarStyle = 2130903408;
 			
 			// aapt resource value: 0x7F030171
-			public const int spinBars = 2130903409;
+			public const int spanCount = 2130903409;
 			
 			// aapt resource value: 0x7F030172
-			public const int spinnerDropDownItemStyle = 2130903410;
+			public const int spinBars = 2130903410;
 			
 			// aapt resource value: 0x7F030173
-			public const int spinnerStyle = 2130903411;
+			public const int spinnerDropDownItemStyle = 2130903411;
 			
 			// aapt resource value: 0x7F030174
-			public const int splitTrack = 2130903412;
+			public const int spinnerStyle = 2130903412;
 			
 			// aapt resource value: 0x7F030175
-			public const int srcCompat = 2130903413;
+			public const int splitTrack = 2130903413;
 			
 			// aapt resource value: 0x7F030176
-			public const int stackFromEnd = 2130903414;
+			public const int srcCompat = 2130903414;
 			
 			// aapt resource value: 0x7F030177
-			public const int state_above_anchor = 2130903415;
+			public const int stackFromEnd = 2130903415;
 			
 			// aapt resource value: 0x7F030178
-			public const int state_collapsed = 2130903416;
+			public const int state_above_anchor = 2130903416;
 			
 			// aapt resource value: 0x7F030179
-			public const int state_collapsible = 2130903417;
+			public const int state_collapsed = 2130903417;
 			
 			// aapt resource value: 0x7F03017A
-			public const int state_liftable = 2130903418;
+			public const int state_collapsible = 2130903418;
 			
 			// aapt resource value: 0x7F03017B
-			public const int state_lifted = 2130903419;
+			public const int state_liftable = 2130903419;
 			
 			// aapt resource value: 0x7F03017C
-			public const int statusBarBackground = 2130903420;
+			public const int state_lifted = 2130903420;
 			
 			// aapt resource value: 0x7F03017D
-			public const int statusBarScrim = 2130903421;
+			public const int statusBarBackground = 2130903421;
 			
 			// aapt resource value: 0x7F03017E
-			public const int strokeColor = 2130903422;
+			public const int statusBarScrim = 2130903422;
 			
 			// aapt resource value: 0x7F03017F
-			public const int strokeWidth = 2130903423;
+			public const int strokeColor = 2130903423;
 			
 			// aapt resource value: 0x7F030180
-			public const int subMenuArrow = 2130903424;
+			public const int strokeWidth = 2130903424;
 			
 			// aapt resource value: 0x7F030181
-			public const int submitBackground = 2130903425;
+			public const int subMenuArrow = 2130903425;
 			
 			// aapt resource value: 0x7F030182
-			public const int subtitle = 2130903426;
+			public const int submitBackground = 2130903426;
 			
 			// aapt resource value: 0x7F030183
-			public const int subtitleTextAppearance = 2130903427;
+			public const int subtitle = 2130903427;
 			
 			// aapt resource value: 0x7F030184
-			public const int subtitleTextColor = 2130903428;
+			public const int subtitleTextAppearance = 2130903428;
 			
 			// aapt resource value: 0x7F030185
-			public const int subtitleTextStyle = 2130903429;
+			public const int subtitleTextColor = 2130903429;
 			
 			// aapt resource value: 0x7F030186
-			public const int suggestionRowLayout = 2130903430;
+			public const int subtitleTextStyle = 2130903430;
 			
 			// aapt resource value: 0x7F030187
-			public const int switchMinWidth = 2130903431;
+			public const int suggestionRowLayout = 2130903431;
 			
 			// aapt resource value: 0x7F030188
-			public const int switchPadding = 2130903432;
+			public const int switchMinWidth = 2130903432;
 			
 			// aapt resource value: 0x7F030189
-			public const int switchStyle = 2130903433;
+			public const int switchPadding = 2130903433;
 			
 			// aapt resource value: 0x7F03018A
-			public const int switchTextAppearance = 2130903434;
+			public const int switchStyle = 2130903434;
 			
 			// aapt resource value: 0x7F03018B
-			public const int tabBackground = 2130903435;
+			public const int switchTextAppearance = 2130903435;
 			
 			// aapt resource value: 0x7F03018C
-			public const int tabContentStart = 2130903436;
+			public const int tabBackground = 2130903436;
 			
 			// aapt resource value: 0x7F03018D
-			public const int tabGravity = 2130903437;
+			public const int tabContentStart = 2130903437;
 			
 			// aapt resource value: 0x7F03018E
-			public const int tabIconTint = 2130903438;
+			public const int tabGravity = 2130903438;
 			
 			// aapt resource value: 0x7F03018F
-			public const int tabIconTintMode = 2130903439;
+			public const int tabIconTint = 2130903439;
 			
 			// aapt resource value: 0x7F030190
-			public const int tabIndicator = 2130903440;
+			public const int tabIconTintMode = 2130903440;
 			
 			// aapt resource value: 0x7F030191
-			public const int tabIndicatorAnimationDuration = 2130903441;
+			public const int tabIndicator = 2130903441;
 			
 			// aapt resource value: 0x7F030192
-			public const int tabIndicatorColor = 2130903442;
+			public const int tabIndicatorAnimationDuration = 2130903442;
 			
 			// aapt resource value: 0x7F030193
-			public const int tabIndicatorFullWidth = 2130903443;
+			public const int tabIndicatorColor = 2130903443;
 			
 			// aapt resource value: 0x7F030194
-			public const int tabIndicatorGravity = 2130903444;
+			public const int tabIndicatorFullWidth = 2130903444;
 			
 			// aapt resource value: 0x7F030195
-			public const int tabIndicatorHeight = 2130903445;
+			public const int tabIndicatorGravity = 2130903445;
 			
 			// aapt resource value: 0x7F030196
-			public const int tabInlineLabel = 2130903446;
+			public const int tabIndicatorHeight = 2130903446;
 			
 			// aapt resource value: 0x7F030197
-			public const int tabMaxWidth = 2130903447;
+			public const int tabInlineLabel = 2130903447;
 			
 			// aapt resource value: 0x7F030198
-			public const int tabMinWidth = 2130903448;
+			public const int tabMaxWidth = 2130903448;
 			
 			// aapt resource value: 0x7F030199
-			public const int tabMode = 2130903449;
+			public const int tabMinWidth = 2130903449;
 			
 			// aapt resource value: 0x7F03019A
-			public const int tabPadding = 2130903450;
+			public const int tabMode = 2130903450;
 			
 			// aapt resource value: 0x7F03019B
-			public const int tabPaddingBottom = 2130903451;
+			public const int tabPadding = 2130903451;
 			
 			// aapt resource value: 0x7F03019C
-			public const int tabPaddingEnd = 2130903452;
+			public const int tabPaddingBottom = 2130903452;
 			
 			// aapt resource value: 0x7F03019D
-			public const int tabPaddingStart = 2130903453;
+			public const int tabPaddingEnd = 2130903453;
 			
 			// aapt resource value: 0x7F03019E
-			public const int tabPaddingTop = 2130903454;
+			public const int tabPaddingStart = 2130903454;
 			
 			// aapt resource value: 0x7F03019F
-			public const int tabRippleColor = 2130903455;
+			public const int tabPaddingTop = 2130903455;
 			
 			// aapt resource value: 0x7F0301A0
-			public const int tabSelectedTextColor = 2130903456;
+			public const int tabRippleColor = 2130903456;
 			
 			// aapt resource value: 0x7F0301A1
-			public const int tabStyle = 2130903457;
+			public const int tabSelectedTextColor = 2130903457;
 			
 			// aapt resource value: 0x7F0301A2
-			public const int tabTextAppearance = 2130903458;
+			public const int tabStyle = 2130903458;
 			
 			// aapt resource value: 0x7F0301A3
-			public const int tabTextColor = 2130903459;
+			public const int tabTextAppearance = 2130903459;
 			
 			// aapt resource value: 0x7F0301A4
-			public const int tabUnboundedRipple = 2130903460;
+			public const int tabTextColor = 2130903460;
 			
 			// aapt resource value: 0x7F0301A5
-			public const int textAllCaps = 2130903461;
+			public const int tabUnboundedRipple = 2130903461;
 			
 			// aapt resource value: 0x7F0301A6
-			public const int textAppearanceBody1 = 2130903462;
+			public const int textAllCaps = 2130903462;
 			
 			// aapt resource value: 0x7F0301A7
-			public const int textAppearanceBody2 = 2130903463;
+			public const int textAppearanceBody1 = 2130903463;
 			
 			// aapt resource value: 0x7F0301A8
-			public const int textAppearanceButton = 2130903464;
+			public const int textAppearanceBody2 = 2130903464;
 			
 			// aapt resource value: 0x7F0301A9
-			public const int textAppearanceCaption = 2130903465;
+			public const int textAppearanceButton = 2130903465;
 			
 			// aapt resource value: 0x7F0301AA
-			public const int textAppearanceHeadline1 = 2130903466;
+			public const int textAppearanceCaption = 2130903466;
 			
 			// aapt resource value: 0x7F0301AB
-			public const int textAppearanceHeadline2 = 2130903467;
+			public const int textAppearanceHeadline1 = 2130903467;
 			
 			// aapt resource value: 0x7F0301AC
-			public const int textAppearanceHeadline3 = 2130903468;
+			public const int textAppearanceHeadline2 = 2130903468;
 			
 			// aapt resource value: 0x7F0301AD
-			public const int textAppearanceHeadline4 = 2130903469;
+			public const int textAppearanceHeadline3 = 2130903469;
 			
 			// aapt resource value: 0x7F0301AE
-			public const int textAppearanceHeadline5 = 2130903470;
+			public const int textAppearanceHeadline4 = 2130903470;
 			
 			// aapt resource value: 0x7F0301AF
-			public const int textAppearanceHeadline6 = 2130903471;
+			public const int textAppearanceHeadline5 = 2130903471;
 			
 			// aapt resource value: 0x7F0301B0
-			public const int textAppearanceLargePopupMenu = 2130903472;
+			public const int textAppearanceHeadline6 = 2130903472;
 			
 			// aapt resource value: 0x7F0301B1
-			public const int textAppearanceListItem = 2130903473;
+			public const int textAppearanceLargePopupMenu = 2130903473;
 			
 			// aapt resource value: 0x7F0301B2
-			public const int textAppearanceListItemSecondary = 2130903474;
+			public const int textAppearanceListItem = 2130903474;
 			
 			// aapt resource value: 0x7F0301B3
-			public const int textAppearanceListItemSmall = 2130903475;
+			public const int textAppearanceListItemSecondary = 2130903475;
 			
 			// aapt resource value: 0x7F0301B4
-			public const int textAppearanceOverline = 2130903476;
+			public const int textAppearanceListItemSmall = 2130903476;
 			
 			// aapt resource value: 0x7F0301B5
-			public const int textAppearancePopupMenuHeader = 2130903477;
+			public const int textAppearanceOverline = 2130903477;
 			
 			// aapt resource value: 0x7F0301B6
-			public const int textAppearanceSearchResultSubtitle = 2130903478;
+			public const int textAppearancePopupMenuHeader = 2130903478;
 			
 			// aapt resource value: 0x7F0301B7
-			public const int textAppearanceSearchResultTitle = 2130903479;
+			public const int textAppearanceSearchResultSubtitle = 2130903479;
 			
 			// aapt resource value: 0x7F0301B8
-			public const int textAppearanceSmallPopupMenu = 2130903480;
+			public const int textAppearanceSearchResultTitle = 2130903480;
 			
 			// aapt resource value: 0x7F0301B9
-			public const int textAppearanceSubtitle1 = 2130903481;
+			public const int textAppearanceSmallPopupMenu = 2130903481;
 			
 			// aapt resource value: 0x7F0301BA
-			public const int textAppearanceSubtitle2 = 2130903482;
+			public const int textAppearanceSubtitle1 = 2130903482;
 			
 			// aapt resource value: 0x7F0301BB
-			public const int textColorAlertDialogListItem = 2130903483;
+			public const int textAppearanceSubtitle2 = 2130903483;
 			
 			// aapt resource value: 0x7F0301BC
-			public const int textColorSearchUrl = 2130903484;
+			public const int textColorAlertDialogListItem = 2130903484;
 			
 			// aapt resource value: 0x7F0301BD
-			public const int textEndPadding = 2130903485;
+			public const int textColorSearchUrl = 2130903485;
 			
 			// aapt resource value: 0x7F0301BE
-			public const int textInputStyle = 2130903486;
+			public const int textEndPadding = 2130903486;
 			
 			// aapt resource value: 0x7F0301BF
-			public const int textLocale = 2130903487;
+			public const int textInputStyle = 2130903487;
 			
 			// aapt resource value: 0x7F0301C0
-			public const int textStartPadding = 2130903488;
+			public const int textLocale = 2130903488;
 			
 			// aapt resource value: 0x7F0301C1
-			public const int theme = 2130903489;
+			public const int textStartPadding = 2130903489;
 			
 			// aapt resource value: 0x7F0301C2
-			public const int thickness = 2130903490;
+			public const int theme = 2130903490;
 			
 			// aapt resource value: 0x7F0301C3
-			public const int thumbTextPadding = 2130903491;
+			public const int thickness = 2130903491;
 			
 			// aapt resource value: 0x7F0301C4
-			public const int thumbTint = 2130903492;
+			public const int thumbTextPadding = 2130903492;
 			
 			// aapt resource value: 0x7F0301C5
-			public const int thumbTintMode = 2130903493;
+			public const int thumbTint = 2130903493;
 			
 			// aapt resource value: 0x7F0301C6
-			public const int tickMark = 2130903494;
+			public const int thumbTintMode = 2130903494;
 			
 			// aapt resource value: 0x7F0301C7
-			public const int tickMarkTint = 2130903495;
+			public const int tickMark = 2130903495;
 			
 			// aapt resource value: 0x7F0301C8
-			public const int tickMarkTintMode = 2130903496;
+			public const int tickMarkTint = 2130903496;
 			
 			// aapt resource value: 0x7F0301C9
-			public const int tint = 2130903497;
+			public const int tickMarkTintMode = 2130903497;
 			
 			// aapt resource value: 0x7F0301CA
-			public const int tintMode = 2130903498;
+			public const int tint = 2130903498;
 			
 			// aapt resource value: 0x7F0301CB
-			public const int title = 2130903499;
+			public const int tintMode = 2130903499;
 			
 			// aapt resource value: 0x7F0301CC
-			public const int titleEnabled = 2130903500;
+			public const int title = 2130903500;
 			
 			// aapt resource value: 0x7F0301CD
-			public const int titleMargin = 2130903501;
+			public const int titleEnabled = 2130903501;
 			
 			// aapt resource value: 0x7F0301CE
-			public const int titleMarginBottom = 2130903502;
+			public const int titleMargin = 2130903502;
 			
 			// aapt resource value: 0x7F0301CF
-			public const int titleMarginEnd = 2130903503;
-			
-			// aapt resource value: 0x7F0301D2
-			public const int titleMargins = 2130903506;
+			public const int titleMarginBottom = 2130903503;
 			
 			// aapt resource value: 0x7F0301D0
-			public const int titleMarginStart = 2130903504;
-			
-			// aapt resource value: 0x7F0301D1
-			public const int titleMarginTop = 2130903505;
+			public const int titleMarginEnd = 2130903504;
 			
 			// aapt resource value: 0x7F0301D3
-			public const int titleTextAppearance = 2130903507;
+			public const int titleMargins = 2130903507;
+			
+			// aapt resource value: 0x7F0301D1
+			public const int titleMarginStart = 2130903505;
+			
+			// aapt resource value: 0x7F0301D2
+			public const int titleMarginTop = 2130903506;
 			
 			// aapt resource value: 0x7F0301D4
-			public const int titleTextColor = 2130903508;
+			public const int titleTextAppearance = 2130903508;
 			
 			// aapt resource value: 0x7F0301D5
-			public const int titleTextStyle = 2130903509;
+			public const int titleTextColor = 2130903509;
 			
 			// aapt resource value: 0x7F0301D6
-			public const int toolbarId = 2130903510;
+			public const int titleTextStyle = 2130903510;
 			
 			// aapt resource value: 0x7F0301D7
-			public const int toolbarNavigationButtonStyle = 2130903511;
+			public const int toolbarId = 2130903511;
 			
 			// aapt resource value: 0x7F0301D8
-			public const int toolbarStyle = 2130903512;
+			public const int toolbarNavigationButtonStyle = 2130903512;
 			
 			// aapt resource value: 0x7F0301D9
-			public const int tooltipForegroundColor = 2130903513;
+			public const int toolbarStyle = 2130903513;
 			
 			// aapt resource value: 0x7F0301DA
-			public const int tooltipFrameBackground = 2130903514;
+			public const int tooltipForegroundColor = 2130903514;
 			
 			// aapt resource value: 0x7F0301DB
-			public const int tooltipText = 2130903515;
+			public const int tooltipFrameBackground = 2130903515;
 			
 			// aapt resource value: 0x7F0301DC
-			public const int track = 2130903516;
+			public const int tooltipText = 2130903516;
 			
 			// aapt resource value: 0x7F0301DD
-			public const int trackTint = 2130903517;
+			public const int track = 2130903517;
 			
 			// aapt resource value: 0x7F0301DE
-			public const int trackTintMode = 2130903518;
+			public const int trackTint = 2130903518;
 			
 			// aapt resource value: 0x7F0301DF
-			public const int ttcIndex = 2130903519;
+			public const int trackTintMode = 2130903519;
 			
 			// aapt resource value: 0x7F0301E0
-			public const int useCompatPadding = 2130903520;
+			public const int ttcIndex = 2130903520;
 			
 			// aapt resource value: 0x7F0301E1
-			public const int viewInflaterClass = 2130903521;
+			public const int useCompatPadding = 2130903521;
 			
 			// aapt resource value: 0x7F0301E2
-			public const int voiceIcon = 2130903522;
+			public const int viewInflaterClass = 2130903522;
 			
 			// aapt resource value: 0x7F0301E3
-			public const int windowActionBar = 2130903523;
+			public const int voiceIcon = 2130903523;
 			
 			// aapt resource value: 0x7F0301E4
-			public const int windowActionBarOverlay = 2130903524;
+			public const int windowActionBar = 2130903524;
 			
 			// aapt resource value: 0x7F0301E5
-			public const int windowActionModeOverlay = 2130903525;
+			public const int windowActionBarOverlay = 2130903525;
 			
 			// aapt resource value: 0x7F0301E6
-			public const int windowFixedHeightMajor = 2130903526;
+			public const int windowActionModeOverlay = 2130903526;
 			
 			// aapt resource value: 0x7F0301E7
-			public const int windowFixedHeightMinor = 2130903527;
+			public const int windowFixedHeightMajor = 2130903527;
 			
 			// aapt resource value: 0x7F0301E8
-			public const int windowFixedWidthMajor = 2130903528;
+			public const int windowFixedHeightMinor = 2130903528;
 			
 			// aapt resource value: 0x7F0301E9
-			public const int windowFixedWidthMinor = 2130903529;
+			public const int windowFixedWidthMajor = 2130903529;
 			
 			// aapt resource value: 0x7F0301EA
-			public const int windowMinWidthMajor = 2130903530;
+			public const int windowFixedWidthMinor = 2130903530;
 			
 			// aapt resource value: 0x7F0301EB
-			public const int windowMinWidthMinor = 2130903531;
+			public const int windowMinWidthMajor = 2130903531;
 			
 			// aapt resource value: 0x7F0301EC
-			public const int windowNoTitle = 2130903532;
+			public const int windowMinWidthMinor = 2130903532;
+			
+			// aapt resource value: 0x7F0301ED
+			public const int windowNoTitle = 2130903533;
 			
 			static Attribute()
 			{
@@ -11967,421 +9318,418 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			public const int flyoutcontent_appbar = 2131230834;
 			
 			// aapt resource value: 0x7F080073
-			public const int flyoutcontent_recycler = 2131230835;
-			
-			// aapt resource value: 0x7F080074
-			public const int forever = 2131230836;
+			public const int forever = 2131230835;
 			
 			// aapt resource value: 0x7F080002
 			public const int FUNCTION = 2131230722;
 			
+			// aapt resource value: 0x7F080074
+			public const int ghost_view = 2131230836;
+			
 			// aapt resource value: 0x7F080075
-			public const int ghost_view = 2131230837;
+			public const int ghost_view_holder = 2131230837;
 			
 			// aapt resource value: 0x7F080076
-			public const int ghost_view_holder = 2131230838;
+			public const int group_divider = 2131230838;
 			
 			// aapt resource value: 0x7F080077
-			public const int group_divider = 2131230839;
+			public const int home = 2131230839;
 			
 			// aapt resource value: 0x7F080078
-			public const int home = 2131230840;
+			public const int homeAsUp = 2131230840;
 			
 			// aapt resource value: 0x7F080079
-			public const int homeAsUp = 2131230841;
+			public const int icon = 2131230841;
 			
 			// aapt resource value: 0x7F08007A
-			public const int icon = 2131230842;
+			public const int icon_group = 2131230842;
 			
 			// aapt resource value: 0x7F08007B
-			public const int icon_group = 2131230843;
+			public const int ifRoom = 2131230843;
 			
 			// aapt resource value: 0x7F08007C
-			public const int ifRoom = 2131230844;
+			public const int image = 2131230844;
 			
 			// aapt resource value: 0x7F08007D
-			public const int image = 2131230845;
+			public const int info = 2131230845;
 			
 			// aapt resource value: 0x7F08007E
-			public const int info = 2131230846;
+			public const int italic = 2131230846;
 			
 			// aapt resource value: 0x7F08007F
-			public const int italic = 2131230847;
+			public const int item_touch_helper_previous_elevation = 2131230847;
 			
 			// aapt resource value: 0x7F080080
-			public const int item_touch_helper_previous_elevation = 2131230848;
+			public const int labeled = 2131230848;
 			
 			// aapt resource value: 0x7F080081
-			public const int labeled = 2131230849;
+			public const int largeLabel = 2131230849;
 			
 			// aapt resource value: 0x7F080082
-			public const int largeLabel = 2131230850;
+			public const int left = 2131230850;
 			
 			// aapt resource value: 0x7F080083
-			public const int left = 2131230851;
+			public const int line1 = 2131230851;
 			
 			// aapt resource value: 0x7F080084
-			public const int line1 = 2131230852;
+			public const int line3 = 2131230852;
 			
 			// aapt resource value: 0x7F080085
-			public const int line3 = 2131230853;
+			public const int listMode = 2131230853;
 			
 			// aapt resource value: 0x7F080086
-			public const int listMode = 2131230854;
+			public const int list_item = 2131230854;
 			
 			// aapt resource value: 0x7F080087
-			public const int list_item = 2131230855;
+			public const int main_appbar = 2131230855;
 			
 			// aapt resource value: 0x7F080088
-			public const int main_appbar = 2131230856;
+			public const int main_tablayout = 2131230856;
 			
 			// aapt resource value: 0x7F080089
-			public const int main_tablayout = 2131230857;
+			public const int main_toolbar = 2131230857;
 			
 			// aapt resource value: 0x7F08008A
-			public const int main_toolbar = 2131230858;
+			public const int main_viewpager = 2131230858;
 			
 			// aapt resource value: 0x7F08008B
-			public const int main_viewpager = 2131230859;
+			public const int masked = 2131230859;
 			
 			// aapt resource value: 0x7F08008C
-			public const int masked = 2131230860;
+			public const int media_actions = 2131230860;
 			
 			// aapt resource value: 0x7F08008D
-			public const int media_actions = 2131230861;
-			
-			// aapt resource value: 0x7F08008E
-			public const int message = 2131230862;
+			public const int message = 2131230861;
 			
 			// aapt resource value: 0x7F080003
 			public const int META = 2131230723;
 			
+			// aapt resource value: 0x7F08008E
+			public const int middle = 2131230862;
+			
 			// aapt resource value: 0x7F08008F
-			public const int middle = 2131230863;
+			public const int mini = 2131230863;
 			
 			// aapt resource value: 0x7F080090
-			public const int mini = 2131230864;
+			public const int mtrl_child_content_container = 2131230864;
 			
 			// aapt resource value: 0x7F080091
-			public const int mtrl_child_content_container = 2131230865;
+			public const int mtrl_internal_children_alpha_tag = 2131230865;
 			
 			// aapt resource value: 0x7F080092
-			public const int mtrl_internal_children_alpha_tag = 2131230866;
+			public const int multiply = 2131230866;
 			
 			// aapt resource value: 0x7F080093
-			public const int multiply = 2131230867;
+			public const int navigation_header_container = 2131230867;
 			
 			// aapt resource value: 0x7F080094
-			public const int navigation_header_container = 2131230868;
+			public const int never = 2131230868;
 			
 			// aapt resource value: 0x7F080095
-			public const int never = 2131230869;
+			public const int none = 2131230869;
 			
 			// aapt resource value: 0x7F080096
-			public const int none = 2131230870;
+			public const int normal = 2131230870;
 			
 			// aapt resource value: 0x7F080097
-			public const int normal = 2131230871;
+			public const int notification_background = 2131230871;
 			
 			// aapt resource value: 0x7F080098
-			public const int notification_background = 2131230872;
+			public const int notification_main_column = 2131230872;
 			
 			// aapt resource value: 0x7F080099
-			public const int notification_main_column = 2131230873;
+			public const int notification_main_column_container = 2131230873;
 			
 			// aapt resource value: 0x7F08009A
-			public const int notification_main_column_container = 2131230874;
+			public const int off = 2131230874;
 			
 			// aapt resource value: 0x7F08009B
-			public const int off = 2131230875;
+			public const int on = 2131230875;
 			
 			// aapt resource value: 0x7F08009C
-			public const int on = 2131230876;
+			public const int outline = 2131230876;
 			
 			// aapt resource value: 0x7F08009D
-			public const int outline = 2131230877;
+			public const int parallax = 2131230877;
 			
 			// aapt resource value: 0x7F08009E
-			public const int parallax = 2131230878;
+			public const int parentPanel = 2131230878;
 			
 			// aapt resource value: 0x7F08009F
-			public const int parentPanel = 2131230879;
+			public const int parent_matrix = 2131230879;
 			
 			// aapt resource value: 0x7F0800A0
-			public const int parent_matrix = 2131230880;
+			public const int pin = 2131230880;
 			
 			// aapt resource value: 0x7F0800A1
-			public const int pin = 2131230881;
+			public const int progress_circular = 2131230881;
 			
 			// aapt resource value: 0x7F0800A2
-			public const int progress_circular = 2131230882;
+			public const int progress_horizontal = 2131230882;
 			
 			// aapt resource value: 0x7F0800A3
-			public const int progress_horizontal = 2131230883;
+			public const int radio = 2131230883;
 			
 			// aapt resource value: 0x7F0800A4
-			public const int radio = 2131230884;
+			public const int right = 2131230884;
 			
 			// aapt resource value: 0x7F0800A5
-			public const int right = 2131230885;
+			public const int right_icon = 2131230885;
 			
 			// aapt resource value: 0x7F0800A6
-			public const int right_icon = 2131230886;
+			public const int right_side = 2131230886;
 			
 			// aapt resource value: 0x7F0800A7
-			public const int right_side = 2131230887;
+			public const int save_non_transition_alpha = 2131230887;
 			
 			// aapt resource value: 0x7F0800A8
-			public const int save_non_transition_alpha = 2131230888;
+			public const int save_overlay_view = 2131230888;
 			
 			// aapt resource value: 0x7F0800A9
-			public const int save_overlay_view = 2131230889;
+			public const int screen = 2131230889;
 			
 			// aapt resource value: 0x7F0800AA
-			public const int screen = 2131230890;
-			
-			// aapt resource value: 0x7F0800AB
-			public const int scroll = 2131230891;
-			
-			// aapt resource value: 0x7F0800AF
-			public const int scrollable = 2131230895;
-			
-			// aapt resource value: 0x7F0800AC
-			public const int scrollIndicatorDown = 2131230892;
-			
-			// aapt resource value: 0x7F0800AD
-			public const int scrollIndicatorUp = 2131230893;
+			public const int scroll = 2131230890;
 			
 			// aapt resource value: 0x7F0800AE
-			public const int scrollView = 2131230894;
+			public const int scrollable = 2131230894;
+			
+			// aapt resource value: 0x7F0800AB
+			public const int scrollIndicatorDown = 2131230891;
+			
+			// aapt resource value: 0x7F0800AC
+			public const int scrollIndicatorUp = 2131230892;
+			
+			// aapt resource value: 0x7F0800AD
+			public const int scrollView = 2131230893;
+			
+			// aapt resource value: 0x7F0800AF
+			public const int search_badge = 2131230895;
 			
 			// aapt resource value: 0x7F0800B0
-			public const int search_badge = 2131230896;
+			public const int search_bar = 2131230896;
 			
 			// aapt resource value: 0x7F0800B1
-			public const int search_bar = 2131230897;
+			public const int search_button = 2131230897;
 			
 			// aapt resource value: 0x7F0800B2
-			public const int search_button = 2131230898;
+			public const int search_close_btn = 2131230898;
 			
 			// aapt resource value: 0x7F0800B3
-			public const int search_close_btn = 2131230899;
+			public const int search_edit_frame = 2131230899;
 			
 			// aapt resource value: 0x7F0800B4
-			public const int search_edit_frame = 2131230900;
+			public const int search_go_btn = 2131230900;
 			
 			// aapt resource value: 0x7F0800B5
-			public const int search_go_btn = 2131230901;
+			public const int search_mag_icon = 2131230901;
 			
 			// aapt resource value: 0x7F0800B6
-			public const int search_mag_icon = 2131230902;
+			public const int search_plate = 2131230902;
 			
 			// aapt resource value: 0x7F0800B7
-			public const int search_plate = 2131230903;
+			public const int search_src_text = 2131230903;
 			
 			// aapt resource value: 0x7F0800B8
-			public const int search_src_text = 2131230904;
-			
-			// aapt resource value: 0x7F0800B9
-			public const int search_voice_btn = 2131230905;
-			
-			// aapt resource value: 0x7F0800BB
-			public const int selected = 2131230907;
+			public const int search_voice_btn = 2131230904;
 			
 			// aapt resource value: 0x7F0800BA
-			public const int select_dialog_listview = 2131230906;
+			public const int selected = 2131230906;
+			
+			// aapt resource value: 0x7F0800B9
+			public const int select_dialog_listview = 2131230905;
+			
+			// aapt resource value: 0x7F0800BB
+			public const int shellcontent_appbar = 2131230907;
 			
 			// aapt resource value: 0x7F0800BC
-			public const int shellcontent_appbar = 2131230908;
-			
-			// aapt resource value: 0x7F0800BD
-			public const int shellcontent_toolbar = 2131230909;
+			public const int shellcontent_toolbar = 2131230908;
 			
 			// aapt resource value: 0x7F080004
 			public const int SHIFT = 2131230724;
 			
+			// aapt resource value: 0x7F0800BD
+			public const int shortcut = 2131230909;
+			
 			// aapt resource value: 0x7F0800BE
-			public const int shortcut = 2131230910;
+			public const int showCustom = 2131230910;
 			
 			// aapt resource value: 0x7F0800BF
-			public const int showCustom = 2131230911;
+			public const int showHome = 2131230911;
 			
 			// aapt resource value: 0x7F0800C0
-			public const int showHome = 2131230912;
+			public const int showTitle = 2131230912;
 			
 			// aapt resource value: 0x7F0800C1
-			public const int showTitle = 2131230913;
+			public const int sliding_tabs = 2131230913;
 			
 			// aapt resource value: 0x7F0800C2
-			public const int sliding_tabs = 2131230914;
+			public const int smallLabel = 2131230914;
 			
 			// aapt resource value: 0x7F0800C3
-			public const int smallLabel = 2131230915;
+			public const int snackbar_action = 2131230915;
 			
 			// aapt resource value: 0x7F0800C4
-			public const int snackbar_action = 2131230916;
+			public const int snackbar_text = 2131230916;
 			
 			// aapt resource value: 0x7F0800C5
-			public const int snackbar_text = 2131230917;
+			public const int snap = 2131230917;
 			
 			// aapt resource value: 0x7F0800C6
-			public const int snap = 2131230918;
+			public const int snapMargins = 2131230918;
 			
 			// aapt resource value: 0x7F0800C7
-			public const int snapMargins = 2131230919;
+			public const int spacer = 2131230919;
 			
 			// aapt resource value: 0x7F0800C8
-			public const int spacer = 2131230920;
+			public const int split_action_bar = 2131230920;
 			
 			// aapt resource value: 0x7F0800C9
-			public const int split_action_bar = 2131230921;
+			public const int src_atop = 2131230921;
 			
 			// aapt resource value: 0x7F0800CA
-			public const int src_atop = 2131230922;
+			public const int src_in = 2131230922;
 			
 			// aapt resource value: 0x7F0800CB
-			public const int src_in = 2131230923;
+			public const int src_over = 2131230923;
 			
 			// aapt resource value: 0x7F0800CC
-			public const int src_over = 2131230924;
+			public const int start = 2131230924;
 			
 			// aapt resource value: 0x7F0800CD
-			public const int start = 2131230925;
+			public const int status_bar_latest_event_content = 2131230925;
 			
 			// aapt resource value: 0x7F0800CE
-			public const int status_bar_latest_event_content = 2131230926;
+			public const int stretch = 2131230926;
 			
 			// aapt resource value: 0x7F0800CF
-			public const int stretch = 2131230927;
+			public const int submenuarrow = 2131230927;
 			
 			// aapt resource value: 0x7F0800D0
-			public const int submenuarrow = 2131230928;
-			
-			// aapt resource value: 0x7F0800D1
-			public const int submit_area = 2131230929;
+			public const int submit_area = 2131230928;
 			
 			// aapt resource value: 0x7F080005
 			public const int SYM = 2131230725;
 			
+			// aapt resource value: 0x7F0800D1
+			public const int tabMode = 2131230929;
+			
 			// aapt resource value: 0x7F0800D2
-			public const int tabMode = 2131230930;
+			public const int tag_accessibility_actions = 2131230930;
 			
 			// aapt resource value: 0x7F0800D3
-			public const int tag_accessibility_actions = 2131230931;
+			public const int tag_accessibility_clickable_spans = 2131230931;
 			
 			// aapt resource value: 0x7F0800D4
-			public const int tag_accessibility_clickable_spans = 2131230932;
+			public const int tag_accessibility_heading = 2131230932;
 			
 			// aapt resource value: 0x7F0800D5
-			public const int tag_accessibility_heading = 2131230933;
+			public const int tag_accessibility_pane_title = 2131230933;
 			
 			// aapt resource value: 0x7F0800D6
-			public const int tag_accessibility_pane_title = 2131230934;
+			public const int tag_screen_reader_focusable = 2131230934;
 			
 			// aapt resource value: 0x7F0800D7
-			public const int tag_screen_reader_focusable = 2131230935;
+			public const int tag_transition_group = 2131230935;
 			
 			// aapt resource value: 0x7F0800D8
-			public const int tag_transition_group = 2131230936;
+			public const int tag_unhandled_key_event_manager = 2131230936;
 			
 			// aapt resource value: 0x7F0800D9
-			public const int tag_unhandled_key_event_manager = 2131230937;
+			public const int tag_unhandled_key_listeners = 2131230937;
 			
 			// aapt resource value: 0x7F0800DA
-			public const int tag_unhandled_key_listeners = 2131230938;
+			public const int text = 2131230938;
 			
 			// aapt resource value: 0x7F0800DB
-			public const int text = 2131230939;
-			
-			// aapt resource value: 0x7F0800DC
-			public const int text2 = 2131230940;
-			
-			// aapt resource value: 0x7F0800E1
-			public const int textinput_counter = 2131230945;
-			
-			// aapt resource value: 0x7F0800E2
-			public const int textinput_error = 2131230946;
-			
-			// aapt resource value: 0x7F0800E3
-			public const int textinput_helper_text = 2131230947;
-			
-			// aapt resource value: 0x7F0800DD
-			public const int textSpacerNoButtons = 2131230941;
-			
-			// aapt resource value: 0x7F0800DE
-			public const int textSpacerNoTitle = 2131230942;
-			
-			// aapt resource value: 0x7F0800DF
-			public const int textStart = 2131230943;
+			public const int text2 = 2131230939;
 			
 			// aapt resource value: 0x7F0800E0
-			public const int text_input_password_toggle = 2131230944;
+			public const int textinput_counter = 2131230944;
+			
+			// aapt resource value: 0x7F0800E1
+			public const int textinput_error = 2131230945;
+			
+			// aapt resource value: 0x7F0800E2
+			public const int textinput_helper_text = 2131230946;
+			
+			// aapt resource value: 0x7F0800DC
+			public const int textSpacerNoButtons = 2131230940;
+			
+			// aapt resource value: 0x7F0800DD
+			public const int textSpacerNoTitle = 2131230941;
+			
+			// aapt resource value: 0x7F0800DE
+			public const int textStart = 2131230942;
+			
+			// aapt resource value: 0x7F0800DF
+			public const int text_input_password_toggle = 2131230943;
+			
+			// aapt resource value: 0x7F0800E3
+			public const int time = 2131230947;
 			
 			// aapt resource value: 0x7F0800E4
-			public const int time = 2131230948;
+			public const int title = 2131230948;
 			
 			// aapt resource value: 0x7F0800E5
-			public const int title = 2131230949;
+			public const int titleDividerNoCustom = 2131230949;
 			
 			// aapt resource value: 0x7F0800E6
-			public const int titleDividerNoCustom = 2131230950;
+			public const int title_template = 2131230950;
 			
 			// aapt resource value: 0x7F0800E7
-			public const int title_template = 2131230951;
+			public const int toolbar = 2131230951;
 			
 			// aapt resource value: 0x7F0800E8
-			public const int toolbar = 2131230952;
+			public const int top = 2131230952;
 			
 			// aapt resource value: 0x7F0800E9
-			public const int top = 2131230953;
+			public const int topPanel = 2131230953;
 			
 			// aapt resource value: 0x7F0800EA
-			public const int topPanel = 2131230954;
+			public const int touch_outside = 2131230954;
 			
 			// aapt resource value: 0x7F0800EB
-			public const int touch_outside = 2131230955;
+			public const int transition_current_scene = 2131230955;
 			
 			// aapt resource value: 0x7F0800EC
-			public const int transition_current_scene = 2131230956;
+			public const int transition_layout_save = 2131230956;
 			
 			// aapt resource value: 0x7F0800ED
-			public const int transition_layout_save = 2131230957;
+			public const int transition_position = 2131230957;
 			
 			// aapt resource value: 0x7F0800EE
-			public const int transition_position = 2131230958;
+			public const int transition_scene_layoutid_cache = 2131230958;
 			
 			// aapt resource value: 0x7F0800EF
-			public const int transition_scene_layoutid_cache = 2131230959;
+			public const int transition_transform = 2131230959;
 			
 			// aapt resource value: 0x7F0800F0
-			public const int transition_transform = 2131230960;
+			public const int @unchecked = 2131230960;
 			
 			// aapt resource value: 0x7F0800F1
-			public const int @unchecked = 2131230961;
+			public const int uniform = 2131230961;
 			
 			// aapt resource value: 0x7F0800F2
-			public const int uniform = 2131230962;
+			public const int unlabeled = 2131230962;
 			
 			// aapt resource value: 0x7F0800F3
-			public const int unlabeled = 2131230963;
+			public const int up = 2131230963;
 			
 			// aapt resource value: 0x7F0800F4
-			public const int up = 2131230964;
+			public const int useLogo = 2131230964;
 			
 			// aapt resource value: 0x7F0800F5
-			public const int useLogo = 2131230965;
+			public const int view_offset_helper = 2131230965;
 			
 			// aapt resource value: 0x7F0800F6
-			public const int view_offset_helper = 2131230966;
+			public const int visible = 2131230966;
 			
 			// aapt resource value: 0x7F0800F7
-			public const int visible = 2131230967;
+			public const int withText = 2131230967;
 			
 			// aapt resource value: 0x7F0800F8
-			public const int withText = 2131230968;
-			
-			// aapt resource value: 0x7F0800F9
-			public const int wrap_content = 2131230969;
+			public const int wrap_content = 2131230968;
 			
 			static Id()
 			{
@@ -13475,10 +10823,7 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			public const int CardView_Light = 2131558598;
 			
 			// aapt resource value: 0x7F0D01FC
-			public const int collectionViewScrollBars = 2131558908;
-			
-			// aapt resource value: 0x7F0D01FD
-			public const int collectionViewTheme = 2131558909;
+			public const int collectionViewTheme = 2131558908;
 			
 			// aapt resource value: 0x7F0D00C7
 			public const int MainTheme = 2131558599;
@@ -13581,6 +10926,12 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			
 			// aapt resource value: 0x7F0D00E8
 			public const int RtlUnderlay_Widget_AppCompat_ActionButton_Overflow = 2131558632;
+			
+			// aapt resource value: 0x7F0D01FD
+			public const int scrollViewScrollBars = 2131558909;
+			
+			// aapt resource value: 0x7F0D01FE
+			public const int scrollViewTheme = 2131558910;
 			
 			// aapt resource value: 0x7F0D00E9
 			public const int TextAppearance_AppCompat = 2131558633;
@@ -14420,7 +11771,7 @@ namespace PerryRhodan.AudiobookPlayer.Android
 		public partial class Styleable
 		{
 			
-			// aapt resource value: { 0x7F030031,0x7F030032,0x7F030033,0x7F030093,0x7F030094,0x7F030095,0x7F030096,0x7F030097,0x7F030098,0x7F0300A6,0x7F0300AB,0x7F0300AC,0x7F0300BF,0x7F0300E9,0x7F0300EE,0x7F0300F3,0x7F0300F4,0x7F0300F6,0x7F030100,0x7F03010A,0x7F030131,0x7F03013D,0x7F03014E,0x7F030152,0x7F030153,0x7F030182,0x7F030185,0x7F0301CB,0x7F0301D5 }
+			// aapt resource value: { 0x7F030031,0x7F030032,0x7F030033,0x7F030093,0x7F030094,0x7F030095,0x7F030096,0x7F030097,0x7F030098,0x7F0300A6,0x7F0300AB,0x7F0300AC,0x7F0300BF,0x7F0300E9,0x7F0300EE,0x7F0300F3,0x7F0300F4,0x7F0300F6,0x7F030100,0x7F03010A,0x7F030131,0x7F03013D,0x7F03014E,0x7F030152,0x7F030153,0x7F030183,0x7F030186,0x7F0301CC,0x7F0301D6 }
 			public static int[] ActionBar = new int[] {
 					2130903089,
 					2130903090,
@@ -14447,10 +11798,10 @@ namespace PerryRhodan.AudiobookPlayer.Android
 					2130903374,
 					2130903378,
 					2130903379,
-					2130903426,
-					2130903429,
-					2130903499,
-					2130903509};
+					2130903427,
+					2130903430,
+					2130903500,
+					2130903510};
 			
 			// aapt resource value: { 0x10100B3 }
 			public static int[] ActionBarLayout = new int[] {
@@ -14557,14 +11908,14 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			public static int[] ActionMenuView = new int[] {
 					-1};
 			
-			// aapt resource value: { 0x7F030031,0x7F030032,0x7F03007F,0x7F0300E9,0x7F030185,0x7F0301D5 }
+			// aapt resource value: { 0x7F030031,0x7F030032,0x7F03007F,0x7F0300E9,0x7F030186,0x7F0301D6 }
 			public static int[] ActionMode = new int[] {
 					2130903089,
 					2130903090,
 					2130903167,
 					2130903273,
-					2130903429,
-					2130903509};
+					2130903430,
+					2130903510};
 			
 			// aapt resource value: 0
 			public const int ActionMode_background = 0;
@@ -14595,7 +11946,7 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 1
 			public const int ActivityChooserView_initialActivityCount = 1;
 			
-			// aapt resource value: { 0x10100F2,0x7F030053,0x7F030054,0x7F030126,0x7F030127,0x7F03013A,0x7F03016A,0x7F03016B }
+			// aapt resource value: { 0x10100F2,0x7F030053,0x7F030054,0x7F030126,0x7F030127,0x7F03013A,0x7F03016B,0x7F03016C }
 			public static int[] AlertDialog = new int[] {
 					16842994,
 					2130903123,
@@ -14603,8 +11954,8 @@ namespace PerryRhodan.AudiobookPlayer.Android
 					2130903334,
 					2130903335,
 					2130903354,
-					2130903402,
-					2130903403};
+					2130903403,
+					2130903404};
 			
 			// aapt resource value: 0
 			public const int AlertDialog_android_layout = 0;
@@ -14696,12 +12047,12 @@ namespace PerryRhodan.AudiobookPlayer.Android
 					2130903237,
 					2130903327};
 			
-			// aapt resource value: { 0x7F030178,0x7F030179,0x7F03017A,0x7F03017B }
+			// aapt resource value: { 0x7F030179,0x7F03017A,0x7F03017B,0x7F03017C }
 			public static int[] AppBarLayoutStates = new int[] {
-					2130903416,
 					2130903417,
 					2130903418,
-					2130903419};
+					2130903419,
+					2130903420};
 			
 			// aapt resource value: 0
 			public const int AppBarLayoutStates_state_collapsed = 0;
@@ -14744,12 +12095,12 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 5
 			public const int AppBarLayout_liftOnScroll = 5;
 			
-			// aapt resource value: { 0x1010119,0x7F030175,0x7F0301C9,0x7F0301CA }
+			// aapt resource value: { 0x1010119,0x7F030176,0x7F0301CA,0x7F0301CB }
 			public static int[] AppCompatImageView = new int[] {
 					16843033,
-					2130903413,
-					2130903497,
-					2130903498};
+					2130903414,
+					2130903498,
+					2130903499};
 			
 			// aapt resource value: 0
 			public const int AppCompatImageView_android_src = 0;
@@ -14763,12 +12114,12 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 3
 			public const int AppCompatImageView_tintMode = 3;
 			
-			// aapt resource value: { 0x1010142,0x7F0301C6,0x7F0301C7,0x7F0301C8 }
+			// aapt resource value: { 0x1010142,0x7F0301C7,0x7F0301C8,0x7F0301C9 }
 			public static int[] AppCompatSeekBar = new int[] {
 					16843074,
-					2130903494,
 					2130903495,
-					2130903496};
+					2130903496,
+					2130903497};
 			
 			// aapt resource value: 0
 			public const int AppCompatSeekBar_android_thumb = 0;
@@ -14813,7 +12164,7 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 0
 			public const int AppCompatTextHelper_android_textAppearance = 0;
 			
-			// aapt resource value: { 0x1010034,0x7F03002C,0x7F03002D,0x7F03002E,0x7F03002F,0x7F030030,0x7F0300B0,0x7F0300B1,0x7F0300B2,0x7F0300B3,0x7F0300B5,0x7F0300B6,0x7F0300B7,0x7F0300B8,0x7F0300D8,0x7F0300DB,0x7F0300E3,0x7F030112,0x7F030120,0x7F0301A5,0x7F0301BF }
+			// aapt resource value: { 0x1010034,0x7F03002C,0x7F03002D,0x7F03002E,0x7F03002F,0x7F030030,0x7F0300B0,0x7F0300B1,0x7F0300B2,0x7F0300B3,0x7F0300B5,0x7F0300B6,0x7F0300B7,0x7F0300B8,0x7F0300D8,0x7F0300DB,0x7F0300E3,0x7F030112,0x7F030120,0x7F0301A6,0x7F0301C0 }
 			public static int[] AppCompatTextView = new int[] {
 					16842804,
 					2130903084,
@@ -14834,8 +12185,8 @@ namespace PerryRhodan.AudiobookPlayer.Android
 					2130903267,
 					2130903314,
 					2130903328,
-					2130903461,
-					2130903487};
+					2130903462,
+					2130903488};
 			
 			// aapt resource value: 0
 			public const int AppCompatTextView_android_textAppearance = 0;
@@ -14900,7 +12251,7 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 20
 			public const int AppCompatTextView_textLocale = 20;
 			
-			// aapt resource value: { 0x1010057,0x10100AE,0x7F030000,0x7F030001,0x7F030002,0x7F030003,0x7F030004,0x7F030005,0x7F030006,0x7F030007,0x7F030008,0x7F030009,0x7F03000A,0x7F03000B,0x7F03000C,0x7F03000E,0x7F03000F,0x7F030010,0x7F030011,0x7F030012,0x7F030013,0x7F030014,0x7F030015,0x7F030016,0x7F030017,0x7F030018,0x7F030019,0x7F03001A,0x7F03001B,0x7F03001C,0x7F03001D,0x7F03001E,0x7F030021,0x7F030022,0x7F030023,0x7F030024,0x7F030025,0x7F03002B,0x7F03003E,0x7F03004C,0x7F03004D,0x7F03004E,0x7F03004F,0x7F030050,0x7F030055,0x7F030056,0x7F030060,0x7F030065,0x7F030086,0x7F030087,0x7F030088,0x7F030089,0x7F03008A,0x7F03008B,0x7F03008C,0x7F03008D,0x7F03008E,0x7F030090,0x7F03009F,0x7F0300A8,0x7F0300A9,0x7F0300AA,0x7F0300AD,0x7F0300AF,0x7F0300BA,0x7F0300BB,0x7F0300BC,0x7F0300BD,0x7F0300BE,0x7F0300F3,0x7F0300FF,0x7F030122,0x7F030123,0x7F030124,0x7F030125,0x7F030128,0x7F030129,0x7F03012A,0x7F03012B,0x7F03012C,0x7F03012D,0x7F03012E,0x7F03012F,0x7F030130,0x7F030145,0x7F030146,0x7F030147,0x7F03014D,0x7F03014F,0x7F030156,0x7F030157,0x7F030158,0x7F030159,0x7F030162,0x7F030163,0x7F030164,0x7F030165,0x7F030172,0x7F030173,0x7F030189,0x7F0301B0,0x7F0301B1,0x7F0301B2,0x7F0301B3,0x7F0301B5,0x7F0301B6,0x7F0301B7,0x7F0301B8,0x7F0301BB,0x7F0301BC,0x7F0301D7,0x7F0301D8,0x7F0301D9,0x7F0301DA,0x7F0301E1,0x7F0301E3,0x7F0301E4,0x7F0301E5,0x7F0301E6,0x7F0301E7,0x7F0301E8,0x7F0301E9,0x7F0301EA,0x7F0301EB,0x7F0301EC }
+			// aapt resource value: { 0x1010057,0x10100AE,0x7F030000,0x7F030001,0x7F030002,0x7F030003,0x7F030004,0x7F030005,0x7F030006,0x7F030007,0x7F030008,0x7F030009,0x7F03000A,0x7F03000B,0x7F03000C,0x7F03000E,0x7F03000F,0x7F030010,0x7F030011,0x7F030012,0x7F030013,0x7F030014,0x7F030015,0x7F030016,0x7F030017,0x7F030018,0x7F030019,0x7F03001A,0x7F03001B,0x7F03001C,0x7F03001D,0x7F03001E,0x7F030021,0x7F030022,0x7F030023,0x7F030024,0x7F030025,0x7F03002B,0x7F03003E,0x7F03004C,0x7F03004D,0x7F03004E,0x7F03004F,0x7F030050,0x7F030055,0x7F030056,0x7F030060,0x7F030065,0x7F030086,0x7F030087,0x7F030088,0x7F030089,0x7F03008A,0x7F03008B,0x7F03008C,0x7F03008D,0x7F03008E,0x7F030090,0x7F03009F,0x7F0300A8,0x7F0300A9,0x7F0300AA,0x7F0300AD,0x7F0300AF,0x7F0300BA,0x7F0300BB,0x7F0300BC,0x7F0300BD,0x7F0300BE,0x7F0300F3,0x7F0300FF,0x7F030122,0x7F030123,0x7F030124,0x7F030125,0x7F030128,0x7F030129,0x7F03012A,0x7F03012B,0x7F03012C,0x7F03012D,0x7F03012E,0x7F03012F,0x7F030130,0x7F030145,0x7F030146,0x7F030147,0x7F03014D,0x7F03014F,0x7F030156,0x7F030157,0x7F030158,0x7F030159,0x7F030163,0x7F030164,0x7F030165,0x7F030166,0x7F030173,0x7F030174,0x7F03018A,0x7F0301B1,0x7F0301B2,0x7F0301B3,0x7F0301B4,0x7F0301B6,0x7F0301B7,0x7F0301B8,0x7F0301B9,0x7F0301BC,0x7F0301BD,0x7F0301D8,0x7F0301D9,0x7F0301DA,0x7F0301DB,0x7F0301E2,0x7F0301E4,0x7F0301E5,0x7F0301E6,0x7F0301E7,0x7F0301E8,0x7F0301E9,0x7F0301EA,0x7F0301EB,0x7F0301EC,0x7F0301ED }
 			public static int[] AppCompatTheme = new int[] {
 					16842839,
 					16842926,
@@ -14995,29 +12346,28 @@ namespace PerryRhodan.AudiobookPlayer.Android
 					2130903383,
 					2130903384,
 					2130903385,
-					2130903394,
 					2130903395,
 					2130903396,
 					2130903397,
-					2130903410,
+					2130903398,
 					2130903411,
-					2130903433,
-					2130903472,
+					2130903412,
+					2130903434,
 					2130903473,
 					2130903474,
 					2130903475,
-					2130903477,
+					2130903476,
 					2130903478,
 					2130903479,
 					2130903480,
-					2130903483,
+					2130903481,
 					2130903484,
-					2130903511,
+					2130903485,
 					2130903512,
 					2130903513,
 					2130903514,
-					2130903521,
-					2130903523,
+					2130903515,
+					2130903522,
 					2130903524,
 					2130903525,
 					2130903526,
@@ -15026,7 +12376,8 @@ namespace PerryRhodan.AudiobookPlayer.Android
 					2130903529,
 					2130903530,
 					2130903531,
-					2130903532};
+					2130903532,
+					2130903533};
 			
 			// aapt resource value: 2
 			public const int AppCompatTheme_actionBarDivider = 2;
@@ -15554,7 +12905,7 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 12
 			public const int CardView_contentPaddingTop = 12;
 			
-			// aapt resource value: { 0x1010034,0x10100AB,0x101011F,0x101014F,0x10101E5,0x7F030062,0x7F030063,0x7F030064,0x7F030066,0x7F030067,0x7F030068,0x7F03006A,0x7F03006B,0x7F03006C,0x7F03006D,0x7F03006E,0x7F03006F,0x7F030074,0x7F030075,0x7F030076,0x7F030078,0x7F030079,0x7F03007A,0x7F03007B,0x7F03007C,0x7F03007D,0x7F03007E,0x7F0300ED,0x7F0300F7,0x7F0300FB,0x7F03015C,0x7F030168,0x7F0301BD,0x7F0301C0 }
+			// aapt resource value: { 0x1010034,0x10100AB,0x101011F,0x101014F,0x10101E5,0x7F030062,0x7F030063,0x7F030064,0x7F030066,0x7F030067,0x7F030068,0x7F03006A,0x7F03006B,0x7F03006C,0x7F03006D,0x7F03006E,0x7F03006F,0x7F030074,0x7F030075,0x7F030076,0x7F030078,0x7F030079,0x7F03007A,0x7F03007B,0x7F03007C,0x7F03007D,0x7F03007E,0x7F0300ED,0x7F0300F7,0x7F0300FB,0x7F03015C,0x7F030169,0x7F0301BE,0x7F0301C1 }
 			public static int[] Chip = new int[] {
 					16842804,
 					16842923,
@@ -15587,18 +12938,18 @@ namespace PerryRhodan.AudiobookPlayer.Android
 					2130903287,
 					2130903291,
 					2130903388,
-					2130903400,
-					2130903485,
-					2130903488};
+					2130903401,
+					2130903486,
+					2130903489};
 			
-			// aapt resource value: { 0x7F030061,0x7F030070,0x7F030071,0x7F030072,0x7F03016C,0x7F03016D }
+			// aapt resource value: { 0x7F030061,0x7F030070,0x7F030071,0x7F030072,0x7F03016D,0x7F03016E }
 			public static int[] ChipGroup = new int[] {
 					2130903137,
 					2130903152,
 					2130903153,
 					2130903154,
-					2130903404,
-					2130903405};
+					2130903405,
+					2130903406};
 			
 			// aapt resource value: 0
 			public const int ChipGroup_checkedChip = 0;
@@ -15720,7 +13071,7 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 33
 			public const int Chip_textStartPadding = 33;
 			
-			// aapt resource value: { 0x7F030082,0x7F030083,0x7F03009E,0x7F0300C6,0x7F0300C7,0x7F0300C8,0x7F0300C9,0x7F0300CA,0x7F0300CB,0x7F0300CC,0x7F03015D,0x7F03015F,0x7F03017D,0x7F0301CB,0x7F0301CC,0x7F0301D6 }
+			// aapt resource value: { 0x7F030082,0x7F030083,0x7F03009E,0x7F0300C6,0x7F0300C7,0x7F0300C8,0x7F0300C9,0x7F0300CA,0x7F0300CB,0x7F0300CC,0x7F03015D,0x7F03015F,0x7F03017E,0x7F0301CC,0x7F0301CD,0x7F0301D7 }
 			public static int[] CollapsingToolbarLayout = new int[] {
 					2130903170,
 					2130903171,
@@ -15734,10 +13085,10 @@ namespace PerryRhodan.AudiobookPlayer.Android
 					2130903244,
 					2130903389,
 					2130903391,
-					2130903421,
-					2130903499,
+					2130903422,
 					2130903500,
-					2130903510};
+					2130903501,
+					2130903511};
 			
 			// aapt resource value: 0
 			public const int CollapsingToolbarLayout_collapsedTitleGravity = 0;
@@ -15832,10 +13183,10 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 3
 			public const int CompoundButton_buttonTintMode = 3;
 			
-			// aapt resource value: { 0x7F030110,0x7F03017C }
+			// aapt resource value: { 0x7F030110,0x7F03017D }
 			public static int[] CoordinatorLayout = new int[] {
 					2130903312,
-					2130903420};
+					2130903421};
 			
 			// aapt resource value: 0
 			public const int CoordinatorLayout_keylines = 0;
@@ -15885,7 +13236,7 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 1
 			public const int DesignTheme_bottomSheetStyle = 1;
 			
-			// aapt resource value: { 0x7F030029,0x7F03002A,0x7F030036,0x7F030085,0x7F0300B4,0x7F0300E6,0x7F030171,0x7F0301C2 }
+			// aapt resource value: { 0x7F030029,0x7F03002A,0x7F030036,0x7F030085,0x7F0300B4,0x7F0300E6,0x7F030172,0x7F0301C3 }
 			public static int[] DrawerArrowToggle = new int[] {
 					2130903081,
 					2130903082,
@@ -15893,8 +13244,8 @@ namespace PerryRhodan.AudiobookPlayer.Android
 					2130903173,
 					2130903220,
 					2130903270,
-					2130903409,
-					2130903490};
+					2130903410,
+					2130903491};
 			
 			// aapt resource value: 0
 			public const int DrawerArrowToggle_arrowHeadLength = 0;
@@ -15920,7 +13271,7 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 7
 			public const int DrawerArrowToggle_thickness = 7;
 			
-			// aapt resource value: { 0x7F030034,0x7F030035,0x7F03003D,0x7F0300BF,0x7F0300D1,0x7F0300D2,0x7F0300ED,0x7F0300F5,0x7F030137,0x7F030151,0x7F03015C,0x7F030168,0x7F0301E0 }
+			// aapt resource value: { 0x7F030034,0x7F030035,0x7F03003D,0x7F0300BF,0x7F0300D1,0x7F0300D2,0x7F0300ED,0x7F0300F5,0x7F030137,0x7F030151,0x7F03015C,0x7F030169,0x7F0301E1 }
 			public static int[] FloatingActionButton = new int[] {
 					2130903092,
 					2130903093,
@@ -15933,8 +13284,8 @@ namespace PerryRhodan.AudiobookPlayer.Android
 					2130903351,
 					2130903377,
 					2130903388,
-					2130903400,
-					2130903520};
+					2130903401,
+					2130903521};
 			
 			// aapt resource value: 0
 			public const int FloatingActionButton_backgroundTint = 0;
@@ -16002,7 +13353,7 @@ namespace PerryRhodan.AudiobookPlayer.Android
 					2130903264,
 					2130903265};
 			
-			// aapt resource value: { 0x1010532,0x1010533,0x101053F,0x101056F,0x1010570,0x7F0300DA,0x7F0300E2,0x7F0300E3,0x7F0300E4,0x7F0301DF }
+			// aapt resource value: { 0x1010532,0x1010533,0x101053F,0x101056F,0x1010570,0x7F0300DA,0x7F0300E2,0x7F0300E3,0x7F0300E4,0x7F0301E0 }
 			public static int[] FontFamilyFont = new int[] {
 					16844082,
 					16844083,
@@ -16013,7 +13364,7 @@ namespace PerryRhodan.AudiobookPlayer.Android
 					2130903266,
 					2130903267,
 					2130903268,
-					2130903519};
+					2130903520};
 			
 			// aapt resource value: 0
 			public const int FontFamilyFont_android_font = 0;
@@ -16147,7 +13498,7 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 0
 			public const int ItemsViewRendererTheme_collectionViewStyle = 0;
 			
-			// aapt resource value: { 0x10100AF,0x10100C4,0x1010126,0x1010127,0x1010128,0x7F0300AC,0x7F0300AE,0x7F030138,0x7F030167 }
+			// aapt resource value: { 0x10100AF,0x10100C4,0x1010126,0x1010127,0x1010128,0x7F0300AC,0x7F0300AE,0x7F030138,0x7F030168 }
 			public static int[] LinearLayoutCompat = new int[] {
 					16842927,
 					16842948,
@@ -16157,7 +13508,7 @@ namespace PerryRhodan.AudiobookPlayer.Android
 					2130903212,
 					2130903214,
 					2130903352,
-					2130903399};
+					2130903400};
 			
 			// aapt resource value: 2
 			public const int LinearLayoutCompat_android_baselineAligned = 2;
@@ -16216,7 +13567,7 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 1
 			public const int ListPopupWindow_android_dropDownVerticalOffset = 1;
 			
-			// aapt resource value: { 0x10101B7,0x10101B8,0x10101B9,0x10101BA,0x7F030034,0x7F030035,0x7F0300A1,0x7F0300F6,0x7F0300F8,0x7F0300F9,0x7F0300FA,0x7F0300FC,0x7F0300FD,0x7F03015C,0x7F03017E,0x7F03017F }
+			// aapt resource value: { 0x10101B7,0x10101B8,0x10101B9,0x10101BA,0x7F030034,0x7F030035,0x7F0300A1,0x7F0300F6,0x7F0300F8,0x7F0300F9,0x7F0300FA,0x7F0300FC,0x7F0300FD,0x7F03015C,0x7F03017F,0x7F030180 }
 			public static int[] MaterialButton = new int[] {
 					16843191,
 					16843192,
@@ -16232,8 +13583,8 @@ namespace PerryRhodan.AudiobookPlayer.Android
 					2130903292,
 					2130903293,
 					2130903388,
-					2130903422,
-					2130903423};
+					2130903423,
+					2130903424};
 			
 			// aapt resource value: 3
 			public const int MaterialButton_android_insetBottom = 3;
@@ -16283,10 +13634,10 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 15
 			public const int MaterialButton_strokeWidth = 15;
 			
-			// aapt resource value: { 0x7F03017E,0x7F03017F }
+			// aapt resource value: { 0x7F03017F,0x7F030180 }
 			public static int[] MaterialCardView = new int[] {
-					2130903422,
-					2130903423};
+					2130903423,
+					2130903424};
 			
 			// aapt resource value: 0
 			public const int MaterialCardView_strokeColor = 0;
@@ -16294,7 +13645,7 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 1
 			public const int MaterialCardView_strokeWidth = 1;
 			
-			// aapt resource value: { 0x7F030041,0x7F030042,0x7F030069,0x7F030073,0x7F030077,0x7F030086,0x7F030087,0x7F03008D,0x7F03008E,0x7F03008F,0x7F0300BE,0x7F0300D9,0x7F030133,0x7F030134,0x7F03013E,0x7F03015E,0x7F03016E,0x7F0301A1,0x7F0301A6,0x7F0301A7,0x7F0301A8,0x7F0301A9,0x7F0301AA,0x7F0301AB,0x7F0301AC,0x7F0301AD,0x7F0301AE,0x7F0301AF,0x7F0301B4,0x7F0301B9,0x7F0301BA,0x7F0301BE }
+			// aapt resource value: { 0x7F030041,0x7F030042,0x7F030069,0x7F030073,0x7F030077,0x7F030086,0x7F030087,0x7F03008D,0x7F03008E,0x7F03008F,0x7F0300BE,0x7F0300D9,0x7F030133,0x7F030134,0x7F03013E,0x7F03015E,0x7F03016F,0x7F0301A2,0x7F0301A7,0x7F0301A8,0x7F0301A9,0x7F0301AA,0x7F0301AB,0x7F0301AC,0x7F0301AD,0x7F0301AE,0x7F0301AF,0x7F0301B0,0x7F0301B5,0x7F0301BA,0x7F0301BB,0x7F0301BF }
 			public static int[] MaterialComponentsTheme = new int[] {
 					2130903105,
 					2130903106,
@@ -16312,9 +13663,8 @@ namespace PerryRhodan.AudiobookPlayer.Android
 					2130903348,
 					2130903358,
 					2130903390,
-					2130903406,
-					2130903457,
-					2130903462,
+					2130903407,
+					2130903458,
 					2130903463,
 					2130903464,
 					2130903465,
@@ -16324,10 +13674,11 @@ namespace PerryRhodan.AudiobookPlayer.Android
 					2130903469,
 					2130903470,
 					2130903471,
-					2130903476,
-					2130903481,
+					2130903472,
+					2130903477,
 					2130903482,
-					2130903486};
+					2130903483,
+					2130903487};
 			
 			// aapt resource value: 0
 			public const int MaterialComponentsTheme_bottomSheetDialogTheme = 0;
@@ -16452,7 +13803,7 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 2
 			public const int MenuGroup_android_visible = 2;
 			
-			// aapt resource value: { 0x1010002,0x101000E,0x10100D0,0x1010106,0x1010194,0x10101DE,0x10101DF,0x10101E1,0x10101E2,0x10101E3,0x10101E4,0x10101E5,0x101026F,0x7F03000D,0x7F03001F,0x7F030020,0x7F030028,0x7F030092,0x7F0300FC,0x7F0300FD,0x7F03013F,0x7F030166,0x7F0301DB }
+			// aapt resource value: { 0x1010002,0x101000E,0x10100D0,0x1010106,0x1010194,0x10101DE,0x10101DF,0x10101E1,0x10101E2,0x10101E3,0x10101E4,0x10101E5,0x101026F,0x7F03000D,0x7F03001F,0x7F030020,0x7F030028,0x7F030092,0x7F0300FC,0x7F0300FD,0x7F03013F,0x7F030167,0x7F0301DC }
 			public static int[] MenuItem = new int[] {
 					16842754,
 					16842766,
@@ -16475,8 +13826,8 @@ namespace PerryRhodan.AudiobookPlayer.Android
 					2130903292,
 					2130903293,
 					2130903359,
-					2130903398,
-					2130903515};
+					2130903399,
+					2130903516};
 			
 			// aapt resource value: 13
 			public const int MenuItem_actionLayout = 13;
@@ -16547,7 +13898,7 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 22
 			public const int MenuItem_tooltipText = 22;
 			
-			// aapt resource value: { 0x10100AE,0x101012C,0x101012D,0x101012E,0x101012F,0x1010130,0x1010131,0x7F030150,0x7F030180 }
+			// aapt resource value: { 0x10100AE,0x101012C,0x101012D,0x101012E,0x101012F,0x1010130,0x1010131,0x7F030150,0x7F030181 }
 			public static int[] MenuView = new int[] {
 					16842926,
 					16843052,
@@ -16557,7 +13908,7 @@ namespace PerryRhodan.AudiobookPlayer.Android
 					16843056,
 					16843057,
 					2130903376,
-					2130903424};
+					2130903425};
 			
 			// aapt resource value: 4
 			public const int MenuView_android_headerBackground = 4;
@@ -16643,9 +13994,9 @@ namespace PerryRhodan.AudiobookPlayer.Android
 					16843465,
 					2130903360};
 			
-			// aapt resource value: { 0x7F030177 }
+			// aapt resource value: { 0x7F030178 }
 			public static int[] PopupWindowBackgroundState = new int[] {
-					2130903415};
+					2130903416};
 			
 			// aapt resource value: 0
 			public const int PopupWindowBackgroundState_state_above_anchor = 0;
@@ -16670,7 +14021,7 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 1
 			public const int RecycleListView_paddingTopNoTitle = 1;
 			
-			// aapt resource value: { 0x10100C4,0x10100EB,0x10100F1,0x7F0300D3,0x7F0300D4,0x7F0300D5,0x7F0300D6,0x7F0300D7,0x7F030114,0x7F03015B,0x7F030170,0x7F030176 }
+			// aapt resource value: { 0x10100C4,0x10100EB,0x10100F1,0x7F0300D3,0x7F0300D4,0x7F0300D5,0x7F0300D6,0x7F0300D7,0x7F030114,0x7F03015B,0x7F030171,0x7F030177 }
 			public static int[] RecyclerView = new int[] {
 					16842948,
 					16842987,
@@ -16682,8 +14033,8 @@ namespace PerryRhodan.AudiobookPlayer.Android
 					2130903255,
 					2130903316,
 					2130903387,
-					2130903408,
-					2130903414};
+					2130903409,
+					2130903415};
 			
 			// aapt resource value: 1
 			public const int RecyclerView_android_clipToPadding = 1;
@@ -16735,7 +14086,14 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 0
 			public const int ScrollingViewBehavior_Layout_behavior_overlapTop = 0;
 			
-			// aapt resource value: { 0x10100DA,0x101011F,0x1010220,0x1010264,0x7F030078,0x7F030091,0x7F0300A7,0x7F0300E7,0x7F0300FE,0x7F030113,0x7F030154,0x7F030155,0x7F030160,0x7F030161,0x7F030181,0x7F030186,0x7F0301E2 }
+			// aapt resource value: { 0x7F030160 }
+			public static int[] ScrollViewRendererTheme = new int[] {
+					2130903392};
+			
+			// aapt resource value: 0
+			public const int ScrollViewRendererTheme_scrollViewStyle = 0;
+			
+			// aapt resource value: { 0x10100DA,0x101011F,0x1010220,0x1010264,0x7F030078,0x7F030091,0x7F0300A7,0x7F0300E7,0x7F0300FE,0x7F030113,0x7F030154,0x7F030155,0x7F030161,0x7F030162,0x7F030182,0x7F030187,0x7F0301E3 }
 			public static int[] SearchView = new int[] {
 					16842970,
 					16843039,
@@ -16749,11 +14107,11 @@ namespace PerryRhodan.AudiobookPlayer.Android
 					2130903315,
 					2130903380,
 					2130903381,
-					2130903392,
 					2130903393,
-					2130903425,
-					2130903430,
-					2130903522};
+					2130903394,
+					2130903426,
+					2130903431,
+					2130903523};
 			
 			// aapt resource value: 0
 			public const int SearchView_android_focusable = 0;
@@ -16806,10 +14164,10 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 16
 			public const int SearchView_voiceIcon = 16;
 			
-			// aapt resource value: { 0x7F03016E,0x7F03016F }
+			// aapt resource value: { 0x7F03016F,0x7F030170 }
 			public static int[] Snackbar = new int[] {
-					2130903406,
-					2130903407};
+					2130903407,
+					2130903408};
 			
 			// aapt resource value: { 0x101011F,0x7F0300BF,0x7F030135 }
 			public static int[] SnackbarLayout = new int[] {
@@ -16889,22 +14247,22 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 1
 			public const int StateListDrawable_android_visible = 1;
 			
-			// aapt resource value: { 0x1010124,0x1010125,0x1010142,0x7F030169,0x7F030174,0x7F030187,0x7F030188,0x7F03018A,0x7F0301C3,0x7F0301C4,0x7F0301C5,0x7F0301DC,0x7F0301DD,0x7F0301DE }
+			// aapt resource value: { 0x1010124,0x1010125,0x1010142,0x7F03016A,0x7F030175,0x7F030188,0x7F030189,0x7F03018B,0x7F0301C4,0x7F0301C5,0x7F0301C6,0x7F0301DD,0x7F0301DE,0x7F0301DF }
 			public static int[] SwitchCompat = new int[] {
 					16843044,
 					16843045,
 					16843074,
-					2130903401,
-					2130903412,
-					2130903431,
+					2130903402,
+					2130903413,
 					2130903432,
-					2130903434,
-					2130903491,
+					2130903433,
+					2130903435,
 					2130903492,
 					2130903493,
-					2130903516,
+					2130903494,
 					2130903517,
-					2130903518};
+					2130903518,
+					2130903519};
 			
 			// aapt resource value: 1
 			public const int SwitchCompat_android_textOff = 1;
@@ -16963,9 +14321,8 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 2
 			public const int TabItem_android_text = 2;
 			
-			// aapt resource value: { 0x7F03018B,0x7F03018C,0x7F03018D,0x7F03018E,0x7F03018F,0x7F030190,0x7F030191,0x7F030192,0x7F030193,0x7F030194,0x7F030195,0x7F030196,0x7F030197,0x7F030198,0x7F030199,0x7F03019A,0x7F03019B,0x7F03019C,0x7F03019D,0x7F03019E,0x7F03019F,0x7F0301A0,0x7F0301A2,0x7F0301A3,0x7F0301A4 }
+			// aapt resource value: { 0x7F03018C,0x7F03018D,0x7F03018E,0x7F03018F,0x7F030190,0x7F030191,0x7F030192,0x7F030193,0x7F030194,0x7F030195,0x7F030196,0x7F030197,0x7F030198,0x7F030199,0x7F03019A,0x7F03019B,0x7F03019C,0x7F03019D,0x7F03019E,0x7F03019F,0x7F0301A0,0x7F0301A1,0x7F0301A3,0x7F0301A4,0x7F0301A5 }
 			public static int[] TabLayout = new int[] {
-					2130903435,
 					2130903436,
 					2130903437,
 					2130903438,
@@ -16987,9 +14344,10 @@ namespace PerryRhodan.AudiobookPlayer.Android
 					2130903454,
 					2130903455,
 					2130903456,
-					2130903458,
+					2130903457,
 					2130903459,
-					2130903460};
+					2130903460,
+					2130903461};
 			
 			// aapt resource value: 0
 			public const int TabLayout_tabBackground = 0;
@@ -17066,7 +14424,7 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 24
 			public const int TabLayout_tabUnboundedRipple = 24;
 			
-			// aapt resource value: { 0x1010095,0x1010096,0x1010097,0x1010098,0x101009A,0x101009B,0x1010161,0x1010162,0x1010163,0x1010164,0x10103AC,0x1010585,0x7F0300DB,0x7F0300E3,0x7F0301A5,0x7F0301BF }
+			// aapt resource value: { 0x1010095,0x1010096,0x1010097,0x1010098,0x101009A,0x101009B,0x1010161,0x1010162,0x1010163,0x1010164,0x10103AC,0x1010585,0x7F0300DB,0x7F0300E3,0x7F0301A6,0x7F0301C0 }
 			public static int[] TextAppearance = new int[] {
 					16842901,
 					16842902,
@@ -17082,8 +14440,8 @@ namespace PerryRhodan.AudiobookPlayer.Android
 					16844165,
 					2130903259,
 					2130903267,
-					2130903461,
-					2130903487};
+					2130903462,
+					2130903488};
 			
 			// aapt resource value: 10
 			public const int TextAppearance_android_fontFamily = 10;
@@ -17263,7 +14621,7 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 2
 			public const int ThemeEnforcement_enforceTextAppearance = 2;
 			
-			// aapt resource value: { 0x10100AF,0x1010140,0x7F030052,0x7F030080,0x7F030081,0x7F030093,0x7F030094,0x7F030095,0x7F030096,0x7F030097,0x7F030098,0x7F030131,0x7F030132,0x7F030136,0x7F030139,0x7F03013B,0x7F03013C,0x7F03014E,0x7F030182,0x7F030183,0x7F030184,0x7F0301CB,0x7F0301CD,0x7F0301CE,0x7F0301CF,0x7F0301D0,0x7F0301D1,0x7F0301D2,0x7F0301D3,0x7F0301D4 }
+			// aapt resource value: { 0x10100AF,0x1010140,0x7F030052,0x7F030080,0x7F030081,0x7F030093,0x7F030094,0x7F030095,0x7F030096,0x7F030097,0x7F030098,0x7F030131,0x7F030132,0x7F030136,0x7F030139,0x7F03013B,0x7F03013C,0x7F03014E,0x7F030183,0x7F030184,0x7F030185,0x7F0301CC,0x7F0301CE,0x7F0301CF,0x7F0301D0,0x7F0301D1,0x7F0301D2,0x7F0301D3,0x7F0301D4,0x7F0301D5 }
 			public static int[] Toolbar = new int[] {
 					16842927,
 					16843072,
@@ -17283,18 +14641,18 @@ namespace PerryRhodan.AudiobookPlayer.Android
 					2130903355,
 					2130903356,
 					2130903374,
-					2130903426,
 					2130903427,
 					2130903428,
-					2130903499,
-					2130903501,
+					2130903429,
+					2130903500,
 					2130903502,
 					2130903503,
 					2130903504,
 					2130903505,
 					2130903506,
 					2130903507,
-					2130903508};
+					2130903508,
+					2130903509};
 			
 			// aapt resource value: 0
 			public const int Toolbar_android_gravity = 0;
@@ -17386,13 +14744,13 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 29
 			public const int Toolbar_titleTextColor = 29;
 			
-			// aapt resource value: { 0x1010000,0x10100DA,0x7F030142,0x7F030143,0x7F0301C1 }
+			// aapt resource value: { 0x1010000,0x10100DA,0x7F030142,0x7F030143,0x7F0301C2 }
 			public static int[] View = new int[] {
 					16842752,
 					16842970,
 					2130903362,
 					2130903363,
-					2130903489};
+					2130903490};
 			
 			// aapt resource value: { 0x10100D4,0x7F030034,0x7F030035 }
 			public static int[] ViewBackgroundHelper = new int[] {

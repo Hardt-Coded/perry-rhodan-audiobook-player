@@ -73,7 +73,7 @@
                         (Translations.current.RemoveFromDownloaQueue,RemoveFromDownloadQueue)
                     | NotDownloaded ->
                         (Translations.current.DownloadAudioBook,AddToDownloadQueue)
-                    | Downloading   ->
+                    | Downloading _  ->
                         ()
 
                     
@@ -308,7 +308,9 @@
 
         let loadingPie factor =
             let f32 = float32
+            
             Fabulous.XamarinForms.SkiaSharp.View.SKCanvasView(
+                
                 invalidate = true,
                 margin = Thickness(5.),                 
                 paintSurface = 
@@ -328,8 +330,8 @@
                             use path = new SKPath()
                             use fillPaint = new SKPaint()
                             use outlinePaint = new SKPaint()
+                                    
                             
-                    
                             path.MoveTo(center);
                             path.ArcTo(rect, startAngle, sweepAngle, false);
                             path.Close();
@@ -344,8 +346,8 @@
                             outlinePaint.Color <- color.ToSKColor() //.WithAlpha(alpha)
                             outlinePaint.IsAntialias <- false
 
-                            
-                            
+                                    
+                                    
                             // Calculate "explode" transform
                             let angle = startAngle + 0.5f * sweepAngle |> float;
                             let x = (explodeOffset |> float) * Math.Cos(Math.PI * angle / 180.0) |> float32;
@@ -366,13 +368,13 @@
                         textPaint.BlendMode <- SKBlendMode.Plus
                         textPaint.IsAntialias <- false
                         textPaint.TextAlign <- SKTextAlign.Center
-                        
+                                
                         let text = sprintf "%i %%" ((factor * 100.0) |> int) 
                         let y = ((info.Height  / 2) |> f32) + (textPaint.TextSize / 2.0f) - 15.0f
                         canvas.DrawText(text, (info.Width / 2) |> f32,y , textPaint)
 
                         canvas.ResetMatrix()
-                        
+                                
 
                         let startAngle = -90.0f
                         let sweepAngle = 
@@ -380,13 +382,16 @@
                             if x >= 360.0f then 359.99f else x
 
                         drawPie false (Color.FromHex("96FF33")) startAngle sweepAngle
-                    )
+                    )    
+                
+            
 
 
         let progressPie factor =
             let f32 = float32
+            
             Fabulous.XamarinForms.SkiaSharp.View.SKCanvasView(
-                automationId="progressPie",
+                
                 invalidate = true,
                 margin=Thickness(4.),
                 width = 20.,
@@ -394,9 +399,12 @@
                 paintSurface = 
                     fun args ->
                         let info = args.Info
+                        
                         let surface = args.Surface
                         let canvas = surface.Canvas
                         canvas.Clear()
+                        
+                        
 
 
 
@@ -409,7 +417,7 @@
                             use path = new SKPath()
                             use fillPaint = new SKPaint()
                             use outlinePaint = new SKPaint()
-                            
+                                    
                             path.MoveTo(center);
                             path.ArcTo(rect, startAngle, sweepAngle, false);
                             path.Close();
@@ -417,7 +425,7 @@
                             fillPaint.Style <- SKPaintStyle.StrokeAndFill
                             fillPaint.Color <- color.ToSKColor()
                             fillPaint.IsAntialias <- false
-                            
+                                    
                             outlinePaint.Style <- SKPaintStyle.Stroke;
                             outlinePaint.StrokeWidth <- 2.0f;
                             outlinePaint.Color <- Color.Black.ToSKColor()
@@ -425,7 +433,7 @@
 
                             canvas.DrawPath(path, fillPaint);
                             canvas.DrawPath(path, outlinePaint);
-                    
+                            
 
                         let startAngle = -90.0f;
                         let sweepAngle = 
@@ -434,6 +442,7 @@
 
                         drawPie Color.Yellow startAngle sweepAngle
                     )
+            
         
        
     let getHoursAndMinutes ms =
@@ -477,11 +486,8 @@
                             Controls.inDownloadQueueLabel.Column(1).Row(1)
                         | Downloading (c,a) ->
                             let factor = (c |> float) / (a |> float)
-                            View.Grid(
-                                children = [
-                                    Draw.loadingPie factor
-                                ]
-                            ).ColumnSpan(3).RowSpan(3)
+                            let pie = (Draw.loadingPie factor).ColumnSpan(3).RowSpan(3)
+                            pie
                         | Downloaded ->
                             Controls.playerSymbolLabel.Column(1).Row(1)
                             
@@ -491,12 +497,8 @@
                         | InProgress pos ->
                             match percentageFinished model with
                             | None -> ()
-                            | Some progress ->
-                                View.Grid(
-                                    children = [
-                                        (Draw.progressPie progress)
-                                    ]
-                                ).Column(0).Row(2)
+                            | Some progress -> 
+                                (Draw.progressPie progress).Column(0).Row(2)
                                     
                         | Listend ->
                             Controls.listendCheckLabel.Column(2).Row(2)

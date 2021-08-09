@@ -16,7 +16,7 @@ let init (allAudioBooks:AudioBookItemNew.AudioBookItem []) =
     |> Array.filter (fun i -> 
         match i.Model.DownloadState with
         | AudioBookItemNew.Queued
-        | AudioBookItemNew.Downloading -> true    
+        | AudioBookItemNew.Downloading _ -> true    
         | _ -> false
     )
 
