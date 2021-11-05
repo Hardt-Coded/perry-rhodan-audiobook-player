@@ -6,6 +6,7 @@
     open System.Threading.Tasks
     open Fabulous
     open Fabulous.XamarinForms
+    open System.Net.Http.Headers
     
 
     type ComError =
@@ -222,21 +223,19 @@
     
     module HttpHelpers =
         
-        let getFileSizeFromHttpHeadersOrDefaultValue defaultValue (headers:Map<string,string>) =
+        let getFileSizeFromHttpHeadersOrDefaultValue defaultValue (headers:HttpContentHeaders) : int =
             // Get FileSize from Download
-            let (hasLength,contentLengthHeader) = 
-                headers.TryGetValue("Content-Length")
-            let (fileSizeFound,contentLength) = 
-                if (hasLength) then
-                    Int32.TryParse(contentLengthHeader)
-                else
-                    (false,0)
-            if (fileSizeFound) then contentLength else defaultValue
+            headers.ContentLength 
+            |> Option.ofNullable 
+            |> Option.defaultValue defaultValue 
+            |> int32
+            
+            
 
 
     module StringHelpers =
 
-        let optToInt defaultValue optStr =
+        let optToInt defaultValue (optStr:string option) =
             optStr
             |> Option.map (fun v ->
                 let (isInt,value) = Int32.TryParse(v)
@@ -333,7 +332,7 @@
 
     module PatternMatchHelpers =
 
-        let (|StringContains|_|) str (input:string) =
+        let (|StringContains|_|) (str:string) (input:string) =
             if (input.Contains(str)) then Some () else None
 
 

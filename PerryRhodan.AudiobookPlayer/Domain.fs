@@ -148,7 +148,7 @@ module Helpers =
         | Some no -> sprintf "%s %i - %s" key no episodeTitle
 
 
-    let tryParseInt str =
+    let tryParseInt (str:string) =
         let (is,v) = Int32.TryParse(str)
         if is then Some v else None
 

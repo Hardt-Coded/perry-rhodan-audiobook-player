@@ -1,6 +1,4 @@
-﻿// Copyright 2018 Fabulous contributors. See LICENSE.md for license.
-
-namespace PerryRhodan.AudiobookPlayer.Android
+﻿namespace PerryRhodan.AudiobookPlayer.Android
 
 open System
 
@@ -24,7 +22,19 @@ type AndroidDownloadFolder() =
             let path = Android.OS.Environment.ExternalStorageDirectory.Path
             path
 
+module HttpStuff =
+    let androidHttpHandler = Xamarin.Android.Net.AndroidClientHandler()
 
+type AndroidHttpClientHandlerService() =
+    interface DependencyServices.IAndroidHttpMessageHandlerService with
+        member this.GetHttpMesageHandler () =
+            HttpStuff.androidHttpHandler
+
+        member this.GetCookieContainer () =
+            HttpStuff.androidHttpHandler.CookieContainer
+
+        member this.SetAutoRedirect redirect =
+            HttpStuff.androidHttpHandler.AllowAutoRedirect <- redirect
 
 
 [<Activity (Label = "Eins A Medien Audiobook Player", Icon = "@drawable/eins_a_launcher", Theme = "@style/MainTheme.Launcher", MainLauncher = true,LaunchMode = LaunchMode.SingleTop, ConfigurationChanges = (ConfigChanges.ScreenSize ||| ConfigChanges.Orientation),ScreenOrientation = ScreenOrientation.Portrait)>]
@@ -57,6 +67,7 @@ type MainActivity() =
         Xamarin.Forms.DependencyService.Register<AudioPlayerServiceImplementation.DecpencyService.AudioPlayer>()
         Xamarin.Forms.DependencyService.Register<NotificationService.NotificationService>()
         Xamarin.Forms.DependencyService.Register<DownloadServiceImplementation.DependencyService.DownloadService>()
+        Xamarin.Forms.DependencyService.Register<AndroidHttpClientHandlerService>()
                     
         Plugin.CurrentActivity.CrossCurrentActivity.Current.Init(this, bundle);
         let appcore  = new PerryRhodan.AudiobookPlayer.MainApp()

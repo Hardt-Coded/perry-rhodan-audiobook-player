@@ -124,6 +124,7 @@
     <AndroidResource Include="Resources\values\styles.xml" />
     <AndroidResource Include="Resources\values\colors.xml" />
     <None Include="packages.config" />
+    <AndroidEnvironment Include="EnvironmentVariables.txt" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PerryRhodan.AudiobookPlayer\PerryRhodan.AudiobookPlayer.fsproj">
@@ -140,8 +141,9 @@
       <HintPath>..\packages\FSharp.Control.AsyncSeq.2.0.21\lib\netstandard2.0\FSharp.Control.AsyncSeq.dll</HintPath>
     </Reference>
     <Reference Include="FSharp.Data">
-      <HintPath>..\packages\FSharp.Data.3.0.0\lib\netstandard2.0\FSharp.Data.dll</HintPath>
+      <HintPath>..\packages\FSharp.Data.4.0.1\lib\netstandard2.0\FSharp.Data.dll</HintPath>
     </Reference>
+	  
     <Reference Include="FSharpx.Async">
       <HintPath>..\packages\FSharpx.Async.1.14.1\lib\netstandard2.0\FSharpx.Async.dll</HintPath>
     </Reference>
@@ -163,6 +165,7 @@
     <Reference Include="SkiaSharp.Views.Forms">
       <HintPath>..\packages\SkiaSharp.Views.Forms.1.68.1\lib\MonoAndroid\SkiaSharp.Views.Forms.dll</HintPath>
     </Reference>
+    <Reference Include="System.Net.Http" />
     <Reference Include="taglib-sharp">
       <HintPath>..\packages\taglib-sharp-netstandard2.0.2.1.0\lib\netstandard2.0\taglib-sharp.dll</HintPath>
     </Reference>
@@ -187,6 +190,9 @@
     <Reference Include="Microsoft.AppCenter.Crashes.Android.Bindings">
       <HintPath>..\packages\Microsoft.AppCenter.Crashes.3.4.0\lib\MonoAndroid403\Microsoft.AppCenter.Crashes.Android.Bindings.dll</HintPath>
     </Reference>
+	  <Reference Include="SchlenkR.FsHttp">
+		  <HintPath>..\packages\SchlenkR.FsHttp.5.1.0\lib\netstandard2.1\FsHttp.dll</HintPath>
+	  </Reference>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Java.Interop" />
