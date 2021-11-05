@@ -71,7 +71,7 @@
         | OpenFeedbackPage
 
 
-    let strToOptInt str =
+    let strToOptInt (str:string) =
         let (isInt,value) = System.Int32.TryParse(str)
         if isInt then Some value else None
     

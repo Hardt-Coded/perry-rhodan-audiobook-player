@@ -18,6 +18,9 @@ open Common
 open Plugin.Permissions.Abstractions
 open Common.EventHelper
 open SkiaSharp
+open System.Collections.Generic
+open System.Linq
+
 
 
 
@@ -34,6 +37,11 @@ module DependencyServices =
 
     type IDownloadService =
         abstract member StartDownload: unit -> unit
+
+    type IAndroidHttpMessageHandlerService =
+        abstract member GetHttpMesageHandler: unit -> HttpMessageHandler 
+        abstract member GetCookieContainer: unit -> CookieContainer 
+        abstract member SetAutoRedirect: bool -> unit
 
 
 module Consts =
@@ -538,6 +546,18 @@ module WebAccess =
     open Microsoft.AppCenter.Crashes
     open Microsoft.AppCenter.Analytics
     
+    
+    
+    let httpHandlerService = lazy (DependencyService.Get<DependencyServices.IAndroidHttpMessageHandlerService>())    
+    let currentHttpClientHandler = lazy (httpHandlerService.Force().GetHttpMesageHandler())
+    let currentCookieContainer = lazy (httpHandlerService.Force().GetCookieContainer())
+    let httpClient = lazy (HttpClient(currentHttpClientHandler.Force()))
+    let useAndroidHttpClient redirect = (
+        httpHandlerService.Force().SetAutoRedirect redirect
+        fun _ -> httpClient.Force()
+    )
+
+
     let handleException f =
         async {
             try
@@ -557,37 +577,51 @@ module WebAccess =
         }
         
 
+
+    //ServicePointManager.ServerCertificateValidationCallback <- (fun sender cert chain sslPolicyError ->
+    //    let a = chain
+    //    true
+    //)
+    open FsHttp
+    open FsHttp.DslCE
+    
     let login username password =
         async {
-                let! res = 
-                    (fun () -> 
-                        Http.AsyncRequest(
-                            baseUrl + "butler.php",
-                            body = FormValues [("action","login"); ("username",username); ("password",password)],
-                            httpMethod = HttpMethod.Post,
-                            customizeHttpRequest = 
-                                (fun req ->                         
-                                    req.AllowAutoRedirect <- false
-                                    req
-                                )
-                            )
-                    )
-                    |> handleException
+            
+            let! res =
+                fun () -> 
+                    httpAsync {
+                        POST $"{baseUrl}butler.php"
+                        body
+                        formUrlEncoded [
+                            ("action","login"); ("username",username); ("password",password)
+                        ]
+                        transformHttpClient (useAndroidHttpClient false)
+                    }
+                |> handleException
 
-                return 
-                    res
-                    |> Result.bind(
-                        fun (resp) ->
-                            let location = resp.Headers |> Seq.filter (fun m -> m.Key = "Location") |> Seq.tryHead
-                            match location with
-                            | None -> 
-                                Analytics.TrackEvent("no location on login response found")
-                                Error (Other Translations.current.UnexpectedServerBehaviorError)
-                            | Some v ->
-                                if v.Value.Contains("98") then Ok (None)
-                                else if v.Value.Contains("61") then Ok (Some resp.Cookies)
-                                else Ok (None)                        
-                    )
+            return 
+                res
+                |> Result.bind(
+                    fun (resp) ->
+                        let location = resp.headers |> Seq.filter (fun m -> m.Key = "Location") |> Seq.tryHead
+                        match location with
+                        | None -> 
+                            Analytics.TrackEvent("no location on login response found")
+                            Error (Other Translations.current.UnexpectedServerBehaviorError)
+                        | Some v ->
+                            
+                            let value = v.Value |> Seq.head
+                            if value.Contains("98") then Ok (None)
+                            else if value.Contains("61") then 
+                                let cookies = 
+                                    currentCookieContainer.Force().GetCookies(Uri(baseUrl))
+                                    |> Seq.cast<Cookie>                                    
+                                    |> Seq.map (fun cc -> (cc.Name,cc.Value))
+                                    |> Map.ofSeq
+                                Ok (Some cookies)
+                            else Ok (None)                        
+                )
         
                 
         }
@@ -600,8 +634,16 @@ module WebAccess =
         async {       
             let seqCC = cc |> Map.toSeq
 
-            let! res = 
-                fun () -> Http.AsyncRequestString(baseUrl + "index.php?id=61",cookies = seqCC, httpMethod="GET")
+            let! res =
+                fun () ->
+                    async {
+                        let! resp = 
+                            httpAsync {
+                                GET $"{baseUrl}index.php?id=61"
+                                transformHttpClient (useAndroidHttpClient true)
+                            }
+                        return! resp.content.ReadAsStringAsync() |> Async.AwaitTask
+                    }
                 |> handleException
 
             return res 
@@ -630,29 +672,40 @@ module WebAccess =
         async {
             let seqCC = cookies |> Map.toSeq
 
-            let! res = 
-                (fun () ->
-                    Http.AsyncRequest(
-                        baseUrl + url,                
-                        httpMethod = HttpMethod.Get,
-                        cookies = seqCC,
-                        customizeHttpRequest = 
-                            (fun req ->                         
-                                req.AllowAutoRedirect <- false
-                                req
-                            )
-                        )
-                )
+            let! res =
+                fun () ->
+                    httpAsync {
+                        GET $"{baseUrl}{url}"
+                        transformHttpClient (useAndroidHttpClient false)
+                    }
                 |> handleException
+
+
+            //let! res = 
+            //    (fun () ->
+            //        Http.AsyncRequest(
+            //            baseUrl + url,                
+            //            httpMethod = HttpMethod.Get,
+            //            cookies = seqCC,
+            //            customizeHttpRequest = 
+            //                (fun req ->                         
+            //                    req.AllowAutoRedirect <- false
+            //                    req
+            //                )
+            //            )
+            //    )
+            //    |> handleException
 
             return
                 res
                 |> Result.bind (
                     fun resp ->
-                        if (not (resp.Headers.ContainsKey("Location"))) then
+                        let location = resp.headers |> Seq.filter (fun m -> m.Key = "Location") |> Seq.tryHead
+                        match location with
+                        | None ->
                             Error (Other Translations.current.NoDownloadUrlFoundError)
-                        else
-                            let downloadUrl = resp.Headers.Item "Location"
+                        | Some location ->
+                            let downloadUrl = location.Value |> Seq.head
                             if (downloadUrl.Contains("index.php?id=98")) then
                                 Error (SessionExpired Translations.current.SessionExpired)
                             else
@@ -802,10 +855,15 @@ module WebAccess =
                                 try
                                     
 
-                                    let! resp = Http.AsyncRequestStream(url,httpMethod=HttpMethod.Get)
+                                    //let! resp = Http.AsyncRequestStream(url,httpMethod=HttpMethod.Get)
+                                    let! resp = 
+                                        httpAsync { 
+                                            GET url 
+                                            transformHttpClient (useAndroidHttpClient true)
+                                        }
 
-                                    if (resp.StatusCode <> 200) then 
-                                        return Error (Other (sprintf "download statuscode %i" resp.StatusCode))
+                                    if (resp.statusCode <> HttpStatusCode.OK) then 
+                                        return Error (Other $"download statuscode {resp.statusCode}")
                                     else
                                 
                                         let unzipTargetFolder = Path.Combine(audioBookFolder,"audio")
@@ -822,10 +880,11 @@ module WebAccess =
 
                                 
                                         let fileSize = 
-                                            (resp.Headers
+                                            (resp.content.Headers
                                             |> HttpHelpers.getFileSizeFromHttpHeadersOrDefaultValue 0)
                                     
-                                        use zipStream = new ZipInputStream(resp.ResponseStream)
+                                        let! responseStream = resp.content.ReadAsStreamAsync() |> Async.AwaitTask
+                                        use zipStream = new ZipInputStream(responseStream)
 
                                         let zipSeq =
                                             seq {
@@ -861,7 +920,7 @@ module WebAccess =
                                         )
                                 
                                         zipStream.Close()
-                                        resp.ResponseStream.Close()    
+                                        responseStream.Close()    
                                         
                                         updateProgress (fileSize / (1024 * 1024), fileSize / (1024 * 1024))
 
@@ -909,6 +968,14 @@ module WebAccess =
             | None -> return Ok (None,None)
             | Some ps ->
                 let productPageUri = Uri(baseUrl + ps)
+
+                let! productPageRes = 
+                    fun () -> 
+                        httpAsync {
+                            GET productPageUri.AbsoluteUri
+                            transformHttpClient (useAndroidHttpClient true)
+                        }
+                    |> handleException
 
                 let! productPageRes = 
                     (fun () -> Http.AsyncRequestString(productPageUri.AbsoluteUri))
