@@ -2,7 +2,7 @@
 
     let appcenterAndroidId = ""
     let supportMessageApi = ""
-
+    let messageEndpoint = ""
 
 
 

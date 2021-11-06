@@ -74,6 +74,8 @@
                     (Controls.primaryTextColorLabel 22.0 "Support und Feedback").Row(0)
                     
                     (Controls.primaryTextColorLabel 14.0 "Senden Sie uns ein Feedback oder eine Anfrage bei Problemen oder Verbesserungsvorschlägen. Die Anfrage geht direkt zum Entwickler. Es wird nur die E-Mail (falls angegeben) und der Text übermittelt. Mehr nicht! Bei Problemen wäre eine Beschreibung hilfreich und die Angabe ihrer Mailadresse, damit wir uns bei Ihnen melden können.").Row(1)
+                    
+                    (Controls.primaryTextColorLabel 14.0 "alternativ einfach eine E-Mail direkt an: info@hardt-solutions.de")
 
                     View.Button(text = "Nachricht senden!", command = (fun () -> dispatch SendMessage), horizontalOptions = LayoutOptions.Center).Row(2)
 

@@ -12,6 +12,7 @@ open Services
 open Microsoft.AppCenter
 open Microsoft.AppCenter.Crashes
 open Microsoft.AppCenter.Analytics
+open Acr.UserDialogs
     
 
 
@@ -70,6 +71,9 @@ type MainActivity() =
         Xamarin.Forms.DependencyService.Register<AndroidHttpClientHandlerService>()
                     
         Plugin.CurrentActivity.CrossCurrentActivity.Current.Init(this, bundle);
+
+        UserDialogs.Init this
+
         let appcore  = new PerryRhodan.AudiobookPlayer.MainApp()
         this.LoadApplication (appcore)
     

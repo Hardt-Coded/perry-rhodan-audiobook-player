@@ -823,6 +823,10 @@ module WebAccess =
                         if not (Directory.Exists(audioBookFolder)) then
                             Directory.CreateDirectory(audioBookFolder) |> ignore
                     
+                        let noMediaFile = Path.Combine(audioBookFolder,".nomedia")
+                        if File.Exists(noMediaFile) |> not then
+                            do! File.WriteAllTextAsync(noMediaFile,"") |> Async.AwaitTask
+
                         match audiobook.DownloadUrl with
                         | None -> return Error (Other Translations.current.NoDownloadUrlFoundError)
                         | Some abDownloadUrl ->    
@@ -950,15 +954,20 @@ module WebAccess =
 
                 let! productPageRes = 
                     fun () -> 
-                        httpAsync {
-                            GET productPageUri.AbsoluteUri
-                            transformHttpClient (useAndroidHttpClient true)
+                        async {
+                            let! res =
+                                httpAsync {
+                                    GET productPageUri.AbsoluteUri
+                                    transformHttpClient (useAndroidHttpClient true)
+                                }
+                            if (res.statusCode <> HttpStatusCode.OK) then 
+                                return ""
+                            else
+                                return! res |> Response.toTextAsync
                         }
                     |> handleException
 
-                let! productPageRes = 
-                    (fun () -> Http.AsyncRequestString(productPageUri.AbsoluteUri))
-                    |> handleException
+                
                 return productPageRes
                     |> Result.bind (
                         fun productPage ->
