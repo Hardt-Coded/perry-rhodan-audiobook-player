@@ -153,6 +153,16 @@ module App =
 
     module Commands =
 
+
+        let runMigrations =
+            fun dispatch ->
+                async {
+                    do! Migrations.runMigrations ()
+                }
+                |> Async.Start
+
+            |> Cmd.ofSub
+
         let removeDownloadCmd (abModel:AudioBookItemNew.Model) =
             fun _ -> 
                 Services.DownloadService.removeDownload <| Services.DownloadService.DownloadInfo.New None abModel.AudioBook
@@ -987,13 +997,13 @@ module App =
     and onInitMsg model =
         
 
-        model, Commands.loadAudioBookItemsCmd
+        model, Cmd.batch [ Commands.loadAudioBookItemsCmd; Commands.runMigrations ]
 
 
     and onAskForAppPermissionMsg model =
         let ask = 
             async { 
-                let! res = Common.Helpers.askPermissionAsync Permission.Storage
+                let! res = Common.Helpers.askForStoragePermissionAsync ()
                 if res then return Init 
                 else return GotoPermissionDeniedPage
             } |> Cmd.ofAsyncMsg

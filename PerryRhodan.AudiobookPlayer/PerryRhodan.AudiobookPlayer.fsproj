@@ -17,6 +17,7 @@
 		<Compile Include="Global.fs" />
 		<Compile Include="Domain.fs" />
 		<Compile Include="Services.fs" />
+		<Compile Include="Migrations.fs" />
 		<Compile Include="AudioPlayer.fs" />
 		<Compile Include="Controls.fs" />
 		<Compile Include="LoginPage.fs" />
@@ -38,12 +39,13 @@
 		<None Include="repl_stuff.fsx" />
 	</ItemGroup>
 	<ItemGroup>
+		<PackageReference Include="Acr.UserDialogs" Version="7.2.0.534" />
 		<PackageReference Include="Fabulous.XamarinForms.SkiaSharp" Version="1.1.0" />
 		<PackageReference Include="Microsoft.AppCenter" Version="3.4.0" />
 		<PackageReference Include="SchlenkR.FsHttp" Version="5.1.0" />
 		<PackageReference Include="SkiaSharp.Views.Forms" Version="1.68.1" />
-		<PackageReference Include="Xamarin.Forms" Version="5.0.0.1874" />
-		<PackageReference Include="Xamarin.Essentials" Version="1.5.3.2" />
+		<PackageReference Include="Xamarin.Forms" Version="5.0.0.2196" />
+		<PackageReference Include="Xamarin.Essentials" Version="1.7.0" />
 		<PackageReference Include="Fabulous.XamarinForms" Version="1.1.0" />
 		<PackageReference Include="Fabulous.XamarinForms.LiveUpdate" Version="1.1.0" />
 		<PackageReference Include="FSharp.Core" Version="5.0.0" />
