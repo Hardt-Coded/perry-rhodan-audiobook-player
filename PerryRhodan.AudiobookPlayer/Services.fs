@@ -642,7 +642,8 @@ module WebAccess =
                                 GET $"{baseUrl}index.php?id=61"
                                 transformHttpClient (useAndroidHttpClient true)
                             }
-                        return! resp.content.ReadAsStringAsync() |> Async.AwaitTask
+                        
+                        return! resp |> Response.toTextAsync
                     }
                 |> handleException
 
@@ -679,22 +680,6 @@ module WebAccess =
                         transformHttpClient (useAndroidHttpClient false)
                     }
                 |> handleException
-
-
-            //let! res = 
-            //    (fun () ->
-            //        Http.AsyncRequest(
-            //            baseUrl + url,                
-            //            httpMethod = HttpMethod.Get,
-            //            cookies = seqCC,
-            //            customizeHttpRequest = 
-            //                (fun req ->                         
-            //                    req.AllowAutoRedirect <- false
-            //                    req
-            //                )
-            //            )
-            //    )
-            //    |> handleException
 
             return
                 res
@@ -883,7 +868,7 @@ module WebAccess =
                                             (resp.content.Headers
                                             |> HttpHelpers.getFileSizeFromHttpHeadersOrDefaultValue 0)
                                     
-                                        let! responseStream = resp.content.ReadAsStreamAsync() |> Async.AwaitTask
+                                        let! responseStream = resp |> Response.toStreamAsync
                                         use zipStream = new ZipInputStream(responseStream)
 
                                         let zipSeq =
