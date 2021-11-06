@@ -576,12 +576,7 @@ module WebAccess =
                     return Error (Other Translations.current.InternalError)
         }
         
-
-
-    //ServicePointManager.ServerCertificateValidationCallback <- (fun sender cert chain sslPolicyError ->
-    //    let a = chain
-    //    true
-    //)
+    
     open FsHttp
     open FsHttp.DslCE
     
@@ -840,7 +835,6 @@ module WebAccess =
                                 try
                                     
 
-                                    //let! resp = Http.AsyncRequestStream(url,httpMethod=HttpMethod.Get)
                                     let! resp = 
                                         httpAsync { 
                                             GET url 
