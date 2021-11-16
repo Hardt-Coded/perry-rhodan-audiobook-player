@@ -134,14 +134,18 @@
         let askForStoragePermissionAsync () =
             async {
                 try
-                    let! statusWrite = Permissions.CheckStatusAsync<Permissions.StorageWrite>() |> Async.AwaitTask
-                    match statusWrite with
-                    | Xamarin.Essentials.PermissionStatus.Granted ->
-                        return true
-                    | _ ->
-                        let! statusWrite = Permissions.RequestAsync<Permissions.StorageWrite>() |> Async.AwaitTask
-                        return statusWrite = Xamarin.Essentials.PermissionStatus.Granted
-                               || statusWrite = Xamarin.Essentials.PermissionStatus.Unknown
+                    if (DeviceInfo.Version.Major >= 10) then
+                        return true;
+                    else
+                        let! statusWrite = Permissions.CheckStatusAsync<Permissions.StorageWrite>() |> Async.AwaitTask
+                   
+                        match statusWrite with
+                        | Xamarin.Essentials.PermissionStatus.Granted ->
+                            return true
+                        | _ ->
+                            let! statusWrite = Permissions.RequestAsync<Permissions.StorageWrite>() |> Async.AwaitTask
+                            return (statusWrite = Xamarin.Essentials.PermissionStatus.Granted 
+                                   || statusWrite = Xamarin.Essentials.PermissionStatus.Unknown)
                 with exn ->
                     return false
             }
