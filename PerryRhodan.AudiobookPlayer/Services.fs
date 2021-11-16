@@ -11,15 +11,9 @@ open FSharp.Data
 open Xamarin.Forms
 open System.Net.Http
 open System.IO.Compression
-open System.Threading.Tasks
 open ICSharpCode.SharpZipLib.Zip
-
 open Common
-open Plugin.Permissions.Abstractions
-open Common.EventHelper
 open SkiaSharp
-open System.Collections.Generic
-open System.Linq
 
 
 
@@ -43,6 +37,9 @@ module DependencyServices =
         abstract member GetCookieContainer: unit -> CookieContainer 
         abstract member SetAutoRedirect: bool -> unit
 
+    type ICloseApplication =
+        abstract member CloseApplication: unit -> unit
+
 
 module Consts =
     
@@ -51,7 +48,11 @@ module Consts =
     let currentLocalDataFolder =  
         let baseFolder = 
             match Device.RuntimePlatform with
-            | Device.Android -> DependencyService.Get<IAndroidDownloadFolder>().GetAndroidDownloadFolder ()
+            | Device.Android -> 
+                if (DeviceInfo.Version.Major >= 10) then
+                    Xamarin.Essentials.FileSystem.AppDataDirectory
+                else
+                    DependencyService.Get<IAndroidDownloadFolder>().GetAndroidDownloadFolder ()
             //| Device.Android -> Path.Combine(DependencyService.Get<IAndroidDownloadFolder>().GetAndroidDownloadFolder (),"..")
             | Device.iOS -> Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
             | _ -> Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
