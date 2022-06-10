@@ -41,7 +41,9 @@ open Xamarin.Forms
                     
                 dlg.PercentComplete <- 0
 
-                do! createNoMediaFile Services.Consts.audioBookDownloadFolderBase
+                let folders = Services.Consts.createCurrentFolders ()
+
+                do! createNoMediaFile folders.audioBookDownloadFolderBase
                 dlg.PercentComplete <- 100
 
                 do! Helpers.confirmMigration "NoMediaMigration_"
@@ -93,8 +95,8 @@ open Xamarin.Forms
                 let result = db.GetCollection<AudioBook>("audiobooks").Update(migratedBooks)
 
                 db.Dispose |> ignore
-                
-                File.Copy(audiobookDbFile, Services.Consts.audioBooksStateDataFile, true)
+                let folders = Services.Consts.createCurrentFolders ()
+                File.Copy(audiobookDbFile, folders.audioBooksStateDataFile, true)
                 ()
             }
             
@@ -132,8 +134,8 @@ open Xamarin.Forms
                 let result = db.GetCollection<AudioBookAudioFilesInfo>("audiobookfileinfos").Update(migratedInfos)
                 
                 db.Dispose |> ignore
-
-                File.Copy(audiobookFilesDbFile, Services.Consts.audioBookAudioFileDb, true)
+                let folders = Services.Consts.createCurrentFolders ()
+                File.Copy(audiobookFilesDbFile, folders.audioBookAudioFileDb, true)
             }
 
         let importDatabases files =
