@@ -14,6 +14,7 @@ open System.IO.Compression
 open ICSharpCode.SharpZipLib.Zip
 open Common
 open SkiaSharp
+open FsHttp
 
 
 
@@ -586,14 +587,17 @@ module WebAccess =
             
             let! res =
                 fun () -> 
-                    httpAsync {
+                    http {
                         POST $"{baseUrl}butler.php"
                         body
                         formUrlEncoded [
-                            ("action","login"); ("username",username); ("password",password)
+                            "action","login"
+                            "username",username
+                            "password",password
                         ]
-                        transformHttpClient (useAndroidHttpClient false)
+                        config_transformHttpClient (useAndroidHttpClient false)
                     }
+                    |> Request.sendAsync
                 |> handleException
 
             return 
@@ -634,10 +638,11 @@ module WebAccess =
                 fun () ->
                     async {
                         let! resp = 
-                            httpAsync {
+                            http {
                                 GET $"{baseUrl}index.php?id=61"
-                                transformHttpClient (useAndroidHttpClient true)
+                                config_transformHttpClient (useAndroidHttpClient true)
                             }
+                            |> Request.sendAsync
                         
                         return! resp |> Response.toTextAsync
                     }
@@ -671,10 +676,11 @@ module WebAccess =
 
             let! res =
                 fun () ->
-                    httpAsync {
+                    http {
                         GET $"{baseUrl}{url}"
-                        transformHttpClient (useAndroidHttpClient false)
+                        config_transformHttpClient (useAndroidHttpClient false)
                     }
+                    |> Request.sendAsync
                 |> handleException
 
             return
@@ -841,10 +847,11 @@ module WebAccess =
                                     
 
                                     let! resp = 
-                                        httpAsync { 
+                                        http { 
                                             GET url 
-                                            transformHttpClient (useAndroidHttpClient true)
+                                            config_transformHttpClient (useAndroidHttpClient true)
                                         }
+                                        |> Request.sendAsync
 
                                     if (resp.statusCode <> HttpStatusCode.OK) then 
                                         return Error (Other $"download statuscode {resp.statusCode}")
@@ -957,10 +964,11 @@ module WebAccess =
                     fun () -> 
                         async {
                             let! res =
-                                httpAsync {
+                                http {
                                     GET productPageUri.AbsoluteUri
-                                    transformHttpClient (useAndroidHttpClient true)
+                                    config_transformHttpClient (useAndroidHttpClient true)
                                 }
+                                |> Request.sendAsync
                             if (res.statusCode <> HttpStatusCode.OK) then 
                                 return ""
                             else

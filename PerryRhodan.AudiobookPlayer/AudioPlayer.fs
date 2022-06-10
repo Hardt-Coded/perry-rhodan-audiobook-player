@@ -185,7 +185,7 @@
                                             for (_,handler) in state |> List.filter (fun (k,_) -> k <> "audioplayer-shutdown-event") do
                                                 do! handler(info)
                                         }
-                                        |> AsyncSeq.toList
+                                        |> AsyncSeq.toListSynchronously
                                     state
                                 | RegisterShutDownEvent handler ->
                                     state @ [("audioplayer-shutdown-event",handler)]
