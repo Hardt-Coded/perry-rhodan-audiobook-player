@@ -46,27 +46,48 @@ module Consts =
     
     open DependencyServices
 
-    let currentLocalDataFolder =  
-        let baseFolder = 
-            match Device.RuntimePlatform with
-            | Device.Android -> 
-                if (DeviceInfo.Version.Major >= 10) then
-                    Xamarin.Essentials.FileSystem.AppDataDirectory
-                else
-                    DependencyService.Get<IAndroidDownloadFolder>().GetAndroidDownloadFolder ()
-            //| Device.Android -> Path.Combine(DependencyService.Get<IAndroidDownloadFolder>().GetAndroidDownloadFolder (),"..")
-            | Device.iOS -> Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
-            | _ -> Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
-        Path.Combine(baseFolder,"PerryRhodan.AudioBookPlayer","data")
-    let stateFileFolder = Path.Combine(currentLocalDataFolder,"states")
-    let audioBooksStateDataFile = Path.Combine(stateFileFolder,"audiobooks.db")
-    let audioBookAudioFileDb = Path.Combine(stateFileFolder,"audiobookfiles.db")
-    let audioBookDownloadFolderBase = Path.Combine(currentLocalDataFolder,"audiobooks")
+    let createCurrentFolders =
+        let mutable folders = None
+        fun () ->
+            match folders with
+            | None ->
+                
+                let currentLocalDataFolder =  
+                    let baseFolder = 
+                        match Device.RuntimePlatform with
+                        | Device.Android -> 
+                            if (DeviceInfo.Version.Major >= 10) then
+                                Xamarin.Essentials.FileSystem.AppDataDirectory
+                            else
+                                DependencyService.Get<IAndroidDownloadFolder>().GetAndroidDownloadFolder ()
+                        | Device.iOS -> Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
+                        | _ -> Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
+                    let playerFolder = Path.Combine(baseFolder,"PerryRhodan.AudioBookPlayer","data")
+                    // checking if I have really write access to it!
+                    try
+                        let testFile = Path.Combine(playerFolder, "testfile.txt")
+                        File.WriteAllText(testFile, "test!")
+                        playerFolder
+                    with
+                    | ex ->
+                        Path.Combine(Xamarin.Essentials.FileSystem.AppDataDirectory,"PerryRhodan.AudioBookPlayer","data")
 
+                let stateFileFolder = Path.Combine(currentLocalDataFolder,"states")
+                let audioBooksStateDataFile = Path.Combine(stateFileFolder,"audiobooks.db")
+                let audioBookAudioFileDb = Path.Combine(stateFileFolder,"audiobookfiles.db")
+                let audioBookDownloadFolderBase = Path.Combine(currentLocalDataFolder,"audiobooks")
+                let result = {|
+                        currentLocalDataFolder = currentLocalDataFolder
+                        stateFileFolder = stateFileFolder
+                        audioBooksStateDataFile = audioBooksStateDataFile
+                        audioBookAudioFileDb = audioBookAudioFileDb
+                        audioBookDownloadFolderBase=audioBookDownloadFolderBase
+                    |}
+                folders <- Some result
+                result
+            | Some folders -> folders
 
     let baseUrl = "https://www.einsamedien.de/"
-
-
 
 
 
@@ -103,13 +124,14 @@ module DataBase =
 
 
     let initAppFolders () =
-        if not (Directory.Exists(currentLocalDataFolder)) then
-            Directory.CreateDirectory(currentLocalDataFolder) |> ignore
-        if not (Directory.Exists(stateFileFolder)) then
-            Directory.CreateDirectory(stateFileFolder) |> ignore
+        let folders = createCurrentFolders ()
+        if not (Directory.Exists(folders.currentLocalDataFolder)) then
+            Directory.CreateDirectory(folders.currentLocalDataFolder) |> ignore
+        if not (Directory.Exists(folders.stateFileFolder)) then
+            Directory.CreateDirectory(folders.stateFileFolder) |> ignore
 
 
-    let private insertNewAudioBooksDb (audioBooks:AudioBook[]) =
+    let private insertNewAudioBooksDb (audioBooksStateDataFile:string) (audioBooks:AudioBook[]) =
         try
             use db = new LiteDatabase(audioBooksStateDataFile, mapper)
             let audioBooksCol = 
@@ -121,7 +143,7 @@ module DataBase =
         | e -> Error e.Message
 
 
-    let private updateAudioBookDb (audioBook:AudioBook) =
+    let private updateAudioBookDb (audioBooksStateDataFile:string) (audioBook:AudioBook) =
         use db = new LiteDatabase(audioBooksStateDataFile, mapper)
         let audioBooks = db.GetCollection<AudioBook>("audiobooks")
 
@@ -130,7 +152,7 @@ module DataBase =
         else (Error Translations.current.ErrorDbWriteAccess)
 
 
-    let private deleteAudioBookDb (audioBook:AudioBook) =
+    let private deleteAudioBookDb (audioBooksStateDataFile:string) (audioBook:AudioBook) =
         use db = new LiteDatabase(audioBooksStateDataFile, mapper)
         let audioBooks = db.GetCollection<AudioBook>("audiobooks")
 
@@ -142,7 +164,7 @@ module DataBase =
         else (Error Translations.current.ErrorDbWriteAccess)
 
 
-    let private deleteDatabase () =
+    let private deleteDatabase (audioBooksStateDataFile:string) (audioBookAudioFileDb:string) =
         use db = new LiteDatabase(audioBooksStateDataFile, mapper)
         let _result = db.DropCollection("audiobooks")
         use db2 = new LiteDatabase(audioBookAudioFileDb, mapper)
@@ -150,7 +172,7 @@ module DataBase =
         ()
 
 
-    let private loadAudioBooksFromDb () =
+    let private loadAudioBooksFromDb (audioBooksStateDataFile:string) =
         initAppFolders ()
                 
         use db = new LiteDatabase(audioBooksStateDataFile, mapper)
@@ -173,7 +195,7 @@ module DataBase =
 
     module private AudioBookFiles =
 
-        let loadAudioBookAudioFileInfosFromDb () =
+        let loadAudioBookAudioFileInfosFromDb (audioBookAudioFileDb:string) =
             use db = new LiteDatabase(audioBookAudioFileDb, mapper)
             let infos = 
                 db.GetCollection<AudioBookAudioFilesInfo>("audiobookfileinfos")
@@ -183,7 +205,7 @@ module DataBase =
             infos
 
 
-        let addAudioFilesInfoToAudioBook (audioFileInfos:AudioBookAudioFilesInfo []) =
+        let addAudioFilesInfoToAudioBook (audioBookAudioFileDb:string) (audioFileInfos:AudioBookAudioFilesInfo []) =
             try
                 use db = new LiteDatabase(audioBookAudioFileDb, mapper)
                 let audioBooksCol = 
@@ -195,7 +217,7 @@ module DataBase =
             | e -> Error e.Message
 
 
-        let updateAudioBookFileInfo (audioFileInfo:AudioBookAudioFilesInfo) =
+        let updateAudioBookFileInfo (audioBookAudioFileDb:string) (audioFileInfo:AudioBookAudioFilesInfo) =
             use db = new LiteDatabase(audioBookAudioFileDb, mapper)
             let audioBooks = db.GetCollection<AudioBookAudioFilesInfo>("audiobookfileinfos")
 
@@ -204,7 +226,7 @@ module DataBase =
             else (Error Translations.current.ErrorDbWriteAccess)
 
 
-        let deleteAudioBookInfoFromDb (audioFileInfo:AudioBookAudioFilesInfo) =
+        let deleteAudioBookInfoFromDb (audioBookAudioFileDb:string) (audioFileInfo:AudioBookAudioFilesInfo) =
             use db = new LiteDatabase(audioBookAudioFileDb, mapper)
             let audioBooks = db.GetCollection<AudioBookAudioFilesInfo>("audiobookfileinfos")
 
@@ -231,13 +253,14 @@ module DataBase =
                     try
                         // init stuff
                         initAppFolders ()
+                        let folders = createCurrentFolders ()
 
                         let loadStateFromDb () =
                             let audioBooks =
-                                loadAudioBooksFromDb ()
+                                loadAudioBooksFromDb folders.audioBooksStateDataFile
 
                             let audioFileInfos =
-                                AudioBookFiles.loadAudioBookAudioFileInfosFromDb ()
+                                AudioBookFiles.loadAudioBookAudioFileInfosFromDb folders.audioBookAudioFileDb
 
                             {
                                 AudioBooks = audioBooks
@@ -251,7 +274,7 @@ module DataBase =
                                 let! msg = inbox.Receive()
                                 match msg with
                                 | UpdateAudioBook (audiobook,replyChannel) ->
-                                    let dbRes = updateAudioBookDb audiobook
+                                    let dbRes = updateAudioBookDb folders.audioBooksStateDataFile audiobook
                                     match dbRes with
                                     | Ok _ ->
                                         let newState =
@@ -270,7 +293,7 @@ module DataBase =
                                         return! (loop state)
 
                                 | InsertAudioBooks (audiobooks,replyChannel) ->
-                                    let dbRes = insertNewAudioBooksDb audiobooks
+                                    let dbRes = insertNewAudioBooksDb folders.audioBooksStateDataFile audiobooks
                                     match dbRes with
                                     | Ok _ ->
                                         let newState =
@@ -294,7 +317,7 @@ module DataBase =
                                     return! (loop state)
 
                                 | RemoveAudiobookFromDatabase (audiobook,replyChannel) ->
-                                    let dbRes = deleteAudioBookDb audiobook
+                                    let dbRes = deleteAudioBookDb folders.audioBooksStateDataFile audiobook
                                     match dbRes with
                                     | Ok _ ->
                                         let newState =
@@ -308,7 +331,7 @@ module DataBase =
                                         return! (loop state)
 
                                 | DeleteDatabase ->
-                                    deleteDatabase ()
+                                    deleteDatabase folders.audioBooksStateDataFile folders.audioBookAudioFileDb
                                     return! (loop <| loadStateFromDb ())
 
 
@@ -336,7 +359,7 @@ module DataBase =
                                                     |> Array.append infos
                                         }
 
-                                    let res = AudioBookFiles.addAudioFilesInfoToAudioBook infos
+                                    let res = AudioBookFiles.addAudioFilesInfoToAudioBook folders.audioBookAudioFileDb infos
                                     replyChannel.Reply(res)
                                     match res with
                                     | Error _ ->
@@ -360,7 +383,7 @@ module DataBase =
                                                     )
                                         }
 
-                                    let res = AudioBookFiles.updateAudioBookFileInfo info
+                                    let res = AudioBookFiles.updateAudioBookFileInfo folders.audioBookAudioFileDb info
                                     replyChannel.Reply(res)
                                     match res with
                                     | Error _ ->
@@ -386,7 +409,7 @@ module DataBase =
                                         replyChannel.Reply(Ok())
                                         return! loop state
                                     | Some info ->
-                                        let res = AudioBookFiles.deleteAudioBookInfoFromDb info 
+                                        let res = AudioBookFiles.deleteAudioBookInfoFromDb folders.audioBookAudioFileDb info 
                                         replyChannel.Reply(res)
                                         match res with
                                         | Error _ ->
@@ -494,10 +517,12 @@ module DataBase =
 
     
     let parseDownloadFolderForAlreadyDownloadedAudioBooks () =
-        if (not (Directory.Exists(audioBookDownloadFolderBase))) then
+        let folders = createCurrentFolders ()
+
+        if (not (Directory.Exists(folders.audioBookDownloadFolderBase))) then
             [||]
         else
-            let directories = Directory.EnumerateDirectories(audioBookDownloadFolderBase)    
+            let directories = Directory.EnumerateDirectories(folders.audioBookDownloadFolderBase)    
             directories
             |> Seq.toArray
             |> Array.Parallel.map (
@@ -823,10 +848,12 @@ module WebAccess =
                 try
                     Microsoft.AppCenter.Analytics.Analytics.TrackEvent("download audiobook")
 
+                    let folders = createCurrentFolders ()
+
                     if (audiobook.State.Downloaded) then 
                         return Error (Other "Audiobook already downloaded!")
                     else
-                        let audioBookFolder = Path.Combine(audioBookDownloadFolderBase,audiobook.FullName)        
+                        let audioBookFolder = Path.Combine(folders.audioBookDownloadFolderBase,$"{audiobook.Id}")        
                         if not (Directory.Exists(audioBookFolder)) then
                             Directory.CreateDirectory(audioBookFolder) |> ignore
                     

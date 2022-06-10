@@ -27,11 +27,11 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <OtherFlags>/warnon:1182</OtherFlags>
     <WarningLevel>4</WarningLevel>
-    <SelectedDevice>Android Emulator</SelectedDevice>
-    <DefaultDevice>pixel_3a_r_11_0_-_api_30</DefaultDevice>
+    <SelectedDevice>pixel_5_-_api_28</SelectedDevice>
+    <DefaultDevice>pixel_5_-_api_28</DefaultDevice>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
-    <ActiveDebugProfile>Android Emulator</ActiveDebugProfile>
+    <ActiveDebugProfile>pixel_5_-_api_28</ActiveDebugProfile>
     <SelectedPlatformGroup>Emulator</SelectedPlatformGroup>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
