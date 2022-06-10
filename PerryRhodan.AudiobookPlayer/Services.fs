@@ -65,6 +65,8 @@ module Consts =
                     let playerFolder = Path.Combine(baseFolder,"PerryRhodan.AudioBookPlayer","data")
                     // checking if I have really write access to it!
                     try
+                        if not (Directory.Exists(playerFolder)) then
+                            Directory.CreateDirectory(playerFolder) |> ignore
                         let testFile = Path.Combine(playerFolder, "testfile.txt")
                         File.WriteAllText(testFile, "test!")
                         playerFolder
@@ -76,6 +78,10 @@ module Consts =
                 let audioBooksStateDataFile = Path.Combine(stateFileFolder,"audiobooks.db")
                 let audioBookAudioFileDb = Path.Combine(stateFileFolder,"audiobookfiles.db")
                 let audioBookDownloadFolderBase = Path.Combine(currentLocalDataFolder,"audiobooks")
+                if not (Directory.Exists(stateFileFolder)) then
+                    Directory.CreateDirectory(stateFileFolder) |> ignore
+                if not (Directory.Exists(audioBookDownloadFolderBase)) then
+                    Directory.CreateDirectory(audioBookDownloadFolderBase) |> ignore
                 let result = {|
                         currentLocalDataFolder = currentLocalDataFolder
                         stateFileFolder = stateFileFolder
