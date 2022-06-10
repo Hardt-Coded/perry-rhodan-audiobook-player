@@ -14,7 +14,7 @@ namespace PerryRhodan.AudiobookPlayer.Android
 {
 	
 	
-	[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Xamarin.Android.Build.Tasks", "12.1.0.11")]
+	[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Xamarin.Android.Build.Tasks", "12.3.0.26")]
 	public partial class Resource
 	{
 		
@@ -319,6 +319,7 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			global::Acr.UserDialogs.Resource.Attribute.colorSurface = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.colorSurface;
 			global::Acr.UserDialogs.Resource.Attribute.colorSwitchThumbNormal = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.colorSwitchThumbNormal;
 			global::Acr.UserDialogs.Resource.Attribute.commitIcon = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.commitIcon;
+			global::Acr.UserDialogs.Resource.Attribute.constraintRotate = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.constraintRotate;
 			global::Acr.UserDialogs.Resource.Attribute.constraints = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.constraints;
 			global::Acr.UserDialogs.Resource.Attribute.constraintSet = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.constraintSet;
 			global::Acr.UserDialogs.Resource.Attribute.constraintSetEnd = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.constraintSetEnd;
@@ -4010,6 +4011,7 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			global::Acr.UserDialogs.Resource.Styleable.ConstraintSet_barrierDirection = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ConstraintSet_barrierDirection;
 			global::Acr.UserDialogs.Resource.Styleable.ConstraintSet_barrierMargin = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ConstraintSet_barrierMargin;
 			global::Acr.UserDialogs.Resource.Styleable.ConstraintSet_chainUseRtl = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ConstraintSet_chainUseRtl;
+			global::Acr.UserDialogs.Resource.Styleable.ConstraintSet_constraintRotate = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ConstraintSet_constraintRotate;
 			global::Acr.UserDialogs.Resource.Styleable.ConstraintSet_constraint_referenced_ids = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ConstraintSet_constraint_referenced_ids;
 			global::Acr.UserDialogs.Resource.Styleable.ConstraintSet_constraint_referenced_tags = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ConstraintSet_constraint_referenced_tags;
 			global::Acr.UserDialogs.Resource.Styleable.ConstraintSet_deriveConstraintsFrom = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ConstraintSet_deriveConstraintsFrom;
@@ -5968,7 +5970,6 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			global::Xamarin.Forms.Platform.Android.Resource.Attribute.colorSurface = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.colorSurface;
 			global::Xamarin.Forms.Platform.Android.Resource.Attribute.colorSwitchThumbNormal = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.colorSwitchThumbNormal;
 			global::Xamarin.Forms.Platform.Android.Resource.Attribute.commitIcon = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.commitIcon;
-			global::Xamarin.Forms.Platform.Android.Resource.Attribute.ConstraintRotate = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.ConstraintRotate;
 			global::Xamarin.Forms.Platform.Android.Resource.Attribute.constraints = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.constraints;
 			global::Xamarin.Forms.Platform.Android.Resource.Attribute.constraintSet = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.constraintSet;
 			global::Xamarin.Forms.Platform.Android.Resource.Attribute.constraintSetEnd = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.constraintSetEnd;
@@ -9724,7 +9725,6 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			global::Xamarin.Forms.Platform.Android.Resource.Styleable.ConstraintSet_barrierDirection = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ConstraintSet_barrierDirection;
 			global::Xamarin.Forms.Platform.Android.Resource.Styleable.ConstraintSet_barrierMargin = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ConstraintSet_barrierMargin;
 			global::Xamarin.Forms.Platform.Android.Resource.Styleable.ConstraintSet_chainUseRtl = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ConstraintSet_chainUseRtl;
-			global::Xamarin.Forms.Platform.Android.Resource.Styleable.ConstraintSet_ConstraintRotate = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ConstraintSet_ConstraintRotate;
 			global::Xamarin.Forms.Platform.Android.Resource.Styleable.ConstraintSet_constraint_referenced_ids = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ConstraintSet_constraint_referenced_ids;
 			global::Xamarin.Forms.Platform.Android.Resource.Styleable.ConstraintSet_constraint_referenced_tags = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ConstraintSet_constraint_referenced_tags;
 			global::Xamarin.Forms.Platform.Android.Resource.Styleable.ConstraintSet_deriveConstraintsFrom = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ConstraintSet_deriveConstraintsFrom;
@@ -11255,7 +11255,6 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			global::Xamarin.Forms.Platform.Resource.Attribute.colorSurface = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.colorSurface;
 			global::Xamarin.Forms.Platform.Resource.Attribute.colorSwitchThumbNormal = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.colorSwitchThumbNormal;
 			global::Xamarin.Forms.Platform.Resource.Attribute.commitIcon = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.commitIcon;
-			global::Xamarin.Forms.Platform.Resource.Attribute.ConstraintRotate = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.ConstraintRotate;
 			global::Xamarin.Forms.Platform.Resource.Attribute.constraints = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.constraints;
 			global::Xamarin.Forms.Platform.Resource.Attribute.constraintSet = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.constraintSet;
 			global::Xamarin.Forms.Platform.Resource.Attribute.constraintSetEnd = global::PerryRhodan.AudiobookPlayer.Android.Resource.Attribute.constraintSetEnd;
@@ -15011,7 +15010,6 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			global::Xamarin.Forms.Platform.Resource.Styleable.ConstraintSet_barrierDirection = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ConstraintSet_barrierDirection;
 			global::Xamarin.Forms.Platform.Resource.Styleable.ConstraintSet_barrierMargin = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ConstraintSet_barrierMargin;
 			global::Xamarin.Forms.Platform.Resource.Styleable.ConstraintSet_chainUseRtl = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ConstraintSet_chainUseRtl;
-			global::Xamarin.Forms.Platform.Resource.Styleable.ConstraintSet_ConstraintRotate = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ConstraintSet_ConstraintRotate;
 			global::Xamarin.Forms.Platform.Resource.Styleable.ConstraintSet_constraint_referenced_ids = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ConstraintSet_constraint_referenced_ids;
 			global::Xamarin.Forms.Platform.Resource.Styleable.ConstraintSet_constraint_referenced_tags = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ConstraintSet_constraint_referenced_tags;
 			global::Xamarin.Forms.Platform.Resource.Styleable.ConstraintSet_deriveConstraintsFrom = global::PerryRhodan.AudiobookPlayer.Android.Resource.Styleable.ConstraintSet_deriveConstraintsFrom;
@@ -16486,740 +16484,740 @@ namespace PerryRhodan.AudiobookPlayer.Android
 		public partial class Attribute
 		{
 			
+			// aapt resource value: 0x7F030002
+			public const int action = 2130903042;
+			
 			// aapt resource value: 0x7F030003
-			public const int action = 2130903043;
+			public const int actionBarDivider = 2130903043;
 			
 			// aapt resource value: 0x7F030004
-			public const int actionBarDivider = 2130903044;
+			public const int actionBarItemBackground = 2130903044;
 			
 			// aapt resource value: 0x7F030005
-			public const int actionBarItemBackground = 2130903045;
+			public const int actionBarPopupTheme = 2130903045;
 			
 			// aapt resource value: 0x7F030006
-			public const int actionBarPopupTheme = 2130903046;
+			public const int actionBarSize = 2130903046;
 			
 			// aapt resource value: 0x7F030007
-			public const int actionBarSize = 2130903047;
+			public const int actionBarSplitStyle = 2130903047;
 			
 			// aapt resource value: 0x7F030008
-			public const int actionBarSplitStyle = 2130903048;
+			public const int actionBarStyle = 2130903048;
 			
 			// aapt resource value: 0x7F030009
-			public const int actionBarStyle = 2130903049;
+			public const int actionBarTabBarStyle = 2130903049;
 			
 			// aapt resource value: 0x7F03000A
-			public const int actionBarTabBarStyle = 2130903050;
+			public const int actionBarTabStyle = 2130903050;
 			
 			// aapt resource value: 0x7F03000B
-			public const int actionBarTabStyle = 2130903051;
+			public const int actionBarTabTextStyle = 2130903051;
 			
 			// aapt resource value: 0x7F03000C
-			public const int actionBarTabTextStyle = 2130903052;
+			public const int actionBarTheme = 2130903052;
 			
 			// aapt resource value: 0x7F03000D
-			public const int actionBarTheme = 2130903053;
+			public const int actionBarWidgetTheme = 2130903053;
 			
 			// aapt resource value: 0x7F03000E
-			public const int actionBarWidgetTheme = 2130903054;
+			public const int actionButtonStyle = 2130903054;
 			
 			// aapt resource value: 0x7F03000F
-			public const int actionButtonStyle = 2130903055;
+			public const int actionDropDownStyle = 2130903055;
 			
 			// aapt resource value: 0x7F030010
-			public const int actionDropDownStyle = 2130903056;
+			public const int actionLayout = 2130903056;
 			
 			// aapt resource value: 0x7F030011
-			public const int actionLayout = 2130903057;
+			public const int actionMenuTextAppearance = 2130903057;
 			
 			// aapt resource value: 0x7F030012
-			public const int actionMenuTextAppearance = 2130903058;
+			public const int actionMenuTextColor = 2130903058;
 			
 			// aapt resource value: 0x7F030013
-			public const int actionMenuTextColor = 2130903059;
+			public const int actionModeBackground = 2130903059;
 			
 			// aapt resource value: 0x7F030014
-			public const int actionModeBackground = 2130903060;
+			public const int actionModeCloseButtonStyle = 2130903060;
 			
 			// aapt resource value: 0x7F030015
-			public const int actionModeCloseButtonStyle = 2130903061;
+			public const int actionModeCloseContentDescription = 2130903061;
 			
 			// aapt resource value: 0x7F030016
-			public const int actionModeCloseContentDescription = 2130903062;
+			public const int actionModeCloseDrawable = 2130903062;
 			
 			// aapt resource value: 0x7F030017
-			public const int actionModeCloseDrawable = 2130903063;
+			public const int actionModeCopyDrawable = 2130903063;
 			
 			// aapt resource value: 0x7F030018
-			public const int actionModeCopyDrawable = 2130903064;
+			public const int actionModeCutDrawable = 2130903064;
 			
 			// aapt resource value: 0x7F030019
-			public const int actionModeCutDrawable = 2130903065;
+			public const int actionModeFindDrawable = 2130903065;
 			
 			// aapt resource value: 0x7F03001A
-			public const int actionModeFindDrawable = 2130903066;
+			public const int actionModePasteDrawable = 2130903066;
 			
 			// aapt resource value: 0x7F03001B
-			public const int actionModePasteDrawable = 2130903067;
+			public const int actionModePopupWindowStyle = 2130903067;
 			
 			// aapt resource value: 0x7F03001C
-			public const int actionModePopupWindowStyle = 2130903068;
+			public const int actionModeSelectAllDrawable = 2130903068;
 			
 			// aapt resource value: 0x7F03001D
-			public const int actionModeSelectAllDrawable = 2130903069;
+			public const int actionModeShareDrawable = 2130903069;
 			
 			// aapt resource value: 0x7F03001E
-			public const int actionModeShareDrawable = 2130903070;
+			public const int actionModeSplitBackground = 2130903070;
 			
 			// aapt resource value: 0x7F03001F
-			public const int actionModeSplitBackground = 2130903071;
+			public const int actionModeStyle = 2130903071;
 			
 			// aapt resource value: 0x7F030020
-			public const int actionModeStyle = 2130903072;
+			public const int actionModeTheme = 2130903072;
 			
 			// aapt resource value: 0x7F030021
-			public const int actionModeTheme = 2130903073;
+			public const int actionModeWebSearchDrawable = 2130903073;
 			
 			// aapt resource value: 0x7F030022
-			public const int actionModeWebSearchDrawable = 2130903074;
+			public const int actionOverflowButtonStyle = 2130903074;
 			
 			// aapt resource value: 0x7F030023
-			public const int actionOverflowButtonStyle = 2130903075;
+			public const int actionOverflowMenuStyle = 2130903075;
 			
 			// aapt resource value: 0x7F030024
-			public const int actionOverflowMenuStyle = 2130903076;
+			public const int actionProviderClass = 2130903076;
 			
 			// aapt resource value: 0x7F030025
-			public const int actionProviderClass = 2130903077;
+			public const int actionTextColorAlpha = 2130903077;
 			
 			// aapt resource value: 0x7F030026
-			public const int actionTextColorAlpha = 2130903078;
+			public const int actionViewClass = 2130903078;
 			
 			// aapt resource value: 0x7F030027
-			public const int actionViewClass = 2130903079;
+			public const int activityChooserViewStyle = 2130903079;
 			
 			// aapt resource value: 0x7F030028
-			public const int activityChooserViewStyle = 2130903080;
+			public const int adjustable = 2130903080;
 			
 			// aapt resource value: 0x7F030029
-			public const int adjustable = 2130903081;
+			public const int ahBarColor = 2130903081;
 			
 			// aapt resource value: 0x7F03002A
-			public const int ahBarColor = 2130903082;
+			public const int ahBarLength = 2130903082;
 			
 			// aapt resource value: 0x7F03002B
-			public const int ahBarLength = 2130903083;
+			public const int ahBarWidth = 2130903083;
 			
 			// aapt resource value: 0x7F03002C
-			public const int ahBarWidth = 2130903084;
+			public const int ahCircleColor = 2130903084;
 			
 			// aapt resource value: 0x7F03002D
-			public const int ahCircleColor = 2130903085;
+			public const int ahDelayMillis = 2130903085;
 			
 			// aapt resource value: 0x7F03002E
-			public const int ahDelayMillis = 2130903086;
+			public const int ahRadius = 2130903086;
 			
 			// aapt resource value: 0x7F03002F
-			public const int ahRadius = 2130903087;
+			public const int ahRimColor = 2130903087;
 			
 			// aapt resource value: 0x7F030030
-			public const int ahRimColor = 2130903088;
+			public const int ahRimWidth = 2130903088;
 			
 			// aapt resource value: 0x7F030031
-			public const int ahRimWidth = 2130903089;
+			public const int ahSpinSpeed = 2130903089;
 			
 			// aapt resource value: 0x7F030032
-			public const int ahSpinSpeed = 2130903090;
+			public const int ahText = 2130903090;
 			
 			// aapt resource value: 0x7F030033
-			public const int ahText = 2130903091;
+			public const int ahTextColor = 2130903091;
 			
 			// aapt resource value: 0x7F030034
-			public const int ahTextColor = 2130903092;
+			public const int ahTextSize = 2130903092;
 			
 			// aapt resource value: 0x7F030035
-			public const int ahTextSize = 2130903093;
+			public const int alertDialogButtonGroupStyle = 2130903093;
 			
 			// aapt resource value: 0x7F030036
-			public const int alertDialogButtonGroupStyle = 2130903094;
+			public const int alertDialogCenterButtons = 2130903094;
 			
 			// aapt resource value: 0x7F030037
-			public const int alertDialogCenterButtons = 2130903095;
+			public const int alertDialogStyle = 2130903095;
 			
 			// aapt resource value: 0x7F030038
-			public const int alertDialogStyle = 2130903096;
+			public const int alertDialogTheme = 2130903096;
 			
 			// aapt resource value: 0x7F030039
-			public const int alertDialogTheme = 2130903097;
+			public const int allowDividerAbove = 2130903097;
 			
 			// aapt resource value: 0x7F03003A
-			public const int allowDividerAbove = 2130903098;
+			public const int allowDividerAfterLastItem = 2130903098;
 			
 			// aapt resource value: 0x7F03003B
-			public const int allowDividerAfterLastItem = 2130903099;
+			public const int allowDividerBelow = 2130903099;
 			
 			// aapt resource value: 0x7F03003C
-			public const int allowDividerBelow = 2130903100;
+			public const int allowStacking = 2130903100;
 			
 			// aapt resource value: 0x7F03003D
-			public const int allowStacking = 2130903101;
+			public const int alpha = 2130903101;
 			
 			// aapt resource value: 0x7F03003E
-			public const int alpha = 2130903102;
+			public const int alphabeticModifiers = 2130903102;
 			
 			// aapt resource value: 0x7F03003F
-			public const int alphabeticModifiers = 2130903103;
+			public const int altSrc = 2130903103;
 			
 			// aapt resource value: 0x7F030040
-			public const int altSrc = 2130903104;
+			public const int animateCircleAngleTo = 2130903104;
 			
 			// aapt resource value: 0x7F030041
-			public const int animateCircleAngleTo = 2130903105;
+			public const int animateRelativeTo = 2130903105;
 			
 			// aapt resource value: 0x7F030042
-			public const int animateRelativeTo = 2130903106;
+			public const int animationMode = 2130903106;
 			
 			// aapt resource value: 0x7F030043
-			public const int animationMode = 2130903107;
+			public const int appBarLayoutStyle = 2130903107;
 			
 			// aapt resource value: 0x7F030044
-			public const int appBarLayoutStyle = 2130903108;
+			public const int applyMotionScene = 2130903108;
 			
 			// aapt resource value: 0x7F030045
-			public const int applyMotionScene = 2130903109;
+			public const int arcMode = 2130903109;
 			
 			// aapt resource value: 0x7F030046
-			public const int arcMode = 2130903110;
+			public const int argType = 2130903110;
 			
 			// aapt resource value: 0x7F030047
-			public const int argType = 2130903111;
+			public const int arrowHeadLength = 2130903111;
 			
 			// aapt resource value: 0x7F030048
-			public const int arrowHeadLength = 2130903112;
+			public const int arrowShaftLength = 2130903112;
 			
 			// aapt resource value: 0x7F030049
-			public const int arrowShaftLength = 2130903113;
+			public const int attributeName = 2130903113;
 			
 			// aapt resource value: 0x7F03004A
-			public const int attributeName = 2130903114;
+			public const int autoCompleteMode = 2130903114;
 			
 			// aapt resource value: 0x7F03004B
-			public const int autoCompleteMode = 2130903115;
+			public const int autoCompleteTextViewStyle = 2130903115;
 			
 			// aapt resource value: 0x7F03004C
-			public const int autoCompleteTextViewStyle = 2130903116;
+			public const int autoSizeMaxTextSize = 2130903116;
 			
 			// aapt resource value: 0x7F03004D
-			public const int autoSizeMaxTextSize = 2130903117;
+			public const int autoSizeMinTextSize = 2130903117;
 			
 			// aapt resource value: 0x7F03004E
-			public const int autoSizeMinTextSize = 2130903118;
+			public const int autoSizePresetSizes = 2130903118;
 			
 			// aapt resource value: 0x7F03004F
-			public const int autoSizePresetSizes = 2130903119;
+			public const int autoSizeStepGranularity = 2130903119;
 			
 			// aapt resource value: 0x7F030050
-			public const int autoSizeStepGranularity = 2130903120;
+			public const int autoSizeTextType = 2130903120;
 			
 			// aapt resource value: 0x7F030051
-			public const int autoSizeTextType = 2130903121;
+			public const int autoTransition = 2130903121;
 			
 			// aapt resource value: 0x7F030052
-			public const int autoTransition = 2130903122;
+			public const int background = 2130903122;
 			
 			// aapt resource value: 0x7F030053
-			public const int background = 2130903123;
+			public const int backgroundColor = 2130903123;
 			
 			// aapt resource value: 0x7F030054
-			public const int backgroundColor = 2130903124;
+			public const int backgroundInsetBottom = 2130903124;
 			
 			// aapt resource value: 0x7F030055
-			public const int backgroundInsetBottom = 2130903125;
+			public const int backgroundInsetEnd = 2130903125;
 			
 			// aapt resource value: 0x7F030056
-			public const int backgroundInsetEnd = 2130903126;
+			public const int backgroundInsetStart = 2130903126;
 			
 			// aapt resource value: 0x7F030057
-			public const int backgroundInsetStart = 2130903127;
+			public const int backgroundInsetTop = 2130903127;
 			
 			// aapt resource value: 0x7F030058
-			public const int backgroundInsetTop = 2130903128;
+			public const int backgroundOverlayColorAlpha = 2130903128;
 			
 			// aapt resource value: 0x7F030059
-			public const int backgroundOverlayColorAlpha = 2130903129;
+			public const int backgroundSplit = 2130903129;
 			
 			// aapt resource value: 0x7F03005A
-			public const int backgroundSplit = 2130903130;
+			public const int backgroundStacked = 2130903130;
 			
 			// aapt resource value: 0x7F03005B
-			public const int backgroundStacked = 2130903131;
+			public const int backgroundTint = 2130903131;
 			
 			// aapt resource value: 0x7F03005C
-			public const int backgroundTint = 2130903132;
+			public const int backgroundTintMode = 2130903132;
 			
 			// aapt resource value: 0x7F03005D
-			public const int backgroundTintMode = 2130903133;
+			public const int badgeGravity = 2130903133;
 			
 			// aapt resource value: 0x7F03005E
-			public const int badgeGravity = 2130903134;
+			public const int badgeStyle = 2130903134;
 			
 			// aapt resource value: 0x7F03005F
-			public const int badgeStyle = 2130903135;
+			public const int badgeTextColor = 2130903135;
 			
 			// aapt resource value: 0x7F030060
-			public const int badgeTextColor = 2130903136;
+			public const int barLength = 2130903136;
 			
 			// aapt resource value: 0x7F030061
-			public const int barLength = 2130903137;
+			public const int barrierAllowsGoneWidgets = 2130903137;
 			
 			// aapt resource value: 0x7F030062
-			public const int barrierAllowsGoneWidgets = 2130903138;
+			public const int barrierDirection = 2130903138;
 			
 			// aapt resource value: 0x7F030063
-			public const int barrierDirection = 2130903139;
+			public const int barrierMargin = 2130903139;
 			
 			// aapt resource value: 0x7F030064
-			public const int barrierMargin = 2130903140;
+			public const int behavior_autoHide = 2130903140;
 			
 			// aapt resource value: 0x7F030065
-			public const int behavior_autoHide = 2130903141;
+			public const int behavior_autoShrink = 2130903141;
 			
 			// aapt resource value: 0x7F030066
-			public const int behavior_autoShrink = 2130903142;
+			public const int behavior_draggable = 2130903142;
 			
 			// aapt resource value: 0x7F030067
-			public const int behavior_draggable = 2130903143;
+			public const int behavior_expandedOffset = 2130903143;
 			
 			// aapt resource value: 0x7F030068
-			public const int behavior_expandedOffset = 2130903144;
+			public const int behavior_fitToContents = 2130903144;
 			
 			// aapt resource value: 0x7F030069
-			public const int behavior_fitToContents = 2130903145;
+			public const int behavior_halfExpandedRatio = 2130903145;
 			
 			// aapt resource value: 0x7F03006A
-			public const int behavior_halfExpandedRatio = 2130903146;
+			public const int behavior_hideable = 2130903146;
 			
 			// aapt resource value: 0x7F03006B
-			public const int behavior_hideable = 2130903147;
+			public const int behavior_overlapTop = 2130903147;
 			
 			// aapt resource value: 0x7F03006C
-			public const int behavior_overlapTop = 2130903148;
+			public const int behavior_peekHeight = 2130903148;
 			
 			// aapt resource value: 0x7F03006D
-			public const int behavior_peekHeight = 2130903149;
+			public const int behavior_saveFlags = 2130903149;
 			
 			// aapt resource value: 0x7F03006E
-			public const int behavior_saveFlags = 2130903150;
+			public const int behavior_skipCollapsed = 2130903150;
 			
 			// aapt resource value: 0x7F03006F
-			public const int behavior_skipCollapsed = 2130903151;
-			
-			// aapt resource value: 0x7F030070
-			public const int blendSrc = 2130903152;
-			
-			// aapt resource value: 0x7F030074
-			public const int borderlessButtonStyle = 2130903156;
-			
-			// aapt resource value: 0x7F030071
-			public const int borderRound = 2130903153;
-			
-			// aapt resource value: 0x7F030072
-			public const int borderRoundPercent = 2130903154;
+			public const int blendSrc = 2130903151;
 			
 			// aapt resource value: 0x7F030073
-			public const int borderWidth = 2130903155;
+			public const int borderlessButtonStyle = 2130903155;
+			
+			// aapt resource value: 0x7F030070
+			public const int borderRound = 2130903152;
+			
+			// aapt resource value: 0x7F030071
+			public const int borderRoundPercent = 2130903153;
+			
+			// aapt resource value: 0x7F030072
+			public const int borderWidth = 2130903154;
+			
+			// aapt resource value: 0x7F030074
+			public const int bottomAppBarStyle = 2130903156;
 			
 			// aapt resource value: 0x7F030075
-			public const int bottomAppBarStyle = 2130903157;
+			public const int bottomNavigationStyle = 2130903157;
 			
 			// aapt resource value: 0x7F030076
-			public const int bottomNavigationStyle = 2130903158;
+			public const int bottomSheetDialogTheme = 2130903158;
 			
 			// aapt resource value: 0x7F030077
-			public const int bottomSheetDialogTheme = 2130903159;
+			public const int bottomSheetStyle = 2130903159;
 			
 			// aapt resource value: 0x7F030078
-			public const int bottomSheetStyle = 2130903160;
+			public const int boxBackgroundColor = 2130903160;
 			
 			// aapt resource value: 0x7F030079
-			public const int boxBackgroundColor = 2130903161;
+			public const int boxBackgroundMode = 2130903161;
 			
 			// aapt resource value: 0x7F03007A
-			public const int boxBackgroundMode = 2130903162;
+			public const int boxCollapsedPaddingTop = 2130903162;
 			
 			// aapt resource value: 0x7F03007B
-			public const int boxCollapsedPaddingTop = 2130903163;
+			public const int boxCornerRadiusBottomEnd = 2130903163;
 			
 			// aapt resource value: 0x7F03007C
-			public const int boxCornerRadiusBottomEnd = 2130903164;
+			public const int boxCornerRadiusBottomStart = 2130903164;
 			
 			// aapt resource value: 0x7F03007D
-			public const int boxCornerRadiusBottomStart = 2130903165;
+			public const int boxCornerRadiusTopEnd = 2130903165;
 			
 			// aapt resource value: 0x7F03007E
-			public const int boxCornerRadiusTopEnd = 2130903166;
+			public const int boxCornerRadiusTopStart = 2130903166;
 			
 			// aapt resource value: 0x7F03007F
-			public const int boxCornerRadiusTopStart = 2130903167;
+			public const int boxStrokeColor = 2130903167;
 			
 			// aapt resource value: 0x7F030080
-			public const int boxStrokeColor = 2130903168;
+			public const int boxStrokeErrorColor = 2130903168;
 			
 			// aapt resource value: 0x7F030081
-			public const int boxStrokeErrorColor = 2130903169;
+			public const int boxStrokeWidth = 2130903169;
 			
 			// aapt resource value: 0x7F030082
-			public const int boxStrokeWidth = 2130903170;
+			public const int boxStrokeWidthFocused = 2130903170;
 			
 			// aapt resource value: 0x7F030083
-			public const int boxStrokeWidthFocused = 2130903171;
+			public const int brightness = 2130903171;
 			
 			// aapt resource value: 0x7F030084
-			public const int brightness = 2130903172;
+			public const int buttonBarButtonStyle = 2130903172;
 			
 			// aapt resource value: 0x7F030085
-			public const int buttonBarButtonStyle = 2130903173;
+			public const int buttonBarNegativeButtonStyle = 2130903173;
 			
 			// aapt resource value: 0x7F030086
-			public const int buttonBarNegativeButtonStyle = 2130903174;
+			public const int buttonBarNeutralButtonStyle = 2130903174;
 			
 			// aapt resource value: 0x7F030087
-			public const int buttonBarNeutralButtonStyle = 2130903175;
+			public const int buttonBarPositiveButtonStyle = 2130903175;
 			
 			// aapt resource value: 0x7F030088
-			public const int buttonBarPositiveButtonStyle = 2130903176;
+			public const int buttonBarStyle = 2130903176;
 			
 			// aapt resource value: 0x7F030089
-			public const int buttonBarStyle = 2130903177;
+			public const int buttonCompat = 2130903177;
 			
 			// aapt resource value: 0x7F03008A
-			public const int buttonCompat = 2130903178;
+			public const int buttonGravity = 2130903178;
 			
 			// aapt resource value: 0x7F03008B
-			public const int buttonGravity = 2130903179;
+			public const int buttonIconDimen = 2130903179;
 			
 			// aapt resource value: 0x7F03008C
-			public const int buttonIconDimen = 2130903180;
+			public const int buttonPanelSideLayout = 2130903180;
 			
 			// aapt resource value: 0x7F03008D
-			public const int buttonPanelSideLayout = 2130903181;
+			public const int buttonStyle = 2130903181;
 			
 			// aapt resource value: 0x7F03008E
-			public const int buttonStyle = 2130903182;
+			public const int buttonStyleSmall = 2130903182;
 			
 			// aapt resource value: 0x7F03008F
-			public const int buttonStyleSmall = 2130903183;
+			public const int buttonTint = 2130903183;
 			
 			// aapt resource value: 0x7F030090
-			public const int buttonTint = 2130903184;
+			public const int buttonTintMode = 2130903184;
 			
 			// aapt resource value: 0x7F030091
-			public const int buttonTintMode = 2130903185;
+			public const int cardBackgroundColor = 2130903185;
 			
 			// aapt resource value: 0x7F030092
-			public const int cardBackgroundColor = 2130903186;
+			public const int cardCornerRadius = 2130903186;
 			
 			// aapt resource value: 0x7F030093
-			public const int cardCornerRadius = 2130903187;
+			public const int cardElevation = 2130903187;
 			
 			// aapt resource value: 0x7F030094
-			public const int cardElevation = 2130903188;
+			public const int cardForegroundColor = 2130903188;
 			
 			// aapt resource value: 0x7F030095
-			public const int cardForegroundColor = 2130903189;
+			public const int cardMaxElevation = 2130903189;
 			
 			// aapt resource value: 0x7F030096
-			public const int cardMaxElevation = 2130903190;
+			public const int cardPreventCornerOverlap = 2130903190;
 			
 			// aapt resource value: 0x7F030097
-			public const int cardPreventCornerOverlap = 2130903191;
+			public const int cardUseCompatPadding = 2130903191;
 			
 			// aapt resource value: 0x7F030098
-			public const int cardUseCompatPadding = 2130903192;
+			public const int cardViewStyle = 2130903192;
 			
 			// aapt resource value: 0x7F030099
-			public const int cardViewStyle = 2130903193;
+			public const int carousel_backwardTransition = 2130903193;
 			
 			// aapt resource value: 0x7F03009A
-			public const int carousel_backwardTransition = 2130903194;
+			public const int carousel_emptyViewsBehavior = 2130903194;
 			
 			// aapt resource value: 0x7F03009B
-			public const int carousel_emptyViewsBehavior = 2130903195;
+			public const int carousel_firstView = 2130903195;
 			
 			// aapt resource value: 0x7F03009C
-			public const int carousel_firstView = 2130903196;
+			public const int carousel_forwardTransition = 2130903196;
 			
 			// aapt resource value: 0x7F03009D
-			public const int carousel_forwardTransition = 2130903197;
+			public const int carousel_infinite = 2130903197;
 			
 			// aapt resource value: 0x7F03009E
-			public const int carousel_infinite = 2130903198;
+			public const int carousel_nextState = 2130903198;
 			
 			// aapt resource value: 0x7F03009F
-			public const int carousel_nextState = 2130903199;
+			public const int carousel_previousState = 2130903199;
 			
 			// aapt resource value: 0x7F0300A0
-			public const int carousel_previousState = 2130903200;
+			public const int carousel_touchUpMode = 2130903200;
 			
 			// aapt resource value: 0x7F0300A1
-			public const int carousel_touchUpMode = 2130903201;
+			public const int carousel_touchUp_dampeningFactor = 2130903201;
 			
 			// aapt resource value: 0x7F0300A2
-			public const int carousel_touchUp_dampeningFactor = 2130903202;
+			public const int carousel_touchUp_velocityThreshold = 2130903202;
 			
 			// aapt resource value: 0x7F0300A3
-			public const int carousel_touchUp_velocityThreshold = 2130903203;
+			public const int chainUseRtl = 2130903203;
 			
 			// aapt resource value: 0x7F0300A4
-			public const int chainUseRtl = 2130903204;
+			public const int checkBoxPreferenceStyle = 2130903204;
 			
 			// aapt resource value: 0x7F0300A5
-			public const int checkBoxPreferenceStyle = 2130903205;
+			public const int checkboxStyle = 2130903205;
 			
 			// aapt resource value: 0x7F0300A6
-			public const int checkboxStyle = 2130903206;
+			public const int checkedButton = 2130903206;
 			
 			// aapt resource value: 0x7F0300A7
-			public const int checkedButton = 2130903207;
+			public const int checkedChip = 2130903207;
 			
 			// aapt resource value: 0x7F0300A8
-			public const int checkedChip = 2130903208;
+			public const int checkedIcon = 2130903208;
 			
 			// aapt resource value: 0x7F0300A9
-			public const int checkedIcon = 2130903209;
+			public const int checkedIconEnabled = 2130903209;
 			
 			// aapt resource value: 0x7F0300AA
-			public const int checkedIconEnabled = 2130903210;
+			public const int checkedIconMargin = 2130903210;
 			
 			// aapt resource value: 0x7F0300AB
-			public const int checkedIconMargin = 2130903211;
+			public const int checkedIconSize = 2130903211;
 			
 			// aapt resource value: 0x7F0300AC
-			public const int checkedIconSize = 2130903212;
+			public const int checkedIconTint = 2130903212;
 			
 			// aapt resource value: 0x7F0300AD
-			public const int checkedIconTint = 2130903213;
+			public const int checkedIconVisible = 2130903213;
 			
 			// aapt resource value: 0x7F0300AE
-			public const int checkedIconVisible = 2130903214;
+			public const int checkedTextViewStyle = 2130903214;
 			
 			// aapt resource value: 0x7F0300AF
-			public const int checkedTextViewStyle = 2130903215;
+			public const int chipBackgroundColor = 2130903215;
 			
 			// aapt resource value: 0x7F0300B0
-			public const int chipBackgroundColor = 2130903216;
+			public const int chipCornerRadius = 2130903216;
 			
 			// aapt resource value: 0x7F0300B1
-			public const int chipCornerRadius = 2130903217;
+			public const int chipEndPadding = 2130903217;
 			
 			// aapt resource value: 0x7F0300B2
-			public const int chipEndPadding = 2130903218;
+			public const int chipGroupStyle = 2130903218;
 			
 			// aapt resource value: 0x7F0300B3
-			public const int chipGroupStyle = 2130903219;
+			public const int chipIcon = 2130903219;
 			
 			// aapt resource value: 0x7F0300B4
-			public const int chipIcon = 2130903220;
+			public const int chipIconEnabled = 2130903220;
 			
 			// aapt resource value: 0x7F0300B5
-			public const int chipIconEnabled = 2130903221;
+			public const int chipIconSize = 2130903221;
 			
 			// aapt resource value: 0x7F0300B6
-			public const int chipIconSize = 2130903222;
+			public const int chipIconTint = 2130903222;
 			
 			// aapt resource value: 0x7F0300B7
-			public const int chipIconTint = 2130903223;
+			public const int chipIconVisible = 2130903223;
 			
 			// aapt resource value: 0x7F0300B8
-			public const int chipIconVisible = 2130903224;
+			public const int chipMinHeight = 2130903224;
 			
 			// aapt resource value: 0x7F0300B9
-			public const int chipMinHeight = 2130903225;
+			public const int chipMinTouchTargetSize = 2130903225;
 			
 			// aapt resource value: 0x7F0300BA
-			public const int chipMinTouchTargetSize = 2130903226;
+			public const int chipSpacing = 2130903226;
 			
 			// aapt resource value: 0x7F0300BB
-			public const int chipSpacing = 2130903227;
+			public const int chipSpacingHorizontal = 2130903227;
 			
 			// aapt resource value: 0x7F0300BC
-			public const int chipSpacingHorizontal = 2130903228;
+			public const int chipSpacingVertical = 2130903228;
 			
 			// aapt resource value: 0x7F0300BD
-			public const int chipSpacingVertical = 2130903229;
+			public const int chipStandaloneStyle = 2130903229;
 			
 			// aapt resource value: 0x7F0300BE
-			public const int chipStandaloneStyle = 2130903230;
+			public const int chipStartPadding = 2130903230;
 			
 			// aapt resource value: 0x7F0300BF
-			public const int chipStartPadding = 2130903231;
+			public const int chipStrokeColor = 2130903231;
 			
 			// aapt resource value: 0x7F0300C0
-			public const int chipStrokeColor = 2130903232;
+			public const int chipStrokeWidth = 2130903232;
 			
 			// aapt resource value: 0x7F0300C1
-			public const int chipStrokeWidth = 2130903233;
+			public const int chipStyle = 2130903233;
 			
 			// aapt resource value: 0x7F0300C2
-			public const int chipStyle = 2130903234;
+			public const int chipSurfaceColor = 2130903234;
 			
 			// aapt resource value: 0x7F0300C3
-			public const int chipSurfaceColor = 2130903235;
-			
-			// aapt resource value: 0x7F0300C4
-			public const int circleRadius = 2130903236;
-			
-			// aapt resource value: 0x7F0300C6
-			public const int circularflow_angles = 2130903238;
-			
-			// aapt resource value: 0x7F0300C7
-			public const int circularflow_defaultAngle = 2130903239;
-			
-			// aapt resource value: 0x7F0300C8
-			public const int circularflow_defaultRadius = 2130903240;
-			
-			// aapt resource value: 0x7F0300C9
-			public const int circularflow_radiusInDP = 2130903241;
-			
-			// aapt resource value: 0x7F0300CA
-			public const int circularflow_viewCenter = 2130903242;
+			public const int circleRadius = 2130903235;
 			
 			// aapt resource value: 0x7F0300C5
-			public const int circularProgressIndicatorStyle = 2130903237;
+			public const int circularflow_angles = 2130903237;
+			
+			// aapt resource value: 0x7F0300C6
+			public const int circularflow_defaultAngle = 2130903238;
+			
+			// aapt resource value: 0x7F0300C7
+			public const int circularflow_defaultRadius = 2130903239;
+			
+			// aapt resource value: 0x7F0300C8
+			public const int circularflow_radiusInDP = 2130903240;
+			
+			// aapt resource value: 0x7F0300C9
+			public const int circularflow_viewCenter = 2130903241;
+			
+			// aapt resource value: 0x7F0300C4
+			public const int circularProgressIndicatorStyle = 2130903236;
+			
+			// aapt resource value: 0x7F0300CA
+			public const int clearsTag = 2130903242;
 			
 			// aapt resource value: 0x7F0300CB
-			public const int clearsTag = 2130903243;
+			public const int clickAction = 2130903243;
 			
 			// aapt resource value: 0x7F0300CC
-			public const int clickAction = 2130903244;
+			public const int clockFaceBackgroundColor = 2130903244;
 			
 			// aapt resource value: 0x7F0300CD
-			public const int clockFaceBackgroundColor = 2130903245;
+			public const int clockHandColor = 2130903245;
 			
 			// aapt resource value: 0x7F0300CE
-			public const int clockHandColor = 2130903246;
+			public const int clockIcon = 2130903246;
 			
 			// aapt resource value: 0x7F0300CF
-			public const int clockIcon = 2130903247;
+			public const int clockNumberTextColor = 2130903247;
 			
 			// aapt resource value: 0x7F0300D0
-			public const int clockNumberTextColor = 2130903248;
+			public const int closeIcon = 2130903248;
 			
 			// aapt resource value: 0x7F0300D1
-			public const int closeIcon = 2130903249;
+			public const int closeIconEnabled = 2130903249;
 			
 			// aapt resource value: 0x7F0300D2
-			public const int closeIconEnabled = 2130903250;
+			public const int closeIconEndPadding = 2130903250;
 			
 			// aapt resource value: 0x7F0300D3
-			public const int closeIconEndPadding = 2130903251;
+			public const int closeIconSize = 2130903251;
 			
 			// aapt resource value: 0x7F0300D4
-			public const int closeIconSize = 2130903252;
+			public const int closeIconStartPadding = 2130903252;
 			
 			// aapt resource value: 0x7F0300D5
-			public const int closeIconStartPadding = 2130903253;
+			public const int closeIconTint = 2130903253;
 			
 			// aapt resource value: 0x7F0300D6
-			public const int closeIconTint = 2130903254;
+			public const int closeIconVisible = 2130903254;
 			
 			// aapt resource value: 0x7F0300D7
-			public const int closeIconVisible = 2130903255;
+			public const int closeItemLayout = 2130903255;
 			
 			// aapt resource value: 0x7F0300D8
-			public const int closeItemLayout = 2130903256;
-			
-			// aapt resource value: 0x7F0300D9
-			public const int collapseContentDescription = 2130903257;
-			
-			// aapt resource value: 0x7F0300DB
-			public const int collapsedSize = 2130903259;
-			
-			// aapt resource value: 0x7F0300DC
-			public const int collapsedTitleGravity = 2130903260;
-			
-			// aapt resource value: 0x7F0300DD
-			public const int collapsedTitleTextAppearance = 2130903261;
+			public const int collapseContentDescription = 2130903256;
 			
 			// aapt resource value: 0x7F0300DA
-			public const int collapseIcon = 2130903258;
+			public const int collapsedSize = 2130903258;
+			
+			// aapt resource value: 0x7F0300DB
+			public const int collapsedTitleGravity = 2130903259;
+			
+			// aapt resource value: 0x7F0300DC
+			public const int collapsedTitleTextAppearance = 2130903260;
+			
+			// aapt resource value: 0x7F0300D9
+			public const int collapseIcon = 2130903257;
+			
+			// aapt resource value: 0x7F0300DD
+			public const int collapsingToolbarLayoutStyle = 2130903261;
 			
 			// aapt resource value: 0x7F0300DE
-			public const int collapsingToolbarLayoutStyle = 2130903262;
+			public const int collectionViewStyle = 2130903262;
 			
 			// aapt resource value: 0x7F0300DF
-			public const int collectionViewStyle = 2130903263;
+			public const int color = 2130903263;
 			
 			// aapt resource value: 0x7F0300E0
-			public const int color = 2130903264;
+			public const int colorAccent = 2130903264;
 			
 			// aapt resource value: 0x7F0300E1
-			public const int colorAccent = 2130903265;
+			public const int colorBackgroundFloating = 2130903265;
 			
 			// aapt resource value: 0x7F0300E2
-			public const int colorBackgroundFloating = 2130903266;
+			public const int colorButtonNormal = 2130903266;
 			
 			// aapt resource value: 0x7F0300E3
-			public const int colorButtonNormal = 2130903267;
+			public const int colorControlActivated = 2130903267;
 			
 			// aapt resource value: 0x7F0300E4
-			public const int colorControlActivated = 2130903268;
+			public const int colorControlHighlight = 2130903268;
 			
 			// aapt resource value: 0x7F0300E5
-			public const int colorControlHighlight = 2130903269;
+			public const int colorControlNormal = 2130903269;
 			
 			// aapt resource value: 0x7F0300E6
-			public const int colorControlNormal = 2130903270;
+			public const int colorError = 2130903270;
 			
 			// aapt resource value: 0x7F0300E7
-			public const int colorError = 2130903271;
+			public const int colorOnBackground = 2130903271;
 			
 			// aapt resource value: 0x7F0300E8
-			public const int colorOnBackground = 2130903272;
+			public const int colorOnError = 2130903272;
 			
 			// aapt resource value: 0x7F0300E9
-			public const int colorOnError = 2130903273;
+			public const int colorOnPrimary = 2130903273;
 			
 			// aapt resource value: 0x7F0300EA
-			public const int colorOnPrimary = 2130903274;
+			public const int colorOnPrimarySurface = 2130903274;
 			
 			// aapt resource value: 0x7F0300EB
-			public const int colorOnPrimarySurface = 2130903275;
+			public const int colorOnSecondary = 2130903275;
 			
 			// aapt resource value: 0x7F0300EC
-			public const int colorOnSecondary = 2130903276;
+			public const int colorOnSurface = 2130903276;
 			
 			// aapt resource value: 0x7F0300ED
-			public const int colorOnSurface = 2130903277;
+			public const int colorPrimary = 2130903277;
 			
 			// aapt resource value: 0x7F0300EE
-			public const int colorPrimary = 2130903278;
+			public const int colorPrimaryDark = 2130903278;
 			
 			// aapt resource value: 0x7F0300EF
-			public const int colorPrimaryDark = 2130903279;
+			public const int colorPrimarySurface = 2130903279;
 			
 			// aapt resource value: 0x7F0300F0
-			public const int colorPrimarySurface = 2130903280;
+			public const int colorPrimaryVariant = 2130903280;
 			
 			// aapt resource value: 0x7F0300F1
-			public const int colorPrimaryVariant = 2130903281;
+			public const int colorSecondary = 2130903281;
 			
 			// aapt resource value: 0x7F0300F2
-			public const int colorSecondary = 2130903282;
+			public const int colorSecondaryVariant = 2130903282;
 			
 			// aapt resource value: 0x7F0300F3
-			public const int colorSecondaryVariant = 2130903283;
+			public const int colorSurface = 2130903283;
 			
 			// aapt resource value: 0x7F0300F4
-			public const int colorSurface = 2130903284;
+			public const int colorSwitchThumbNormal = 2130903284;
 			
 			// aapt resource value: 0x7F0300F5
-			public const int colorSwitchThumbNormal = 2130903285;
+			public const int commitIcon = 2130903285;
 			
 			// aapt resource value: 0x7F0300F6
-			public const int commitIcon = 2130903286;
-			
-			// aapt resource value: 0x7F030000
-			public const int ConstraintRotate = 2130903040;
+			public const int constraintRotate = 2130903286;
 			
 			// aapt resource value: 0x7F0300FC
 			public const int constraints = 2130903292;
@@ -18988,11 +18986,11 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 0x7F030343
 			public const int shapeAppearanceSmallComponent = 2130903875;
 			
-			// aapt resource value: 0x7F030001
-			public const int SharedValue = 2130903041;
+			// aapt resource value: 0x7F030000
+			public const int SharedValue = 2130903040;
 			
-			// aapt resource value: 0x7F030002
-			public const int SharedValueId = 2130903042;
+			// aapt resource value: 0x7F030001
+			public const int SharedValueId = 2130903041;
 			
 			// aapt resource value: 0x7F030344
 			public const int shortcutMatchRequired = 2130903876;
@@ -27082,11 +27080,11 @@ namespace PerryRhodan.AudiobookPlayer.Android
 		public partial class Styleable
 		{
 			
-			// aapt resource value: { 0x7F030053,0x7F03005A,0x7F03005B,0x7F0300FF,0x7F030100,0x7F030101,0x7F030102,0x7F030103,0x7F030104,0x7F03012A,0x7F030146,0x7F030147,0x7F030162,0x7F0301C1,0x7F0301C8,0x7F0301CE,0x7F0301CF,0x7F0301D2,0x7F0301E4,0x7F0301F8,0x7F03026E,0x7F0302C8,0x7F030301,0x7F030312,0x7F030313,0x7F030379,0x7F03037D,0x7F0303EE,0x7F0303FA }
+			// aapt resource value: { 0x7F030052,0x7F030059,0x7F03005A,0x7F0300FF,0x7F030100,0x7F030101,0x7F030102,0x7F030103,0x7F030104,0x7F03012A,0x7F030146,0x7F030147,0x7F030162,0x7F0301C1,0x7F0301C8,0x7F0301CE,0x7F0301CF,0x7F0301D2,0x7F0301E4,0x7F0301F8,0x7F03026E,0x7F0302C8,0x7F030301,0x7F030312,0x7F030313,0x7F030379,0x7F03037D,0x7F0303EE,0x7F0303FA }
 			public static int[] ActionBar = new int[] {
-					2130903123,
+					2130903122,
+					2130903129,
 					2130903130,
-					2130903131,
 					2130903295,
 					2130903296,
 					2130903297,
@@ -27219,11 +27217,11 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			public static int[] ActionMenuView = new int[] {
 					-1};
 			
-			// aapt resource value: { 0x7F030053,0x7F03005A,0x7F0300D8,0x7F0301C1,0x7F03037D,0x7F0303FA }
+			// aapt resource value: { 0x7F030052,0x7F030059,0x7F0300D7,0x7F0301C1,0x7F03037D,0x7F0303FA }
 			public static int[] ActionMode = new int[] {
-					2130903123,
-					2130903130,
-					2130903256,
+					2130903122,
+					2130903129,
+					2130903255,
 					2130903489,
 					2130903933,
 					2130904058};
@@ -27257,10 +27255,10 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 1
 			public const int ActivityChooserView_initialActivityCount = 1;
 			
-			// aapt resource value: { 0x1010003,0x7F030003,0x7F03012E,0x7F03012F,0x7F0303AA }
+			// aapt resource value: { 0x1010003,0x7F030002,0x7F03012E,0x7F03012F,0x7F0303AA }
 			public static int[] ActivityNavigator = new int[] {
 					16842755,
-					2130903043,
+					2130903042,
 					2130903342,
 					2130903343,
 					2130903978};
@@ -27280,11 +27278,11 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 4
 			public const int ActivityNavigator_targetPackage = 4;
 			
-			// aapt resource value: { 0x10100F2,0x7F03008C,0x7F03008D,0x7F030263,0x7F030264,0x7F0302C3,0x7F03034E,0x7F030350 }
+			// aapt resource value: { 0x10100F2,0x7F03008B,0x7F03008C,0x7F030263,0x7F030264,0x7F0302C3,0x7F03034E,0x7F030350 }
 			public static int[] AlertDialog = new int[] {
 					16842994,
+					2130903179,
 					2130903180,
-					2130903181,
 					2130903651,
 					2130903652,
 					2130903747,
@@ -27506,14 +27504,14 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 0
 			public const int AppCompatTextHelper_android_textAppearance = 0;
 			
-			// aapt resource value: { 0x1010034,0x7F03004D,0x7F03004E,0x7F03004F,0x7F030050,0x7F030051,0x7F03014F,0x7F030150,0x7F030151,0x7F030152,0x7F030154,0x7F030155,0x7F030156,0x7F030157,0x7F030195,0x7F0301AB,0x7F0301B4,0x7F03020F,0x7F03025C,0x7F0303AE,0x7F0303D0 }
+			// aapt resource value: { 0x1010034,0x7F03004C,0x7F03004D,0x7F03004E,0x7F03004F,0x7F030050,0x7F03014F,0x7F030150,0x7F030151,0x7F030152,0x7F030154,0x7F030155,0x7F030156,0x7F030157,0x7F030195,0x7F0301AB,0x7F0301B4,0x7F03020F,0x7F03025C,0x7F0303AE,0x7F0303D0 }
 			public static int[] AppCompatTextView = new int[] {
 					16842804,
+					2130903116,
 					2130903117,
 					2130903118,
 					2130903119,
 					2130903120,
-					2130903121,
 					2130903375,
 					2130903376,
 					2130903377,
@@ -27593,10 +27591,11 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 20
 			public const int AppCompatTextView_textLocale = 20;
 			
-			// aapt resource value: { 0x1010057,0x10100AE,0x7F030004,0x7F030005,0x7F030006,0x7F030007,0x7F030008,0x7F030009,0x7F03000A,0x7F03000B,0x7F03000C,0x7F03000D,0x7F03000E,0x7F03000F,0x7F030010,0x7F030012,0x7F030013,0x7F030014,0x7F030015,0x7F030016,0x7F030017,0x7F030018,0x7F030019,0x7F03001A,0x7F03001B,0x7F03001C,0x7F03001D,0x7F03001E,0x7F03001F,0x7F030020,0x7F030021,0x7F030022,0x7F030023,0x7F030024,0x7F030028,0x7F030036,0x7F030037,0x7F030038,0x7F030039,0x7F03004C,0x7F030074,0x7F030085,0x7F030086,0x7F030087,0x7F030088,0x7F030089,0x7F03008E,0x7F03008F,0x7F0300A6,0x7F0300AF,0x7F0300E1,0x7F0300E2,0x7F0300E3,0x7F0300E4,0x7F0300E5,0x7F0300E6,0x7F0300E7,0x7F0300EE,0x7F0300EF,0x7F0300F5,0x7F03010E,0x7F03013D,0x7F030142,0x7F030143,0x7F030148,0x7F03014A,0x7F03015A,0x7F03015B,0x7F03015E,0x7F03015F,0x7F030161,0x7F0301CE,0x7F0301DE,0x7F03025F,0x7F030260,0x7F030261,0x7F030262,0x7F030265,0x7F030266,0x7F030267,0x7F030268,0x7F030269,0x7F03026A,0x7F03026B,0x7F03026C,0x7F03026D,0x7F0302E5,0x7F0302E6,0x7F0302E7,0x7F030300,0x7F030302,0x7F03031A,0x7F03031C,0x7F03031D,0x7F03031E,0x7F030335,0x7F030338,0x7F03033A,0x7F03033B,0x7F03035B,0x7F03035C,0x7F03038A,0x7F0303B9,0x7F0303BB,0x7F0303BC,0x7F0303BD,0x7F0303BF,0x7F0303C0,0x7F0303C1,0x7F0303C2,0x7F0303CA,0x7F0303CB,0x7F0303FC,0x7F0303FD,0x7F0303FE,0x7F0303FF,0x7F030420,0x7F03042F,0x7F030430,0x7F030431,0x7F030432,0x7F030433,0x7F030434,0x7F030435,0x7F030436,0x7F030437,0x7F030438 }
+			// aapt resource value: { 0x1010057,0x10100AE,0x7F030003,0x7F030004,0x7F030005,0x7F030006,0x7F030007,0x7F030008,0x7F030009,0x7F03000A,0x7F03000B,0x7F03000C,0x7F03000D,0x7F03000E,0x7F03000F,0x7F030011,0x7F030012,0x7F030013,0x7F030014,0x7F030015,0x7F030016,0x7F030017,0x7F030018,0x7F030019,0x7F03001A,0x7F03001B,0x7F03001C,0x7F03001D,0x7F03001E,0x7F03001F,0x7F030020,0x7F030021,0x7F030022,0x7F030023,0x7F030027,0x7F030035,0x7F030036,0x7F030037,0x7F030038,0x7F03004B,0x7F030073,0x7F030084,0x7F030085,0x7F030086,0x7F030087,0x7F030088,0x7F03008D,0x7F03008E,0x7F0300A5,0x7F0300AE,0x7F0300E0,0x7F0300E1,0x7F0300E2,0x7F0300E3,0x7F0300E4,0x7F0300E5,0x7F0300E6,0x7F0300ED,0x7F0300EE,0x7F0300F4,0x7F03010E,0x7F03013D,0x7F030142,0x7F030143,0x7F030148,0x7F03014A,0x7F03015A,0x7F03015B,0x7F03015E,0x7F03015F,0x7F030161,0x7F0301CE,0x7F0301DE,0x7F03025F,0x7F030260,0x7F030261,0x7F030262,0x7F030265,0x7F030266,0x7F030267,0x7F030268,0x7F030269,0x7F03026A,0x7F03026B,0x7F03026C,0x7F03026D,0x7F0302E5,0x7F0302E6,0x7F0302E7,0x7F030300,0x7F030302,0x7F03031A,0x7F03031C,0x7F03031D,0x7F03031E,0x7F030335,0x7F030338,0x7F03033A,0x7F03033B,0x7F03035B,0x7F03035C,0x7F03038A,0x7F0303B9,0x7F0303BB,0x7F0303BC,0x7F0303BD,0x7F0303BF,0x7F0303C0,0x7F0303C1,0x7F0303C2,0x7F0303CA,0x7F0303CB,0x7F0303FC,0x7F0303FD,0x7F0303FE,0x7F0303FF,0x7F030420,0x7F03042F,0x7F030430,0x7F030431,0x7F030432,0x7F030433,0x7F030434,0x7F030435,0x7F030436,0x7F030437,0x7F030438 }
 			public static int[] AppCompatTheme = new int[] {
 					16842839,
 					16842926,
+					2130903043,
 					2130903044,
 					2130903045,
 					2130903046,
@@ -27609,7 +27608,7 @@ namespace PerryRhodan.AudiobookPlayer.Android
 					2130903053,
 					2130903054,
 					2130903055,
-					2130903056,
+					2130903057,
 					2130903058,
 					2130903059,
 					2130903060,
@@ -27628,33 +27627,32 @@ namespace PerryRhodan.AudiobookPlayer.Android
 					2130903073,
 					2130903074,
 					2130903075,
-					2130903076,
-					2130903080,
+					2130903079,
+					2130903093,
 					2130903094,
 					2130903095,
 					2130903096,
-					2130903097,
-					2130903116,
-					2130903156,
+					2130903115,
+					2130903155,
+					2130903172,
 					2130903173,
 					2130903174,
 					2130903175,
 					2130903176,
-					2130903177,
+					2130903181,
 					2130903182,
-					2130903183,
-					2130903206,
-					2130903215,
+					2130903205,
+					2130903214,
+					2130903264,
 					2130903265,
 					2130903266,
 					2130903267,
 					2130903268,
 					2130903269,
 					2130903270,
-					2130903271,
+					2130903277,
 					2130903278,
-					2130903279,
-					2130903285,
+					2130903284,
 					2130903310,
 					2130903357,
 					2130903362,
@@ -28115,11 +28113,11 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 1
 			public const int BackgroundStyle_selectableItemBackground = 1;
 			
-			// aapt resource value: { 0x7F030054,0x7F03005E,0x7F030060,0x7F0301D0,0x7F03028F,0x7F0302D0,0x7F03041F }
+			// aapt resource value: { 0x7F030053,0x7F03005D,0x7F03005F,0x7F0301D0,0x7F03028F,0x7F0302D0,0x7F03041F }
 			public static int[] Badge = new int[] {
-					2130903124,
-					2130903134,
-					2130903136,
+					2130903123,
+					2130903133,
+					2130903135,
 					2130903504,
 					2130903695,
 					2130903760,
@@ -28185,9 +28183,9 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 8
 			public const int BaseProgressIndicator_trackThickness = 8;
 			
-			// aapt resource value: { 0x7F03005C,0x7F030162,0x7F030189,0x7F03018A,0x7F03018B,0x7F03018C,0x7F03018D,0x7F0301C9,0x7F0302DE,0x7F0302E0,0x7F0302E1 }
+			// aapt resource value: { 0x7F03005B,0x7F030162,0x7F030189,0x7F03018A,0x7F03018B,0x7F03018C,0x7F03018D,0x7F0301C9,0x7F0302DE,0x7F0302E0,0x7F0302E1 }
 			public static int[] BottomAppBar = new int[] {
-					2130903132,
+					2130903131,
 					2130903394,
 					2130903433,
 					2130903434,
@@ -28239,19 +28237,19 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 0
 			public const int BottomNavigationView_itemHorizontalTranslationEnabled = 0;
 			
-			// aapt resource value: { 0x101011F,0x1010440,0x7F03005C,0x7F030067,0x7F030068,0x7F030069,0x7F03006A,0x7F03006B,0x7F03006D,0x7F03006E,0x7F03006F,0x7F0301BB,0x7F0302DE,0x7F0302E0,0x7F0302E1,0x7F0302E4,0x7F03033F,0x7F030342 }
+			// aapt resource value: { 0x101011F,0x1010440,0x7F03005B,0x7F030066,0x7F030067,0x7F030068,0x7F030069,0x7F03006A,0x7F03006C,0x7F03006D,0x7F03006E,0x7F0301BB,0x7F0302DE,0x7F0302E0,0x7F0302E1,0x7F0302E4,0x7F03033F,0x7F030342 }
 			public static int[] BottomSheetBehavior_Layout = new int[] {
 					16843039,
 					16843840,
-					2130903132,
+					2130903131,
+					2130903142,
 					2130903143,
 					2130903144,
 					2130903145,
 					2130903146,
-					2130903147,
+					2130903148,
 					2130903149,
 					2130903150,
-					2130903151,
 					2130903483,
 					2130903774,
 					2130903776,
@@ -28314,9 +28312,9 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 17
 			public const int BottomSheetBehavior_Layout_shapeAppearanceOverlay = 17;
 			
-			// aapt resource value: { 0x7F03003D }
+			// aapt resource value: { 0x7F03003C }
 			public static int[] ButtonBarLayout = new int[] {
-					2130903101};
+					2130903100};
 			
 			// aapt resource value: 0
 			public const int ButtonBarLayout_allowStacking = 0;
@@ -28332,16 +28330,16 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 1
 			public const int Capability_shortcutMatchRequired = 1;
 			
-			// aapt resource value: { 0x101013F,0x1010140,0x7F030092,0x7F030093,0x7F030094,0x7F030096,0x7F030097,0x7F030098,0x7F030105,0x7F030106,0x7F030108,0x7F030109,0x7F03010B }
+			// aapt resource value: { 0x101013F,0x1010140,0x7F030091,0x7F030092,0x7F030093,0x7F030095,0x7F030096,0x7F030097,0x7F030105,0x7F030106,0x7F030108,0x7F030109,0x7F03010B }
 			public static int[] CardView = new int[] {
 					16843071,
 					16843072,
+					2130903185,
 					2130903186,
 					2130903187,
-					2130903188,
+					2130903189,
 					2130903190,
 					2130903191,
-					2130903192,
 					2130903301,
 					2130903302,
 					2130903304,
@@ -28387,8 +28385,9 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 12
 			public const int CardView_contentPaddingTop = 12;
 			
-			// aapt resource value: { 0x7F03009A,0x7F03009B,0x7F03009C,0x7F03009D,0x7F03009E,0x7F03009F,0x7F0300A0,0x7F0300A1,0x7F0300A2,0x7F0300A3 }
+			// aapt resource value: { 0x7F030099,0x7F03009A,0x7F03009B,0x7F03009C,0x7F03009D,0x7F03009E,0x7F03009F,0x7F0300A0,0x7F0300A1,0x7F0300A2 }
 			public static int[] Carousel = new int[] {
+					2130903193,
 					2130903194,
 					2130903195,
 					2130903196,
@@ -28397,8 +28396,7 @@ namespace PerryRhodan.AudiobookPlayer.Android
 					2130903199,
 					2130903200,
 					2130903201,
-					2130903202,
-					2130903203};
+					2130903202};
 			
 			// aapt resource value: 0
 			public const int Carousel_carousel_backwardTransition = 0;
@@ -28457,7 +28455,7 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 5
 			public const int CheckBoxPreference_summaryOn = 5;
 			
-			// aapt resource value: { 0x1010034,0x1010095,0x1010098,0x10100AB,0x101011F,0x101014F,0x10101E5,0x7F0300A9,0x7F0300AA,0x7F0300AD,0x7F0300AE,0x7F0300B0,0x7F0300B1,0x7F0300B2,0x7F0300B4,0x7F0300B5,0x7F0300B6,0x7F0300B7,0x7F0300B8,0x7F0300B9,0x7F0300BA,0x7F0300BF,0x7F0300C0,0x7F0300C1,0x7F0300C3,0x7F0300D1,0x7F0300D2,0x7F0300D3,0x7F0300D4,0x7F0300D5,0x7F0300D6,0x7F0300D7,0x7F030170,0x7F0301C7,0x7F0301D3,0x7F0301D8,0x7F030329,0x7F03033F,0x7F030342,0x7F03034A,0x7F0303CC,0x7F0303D5 }
+			// aapt resource value: { 0x1010034,0x1010095,0x1010098,0x10100AB,0x101011F,0x101014F,0x10101E5,0x7F0300A8,0x7F0300A9,0x7F0300AC,0x7F0300AD,0x7F0300AF,0x7F0300B0,0x7F0300B1,0x7F0300B3,0x7F0300B4,0x7F0300B5,0x7F0300B6,0x7F0300B7,0x7F0300B8,0x7F0300B9,0x7F0300BE,0x7F0300BF,0x7F0300C0,0x7F0300C2,0x7F0300D0,0x7F0300D1,0x7F0300D2,0x7F0300D3,0x7F0300D4,0x7F0300D5,0x7F0300D6,0x7F030170,0x7F0301C7,0x7F0301D3,0x7F0301D8,0x7F030329,0x7F03033F,0x7F030342,0x7F03034A,0x7F0303CC,0x7F0303D5 }
 			public static int[] Chip = new int[] {
 					16842804,
 					16842901,
@@ -28466,31 +28464,31 @@ namespace PerryRhodan.AudiobookPlayer.Android
 					16843039,
 					16843087,
 					16843237,
+					2130903208,
 					2130903209,
-					2130903210,
+					2130903212,
 					2130903213,
-					2130903214,
+					2130903215,
 					2130903216,
 					2130903217,
-					2130903218,
+					2130903219,
 					2130903220,
 					2130903221,
 					2130903222,
 					2130903223,
 					2130903224,
 					2130903225,
-					2130903226,
+					2130903230,
 					2130903231,
 					2130903232,
-					2130903233,
-					2130903235,
+					2130903234,
+					2130903248,
 					2130903249,
 					2130903250,
 					2130903251,
 					2130903252,
 					2130903253,
 					2130903254,
-					2130903255,
 					2130903408,
 					2130903495,
 					2130903507,
@@ -28502,12 +28500,12 @@ namespace PerryRhodan.AudiobookPlayer.Android
 					2130904012,
 					2130904021};
 			
-			// aapt resource value: { 0x7F0300A8,0x7F0300BB,0x7F0300BC,0x7F0300BD,0x7F03033C,0x7F030351,0x7F030353 }
+			// aapt resource value: { 0x7F0300A7,0x7F0300BA,0x7F0300BB,0x7F0300BC,0x7F03033C,0x7F030351,0x7F030353 }
 			public static int[] ChipGroup = new int[] {
-					2130903208,
+					2130903207,
+					2130903226,
 					2130903227,
 					2130903228,
-					2130903229,
 					2130903868,
 					2130903889,
 					2130903891};
@@ -28674,10 +28672,10 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 2
 			public const int CircularProgressIndicator_indicatorSize = 2;
 			
-			// aapt resource value: { 0x7F0300CD,0x7F0300D0 }
+			// aapt resource value: { 0x7F0300CC,0x7F0300CF }
 			public static int[] ClockFaceView = new int[] {
-					2130903245,
-					2130903248};
+					2130903244,
+					2130903247};
 			
 			// aapt resource value: 0
 			public const int ClockFaceView_clockFaceBackgroundColor = 0;
@@ -28685,9 +28683,9 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 1
 			public const int ClockFaceView_clockNumberTextColor = 1;
 			
-			// aapt resource value: { 0x7F0300CE,0x7F030287,0x7F03033D }
+			// aapt resource value: { 0x7F0300CD,0x7F030287,0x7F03033D }
 			public static int[] ClockHandView = new int[] {
-					2130903246,
+					2130903245,
 					2130903687,
 					2130903869};
 			
@@ -28700,10 +28698,10 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 2
 			public const int ClockHandView_selectorSize = 2;
 			
-			// aapt resource value: { 0x7F0300DC,0x7F0300DD,0x7F03010C,0x7F03017F,0x7F030180,0x7F030181,0x7F030182,0x7F030183,0x7F030184,0x7F030185,0x7F030188,0x7F0301B6,0x7F030292,0x7F03032F,0x7F030331,0x7F030374,0x7F0303EE,0x7F0303F0,0x7F0303F1,0x7F0303FB }
+			// aapt resource value: { 0x7F0300DB,0x7F0300DC,0x7F03010C,0x7F03017F,0x7F030180,0x7F030181,0x7F030182,0x7F030183,0x7F030184,0x7F030185,0x7F030188,0x7F0301B6,0x7F030292,0x7F03032F,0x7F030331,0x7F030374,0x7F0303EE,0x7F0303F0,0x7F0303F1,0x7F0303FB }
 			public static int[] CollapsingToolbarLayout = new int[] {
+					2130903259,
 					2130903260,
-					2130903261,
 					2130903308,
 					2130903423,
 					2130903424,
@@ -28794,11 +28792,11 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 19
 			public const int CollapsingToolbarLayout_toolbarId = 19;
 			
-			// aapt resource value: { 0x10101A5,0x101031F,0x7F03003E }
+			// aapt resource value: { 0x10101A5,0x101031F,0x7F03003D }
 			public static int[] ColorStateListItem = new int[] {
 					16843173,
 					16843551,
-					2130903102};
+					2130903101};
 			
 			// aapt resource value: 2
 			public const int ColorStateListItem_alpha = 2;
@@ -28809,12 +28807,12 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 0
 			public const int ColorStateListItem_android_color = 0;
 			
-			// aapt resource value: { 0x1010107,0x7F03008A,0x7F030090,0x7F030091 }
+			// aapt resource value: { 0x1010107,0x7F030089,0x7F03008F,0x7F030090 }
 			public static int[] CompoundButton = new int[] {
 					16843015,
-					2130903178,
-					2130903184,
-					2130903185};
+					2130903177,
+					2130903183,
+					2130903184};
 			
 			// aapt resource value: 0
 			public const int CompoundButton_android_button = 0;
@@ -28828,7 +28826,7 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 3
 			public const int CompoundButton_buttonTintMode = 3;
 			
-			// aapt resource value: { 0x10100C4,0x10100D0,0x10100DC,0x10100F4,0x10100F5,0x10100F7,0x10100F8,0x10100F9,0x10100FA,0x101011F,0x1010120,0x101013F,0x1010140,0x101031F,0x1010320,0x1010321,0x1010322,0x1010323,0x1010324,0x1010325,0x1010326,0x1010327,0x1010328,0x10103B5,0x10103B6,0x10103FA,0x1010440,0x7F030041,0x7F030042,0x7F030062,0x7F030063,0x7F030064,0x7F0300A4,0x7F0300FA,0x7F0300FB,0x7F03014E,0x7F030197,0x7F030198,0x7F030199,0x7F03019A,0x7F03019B,0x7F03019C,0x7F03019D,0x7F03019E,0x7F03019F,0x7F0301A0,0x7F0301A1,0x7F0301A2,0x7F0301A3,0x7F0301A5,0x7F0301A6,0x7F0301A7,0x7F0301A8,0x7F0301A9,0x7F03021A,0x7F03021B,0x7F03021C,0x7F03021D,0x7F03021E,0x7F03021F,0x7F030220,0x7F030221,0x7F030222,0x7F030223,0x7F030224,0x7F030225,0x7F030226,0x7F030227,0x7F030228,0x7F030229,0x7F03022A,0x7F03022B,0x7F03022C,0x7F03022D,0x7F03022E,0x7F03022F,0x7F030230,0x7F030231,0x7F030232,0x7F030233,0x7F030234,0x7F030235,0x7F030236,0x7F030237,0x7F030238,0x7F030239,0x7F03023A,0x7F03023B,0x7F03023C,0x7F03023D,0x7F03023E,0x7F03023F,0x7F030240,0x7F030241,0x7F030242,0x7F030243,0x7F030244,0x7F030245,0x7F030246,0x7F030247,0x7F030249,0x7F03024A,0x7F03024B,0x7F03024C,0x7F03024D,0x7F03024E,0x7F03024F,0x7F030250,0x7F030251,0x7F030254,0x7F030258,0x7F0302BD,0x7F0302BE,0x7F0302ED,0x7F0302F5,0x7F0302FA,0x7F030314,0x7F030315,0x7F030316,0x7F03040E,0x7F030410,0x7F030412,0x7F030425 }
+			// aapt resource value: { 0x10100C4,0x10100D0,0x10100DC,0x10100F4,0x10100F5,0x10100F7,0x10100F8,0x10100F9,0x10100FA,0x101011F,0x1010120,0x101013F,0x1010140,0x101031F,0x1010320,0x1010321,0x1010322,0x1010323,0x1010324,0x1010325,0x1010326,0x1010327,0x1010328,0x10103B5,0x10103B6,0x10103FA,0x1010440,0x7F030040,0x7F030041,0x7F030061,0x7F030062,0x7F030063,0x7F0300A3,0x7F0300FA,0x7F0300FB,0x7F03014E,0x7F030197,0x7F030198,0x7F030199,0x7F03019A,0x7F03019B,0x7F03019C,0x7F03019D,0x7F03019E,0x7F03019F,0x7F0301A0,0x7F0301A1,0x7F0301A2,0x7F0301A3,0x7F0301A5,0x7F0301A6,0x7F0301A7,0x7F0301A8,0x7F0301A9,0x7F03021A,0x7F03021B,0x7F03021C,0x7F03021D,0x7F03021E,0x7F03021F,0x7F030220,0x7F030221,0x7F030222,0x7F030223,0x7F030224,0x7F030225,0x7F030226,0x7F030227,0x7F030228,0x7F030229,0x7F03022A,0x7F03022B,0x7F03022C,0x7F03022D,0x7F03022E,0x7F03022F,0x7F030230,0x7F030231,0x7F030232,0x7F030233,0x7F030234,0x7F030235,0x7F030236,0x7F030237,0x7F030238,0x7F030239,0x7F03023A,0x7F03023B,0x7F03023C,0x7F03023D,0x7F03023E,0x7F03023F,0x7F030240,0x7F030241,0x7F030242,0x7F030243,0x7F030244,0x7F030245,0x7F030246,0x7F030247,0x7F030249,0x7F03024A,0x7F03024B,0x7F03024C,0x7F03024D,0x7F03024E,0x7F03024F,0x7F030250,0x7F030251,0x7F030254,0x7F030258,0x7F0302BD,0x7F0302BE,0x7F0302ED,0x7F0302F5,0x7F0302FA,0x7F030314,0x7F030315,0x7F030316,0x7F03040E,0x7F030410,0x7F030412,0x7F030425 }
 			public static int[] Constraint = new int[] {
 					16842948,
 					16842960,
@@ -28857,12 +28855,12 @@ namespace PerryRhodan.AudiobookPlayer.Android
 					16843702,
 					16843770,
 					16843840,
+					2130903104,
 					2130903105,
-					2130903106,
+					2130903137,
 					2130903138,
 					2130903139,
-					2130903140,
-					2130903204,
+					2130903203,
 					2130903290,
 					2130903291,
 					2130903374,
@@ -28954,7 +28952,7 @@ namespace PerryRhodan.AudiobookPlayer.Android
 					2130904082,
 					2130904101};
 			
-			// aapt resource value: { 0x10100C4,0x10100D5,0x10100D6,0x10100D7,0x10100D8,0x10100D9,0x10100DC,0x10100F4,0x10100F5,0x10100F6,0x10100F7,0x10100F8,0x10100F9,0x10100FA,0x101011F,0x1010120,0x101013F,0x1010140,0x10103B3,0x10103B4,0x10103B5,0x10103B6,0x1010440,0x101053B,0x101053C,0x7F030062,0x7F030063,0x7F030064,0x7F0300A4,0x7F0300C6,0x7F0300C7,0x7F0300C8,0x7F0300C9,0x7F0300CA,0x7F0300F7,0x7F0300FA,0x7F0300FB,0x7F030197,0x7F030198,0x7F030199,0x7F03019A,0x7F03019B,0x7F03019C,0x7F03019D,0x7F03019E,0x7F03019F,0x7F0301A0,0x7F0301A1,0x7F0301A2,0x7F0301A3,0x7F0301A5,0x7F0301A6,0x7F0301A7,0x7F0301A8,0x7F0301A9,0x7F030212,0x7F03021A,0x7F03021B,0x7F03021C,0x7F03021D,0x7F03021E,0x7F03021F,0x7F030220,0x7F030221,0x7F030222,0x7F030223,0x7F030224,0x7F030225,0x7F030226,0x7F030227,0x7F030228,0x7F030229,0x7F03022A,0x7F03022B,0x7F03022C,0x7F03022D,0x7F03022E,0x7F03022F,0x7F030230,0x7F030231,0x7F030232,0x7F030233,0x7F030234,0x7F030235,0x7F030236,0x7F030237,0x7F030238,0x7F030239,0x7F03023A,0x7F03023B,0x7F03023C,0x7F03023D,0x7F03023E,0x7F03023F,0x7F030240,0x7F030241,0x7F030242,0x7F030243,0x7F030244,0x7F030245,0x7F030246,0x7F030247,0x7F030249,0x7F03024A,0x7F03024B,0x7F03024C,0x7F03024D,0x7F03024E,0x7F03024F,0x7F030250,0x7F030251,0x7F030254,0x7F030255,0x7F030258 }
+			// aapt resource value: { 0x10100C4,0x10100D5,0x10100D6,0x10100D7,0x10100D8,0x10100D9,0x10100DC,0x10100F4,0x10100F5,0x10100F6,0x10100F7,0x10100F8,0x10100F9,0x10100FA,0x101011F,0x1010120,0x101013F,0x1010140,0x10103B3,0x10103B4,0x10103B5,0x10103B6,0x1010440,0x101053B,0x101053C,0x7F030061,0x7F030062,0x7F030063,0x7F0300A3,0x7F0300C5,0x7F0300C6,0x7F0300C7,0x7F0300C8,0x7F0300C9,0x7F0300F7,0x7F0300FA,0x7F0300FB,0x7F030197,0x7F030198,0x7F030199,0x7F03019A,0x7F03019B,0x7F03019C,0x7F03019D,0x7F03019E,0x7F03019F,0x7F0301A0,0x7F0301A1,0x7F0301A2,0x7F0301A3,0x7F0301A5,0x7F0301A6,0x7F0301A7,0x7F0301A8,0x7F0301A9,0x7F030212,0x7F03021A,0x7F03021B,0x7F03021C,0x7F03021D,0x7F03021E,0x7F03021F,0x7F030220,0x7F030221,0x7F030222,0x7F030223,0x7F030224,0x7F030225,0x7F030226,0x7F030227,0x7F030228,0x7F030229,0x7F03022A,0x7F03022B,0x7F03022C,0x7F03022D,0x7F03022E,0x7F03022F,0x7F030230,0x7F030231,0x7F030232,0x7F030233,0x7F030234,0x7F030235,0x7F030236,0x7F030237,0x7F030238,0x7F030239,0x7F03023A,0x7F03023B,0x7F03023C,0x7F03023D,0x7F03023E,0x7F03023F,0x7F030240,0x7F030241,0x7F030242,0x7F030243,0x7F030244,0x7F030245,0x7F030246,0x7F030247,0x7F030249,0x7F03024A,0x7F03024B,0x7F03024C,0x7F03024D,0x7F03024E,0x7F03024F,0x7F030250,0x7F030251,0x7F030254,0x7F030255,0x7F030258 }
 			public static int[] ConstraintLayout_Layout = new int[] {
 					16842948,
 					16842965,
@@ -28981,15 +28979,15 @@ namespace PerryRhodan.AudiobookPlayer.Android
 					16843840,
 					16844091,
 					16844092,
+					2130903137,
 					2130903138,
 					2130903139,
-					2130903140,
-					2130903204,
+					2130903203,
+					2130903237,
 					2130903238,
 					2130903239,
 					2130903240,
 					2130903241,
-					2130903242,
 					2130903287,
 					2130903290,
 					2130903291,
@@ -29443,7 +29441,7 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 3
 			public const int ConstraintLayout_ReactiveGuide_reactiveGuide_valueId = 3;
 			
-			// aapt resource value: { 0x10100C4,0x10100D0,0x10100DC,0x10100F4,0x10100F5,0x10100F7,0x10100F8,0x10100F9,0x10100FA,0x101011F,0x1010120,0x101013F,0x1010140,0x101031F,0x1010320,0x1010321,0x1010322,0x1010323,0x1010324,0x1010325,0x1010326,0x1010327,0x1010328,0x10103B5,0x10103B6,0x10103FA,0x1010440,0x7F030041,0x7F030042,0x7F030062,0x7F030063,0x7F030064,0x7F0300A4,0x7F0300FA,0x7F03014E,0x7F030197,0x7F030198,0x7F030199,0x7F03019A,0x7F03019B,0x7F03019C,0x7F03019D,0x7F03019E,0x7F03019F,0x7F0301A0,0x7F0301A1,0x7F0301A2,0x7F0301A3,0x7F0301A5,0x7F0301A6,0x7F0301A7,0x7F0301A8,0x7F0301A9,0x7F03021A,0x7F03021B,0x7F03021C,0x7F030220,0x7F030224,0x7F030225,0x7F030226,0x7F030229,0x7F03022A,0x7F03022B,0x7F03022C,0x7F03022D,0x7F03022E,0x7F03022F,0x7F030230,0x7F030231,0x7F030232,0x7F030233,0x7F030234,0x7F030237,0x7F03023C,0x7F03023D,0x7F030240,0x7F030241,0x7F030242,0x7F030243,0x7F030244,0x7F030245,0x7F030246,0x7F030247,0x7F030249,0x7F03024A,0x7F03024B,0x7F03024C,0x7F03024D,0x7F03024E,0x7F03024F,0x7F030250,0x7F030251,0x7F030254,0x7F030258,0x7F0302BD,0x7F0302BE,0x7F0302BF,0x7F0302ED,0x7F0302F5,0x7F0302FA,0x7F030314,0x7F030315,0x7F030316,0x7F03040E,0x7F030410,0x7F030412,0x7F030425 }
+			// aapt resource value: { 0x10100C4,0x10100D0,0x10100DC,0x10100F4,0x10100F5,0x10100F7,0x10100F8,0x10100F9,0x10100FA,0x101011F,0x1010120,0x101013F,0x1010140,0x101031F,0x1010320,0x1010321,0x1010322,0x1010323,0x1010324,0x1010325,0x1010326,0x1010327,0x1010328,0x10103B5,0x10103B6,0x10103FA,0x1010440,0x7F030040,0x7F030041,0x7F030061,0x7F030062,0x7F030063,0x7F0300A3,0x7F0300FA,0x7F03014E,0x7F030197,0x7F030198,0x7F030199,0x7F03019A,0x7F03019B,0x7F03019C,0x7F03019D,0x7F03019E,0x7F03019F,0x7F0301A0,0x7F0301A1,0x7F0301A2,0x7F0301A3,0x7F0301A5,0x7F0301A6,0x7F0301A7,0x7F0301A8,0x7F0301A9,0x7F03021A,0x7F03021B,0x7F03021C,0x7F030220,0x7F030224,0x7F030225,0x7F030226,0x7F030229,0x7F03022A,0x7F03022B,0x7F03022C,0x7F03022D,0x7F03022E,0x7F03022F,0x7F030230,0x7F030231,0x7F030232,0x7F030233,0x7F030234,0x7F030237,0x7F03023C,0x7F03023D,0x7F030240,0x7F030241,0x7F030242,0x7F030243,0x7F030244,0x7F030245,0x7F030246,0x7F030247,0x7F030249,0x7F03024A,0x7F03024B,0x7F03024C,0x7F03024D,0x7F03024E,0x7F03024F,0x7F030250,0x7F030251,0x7F030254,0x7F030258,0x7F0302BD,0x7F0302BE,0x7F0302BF,0x7F0302ED,0x7F0302F5,0x7F0302FA,0x7F030314,0x7F030315,0x7F030316,0x7F03040E,0x7F030410,0x7F030412,0x7F030425 }
 			public static int[] ConstraintOverride = new int[] {
 					16842948,
 					16842960,
@@ -29472,12 +29470,12 @@ namespace PerryRhodan.AudiobookPlayer.Android
 					16843702,
 					16843770,
 					16843840,
+					2130903104,
 					2130903105,
-					2130903106,
+					2130903137,
 					2130903138,
 					2130903139,
-					2130903140,
-					2130903204,
+					2130903203,
 					2130903290,
 					2130903374,
 					2130903447,
@@ -29874,7 +29872,7 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 106
 			public const int ConstraintOverride_visibilityMode = 106;
 			
-			// aapt resource value: { 0x10100C4,0x10100D0,0x10100DC,0x10100F4,0x10100F5,0x10100F7,0x10100F8,0x10100F9,0x10100FA,0x101011F,0x1010120,0x101013F,0x1010140,0x10101B5,0x10101B6,0x101031F,0x1010320,0x1010321,0x1010322,0x1010323,0x1010324,0x1010325,0x1010326,0x1010327,0x1010328,0x10103B5,0x10103B6,0x10103FA,0x1010440,0x7F030000,0x7F030041,0x7F030042,0x7F030062,0x7F030063,0x7F030064,0x7F0300A4,0x7F0300FA,0x7F0300FB,0x7F03013B,0x7F03014E,0x7F030197,0x7F030198,0x7F030199,0x7F03019A,0x7F03019B,0x7F03019C,0x7F03019D,0x7F03019E,0x7F03019F,0x7F0301A0,0x7F0301A1,0x7F0301A2,0x7F0301A3,0x7F0301A5,0x7F0301A6,0x7F0301A7,0x7F0301A8,0x7F0301A9,0x7F03021A,0x7F03021B,0x7F03021C,0x7F03021D,0x7F03021E,0x7F03021F,0x7F030220,0x7F030221,0x7F030222,0x7F030223,0x7F030224,0x7F030225,0x7F030226,0x7F030227,0x7F030228,0x7F030229,0x7F03022A,0x7F03022B,0x7F03022D,0x7F03022E,0x7F03022F,0x7F030230,0x7F030231,0x7F030232,0x7F030233,0x7F030234,0x7F030235,0x7F030236,0x7F030237,0x7F030238,0x7F030239,0x7F03023A,0x7F03023B,0x7F03023C,0x7F03023D,0x7F03023E,0x7F03023F,0x7F030240,0x7F030241,0x7F030242,0x7F030244,0x7F030245,0x7F030246,0x7F030247,0x7F030249,0x7F03024A,0x7F03024B,0x7F03024C,0x7F03024D,0x7F03024E,0x7F03024F,0x7F030250,0x7F030251,0x7F030254,0x7F030258,0x7F0302BD,0x7F0302BE,0x7F0302ED,0x7F0302F5,0x7F0302FA,0x7F030316,0x7F030410,0x7F030412 }
+			// aapt resource value: { 0x10100C4,0x10100D0,0x10100DC,0x10100F4,0x10100F5,0x10100F7,0x10100F8,0x10100F9,0x10100FA,0x101011F,0x1010120,0x101013F,0x1010140,0x10101B5,0x10101B6,0x101031F,0x1010320,0x1010321,0x1010322,0x1010323,0x1010324,0x1010325,0x1010326,0x1010327,0x1010328,0x10103B5,0x10103B6,0x10103FA,0x1010440,0x7F030040,0x7F030041,0x7F030061,0x7F030062,0x7F030063,0x7F0300A3,0x7F0300F6,0x7F0300FA,0x7F0300FB,0x7F03013B,0x7F03014E,0x7F030197,0x7F030198,0x7F030199,0x7F03019A,0x7F03019B,0x7F03019C,0x7F03019D,0x7F03019E,0x7F03019F,0x7F0301A0,0x7F0301A1,0x7F0301A2,0x7F0301A3,0x7F0301A5,0x7F0301A6,0x7F0301A7,0x7F0301A8,0x7F0301A9,0x7F03021A,0x7F03021B,0x7F03021C,0x7F03021D,0x7F03021E,0x7F03021F,0x7F030220,0x7F030221,0x7F030222,0x7F030223,0x7F030224,0x7F030225,0x7F030226,0x7F030227,0x7F030228,0x7F030229,0x7F03022A,0x7F03022B,0x7F03022D,0x7F03022E,0x7F03022F,0x7F030230,0x7F030231,0x7F030232,0x7F030233,0x7F030234,0x7F030235,0x7F030236,0x7F030237,0x7F030238,0x7F030239,0x7F03023A,0x7F03023B,0x7F03023C,0x7F03023D,0x7F03023E,0x7F03023F,0x7F030240,0x7F030241,0x7F030242,0x7F030244,0x7F030245,0x7F030246,0x7F030247,0x7F030249,0x7F03024A,0x7F03024B,0x7F03024C,0x7F03024D,0x7F03024E,0x7F03024F,0x7F030250,0x7F030251,0x7F030254,0x7F030258,0x7F0302BD,0x7F0302BE,0x7F0302ED,0x7F0302F5,0x7F0302FA,0x7F030316,0x7F030410,0x7F030412 }
 			public static int[] ConstraintSet = new int[] {
 					16842948,
 					16842960,
@@ -29905,13 +29903,13 @@ namespace PerryRhodan.AudiobookPlayer.Android
 					16843702,
 					16843770,
 					16843840,
-					2130903040,
+					2130903104,
 					2130903105,
-					2130903106,
+					2130903137,
 					2130903138,
 					2130903139,
-					2130903140,
-					2130903204,
+					2130903203,
+					2130903286,
 					2130903290,
 					2130903291,
 					2130903355,
@@ -30085,26 +30083,26 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 2
 			public const int ConstraintSet_android_visibility = 2;
 			
+			// aapt resource value: 29
+			public const int ConstraintSet_animateCircleAngleTo = 29;
+			
 			// aapt resource value: 30
-			public const int ConstraintSet_animateCircleAngleTo = 30;
+			public const int ConstraintSet_animateRelativeTo = 30;
 			
 			// aapt resource value: 31
-			public const int ConstraintSet_animateRelativeTo = 31;
+			public const int ConstraintSet_barrierAllowsGoneWidgets = 31;
 			
 			// aapt resource value: 32
-			public const int ConstraintSet_barrierAllowsGoneWidgets = 32;
+			public const int ConstraintSet_barrierDirection = 32;
 			
 			// aapt resource value: 33
-			public const int ConstraintSet_barrierDirection = 33;
+			public const int ConstraintSet_barrierMargin = 33;
 			
 			// aapt resource value: 34
-			public const int ConstraintSet_barrierMargin = 34;
+			public const int ConstraintSet_chainUseRtl = 34;
 			
 			// aapt resource value: 35
-			public const int ConstraintSet_chainUseRtl = 35;
-			
-			// aapt resource value: 29
-			public const int ConstraintSet_ConstraintRotate = 29;
+			public const int ConstraintSet_constraintRotate = 35;
 			
 			// aapt resource value: 36
 			public const int ConstraintSet_constraint_referenced_ids = 36;
@@ -30772,9 +30770,9 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 1
 			public const int CoordinatorLayout_statusBarBackground = 1;
 			
-			// aapt resource value: { 0x7F03004A,0x7F030124,0x7F030125,0x7F030126,0x7F030127,0x7F030128,0x7F030129,0x7F03012B,0x7F03012C,0x7F03012D,0x7F030298 }
+			// aapt resource value: { 0x7F030049,0x7F030124,0x7F030125,0x7F030126,0x7F030127,0x7F030128,0x7F030129,0x7F03012B,0x7F03012C,0x7F03012D,0x7F030298 }
 			public static int[] CustomAttribute = new int[] {
-					2130903114,
+					2130903113,
 					2130903332,
 					2130903333,
 					2130903334,
@@ -30870,12 +30868,12 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 11
 			public const int DialogPreference_positiveButtonText = 11;
 			
-			// aapt resource value: { 0x7F030048,0x7F030049,0x7F030061,0x7F0300E0,0x7F030153,0x7F0301BA,0x7F03035A,0x7F0303DC }
+			// aapt resource value: { 0x7F030047,0x7F030048,0x7F030060,0x7F0300DF,0x7F030153,0x7F0301BA,0x7F03035A,0x7F0303DC }
 			public static int[] DrawerArrowToggle = new int[] {
+					2130903111,
 					2130903112,
-					2130903113,
-					2130903137,
-					2130903264,
+					2130903136,
+					2130903263,
 					2130903379,
 					2130903482,
 					2130903898,
@@ -30919,19 +30917,19 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 0
 			public const int EditTextPreference_useSimpleSummaryProvider = 0;
 			
-			// aapt resource value: { 0x7F0300DB,0x7F030162,0x7F030186,0x7F0301C7,0x7F03034A,0x7F03034F }
+			// aapt resource value: { 0x7F0300DA,0x7F030162,0x7F030186,0x7F0301C7,0x7F03034A,0x7F03034F }
 			public static int[] ExtendedFloatingActionButton = new int[] {
-					2130903259,
+					2130903258,
 					2130903394,
 					2130903430,
 					2130903495,
 					2130903882,
 					2130903887};
 			
-			// aapt resource value: { 0x7F030065,0x7F030066 }
+			// aapt resource value: { 0x7F030064,0x7F030065 }
 			public static int[] ExtendedFloatingActionButton_Behavior_Layout = new int[] {
-					2130903141,
-					2130903142};
+					2130903140,
+					2130903141};
 			
 			// aapt resource value: 0
 			public const int ExtendedFloatingActionButton_Behavior_Layout_behavior_autoHide = 0;
@@ -30957,12 +30955,12 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 5
 			public const int ExtendedFloatingActionButton_shrinkMotionSpec = 5;
 			
-			// aapt resource value: { 0x101000E,0x7F03005C,0x7F03005D,0x7F030073,0x7F030162,0x7F030170,0x7F03018E,0x7F03018F,0x7F0301C7,0x7F0301D1,0x7F030291,0x7F030311,0x7F030329,0x7F03033F,0x7F030342,0x7F03034A,0x7F03041B }
+			// aapt resource value: { 0x101000E,0x7F03005B,0x7F03005C,0x7F030072,0x7F030162,0x7F030170,0x7F03018E,0x7F03018F,0x7F0301C7,0x7F0301D1,0x7F030291,0x7F030311,0x7F030329,0x7F03033F,0x7F030342,0x7F03034A,0x7F03041B }
 			public static int[] FloatingActionButton = new int[] {
 					16842766,
+					2130903131,
 					2130903132,
-					2130903133,
-					2130903155,
+					2130903154,
 					2130903394,
 					2130903408,
 					2130903438,
@@ -30986,9 +30984,9 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 2
 			public const int FloatingActionButton_backgroundTintMode = 2;
 			
-			// aapt resource value: { 0x7F030065 }
+			// aapt resource value: { 0x7F030064 }
 			public static int[] FloatingActionButton_Behavior_Layout = new int[] {
-					2130903141};
+					2130903140};
 			
 			// aapt resource value: 0
 			public const int FloatingActionButton_Behavior_Layout_behavior_autoHide = 0;
@@ -31223,11 +31221,11 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 2
 			public const int GradientColor_android_type = 2;
 			
-			// aapt resource value: { 0x7F030040,0x7F030070,0x7F030084,0x7F03010D,0x7F030121,0x7F0301DF,0x7F0301E0,0x7F0301E1,0x7F0301E2,0x7F0302DC,0x7F03032B,0x7F03032C,0x7F03032D,0x7F030427 }
+			// aapt resource value: { 0x7F03003F,0x7F03006F,0x7F030083,0x7F03010D,0x7F030121,0x7F0301DF,0x7F0301E0,0x7F0301E1,0x7F0301E2,0x7F0302DC,0x7F03032B,0x7F03032C,0x7F03032D,0x7F030427 }
 			public static int[] ImageFilterView = new int[] {
-					2130903104,
-					2130903152,
-					2130903172,
+					2130903103,
+					2130903151,
+					2130903171,
 					2130903309,
 					2130903329,
 					2130903519,
@@ -31308,9 +31306,9 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 3
 			public const int Insets_paddingTopSystemWindowInsets = 3;
 			
-			// aapt resource value: { 0x7F0300DF }
+			// aapt resource value: { 0x7F0300DE }
 			public static int[] ItemsViewRendererTheme = new int[] {
-					2130903263};
+					2130903262};
 			
 			// aapt resource value: 0
 			public const int ItemsViewRendererTheme_collectionViewStyle = 0;
@@ -31686,7 +31684,7 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 12
 			public const int KeyTrigger_viewTransitionOnPositiveCross = 12;
 			
-			// aapt resource value: { 0x10100C4,0x10100F4,0x10100F5,0x10100F7,0x10100F8,0x10100F9,0x10100FA,0x10103B5,0x10103B6,0x7F030062,0x7F030063,0x7F030064,0x7F0300A4,0x7F0300FA,0x7F0300FB,0x7F03021A,0x7F03021B,0x7F03021C,0x7F03021D,0x7F03021E,0x7F03021F,0x7F030220,0x7F030221,0x7F030222,0x7F030223,0x7F030224,0x7F030225,0x7F030226,0x7F030227,0x7F030228,0x7F030229,0x7F03022A,0x7F03022B,0x7F03022C,0x7F03022D,0x7F03022E,0x7F03022F,0x7F030230,0x7F030231,0x7F030232,0x7F030233,0x7F030234,0x7F030235,0x7F030236,0x7F030237,0x7F030238,0x7F030239,0x7F03023A,0x7F03023B,0x7F03023D,0x7F03023E,0x7F03023F,0x7F030240,0x7F030241,0x7F030242,0x7F030243,0x7F030244,0x7F030245,0x7F030246,0x7F030247,0x7F030249,0x7F03024A,0x7F03024B,0x7F03024C,0x7F03024D,0x7F03024E,0x7F03024F,0x7F030250,0x7F030251,0x7F030254,0x7F030258,0x7F030290,0x7F030294,0x7F03029B,0x7F03029F }
+			// aapt resource value: { 0x10100C4,0x10100F4,0x10100F5,0x10100F7,0x10100F8,0x10100F9,0x10100FA,0x10103B5,0x10103B6,0x7F030061,0x7F030062,0x7F030063,0x7F0300A3,0x7F0300FA,0x7F0300FB,0x7F03021A,0x7F03021B,0x7F03021C,0x7F03021D,0x7F03021E,0x7F03021F,0x7F030220,0x7F030221,0x7F030222,0x7F030223,0x7F030224,0x7F030225,0x7F030226,0x7F030227,0x7F030228,0x7F030229,0x7F03022A,0x7F03022B,0x7F03022C,0x7F03022D,0x7F03022E,0x7F03022F,0x7F030230,0x7F030231,0x7F030232,0x7F030233,0x7F030234,0x7F030235,0x7F030236,0x7F030237,0x7F030238,0x7F030239,0x7F03023A,0x7F03023B,0x7F03023D,0x7F03023E,0x7F03023F,0x7F030240,0x7F030241,0x7F030242,0x7F030243,0x7F030244,0x7F030245,0x7F030246,0x7F030247,0x7F030249,0x7F03024A,0x7F03024B,0x7F03024C,0x7F03024D,0x7F03024E,0x7F03024F,0x7F030250,0x7F030251,0x7F030254,0x7F030258,0x7F030290,0x7F030294,0x7F03029B,0x7F03029F }
 			public static int[] Layout = new int[] {
 					16842948,
 					16842996,
@@ -31697,10 +31695,10 @@ namespace PerryRhodan.AudiobookPlayer.Android
 					16843002,
 					16843701,
 					16843702,
+					2130903137,
 					2130903138,
 					2130903139,
-					2130903140,
-					2130903204,
+					2130903203,
 					2130903290,
 					2130903291,
 					2130903578,
@@ -32092,12 +32090,12 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 4
 			public const int ListPreference_useSimpleSummaryProvider = 4;
 			
-			// aapt resource value: { 0x7F030055,0x7F030056,0x7F030057,0x7F030058 }
+			// aapt resource value: { 0x7F030054,0x7F030055,0x7F030056,0x7F030057 }
 			public static int[] MaterialAlertDialog = new int[] {
+					2130903124,
 					2130903125,
 					2130903126,
-					2130903127,
-					2130903128};
+					2130903127};
 			
 			// aapt resource value: { 0x7F030270,0x7F030271,0x7F030272,0x7F030273,0x7F030274 }
 			public static int[] MaterialAlertDialogTheme = new int[] {
@@ -32141,7 +32139,7 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 0
 			public const int MaterialAutoCompleteTextView_android_inputType = 0;
 			
-			// aapt resource value: { 0x10100D4,0x10101B7,0x10101B8,0x10101B9,0x10101BA,0x10101E5,0x7F03005C,0x7F03005D,0x7F030115,0x7F030162,0x7F0301D2,0x7F0301D4,0x7F0301D5,0x7F0301D6,0x7F0301D9,0x7F0301DA,0x7F030329,0x7F03033F,0x7F030342,0x7F030375,0x7F030376 }
+			// aapt resource value: { 0x10100D4,0x10101B7,0x10101B8,0x10101B9,0x10101BA,0x10101E5,0x7F03005B,0x7F03005C,0x7F030115,0x7F030162,0x7F0301D2,0x7F0301D4,0x7F0301D5,0x7F0301D6,0x7F0301D9,0x7F0301DA,0x7F030329,0x7F03033F,0x7F030342,0x7F030375,0x7F030376 }
 			public static int[] MaterialButton = new int[] {
 					16842964,
 					16843191,
@@ -32149,8 +32147,8 @@ namespace PerryRhodan.AudiobookPlayer.Android
 					16843193,
 					16843194,
 					16843237,
+					2130903131,
 					2130903132,
-					2130903133,
 					2130903317,
 					2130903394,
 					2130903506,
@@ -32165,9 +32163,9 @@ namespace PerryRhodan.AudiobookPlayer.Android
 					2130903925,
 					2130903926};
 			
-			// aapt resource value: { 0x7F0300A7,0x7F03033C,0x7F030353 }
+			// aapt resource value: { 0x7F0300A6,0x7F03033C,0x7F030353 }
 			public static int[] MaterialButtonToggleGroup = new int[] {
-					2130903207,
+					2130903206,
 					2130903868,
 					2130903891};
 			
@@ -32329,14 +32327,14 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 9
 			public const int MaterialCalendar_yearTodayStyle = 9;
 			
-			// aapt resource value: { 0x10101E5,0x7F030095,0x7F0300A9,0x7F0300AB,0x7F0300AC,0x7F0300AD,0x7F030329,0x7F03033F,0x7F030342,0x7F03036F,0x7F030375,0x7F030376 }
+			// aapt resource value: { 0x10101E5,0x7F030094,0x7F0300A8,0x7F0300AA,0x7F0300AB,0x7F0300AC,0x7F030329,0x7F03033F,0x7F030342,0x7F03036F,0x7F030375,0x7F030376 }
 			public static int[] MaterialCardView = new int[] {
 					16843237,
-					2130903189,
-					2130903209,
+					2130903188,
+					2130903208,
+					2130903210,
 					2130903211,
 					2130903212,
-					2130903213,
 					2130903849,
 					2130903871,
 					2130903874,
@@ -32380,9 +32378,9 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 11
 			public const int MaterialCardView_strokeWidth = 11;
 			
-			// aapt resource value: { 0x7F030090,0x7F03041C }
+			// aapt resource value: { 0x7F03008F,0x7F03041C }
 			public static int[] MaterialCheckBox = new int[] {
-					2130903184,
+					2130903183,
 					2130904092};
 			
 			// aapt resource value: 0
@@ -32391,9 +32389,9 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 1
 			public const int MaterialCheckBox_useMaterialThemeColors = 1;
 			
-			// aapt resource value: { 0x7F030090,0x7F03041C }
+			// aapt resource value: { 0x7F03008F,0x7F03041C }
 			public static int[] MaterialRadioButton = new int[] {
-					2130903184,
+					2130903183,
 					2130904092};
 			
 			// aapt resource value: 0
@@ -32443,9 +32441,9 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 2
 			public const int MaterialTextView_lineHeight = 2;
 			
-			// aapt resource value: { 0x7F0300CF,0x7F03020A }
+			// aapt resource value: { 0x7F0300CE,0x7F03020A }
 			public static int[] MaterialTimePicker = new int[] {
-					2130903247,
+					2130903246,
 					2130903562};
 			
 			// aapt resource value: 0
@@ -32496,7 +32494,7 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 2
 			public const int MenuGroup_android_visible = 2;
 			
-			// aapt resource value: { 0x1010002,0x101000E,0x10100D0,0x1010106,0x1010194,0x10101DE,0x10101DF,0x10101E1,0x10101E2,0x10101E3,0x10101E4,0x10101E5,0x101026F,0x7F030011,0x7F030025,0x7F030027,0x7F03003F,0x7F0300FE,0x7F0301D9,0x7F0301DA,0x7F0302D1,0x7F030347,0x7F030401 }
+			// aapt resource value: { 0x1010002,0x101000E,0x10100D0,0x1010106,0x1010194,0x10101DE,0x10101DF,0x10101E1,0x10101E2,0x10101E3,0x10101E4,0x10101E5,0x101026F,0x7F030010,0x7F030024,0x7F030026,0x7F03003E,0x7F0300FE,0x7F0301D9,0x7F0301DA,0x7F0302D1,0x7F030347,0x7F030401 }
 			public static int[] MenuItem = new int[] {
 					16842754,
 					16842766,
@@ -32511,10 +32509,10 @@ namespace PerryRhodan.AudiobookPlayer.Android
 					16843236,
 					16843237,
 					16843375,
-					2130903057,
-					2130903077,
-					2130903079,
-					2130903103,
+					2130903056,
+					2130903076,
+					2130903078,
+					2130903102,
 					2130903294,
 					2130903513,
 					2130903514,
@@ -32657,10 +32655,10 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 5
 			public const int MockView_mock_showLabel = 5;
 			
-			// aapt resource value: { 0x7F030041,0x7F030042,0x7F03014E,0x7F0302BC,0x7F0302BE,0x7F0302ED,0x7F030314,0x7F030315,0x7F030316,0x7F030410 }
+			// aapt resource value: { 0x7F030040,0x7F030041,0x7F03014E,0x7F0302BC,0x7F0302BE,0x7F0302ED,0x7F030314,0x7F030315,0x7F030316,0x7F030410 }
 			public static int[] Motion = new int[] {
+					2130903104,
 					2130903105,
-					2130903106,
 					2130903374,
 					2130903740,
 					2130903742,
@@ -32716,7 +32714,7 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 1
 			public const int MotionHelper_onShow = 1;
 			
-			// aapt resource value: { 0x1010095,0x1010096,0x1010097,0x1010098,0x10100AF,0x101014F,0x1010164,0x10103AC,0x1010535,0x7F030071,0x7F030072,0x7F03032E,0x7F0303C5,0x7F0303C6,0x7F0303C7,0x7F0303C8,0x7F0303C9,0x7F0303D1,0x7F0303D2,0x7F0303D3,0x7F0303D4,0x7F0303D6,0x7F0303D7,0x7F0303D8,0x7F0303D9 }
+			// aapt resource value: { 0x1010095,0x1010096,0x1010097,0x1010098,0x10100AF,0x101014F,0x1010164,0x10103AC,0x1010535,0x7F030070,0x7F030071,0x7F03032E,0x7F0303C5,0x7F0303C6,0x7F0303C7,0x7F0303C8,0x7F0303C9,0x7F0303D1,0x7F0303D2,0x7F0303D3,0x7F0303D4,0x7F0303D6,0x7F0303D7,0x7F0303D8,0x7F0303D9 }
 			public static int[] MotionLabel = new int[] {
 					16842901,
 					16842902,
@@ -32727,8 +32725,8 @@ namespace PerryRhodan.AudiobookPlayer.Android
 					16843108,
 					16843692,
 					16844085,
+					2130903152,
 					2130903153,
-					2130903154,
 					2130903854,
 					2130904005,
 					2130904006,
@@ -32819,9 +32817,9 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 24
 			public const int MotionLabel_textureWidth = 24;
 			
-			// aapt resource value: { 0x7F030045,0x7F030122,0x7F030212,0x7F0302A6,0x7F0302BD,0x7F03034B }
+			// aapt resource value: { 0x7F030044,0x7F030122,0x7F030212,0x7F0302A6,0x7F0302BD,0x7F03034B }
 			public static int[] MotionLayout = new int[] {
-					2130903109,
+					2130903108,
 					2130903330,
 					2130903570,
 					2130903718,
@@ -32960,11 +32958,11 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 8
 			public const int NavAction_popUpToInclusive = 8;
 			
-			// aapt resource value: { 0x1010003,0x10101ED,0x7F030047,0x7F0302CF }
+			// aapt resource value: { 0x1010003,0x10101ED,0x7F030046,0x7F0302CF }
 			public static int[] NavArgument = new int[] {
 					16842755,
 					16843245,
-					2130903111,
+					2130903110,
 					2130903759};
 			
 			// aapt resource value: 1
@@ -32979,10 +32977,10 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 3
 			public const int NavArgument_nullable = 3;
 			
-			// aapt resource value: { 0x10104EE,0x7F030003,0x7F030299,0x7F03041A }
+			// aapt resource value: { 0x10104EE,0x7F030002,0x7F030299,0x7F03041A }
 			public static int[] NavDeepLink = new int[] {
 					16844014,
-					2130903043,
+					2130903042,
 					2130903705,
 					2130904090};
 			
@@ -33012,9 +33010,9 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 0
 			public const int NavHost_navGraph = 0;
 			
-			// aapt resource value: { 0x7F03005C,0x7F030162,0x7F0301F0,0x7F0301F5,0x7F0301F6,0x7F0301F9,0x7F030205,0x7F030206,0x7F030207,0x7F03020E,0x7F030296 }
+			// aapt resource value: { 0x7F03005B,0x7F030162,0x7F0301F0,0x7F0301F5,0x7F0301F6,0x7F0301F9,0x7F030205,0x7F030206,0x7F030207,0x7F03020E,0x7F030296 }
 			public static int[] NavigationBarView = new int[] {
-					2130903132,
+					2130903131,
 					2130903394,
 					2130903536,
 					2130903541,
@@ -33183,9 +33181,9 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 0
 			public const int NavInclude_graph = 0;
 			
-			// aapt resource value: { 0x7F0300CC,0x7F0303A9 }
+			// aapt resource value: { 0x7F0300CB,0x7F0303A9 }
 			public static int[] OnClick = new int[] {
-					2130903244,
+					2130903243,
 					2130903977};
 			
 			// aapt resource value: 0
@@ -33194,9 +33192,9 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 1
 			public const int OnClick_targetId = 1;
 			
-			// aapt resource value: { 0x7F03004B,0x7F03014B,0x7F03014C,0x7F03014D,0x7F03025B,0x7F03028C,0x7F030293,0x7F0302C2,0x7F0302CC,0x7F0302D8,0x7F03032A,0x7F03035E,0x7F03035F,0x7F030360,0x7F030361,0x7F030362,0x7F030402,0x7F030403,0x7F030404 }
+			// aapt resource value: { 0x7F03004A,0x7F03014B,0x7F03014C,0x7F03014D,0x7F03025B,0x7F03028C,0x7F030293,0x7F0302C2,0x7F0302CC,0x7F0302D8,0x7F03032A,0x7F03035E,0x7F03035F,0x7F030360,0x7F030361,0x7F030362,0x7F030402,0x7F030403,0x7F030404 }
 			public static int[] OnSwipe = new int[] {
-					2130903115,
+					2130903114,
 					2130903371,
 					2130903372,
 					2130903373,
@@ -33295,7 +33293,7 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 2
 			public const int PopupWindow_overlapAnchor = 2;
 			
-			// aapt resource value: { 0x1010002,0x101000D,0x101000E,0x10100F2,0x10101E1,0x10101E6,0x10101E8,0x10101E9,0x10101EA,0x10101EB,0x10101EC,0x10101ED,0x10101EE,0x10102E3,0x101055C,0x1010561,0x7F03003A,0x7F03003C,0x7F030137,0x7F03013A,0x7F030165,0x7F030167,0x7F0301B8,0x7F0301D2,0x7F0301D7,0x7F0301EF,0x7F030208,0x7F030211,0x7F0302D9,0x7F0302F4,0x7F030339,0x7F030345,0x7F030352,0x7F030382,0x7F0303EE,0x7F03042E }
+			// aapt resource value: { 0x1010002,0x101000D,0x101000E,0x10100F2,0x10101E1,0x10101E6,0x10101E8,0x10101E9,0x10101EA,0x10101EB,0x10101EC,0x10101ED,0x10101EE,0x10102E3,0x101055C,0x1010561,0x7F030039,0x7F03003B,0x7F030137,0x7F03013A,0x7F030165,0x7F030167,0x7F0301B8,0x7F0301D2,0x7F0301D7,0x7F0301EF,0x7F030208,0x7F030211,0x7F0302D9,0x7F0302F4,0x7F030339,0x7F030345,0x7F030352,0x7F030382,0x7F0303EE,0x7F03042E }
 			public static int[] Preference = new int[] {
 					16842754,
 					16842765,
@@ -33313,8 +33311,8 @@ namespace PerryRhodan.AudiobookPlayer.Android
 					16843491,
 					16844124,
 					16844129,
-					2130903098,
-					2130903100,
+					2130903097,
+					2130903099,
 					2130903351,
 					2130903354,
 					2130903397,
@@ -33334,19 +33332,19 @@ namespace PerryRhodan.AudiobookPlayer.Android
 					2130904046,
 					2130904110};
 			
-			// aapt resource value: { 0x10100F2,0x1010129,0x101012A,0x7F03003B }
+			// aapt resource value: { 0x10100F2,0x1010129,0x101012A,0x7F03003A }
 			public static int[] PreferenceFragment = new int[] {
 					16842994,
 					16843049,
 					16843050,
-					2130903099};
+					2130903098};
 			
-			// aapt resource value: { 0x10100F2,0x1010129,0x101012A,0x7F03003B }
+			// aapt resource value: { 0x10100F2,0x1010129,0x101012A,0x7F03003A }
 			public static int[] PreferenceFragmentCompat = new int[] {
 					16842994,
 					16843049,
 					16843050,
-					2130903099};
+					2130903098};
 			
 			// aapt resource value: 3
 			public const int PreferenceFragmentCompat_allowDividerAfterLastItem = 3;
@@ -33406,9 +33404,9 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 3
 			public const int PreferenceImageView_maxWidth = 3;
 			
-			// aapt resource value: { 0x7F0300A5,0x7F030141,0x7F03015C,0x7F030160,0x7F030304,0x7F030305,0x7F030306,0x7F030307,0x7F030308,0x7F030309,0x7F03030A,0x7F03030B,0x7F03030C,0x7F030337,0x7F030388,0x7F030389 }
+			// aapt resource value: { 0x7F0300A4,0x7F030141,0x7F03015C,0x7F030160,0x7F030304,0x7F030305,0x7F030306,0x7F030307,0x7F030308,0x7F030309,0x7F03030A,0x7F03030B,0x7F03030C,0x7F030337,0x7F030388,0x7F030389 }
 			public static int[] PreferenceTheme = new int[] {
-					2130903205,
+					2130903204,
 					2130903361,
 					2130903388,
 					2130903392,
@@ -33581,8 +33579,9 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 35
 			public const int Preference_widgetLayout = 35;
 			
-			// aapt resource value: { 0x7F03002A,0x7F03002B,0x7F03002C,0x7F03002D,0x7F03002E,0x7F03002F,0x7F030030,0x7F030031,0x7F030032,0x7F030033,0x7F030034,0x7F030035 }
+			// aapt resource value: { 0x7F030029,0x7F03002A,0x7F03002B,0x7F03002C,0x7F03002D,0x7F03002E,0x7F03002F,0x7F030030,0x7F030031,0x7F030032,0x7F030033,0x7F030034 }
 			public static int[] ProgressWheel = new int[] {
+					2130903081,
 					2130903082,
 					2130903083,
 					2130903084,
@@ -33593,8 +33592,7 @@ namespace PerryRhodan.AudiobookPlayer.Android
 					2130903089,
 					2130903090,
 					2130903091,
-					2130903092,
-					2130903093};
+					2130903092};
 			
 			// aapt resource value: 0
 			public const int ProgressWheel_ahBarColor = 0;
@@ -33742,9 +33740,9 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 0
 			public const int ScrimInsetsFrameLayout_insetForeground = 0;
 			
-			// aapt resource value: { 0x7F03006C }
+			// aapt resource value: { 0x7F03006B }
 			public static int[] ScrollingViewBehavior_Layout = new int[] {
-					2130903148};
+					2130903147};
 			
 			// aapt resource value: 0
 			public const int ScrollingViewBehavior_Layout_behavior_overlapTop = 0;
@@ -33756,14 +33754,14 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 0
 			public const int ScrollViewRendererTheme_scrollViewStyle = 0;
 			
-			// aapt resource value: { 0x10100DA,0x101011F,0x1010220,0x1010264,0x7F0300D1,0x7F0300F6,0x7F030135,0x7F0301BC,0x7F0301DB,0x7F030211,0x7F030317,0x7F030318,0x7F030333,0x7F030334,0x7F030378,0x7F030381,0x7F030426 }
+			// aapt resource value: { 0x10100DA,0x101011F,0x1010220,0x1010264,0x7F0300D0,0x7F0300F5,0x7F030135,0x7F0301BC,0x7F0301DB,0x7F030211,0x7F030317,0x7F030318,0x7F030333,0x7F030334,0x7F030378,0x7F030381,0x7F030426 }
 			public static int[] SearchView = new int[] {
 					16842970,
 					16843039,
 					16843296,
 					16843364,
-					2130903249,
-					2130903286,
+					2130903248,
+					2130903285,
 					2130903349,
 					2130903484,
 					2130903515,
@@ -33827,11 +33825,11 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 16
 			public const int SearchView_voiceIcon = 16;
 			
-			// aapt resource value: { 0x10100F2,0x1010136,0x7F030029,0x7F03029A,0x7F030336,0x7F03034C,0x7F030419 }
+			// aapt resource value: { 0x10100F2,0x1010136,0x7F030028,0x7F03029A,0x7F030336,0x7F03034C,0x7F030419 }
 			public static int[] SeekBarPreference = new int[] {
 					16842994,
 					16843062,
-					2130903081,
+					2130903080,
 					2130903706,
 					2130903862,
 					2130903884,
@@ -34045,14 +34043,14 @@ namespace PerryRhodan.AudiobookPlayer.Android
 					2130903895,
 					2130903896};
 			
-			// aapt resource value: { 0x101011F,0x7F030026,0x7F030043,0x7F030059,0x7F03005C,0x7F03005D,0x7F030162,0x7F03028D }
+			// aapt resource value: { 0x101011F,0x7F030025,0x7F030042,0x7F030058,0x7F03005B,0x7F03005C,0x7F030162,0x7F03028D }
 			public static int[] SnackbarLayout = new int[] {
 					16843039,
-					2130903078,
-					2130903107,
-					2130903129,
+					2130903077,
+					2130903106,
+					2130903128,
+					2130903131,
 					2130903132,
-					2130903133,
 					2130903394,
 					2130903693};
 			
@@ -34512,7 +34510,7 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 15
 			public const int TextAppearance_textLocale = 15;
 			
-			// aapt resource value: { 0x1010095,0x1010096,0x1010097,0x101014F,0x1010161,0x1010162,0x1010163,0x1010164,0x10103AC,0x7F030071,0x7F030072,0x7F0303CD,0x7F0303D1,0x7F0303D2 }
+			// aapt resource value: { 0x1010095,0x1010096,0x1010097,0x101014F,0x1010161,0x1010162,0x1010163,0x1010164,0x10103AC,0x7F030070,0x7F030071,0x7F0303CD,0x7F0303D1,0x7F0303D2 }
 			public static int[] TextEffects = new int[] {
 					16842901,
 					16842902,
@@ -34523,8 +34521,8 @@ namespace PerryRhodan.AudiobookPlayer.Android
 					16843107,
 					16843108,
 					16843692,
+					2130903152,
 					2130903153,
-					2130903154,
 					2130904013,
 					2130904017,
 					2130904018};
@@ -34578,13 +34576,14 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 0
 			public const int TextInputEditText_textInputLayoutFocusedRectEnabled = 0;
 			
-			// aapt resource value: { 0x101000E,0x101009A,0x101011F,0x101013F,0x1010150,0x7F030079,0x7F03007A,0x7F03007B,0x7F03007C,0x7F03007D,0x7F03007E,0x7F03007F,0x7F030080,0x7F030081,0x7F030082,0x7F030083,0x7F03011B,0x7F03011C,0x7F03011D,0x7F03011E,0x7F03011F,0x7F030120,0x7F030168,0x7F030169,0x7F03016A,0x7F03016B,0x7F03016C,0x7F03016D,0x7F030174,0x7F030175,0x7F030176,0x7F030177,0x7F030178,0x7F030179,0x7F03017A,0x7F03017E,0x7F0301C2,0x7F0301C3,0x7F0301C4,0x7F0301C5,0x7F0301CA,0x7F0301CB,0x7F0301CC,0x7F0301CD,0x7F0302E8,0x7F0302E9,0x7F0302EA,0x7F0302EB,0x7F0302EC,0x7F0302F6,0x7F0302F7,0x7F0302F8,0x7F03030D,0x7F03030E,0x7F03030F,0x7F03033F,0x7F030342,0x7F030367,0x7F030368,0x7F030369,0x7F03036A,0x7F03036B,0x7F03037E,0x7F03037F,0x7F030380 }
+			// aapt resource value: { 0x101000E,0x101009A,0x101011F,0x101013F,0x1010150,0x7F030078,0x7F030079,0x7F03007A,0x7F03007B,0x7F03007C,0x7F03007D,0x7F03007E,0x7F03007F,0x7F030080,0x7F030081,0x7F030082,0x7F03011B,0x7F03011C,0x7F03011D,0x7F03011E,0x7F03011F,0x7F030120,0x7F030168,0x7F030169,0x7F03016A,0x7F03016B,0x7F03016C,0x7F03016D,0x7F030174,0x7F030175,0x7F030176,0x7F030177,0x7F030178,0x7F030179,0x7F03017A,0x7F03017E,0x7F0301C2,0x7F0301C3,0x7F0301C4,0x7F0301C5,0x7F0301CA,0x7F0301CB,0x7F0301CC,0x7F0301CD,0x7F0302E8,0x7F0302E9,0x7F0302EA,0x7F0302EB,0x7F0302EC,0x7F0302F6,0x7F0302F7,0x7F0302F8,0x7F03030D,0x7F03030E,0x7F03030F,0x7F03033F,0x7F030342,0x7F030367,0x7F030368,0x7F030369,0x7F03036A,0x7F03036B,0x7F03037E,0x7F03037F,0x7F030380 }
 			public static int[] TextInputLayout = new int[] {
 					16842766,
 					16842906,
 					16843039,
 					16843071,
 					16843088,
+					2130903160,
 					2130903161,
 					2130903162,
 					2130903163,
@@ -34595,7 +34594,6 @@ namespace PerryRhodan.AudiobookPlayer.Android
 					2130903168,
 					2130903169,
 					2130903170,
-					2130903171,
 					2130903323,
 					2130903324,
 					2130903325,
@@ -34856,13 +34854,13 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 2
 			public const int ThemeEnforcement_enforceTextAppearance = 2;
 			
-			// aapt resource value: { 0x10100AF,0x1010140,0x7F03008B,0x7F0300D9,0x7F0300DA,0x7F0300FF,0x7F030100,0x7F030101,0x7F030102,0x7F030103,0x7F030104,0x7F03026E,0x7F03026F,0x7F03028E,0x7F030296,0x7F0302C5,0x7F0302C6,0x7F030301,0x7F030379,0x7F03037B,0x7F03037C,0x7F0303EE,0x7F0303F2,0x7F0303F3,0x7F0303F4,0x7F0303F5,0x7F0303F6,0x7F0303F7,0x7F0303F8,0x7F0303F9 }
+			// aapt resource value: { 0x10100AF,0x1010140,0x7F03008A,0x7F0300D8,0x7F0300D9,0x7F0300FF,0x7F030100,0x7F030101,0x7F030102,0x7F030103,0x7F030104,0x7F03026E,0x7F03026F,0x7F03028E,0x7F030296,0x7F0302C5,0x7F0302C6,0x7F030301,0x7F030379,0x7F03037B,0x7F03037C,0x7F0303EE,0x7F0303F2,0x7F0303F3,0x7F0303F4,0x7F0303F5,0x7F0303F6,0x7F0303F7,0x7F0303F8,0x7F0303F9 }
 			public static int[] Toolbar = new int[] {
 					16842927,
 					16843072,
-					2130903179,
+					2130903178,
+					2130903256,
 					2130903257,
-					2130903258,
 					2130903295,
 					2130903296,
 					2130903297,
@@ -34979,7 +34977,7 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 29
 			public const int Toolbar_titleTextColor = 29;
 			
-			// aapt resource value: { 0x1010034,0x10100D5,0x10100F6,0x101013F,0x1010140,0x101014F,0x7F03005C }
+			// aapt resource value: { 0x1010034,0x10100D5,0x10100F6,0x101013F,0x1010140,0x101014F,0x7F03005B }
 			public static int[] Tooltip = new int[] {
 					16842804,
 					16842965,
@@ -34987,7 +34985,7 @@ namespace PerryRhodan.AudiobookPlayer.Android
 					16843071,
 					16843072,
 					16843087,
-					2130903132};
+					2130903131};
 			
 			// aapt resource value: 2
 			public const int Tooltip_android_layout_margin = 2;
@@ -35061,10 +35059,10 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 11
 			public const int Transform_transformPivotTarget = 11;
 			
-			// aapt resource value: { 0x10100D0,0x7F030052,0x7F0300F8,0x7F0300F9,0x7F03015D,0x7F030213,0x7F0302BA,0x7F0302ED,0x7F030365,0x7F03040F,0x7F030411 }
+			// aapt resource value: { 0x10100D0,0x7F030051,0x7F0300F8,0x7F0300F9,0x7F03015D,0x7F030213,0x7F0302BA,0x7F0302ED,0x7F030365,0x7F03040F,0x7F030411 }
 			public static int[] Transition = new int[] {
 					16842960,
-					2130903122,
+					2130903121,
 					2130903288,
 					2130903289,
 					2130903389,
@@ -35139,11 +35137,11 @@ namespace PerryRhodan.AudiobookPlayer.Android
 					2130903778,
 					2130904026};
 			
-			// aapt resource value: { 0x10100D4,0x7F03005C,0x7F03005D }
+			// aapt resource value: { 0x10100D4,0x7F03005B,0x7F03005C }
 			public static int[] ViewBackgroundHelper = new int[] {
 					16842964,
-					2130903132,
-					2130903133};
+					2130903131,
+					2130903132};
 			
 			// aapt resource value: 0
 			public const int ViewBackgroundHelper_android_background = 0;
@@ -35176,12 +35174,12 @@ namespace PerryRhodan.AudiobookPlayer.Android
 			// aapt resource value: 1
 			public const int ViewStubCompat_android_layout = 1;
 			
-			// aapt resource value: { 0x10100D0,0x7F030001,0x7F030002,0x7F0300CB,0x7F03015D,0x7F0301DC,0x7F0301DD,0x7F0302BA,0x7F0302BF,0x7F0302D7,0x7F0302ED,0x7F03033E,0x7F03040F,0x7F030418,0x7F030421 }
+			// aapt resource value: { 0x10100D0,0x7F030000,0x7F030001,0x7F0300CA,0x7F03015D,0x7F0301DC,0x7F0301DD,0x7F0302BA,0x7F0302BF,0x7F0302D7,0x7F0302ED,0x7F03033E,0x7F03040F,0x7F030418,0x7F030421 }
 			public static int[] ViewTransition = new int[] {
 					16842960,
+					2130903040,
 					2130903041,
-					2130903042,
-					2130903243,
+					2130903242,
 					2130903389,
 					2130903516,
 					2130903517,

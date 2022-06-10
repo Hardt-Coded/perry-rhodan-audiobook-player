@@ -1,14 +1,8 @@
 ﻿module WhatsNew
 
-open Fabulous
 open FsHttp
-open FsHttp.DslCE
-open FSharp.Data
-open Microsoft.AppCenter.Analytics
 open Microsoft.AppCenter.Crashes
 open System.Net
-
-
 
 
     module Helpers =
@@ -37,9 +31,10 @@ let getLatestMessageAsync () =
                 return None
             else
                 let! resp =
-                    httpAsync {
+                    http {
                         GET Global.messageEndpoint
                     }
+                    |> Request.sendAsync
 
                 if resp.statusCode <> HttpStatusCode.OK then
                     Crashes.TrackError (exn ($"Error loading Messages from '{Global.messageEndpoint}' StatusCode: {resp.statusCode}"), Map.empty)
@@ -53,7 +48,7 @@ let getLatestMessageAsync () =
                         messsageJsonArray 
                         |> Array.tryHead
                         |> Option.map (fun json ->
-                            (json.["date"].AsString(), json.["message"].AsString())
+                            (json.GetProperty("date").GetString(), json.GetProperty("message").GetString())
                         )
         with
         | ex ->
