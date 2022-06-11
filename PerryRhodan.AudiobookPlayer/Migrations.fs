@@ -7,6 +7,7 @@
     open Acr.UserDialogs
     open Xamarin.Forms
 
+
    
     let [<Literal>] noMediaMigration = "NoMediaMigration_"
     let [<Literal>] internalStorageMigration = "InternalStorageMigration_"
@@ -203,7 +204,11 @@
 
         let mapper = FSharpBsonMapper()
 
-        let private cleanupAudiobookDb (audiobookDbFile:string) =
+        let removeOldStoragePath (file:string) =
+            let idx = file.IndexOf("PerryRhodan.AudioBookPlayer/data")
+            file.[idx..].Replace("PerryRhodan.AudioBookPlayer/data","")
+
+        let private cleanupAudiobookDb (audiobookDbFile:string) newDataFolder =
             async {
                 use db = new LiteDatabase(audiobookDbFile, mapper)
                 let audioBooks = 
@@ -232,6 +237,22 @@
                                     x.State with
                                         Downloaded = false
                                         DownloadedFolder = None
+                                        CurrentPosition = 
+                                            x.State.CurrentPosition 
+                                            |> Option.map (fun pos -> 
+                                                let cleanedFile = removeOldStoragePath pos.Filename
+                                                let newFile = $"{newDataFolder}{cleanedFile}"
+                                                
+                                                #if DEBUG
+                                                System.Diagnostics.Debug.WriteLine($"newDataFolder: {newDataFolder}")
+                                                System.Diagnostics.Debug.WriteLine($"old: {pos.Filename}")
+                                                System.Diagnostics.Debug.WriteLine($"cleanedFile: {cleanedFile}")
+                                                System.Diagnostics.Debug.WriteLine($"newFile: {newFile}")
+                                                #endif
+                                                { pos with 
+                                                    Filename = newFile
+                                                }
+                                            )
                                 }
                         }
                     
@@ -244,7 +265,7 @@
             }
             
 
-        let private cleanupAudioBookFilesInfoDb (audiobookFilesDbFile:string) =
+        let private cleanupAudioBookFilesInfoDb (audiobookFilesDbFile:string) (newDataFolder:string)=
             async {
                 use db = new LiteDatabase(audiobookFilesDbFile, mapper)
 
@@ -254,9 +275,7 @@
                         |> Seq.toArray
 
 
-                let removeOldStoragePath (file:string) =
-                    let idx = file.IndexOf("PerryRhodan.AudioBookPlayer/data")
-                    file.[idx..].Replace("PerryRhodan.AudioBookPlayer/data","")
+                
 
                 let migratedInfos =
                     infos
@@ -265,9 +284,10 @@
                             AudioFiles = 
                                 x.AudioFiles
                                 |> List.map (fun e ->
+                                    let newFileName = $"{newDataFolder}{removeOldStoragePath e.FileName}"
                                     { 
                                         e with
-                                            FileName = Path.Combine(Services.Consts.baseUrl, removeOldStoragePath e.FileName)
+                                            FileName = newFileName
                                     }
                                 )
                         }
@@ -280,6 +300,25 @@
             }
 
 
+        let rec directoryCopy srcPath dstPath =
+            if not <| System.IO.Directory.Exists(srcPath) then
+                let msg = System.String.Format("Source directory does not exist or could not be found: {0}", srcPath)
+                raise (System.IO.DirectoryNotFoundException(msg))
+        
+            if not <| System.IO.Directory.Exists(dstPath) then
+                System.IO.Directory.CreateDirectory(dstPath) |> ignore
+        
+            let srcDir = new System.IO.DirectoryInfo(srcPath)
+        
+            for file in srcDir.GetFiles() do
+                let temppath = System.IO.Path.Combine(dstPath, file.Name)
+                file.CopyTo(temppath, true) |> ignore
+        
+            for subdir in srcDir.GetDirectories() do
+                let dstSubDir = System.IO.Path.Combine(dstPath, subdir.Name)
+                directoryCopy subdir.FullName dstSubDir
+
+
         let moveFilesToInternalStorage () =
             async {
                 let internalStorageBasePath =
@@ -288,52 +327,82 @@
                 
                 if Services.Consts.isToInternalStorageMigrated() then
                     return ()
+                else
+                    let folders = Services.Consts.createCurrentFolders ()
+
+                    if not (Directory.Exists(folders.currentLocalBaseFolder)) then
+                        return ()
+                    else
+
+                        if folders.currentLocalBaseFolder.ToUpperInvariant() = internalStorageBasePath.ToUpperInvariant() then
+                            return ()
+                        else
                 
-                let folders = Services.Consts.createCurrentFolders ()
-
-                if folders.currentLocalBaseFolder.ToUpperInvariant() = internalStorageBasePath.ToUpperInvariant() then
-                    return ()
+                            use dlg = UserDialogs.Instance.Progress("Migration Move To Internal Storage", maskType = MaskType.Gradient)
                 
-                use dlg = UserDialogs.Instance.Progress("Migration Move To Internal Storage", maskType = MaskType.Gradient)
+                            dlg.PercentComplete <- 10
+
+                            if (Directory.Exists(internalStorageBasePath)) then
+                                Directory.Delete(internalStorageBasePath, true) |> ignore
+
+
+                            // folder infos
+                            let currentLocalDataFolder = Path.Combine(internalStorageBasePath,"data")
+                            let stateFileFolder = Path.Combine(currentLocalDataFolder,"states")
+                            let newAudiobookDbFile = Path.Combine(stateFileFolder,"audiobooks.db")
+                            let newAudiobookFilesDbFile = Path.Combine(stateFileFolder,"audiobookfiles.db")
+
+                            // move all files!
+                            try
+                                do! Task.Run(fun () -> directoryCopy folders.currentLocalBaseFolder internalStorageBasePath) |> Async.AwaitTask
+                                do! Task.Run(fun () -> Directory.Delete (folders.currentLocalBaseFolder, true)) |> Async.AwaitTask
+                            with
+                            | ex ->
+                                if (Directory.Exists(internalStorageBasePath)) then
+                                    Directory.Delete (internalStorageBasePath, true)
+
+                                // save the db files
+                                if (Directory.Exists(folders.stateFileFolder)) then
+                                    directoryCopy folders.stateFileFolder stateFileFolder
+                    
+                                // delete all
+                                if (Directory.Exists(folders.currentLocalBaseFolder)) then
+                                    Directory.Delete (folders.currentLocalBaseFolder, true)
+                    
+                                do! Common.Helpers.displayAlert ("Fehler","Fehler beim Verschieben von Dateien. App muss neugestartet werden!", "OK")
+
+                                DependencyService.Get<Services.DependencyServices.ICloseApplication>().CloseApplication()
+                                return ()
+                    
+
                 
-                dlg.PercentComplete <- 10
 
-                if (Directory.Exists(internalStorageBasePath)) then
-                    Directory.Delete(internalStorageBasePath) |> ignore
+                            dlg.PercentComplete <- 60
 
-                // move all files!
-                do! Task.Run(fun () -> Directory.Move(folders.currentLocalBaseFolder,internalStorageBasePath)) |> Async.AwaitTask
+                            do! cleanupAudiobookDb newAudiobookDbFile currentLocalDataFolder
 
-                // cleanup the databases
-                let currentLocalDataFolder = Path.Combine(internalStorageBasePath,"data")
-                let stateFileFolder = Path.Combine(currentLocalDataFolder,"states")
-                let newAudiobookDbFile = Path.Combine(stateFileFolder,"audiobooks.db")
-                let newAudiobookFilesDbFile = Path.Combine(stateFileFolder,"audiobookfiles.db")
+                            dlg.PercentComplete <- 70
 
-                dlg.PercentComplete <- 60
+                            do! cleanupAudioBookFilesInfoDb newAudiobookFilesDbFile currentLocalDataFolder
 
-                do! cleanupAudiobookDb newAudiobookDbFile
+                            dlg.PercentComplete <- 80
 
-                dlg.PercentComplete <- 70
+                            // set migrated to internal flag
+                            File.WriteAllText(Path.Combine(Xamarin.Essentials.FileSystem.AppDataDirectory,".migrated"), "")
 
-                do! cleanupAudioBookFilesInfoDb newAudiobookFilesDbFile
-
-                dlg.PercentComplete <- 80
-
-                // set migrated to internal flag
-                File.WriteAllText(Path.Combine(Xamarin.Essentials.FileSystem.AppDataDirectory,".migrated"), "")
-
-                dlg.PercentComplete <- 90
+                            dlg.PercentComplete <- 90
                 
-                do! Helpers.confirmMigration internalStorageMigration
+                            do! Helpers.confirmMigration internalStorageMigration
 
-                dlg.PercentComplete <- 100
+                            dlg.PercentComplete <- 100
 
-                do! Common.Helpers.displayAlert ("Neustart","Ihre Hörbucher wurden in den Aufgrund Einschränkungen zukünftiger Android Versionen verschoben. Die App muss dazu neugestartet werden!", "OK")
+                            do! Common.Helpers.displayAlert (
+                                "Neustart",
+                                "Ihre Hörbucher wurden in den Aufgrund Einschränkungen zukünftiger Android Versionen verschoben. Die App muss dazu beendet werden. Starten Sie diese neu.", "OK")
                 
-                DependencyService.Get<Services.DependencyServices.ICloseApplication>().CloseApplication()
+                            DependencyService.Get<Services.DependencyServices.ICloseApplication>().CloseApplication()
 
-                return ()
+                            return ()
             }
             
 
