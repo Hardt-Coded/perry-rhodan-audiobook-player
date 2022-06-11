@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1085952965451",
+    "project_id": "einsamedien-audioplayer",
+    "storage_bucket": "einsamedien-audioplayer.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1085952965451:android:67639abaf052c9c47886ce",
+        "android_client_info": {
+          "package_name": "hits.rhodan.audiobooks"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1085952965451-hdgk7ukfem1hfnu65rnhn5h5u05jmmf9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC6dHYSJiWKv_C0o0oWGzbxrvvI4GUwKvo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1085952965451-hdgk7ukfem1hfnu65rnhn5h5u05jmmf9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
