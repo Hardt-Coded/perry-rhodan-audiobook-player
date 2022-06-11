@@ -1,14 +1,17 @@
 ﻿module Migrations
 
-open System
-open System.IO
-open FSharp.Control
-open Microsoft.AppCenter.Crashes
-open Acr.UserDialogs
-open System.Net.Http
-open Xamarin.Forms
+    open System
+    open System.IO
+    open FSharp.Control
+    open Microsoft.AppCenter.Crashes
+    open Acr.UserDialogs
+    open Xamarin.Forms
 
-    
+   
+    let [<Literal>] noMediaMigration = "NoMediaMigration_"
+    let [<Literal>] internalStorageMigration = "InternalStorageMigration_"
+
+
     module Helpers =
     
         open Services
@@ -46,7 +49,7 @@ open Xamarin.Forms
                 do! createNoMediaFile folders.audioBookDownloadFolderBase
                 dlg.PercentComplete <- 100
 
-                do! Helpers.confirmMigration "NoMediaMigration_"
+                do! Helpers.confirmMigration noMediaMigration
             }
 
 
@@ -58,7 +61,7 @@ open Xamarin.Forms
 
         let mapper = FSharpBsonMapper()
 
-        let cleanupAudiobookDb (audiobookDbFile:string) =
+        let private cleanupAudiobookDb (audiobookDbFile:string) =
             async {
                 use db = new LiteDatabase(audiobookDbFile, mapper)
                 let audioBooks = 
@@ -101,7 +104,7 @@ open Xamarin.Forms
             }
             
 
-        let cleanupAudioBookFilesDb (audiobookFilesDbFile:string) =
+        let private cleanupAudioBookFilesInfoDb (audiobookFilesDbFile:string) =
             async {
                 use db = new LiteDatabase(audiobookFilesDbFile, mapper)
 
@@ -135,8 +138,9 @@ open Xamarin.Forms
                 
                 db.Dispose |> ignore
                 let folders = Services.Consts.createCurrentFolders ()
-                File.Copy(audiobookFilesDbFile, folders.audioBookAudioFileDb, true)
+                File.Copy(audiobookFilesDbFile, folders.audioBookAudioFileInfoDb, true)
             }
+
 
         let importDatabases files =
             async {
@@ -172,7 +176,7 @@ open Xamarin.Forms
 
                         do! Async.Sleep 300
 
-                        do! cleanupAudioBookFilesDb audiobookFilesDbFile
+                        do! cleanupAudioBookFilesInfoDb audiobookFilesDbFile
 
                         dlg.PercentComplete <- 100
 
@@ -189,39 +193,187 @@ open Xamarin.Forms
                     
             }
             
+       
+    // migrating to internal storage as long you have access to it (Android 9)
+    module MigrateToInternalStorage =
+        open System.Threading.Tasks
+        open LiteDB
+        open LiteDB.FSharp
+        open Domain
+
+        let mapper = FSharpBsonMapper()
+
+        let private cleanupAudiobookDb (audiobookDbFile:string) =
+            async {
+                use db = new LiteDatabase(audiobookDbFile, mapper)
+                let audioBooks = 
+                    db.GetCollection<AudioBook>("audiobooks")
+                        .FindAll()                             
+                        |> Seq.toArray
+                        |> Array.sortBy (fun i -> i.FullName)
+                        |> Array.Parallel.map (
+                            fun i ->
+                                if obj.ReferenceEquals(i.State.LastTimeListend,null) then
+                                    let newMdl = {i.State with LastTimeListend = None }
+                                    { i with State = newMdl }
+                                else
+                                    i
+                        )
+
+                // remove all pathes and pictures
+                let migratedBooks =
+                    audioBooks
+                    |> Array.Parallel.map (fun x ->
+                        {
+                            x with
+                                Picture = None
+                                Thumbnail = None
+                                State = {
+                                    x.State with
+                                        Downloaded = false
+                                        DownloadedFolder = None
+                                }
+                        }
+                    
+                    )
+
+                let result = db.GetCollection<AudioBook>("audiobooks").Update(migratedBooks)
+
+                db.Dispose |> ignore
+                ()
+            }
+            
+
+        let private cleanupAudioBookFilesInfoDb (audiobookFilesDbFile:string) =
+            async {
+                use db = new LiteDatabase(audiobookFilesDbFile, mapper)
+
+                let infos = 
+                    db.GetCollection<AudioBookAudioFilesInfo>("audiobookfileinfos")
+                        .FindAll()                             
+                        |> Seq.toArray
+
+
+                let removeOldStoragePath (file:string) =
+                    let idx = file.IndexOf("PerryRhodan.AudioBookPlayer/data")
+                    file.[idx..].Replace("PerryRhodan.AudioBookPlayer/data","")
+
+                let migratedInfos =
+                    infos
+                    |> Array.Parallel.map (fun x ->
+                        { x with 
+                            AudioFiles = 
+                                x.AudioFiles
+                                |> List.map (fun e ->
+                                    { 
+                                        e with
+                                            FileName = Path.Combine(Services.Consts.baseUrl, removeOldStoragePath e.FileName)
+                                    }
+                                )
+                        }
+                    )
+                ()
+
+                let result = db.GetCollection<AudioBookAudioFilesInfo>("audiobookfileinfos").Update(migratedInfos)
                 
+                db.Dispose |> ignore
+            }
 
 
+        let moveFilesToInternalStorage () =
+            async {
+                let internalStorageBasePath =
+                    Path.Combine(Xamarin.Essentials.FileSystem.AppDataDirectory, "PerryRhodan.AudioBookPlayer")
 
-let private currentMigrations = [
-    "NoMediaMigration_"
-]
+                
+                if Services.Consts.isToInternalStorageMigrated() then
+                    return ()
+                
+                let folders = Services.Consts.createCurrentFolders ()
+
+                if folders.currentLocalBaseFolder.ToUpperInvariant() = internalStorageBasePath.ToUpperInvariant() then
+                    return ()
+                
+                use dlg = UserDialogs.Instance.Progress("Migration Move To Internal Storage", maskType = MaskType.Gradient)
+                
+                dlg.PercentComplete <- 10
+
+                if (Directory.Exists(internalStorageBasePath)) then
+                    Directory.Delete(internalStorageBasePath) |> ignore
+
+                // move all files!
+                do! Task.Run(fun () -> Directory.Move(folders.currentLocalBaseFolder,internalStorageBasePath)) |> Async.AwaitTask
+
+                // cleanup the databases
+                let currentLocalDataFolder = Path.Combine(internalStorageBasePath,"data")
+                let stateFileFolder = Path.Combine(currentLocalDataFolder,"states")
+                let newAudiobookDbFile = Path.Combine(stateFileFolder,"audiobooks.db")
+                let newAudiobookFilesDbFile = Path.Combine(stateFileFolder,"audiobookfiles.db")
+
+                dlg.PercentComplete <- 60
+
+                do! cleanupAudiobookDb newAudiobookDbFile
+
+                dlg.PercentComplete <- 70
+
+                do! cleanupAudioBookFilesInfoDb newAudiobookFilesDbFile
+
+                dlg.PercentComplete <- 80
+
+                // set migrated to internal flag
+                File.WriteAllText(Path.Combine(Xamarin.Essentials.FileSystem.AppDataDirectory,".migrated"), "")
+
+                dlg.PercentComplete <- 90
+                
+                do! Helpers.confirmMigration internalStorageMigration
+
+                dlg.PercentComplete <- 100
+
+                do! Common.Helpers.displayAlert ("Neustart","Ihre Hörbucher wurden in den Aufgrund Einschränkungen zukünftiger Android Versionen verschoben. Die App muss dazu neugestartet werden!", "OK")
+                
+                DependencyService.Get<Services.DependencyServices.ICloseApplication>().CloseApplication()
+
+                return ()
+            }
+            
+
+            
+        
 
 
-let runMigration migration =
-    async {
-        match migration with
-        | "NoMediaMigration_" ->
-            do! NoMediaMigration.runNoMediaMigration ()
+    let private currentMigrations = [
+        noMediaMigration
+        internalStorageMigration
+    ]
 
-        | _ ->
-            Crashes.TrackError (exn ($"Error Migration '{migration}' not found!"), Map.empty)
-    }
+
+    let runMigration migration =
+        async {
+            match migration with
+            | "NoMediaMigration_" ->
+                do! NoMediaMigration.runNoMediaMigration ()
+
+            | "InternalStorageMigration_" ->
+                do! MigrateToInternalStorage.moveFilesToInternalStorage ()
+
+            | _ ->
+                Crashes.TrackError (exn ($"Error Migration '{migration}' not found!"), Map.empty)
+        }
     
         
 
-let runMigrations () =
-    async {
-        do!
-            asyncSeq {
-                for migration in currentMigrations do
-                    let! result = Helpers.isMigrationConfirmed migration
-                    yield (migration,result)
-            }
-            |> AsyncSeq.filter (fun (_,result) -> not result)
-            |> AsyncSeq.map fst
-            |> AsyncSeq.iterAsync runMigration
+    let runMigrations () =
+        async {
+            do!
+                asyncSeq {
+                    for migration in currentMigrations do
+                        let! result = Helpers.isMigrationConfirmed migration
+                        yield (migration,result)
+                }
+                |> AsyncSeq.filter (fun (_,result) -> not result)
+                |> AsyncSeq.map fst
+                |> AsyncSeq.iterAsync runMigration
 
-    }
+        }
             
 

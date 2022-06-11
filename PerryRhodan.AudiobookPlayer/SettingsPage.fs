@@ -175,8 +175,9 @@
                                 (DevicePlatform.Android, ["*/*"] |> List.toSeq )
                             ] |> dict
                         let! result = FilePicker.PickMultipleAsync(PickOptions(PickerTitle="Select Database Files", FileTypes = FilePickerFileType(fileTypes))) |> Async.AwaitTask
-                        do! Async.Sleep 1000
-                        do! Migrations.AudiobooksMissingAfterUpdateAndroid10.importDatabases (result |> Seq.map (fun x -> x.FullPath))
+                        if result |> isNull |> not then
+                            do! Async.Sleep 1000
+                            do! Migrations.AudiobooksMissingAfterUpdateAndroid10.importDatabases (result |> Seq.map (fun x -> x.FullPath))
                     }
                     |> Async.StartImmediate
                 |> Cmd.ofSub

@@ -167,34 +167,35 @@
                         async {
                             let! msg = inbox.Receive()
 
-                            let newState =
-                                match msg with
-                                | AddListener (key,handler) ->
-                                    if not (state |> List.exists (fun (k,_) -> k = key)) then
-                                        state @ [(key,handler)]
-                                    else
-                                        state
-                                | RemoveListener (key,reply) ->
-                                    let newState =
-                                        state |> List.filter (fun (k,_) -> k <> key)
-                                    reply.Reply(true)
-                                    newState
-                                | Dispatch info ->
-                                    let aseq =
-                                        asyncSeq {
-                                            for (_,handler) in state |> List.filter (fun (k,_) -> k <> "audioplayer-shutdown-event") do
-                                                do! handler(info)
-                                        }
-                                        |> AsyncSeq.toListSynchronously
-                                    state
-                                | RegisterShutDownEvent handler ->
-                                    state @ [("audioplayer-shutdown-event",handler)]
-                                | ShutDownService ->
-                                    let shutdownhandler =
-                                        state |> List.tryFind (fun (key,_) -> key = "audioplayer-shutdown-event")
-                                    shutdownhandler
-                                    |> Option.iter (fun (_,h) -> h(AudioPlayerInfo.Empty) |> Async.RunSynchronously)
-                                    state
+                            let! newState =
+                                async {
+                                    match msg with
+                                    | AddListener (key,handler) ->
+                                        if not (state |> List.exists (fun (k,_) -> k = key)) then
+                                            return state @ [(key,handler)]
+                                        else
+                                            return state
+                                    | RemoveListener (key,reply) ->
+                                        let newState =
+                                            state |> List.filter (fun (k,_) -> k <> key)
+                                        reply.Reply(true)
+                                        return newState
+                                    | Dispatch info ->
+                                        
+                                        for (_,handler) in state |> List.filter (fun (k,_) -> k <> "audioplayer-shutdown-event") do
+                                            do! handler(info)
+                                        
+                                        return state
+                                    | RegisterShutDownEvent handler ->
+                                        return state @ [("audioplayer-shutdown-event",handler)]
+                                    | ShutDownService ->
+                                        let shutdownhandler =
+                                            state |> List.tryFind (fun (key,_) -> key = "audioplayer-shutdown-event")
+                                        shutdownhandler
+                                        |> Option.iter (fun (_,h) -> h(AudioPlayerInfo.Empty) |> Async.RunSynchronously)
+                                        return state
+                                }
+                                
                                     
                                     
                                              

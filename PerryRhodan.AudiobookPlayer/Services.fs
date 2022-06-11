@@ -46,33 +46,39 @@ module Consts =
     
     open DependencyServices
 
+    let isToInternalStorageMigrated () =
+        File.Exists (Path.Combine(Xamarin.Essentials.FileSystem.AppDataDirectory,".migrated"))
+
     let createCurrentFolders =
         let mutable folders = None
         fun () ->
             match folders with
             | None ->
                 
-                let currentLocalDataFolder =  
-                    let baseFolder = 
+                let currentLocalBaseFolder =
+                    let storageFolder = 
                         match Device.RuntimePlatform with
                         | Device.Android -> 
-                            if (DeviceInfo.Version.Major >= 10) then
+                            if DeviceInfo.Version.Major >= 10 || isToInternalStorageMigrated () then
                                 Xamarin.Essentials.FileSystem.AppDataDirectory
                             else
                                 DependencyService.Get<IAndroidDownloadFolder>().GetAndroidDownloadFolder ()
                         | Device.iOS -> Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
                         | _ -> Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
-                    let playerFolder = Path.Combine(baseFolder,"PerryRhodan.AudioBookPlayer","data")
-                    // checking if I have really write access to it!
+                    let baseFolder = Path.Combine(storageFolder,"PerryRhodan.AudioBookPlayer")
                     try
-                        if not (Directory.Exists(playerFolder)) then
-                            Directory.CreateDirectory(playerFolder) |> ignore
-                        let testFile = Path.Combine(playerFolder, "testfile.txt")
+                        if not (Directory.Exists(baseFolder)) then
+                            Directory.CreateDirectory(baseFolder) |> ignore
+                        let testFile = Path.Combine(baseFolder, "testfile.txt")
                         File.WriteAllText(testFile, "test!")
-                        playerFolder
+                        baseFolder
                     with
                     | ex ->
-                        Path.Combine(Xamarin.Essentials.FileSystem.AppDataDirectory,"PerryRhodan.AudioBookPlayer","data")
+                        Path.Combine(Xamarin.Essentials.FileSystem.AppDataDirectory,"PerryRhodan.AudioBookPlayer")
+
+                let currentLocalDataFolder =  
+                    Path.Combine(currentLocalBaseFolder,"data")
+                    
 
                 let stateFileFolder = Path.Combine(currentLocalDataFolder,"states")
                 let audioBooksStateDataFile = Path.Combine(stateFileFolder,"audiobooks.db")
@@ -83,10 +89,11 @@ module Consts =
                 if not (Directory.Exists(audioBookDownloadFolderBase)) then
                     Directory.CreateDirectory(audioBookDownloadFolderBase) |> ignore
                 let result = {|
+                        currentLocalBaseFolder = currentLocalBaseFolder
                         currentLocalDataFolder = currentLocalDataFolder
                         stateFileFolder = stateFileFolder
                         audioBooksStateDataFile = audioBooksStateDataFile
-                        audioBookAudioFileDb = audioBookAudioFileDb
+                        audioBookAudioFileInfoDb = audioBookAudioFileDb
                         audioBookDownloadFolderBase=audioBookDownloadFolderBase
                     |}
                 folders <- Some result
@@ -266,7 +273,7 @@ module DataBase =
                                 loadAudioBooksFromDb folders.audioBooksStateDataFile
 
                             let audioFileInfos =
-                                AudioBookFiles.loadAudioBookAudioFileInfosFromDb folders.audioBookAudioFileDb
+                                AudioBookFiles.loadAudioBookAudioFileInfosFromDb folders.audioBookAudioFileInfoDb
 
                             {
                                 AudioBooks = audioBooks
@@ -337,7 +344,7 @@ module DataBase =
                                         return! (loop state)
 
                                 | DeleteDatabase ->
-                                    deleteDatabase folders.audioBooksStateDataFile folders.audioBookAudioFileDb
+                                    deleteDatabase folders.audioBooksStateDataFile folders.audioBookAudioFileInfoDb
                                     return! (loop <| loadStateFromDb ())
 
 
@@ -365,7 +372,7 @@ module DataBase =
                                                     |> Array.append infos
                                         }
 
-                                    let res = AudioBookFiles.addAudioFilesInfoToAudioBook folders.audioBookAudioFileDb infos
+                                    let res = AudioBookFiles.addAudioFilesInfoToAudioBook folders.audioBookAudioFileInfoDb infos
                                     replyChannel.Reply(res)
                                     match res with
                                     | Error _ ->
@@ -389,7 +396,7 @@ module DataBase =
                                                     )
                                         }
 
-                                    let res = AudioBookFiles.updateAudioBookFileInfo folders.audioBookAudioFileDb info
+                                    let res = AudioBookFiles.updateAudioBookFileInfo folders.audioBookAudioFileInfoDb info
                                     replyChannel.Reply(res)
                                     match res with
                                     | Error _ ->
@@ -415,7 +422,7 @@ module DataBase =
                                         replyChannel.Reply(Ok())
                                         return! loop state
                                     | Some info ->
-                                        let res = AudioBookFiles.deleteAudioBookInfoFromDb folders.audioBookAudioFileDb info 
+                                        let res = AudioBookFiles.deleteAudioBookInfoFromDb folders.audioBookAudioFileInfoDb info 
                                         replyChannel.Reply(res)
                                         match res with
                                         | Error _ ->
@@ -530,8 +537,7 @@ module DataBase =
         else
             let directories = Directory.EnumerateDirectories(folders.audioBookDownloadFolderBase)    
             directories
-            |> Seq.toArray
-            |> Array.Parallel.map (
+            |> Seq.map (
                 fun lookupPath ->
                     let audioBookName = DirectoryInfo(lookupPath).Name
                     if (not (Directory.Exists(lookupPath))) then
@@ -549,24 +555,44 @@ module DataBase =
                                 (audioFiles |> Seq.length) > 0 && not hasCorruptDownloadingFlagFile
                             else false
                         let audioBookPath = if hasAudioBook then Some audioPath else None
-                        Some (audioBookName, pic, thumb, hasAudioBook, audioBookPath)
+                        Some {| 
+                            Name = audioBookName
+                            Pic = pic
+                            Thumb = thumb
+                            HasAudioBook = hasAudioBook
+                            AudioBookPath = audioBookPath 
+                        |}
             )
-            |> Array.filter (fun i -> i.IsSome)
-            |> Array.Parallel.map (fun i-> i.Value)
+            |> Seq.choose id
+            |> Seq.toArray
+            
     
     
     let getAudiobooksFromDownloadFolder audiobooks =
         let audioBooksOnDevice = parseDownloadFolderForAlreadyDownloadedAudioBooks ()
-        audiobooks
-        |> Array.choose (
-            fun i ->
-                let onDeviceItem = audioBooksOnDevice |> Array.tryFind (fun (title,_,_,_,_) -> title = i.FullName)
-                match onDeviceItem with
-                | None -> None
-                | Some (_, picPath, thumbPath, hasAudioBook, audioBookPath) ->
-                    let newState = {i.State with Downloaded = hasAudioBook; DownloadedFolder=audioBookPath}
-                    Some {i with State = newState; Picture = picPath; Thumbnail = thumbPath}
-        )
+        let result =
+            audioBooksOnDevice
+            |> Array.choose (
+                fun onDeviceItem ->
+                    let audiobook =
+                        audiobooks
+                        |> Array.tryFind (fun item -> onDeviceItem.Name = item.FullName || onDeviceItem.Name = $"{item.Id}")
+                    match audiobook with
+                    | None -> None
+                    | Some audiobook ->
+                        let newState = {
+                            audiobook.State with 
+                                Downloaded = onDeviceItem.HasAudioBook
+                                DownloadedFolder=onDeviceItem.AudioBookPath
+                        }
+                        Some {
+                            audiobook with 
+                                State = newState
+                                Picture = onDeviceItem.Pic
+                                Thumbnail = onDeviceItem.Thumb
+                        }
+            )
+        result
    
 
 
@@ -793,9 +819,9 @@ module WebAccess =
             progress   
 
 
-        let private processPicFile (updateProgress:UpdateProgress) zipStream audioBookFolder audiobook (entry:ZipEntry) =
+        let private processPicFile (updateProgress:UpdateProgress) zipStream audioBookFolder (audiobook:AudioBook) (entry:ZipEntry) =
             let scale = (entry.CompressedSize |> float) / (entry.Size |> float)            
-            let imageFullName = Path.Combine(audioBookFolder,audiobook.FullName + ".jpg")
+            let imageFullName = Path.Combine(audioBookFolder,$"{audiobook.Id}.jpg")
 
             // try download picture if necessary
             let progress =
@@ -818,7 +844,7 @@ module WebAccess =
                     entry.Size |> int
             
             
-            let thumbFullName = Path.Combine(audioBookFolder,audiobook.FullName + ".thumb.jpg")
+            let thumbFullName = Path.Combine(audioBookFolder,$"{audiobook.Id}.thumb.jpg")
                     
             // try create thumb nail picture if necessary
             if not (File.Exists(thumbFullName)) then
@@ -949,8 +975,8 @@ module WebAccess =
                                         updateProgress (fileSize / (1024 * 1024), fileSize / (1024 * 1024))
 
 
-                                        let imageFullName = Path.Combine(audioBookFolder,audiobook.FullName + ".jpg")
-                                        let thumbFullName = Path.Combine(audioBookFolder,audiobook.FullName + ".thumb.jpg")
+                                        let imageFullName = Path.Combine(audioBookFolder,$"{audiobook.Id}.jpg")
+                                        let thumbFullName = Path.Combine(audioBookFolder,$"{audiobook.Id}.thumb.jpg")
 
                                         let imageFileNames = 
                                             if File.Exists(imageFullName) && File.Exists(thumbFullName) then
