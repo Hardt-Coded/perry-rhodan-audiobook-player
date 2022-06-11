@@ -28,15 +28,15 @@
 
     module private AndroidService =
 
-        [<Service(Name="perry.rhodan.audioplayer.downloadservice.bla0815")>]
+        [<Service(Exported=true,Name="perry.rhodan.audioplayer.downloadservice.bla0815")>]
         type DownloadService() as self =
 
             inherit Service() with
 
                 let buildNotification (title:string) (text:string) =
-                    let intent = new Intent(Android.App.Application.Context, typeof<FormsAppCompatActivity>)
+                    let intent = new Intent(self, typeof<FormsAppCompatActivity>)
                     let pendingIntentId = 83475
-                    let pendingIntent = PendingIntent.GetActivity(Android.App.Application.Context, pendingIntentId, intent,PendingIntentFlags.UpdateCurrent)
+                    let pendingIntent = PendingIntent.GetActivity(self, pendingIntentId, intent, PendingIntentFlags.Immutable ||| PendingIntentFlags.UpdateCurrent)
                    
                     let builder = 
                         if (Build.VERSION.SdkInt >= BuildVersionCodes.O) then

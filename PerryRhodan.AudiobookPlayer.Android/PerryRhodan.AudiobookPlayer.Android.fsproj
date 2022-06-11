@@ -13,7 +13,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>PerryRhodan.AudiobookPlayer.Android</RootNamespace>
     <AssemblyName>PerryRhodan.AudiobookPlayer.Android</AssemblyName>
-    <TargetFrameworkVersion>v11.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v12.0</TargetFrameworkVersion>
     <TemplateGuid>{c9e5eea5-ca05-42a1-839b-61506e0a37df}</TemplateGuid>
     <AndroidApplication>True</AndroidApplication>
     <AndroidResgenFile>Resources\Resource.designer.cs</AndroidResgenFile>
@@ -27,11 +27,11 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <OtherFlags>/warnon:1182</OtherFlags>
     <WarningLevel>4</WarningLevel>
-    <SelectedDevice>android_accelerated_x64_90</SelectedDevice>
-    <DefaultDevice>android_accelerated_x64_90</DefaultDevice>
+    <SelectedDevice>pixel_5_-_api_31</SelectedDevice>
+    <DefaultDevice>pixel_5_-_api_31</DefaultDevice>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
-    <ActiveDebugProfile>android_accelerated_x64_90</ActiveDebugProfile>
+    <ActiveDebugProfile>pixel_5_-_api_31</ActiveDebugProfile>
     <SelectedPlatformGroup>Emulator</SelectedPlatformGroup>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -126,6 +126,8 @@
     <AndroidResource Include="Resources\layout\Toolbar.axml" />
     <AndroidResource Include="Resources\values\styles.xml" />
     <AndroidResource Include="Resources\values\colors.xml" />
+    <AndroidResource Include="Resources\xml\backup_rules.xml" />
+    <AndroidResource Include="Resources\xml\backup_rules_31.xml" />
     <None Include="packages.config" />
     <AndroidEnvironment Include="EnvironmentVariables.txt" />
   </ItemGroup>
