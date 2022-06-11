@@ -64,13 +64,21 @@ module Consts =
                             else
                                 DependencyService.Get<IAndroidDownloadFolder>().GetAndroidDownloadFolder ()
                         | Device.iOS -> Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
-                        | _ -> Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
-                    let baseFolder = Path.Combine(storageFolder,"PerryRhodan.AudioBookPlayer")
+                        | _ -> Xamarin.Essentials.FileSystem.AppDataDirectory
+
+                    let baseFolder = 
+                        let bf = Path.Combine(storageFolder,"PerryRhodan.AudioBookPlayer")
+                        if not (Directory.Exists(bf)) then
+                            Path.Combine(Xamarin.Essentials.FileSystem.AppDataDirectory,"PerryRhodan.AudioBookPlayer")
+                        else
+                            bf
+
                     try
                         if not (Directory.Exists(baseFolder)) then
                             Directory.CreateDirectory(baseFolder) |> ignore
                         let testFile = Path.Combine(baseFolder, "testfile.txt")
                         File.WriteAllText(testFile, "test!")
+                        File.Delete("test!")
                         baseFolder
                     with
                     | ex ->
