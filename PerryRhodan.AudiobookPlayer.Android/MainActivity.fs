@@ -12,6 +12,7 @@ open Services
 open Microsoft.AppCenter
 open Microsoft.AppCenter.Crashes
 open Microsoft.AppCenter.Analytics
+open Acr.UserDialogs
     
 
 
@@ -19,8 +20,7 @@ open Microsoft.AppCenter.Analytics
 type AndroidDownloadFolder() =
     interface DependencyServices.IAndroidDownloadFolder with
         member this.GetAndroidDownloadFolder () =
-            let path = Android.OS.Environment.ExternalStorageDirectory.Path
-            path
+            Android.OS.Environment.ExternalStorageDirectory.Path
 
 module HttpStuff =
     let androidHttpHandler = Xamarin.Android.Net.AndroidClientHandler()
@@ -35,6 +35,12 @@ type AndroidHttpClientHandlerService() =
 
         member this.SetAutoRedirect redirect =
             HttpStuff.androidHttpHandler.AllowAutoRedirect <- redirect
+
+
+type CloseApplication() =
+    interface DependencyServices.ICloseApplication with
+        member this.CloseApplication () =
+            Android.OS.Process.KillProcess(Android.OS.Process.MyPid())
 
 
 [<Activity (Label = "Eins A Medien Audiobook Player", Icon = "@drawable/eins_a_launcher", Theme = "@style/MainTheme.Launcher", MainLauncher = true,LaunchMode = LaunchMode.SingleTop, ConfigurationChanges = (ConfigChanges.ScreenSize ||| ConfigChanges.Orientation),ScreenOrientation = ScreenOrientation.Portrait)>]
@@ -54,7 +60,7 @@ type MainActivity() =
         FormsAppCompatActivity.ToolbarResource <- Resources.Layout.Toolbar
         base.OnCreate (bundle)
 
-
+        
         GlobalType.typeOfMainactivity <- typeof<MainActivity>
         
                 
@@ -68,8 +74,12 @@ type MainActivity() =
         Xamarin.Forms.DependencyService.Register<NotificationService.NotificationService>()
         Xamarin.Forms.DependencyService.Register<DownloadServiceImplementation.DependencyService.DownloadService>()
         Xamarin.Forms.DependencyService.Register<AndroidHttpClientHandlerService>()
+        Xamarin.Forms.DependencyService.Register<CloseApplication>()
                     
         Plugin.CurrentActivity.CrossCurrentActivity.Current.Init(this, bundle);
+
+        UserDialogs.Init this
+
         let appcore  = new PerryRhodan.AudiobookPlayer.MainApp()
         this.LoadApplication (appcore)
     
