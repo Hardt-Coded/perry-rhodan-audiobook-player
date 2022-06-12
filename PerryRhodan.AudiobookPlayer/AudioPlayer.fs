@@ -207,7 +207,6 @@
 
     open Common.MailboxExtensions
     open Common
-    open FSharpx.Control.AsyncExtensions
 
     let audioPlayerStateMailbox         
         (audioService:IAudioServiceImplementation)
