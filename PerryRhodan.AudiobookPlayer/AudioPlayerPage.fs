@@ -302,7 +302,6 @@ open AudioPlayer
         model, cmds
 
 
-    open FSharpx.Control
 
     let rec update msg model =
         match msg with
@@ -475,10 +474,6 @@ open AudioPlayer
         let rewindInSec =
             async {
                 match model.CurrentPositionMs,model.AudioBook.State.LastTimeListend with
-                | _ // no last time listend
-                | None, _ // current position is none or 0
-                | Some 0, _ ->
-                    return 0
                 | _, Some lastTimeListend ->
                     
                     let minutesSinceLastListend =
@@ -496,6 +491,9 @@ open AudioPlayer
                             return! Services.SystemSettings.getRewindWhenStartAfterLongPeriodInSec ()
                         else
                             return! Services.SystemSettings.getRewindWhenStartAfterShortPeriodInSec ()
+                | _, _ ->
+                    return 0
+                
             } |> Async.RunSynchronously
             
         model |> onPlayBaseMsg rewindInSec

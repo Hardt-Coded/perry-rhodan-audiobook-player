@@ -454,16 +454,11 @@
 
     let runMigrations () =
         async {
-            do!
-                asyncSeq {
-                    for migration in currentMigrations do
-                        let! result = Helpers.isMigrationConfirmed migration
-                        yield (migration,result)
-                }
-                |> AsyncSeq.filter (fun (_,result) -> not result)
-                |> AsyncSeq.map fst
-                |> AsyncSeq.iterAsync runMigration
 
+            for migration in currentMigrations do
+                let! result = Helpers.isMigrationConfirmed migration
+                if result then
+                    do! runMigration migration
         }
             
 
