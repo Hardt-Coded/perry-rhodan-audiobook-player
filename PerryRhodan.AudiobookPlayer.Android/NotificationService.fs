@@ -57,7 +57,7 @@ module NotificationService =
                     intent.PutExtra(titleKey,title) |> ignore
                     intent.PutExtra(messageKey,message) |> ignore
                     
-                    let pendingIntent = PendingIntent.GetActivity(Android.App.Application.Context, pendingIntentId, intent,PendingIntentFlags.OneShot)
+                    let pendingIntent = PendingIntent.GetActivity(Android.App.Application.Context, pendingIntentId, intent,PendingIntentFlags.Immutable ||| PendingIntentFlags.UpdateCurrent)
                     let builder = 
                         if (Build.VERSION.SdkInt >= BuildVersionCodes.O) then
                             (new Notification.Builder(Android.App.Application.Context, channelId))

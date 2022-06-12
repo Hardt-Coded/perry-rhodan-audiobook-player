@@ -55,6 +55,7 @@ module App =
 
     type Msg = 
         | Init
+        | InitMigrationDone
         | InitSuccessful of AudioBookItemNew.AudioBookItem []
         | AudioBookItemsChanged of AudioBookItemNew.AudioBookItem []
         | AudioBookItemMsg of (AudioBookItemNew.Model * AudioBookItemNew.Msg)
@@ -152,6 +153,17 @@ module App =
 
 
     module Commands =
+
+
+        let runMigrations =
+            fun dispatch ->
+                async {
+                    do! Migrations.runMigrations ()
+                    dispatch InitMigrationDone
+                }
+                |> Async.Start
+
+            |> Cmd.ofSub
 
         let removeDownloadCmd (abModel:AudioBookItemNew.Model) =
             fun _ -> 
@@ -475,6 +487,8 @@ module App =
                                 a.EpisodenTitel <> b.EpisodenTitel ||
                                 a.Group <> b.Group
 
+                            let folders = Services.Consts.createCurrentFolders ()
+
 
                             let repairedAudioBooksItem =
                                 currentAudioBooks
@@ -483,7 +497,7 @@ module App =
                                     |> Array.tryFind (fun c -> c.Id = i.Model.AudioBook.Id)
                                     |> Option.bind (fun c -> 
                                         if hasDiffMetaData c (i.Model.AudioBook) then
-                                            let newAudioBookFolder = System.IO.Path.Combine(Services.Consts.audioBookDownloadFolderBase, c.FullName)
+                                            let newAudioBookFolder = System.IO.Path.Combine(folders.audioBookDownloadFolderBase, c.FullName)
                                             
                                             let opt predicate input =
                                                 if predicate then
@@ -565,12 +579,12 @@ module App =
                         (input:AsyncResult<AudioBookItemNew.AudioBookItem [] * AudioBookItemNew.AudioBookItem [] * {| OldName:string; NewName:string |} [],SynchronizeWithCloudErrors>) =
                         asyncResult {
                             let! newAudioBookItems, currentAudioBooks, nameDiffOldNewDownloaded = input
-
+                            let folders = Services.Consts.createCurrentFolders ()
                             try
                                 nameDiffOldNewDownloaded
                                 |> Array.map (fun x -> 
-                                    let oldFolder = System.IO.Path.Combine(Services.Consts.audioBookDownloadFolderBase,x.OldName)
-                                    let newFolder = System.IO.Path.Combine(Services.Consts.audioBookDownloadFolderBase,x.NewName)
+                                    let oldFolder = System.IO.Path.Combine(folders.audioBookDownloadFolderBase,x.OldName)
+                                    let newFolder = System.IO.Path.Combine(folders.audioBookDownloadFolderBase,x.NewName)
                                     {| 
                                         OldFolder =     oldFolder
                                         NewFolder =     newFolder
@@ -703,8 +717,9 @@ module App =
     let rec update msg model =
         match msg with
         | Init ->
-            model |> onInitMsg
-
+            model, Commands.runMigrations
+        | InitMigrationDone ->
+            model, Commands.loadAudioBookItemsCmd
         | InitSuccessful items ->
 
             // check if download Service is running
@@ -984,16 +999,13 @@ module App =
             model |> onQuitApplication
 
 
-    and onInitMsg model =
-        
-
-        model, Commands.loadAudioBookItemsCmd
+    
 
 
     and onAskForAppPermissionMsg model =
         let ask = 
             async { 
-                let! res = Common.Helpers.askPermissionAsync Permission.Storage
+                let! res = Common.Helpers.askForStoragePermissionAsync ()
                 if res then return Init 
                 else return GotoPermissionDeniedPage
             } |> Cmd.ofAsyncMsg

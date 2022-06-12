@@ -7,6 +7,7 @@
     open Fabulous
     open Fabulous.XamarinForms
     open System.Net.Http.Headers
+    open Xamarin.Essentials
     
 
     type ComError =
@@ -92,6 +93,7 @@
         open Microsoft.AppCenter.Analytics
         open Microsoft.AppCenter.Crashes
         open Fabulous
+        open Acr.UserDialogs
         
         let displayAlert(title, message, cancel) =
             Async.FromContinuations <| fun (resolve, reject, _) ->
@@ -99,7 +101,8 @@
                     (fun () -> 
                         async {
                             try
-                                do! Application.Current.MainPage.DisplayAlert(title, message, cancel) |> Async.AwaitTask
+                                do! UserDialogs.Instance.AlertAsync(message, title, cancel) |> Async.AwaitTask
+                                //do! Application.Current.MainPage.DisplayAlert(title, message, cancel) |> Async.AwaitTask
                                 resolve ()
                             with
                             | _ as ex ->
@@ -116,7 +119,9 @@
                     (fun () -> 
                         async {
                             try
-                                let! res = Application.Current.MainPage.DisplayAlert(title, message, accept, cancel) |> Async.AwaitTask
+                                
+                                let! res = UserDialogs.Instance.ConfirmAsync(message, title, accept, cancel)  |> Async.AwaitTask
+                                //let! res = Application.Current.MainPage.DisplayAlert(title, message, accept, cancel) |> Async.AwaitTask
                                 resolve res
                             with
                             | ex ->
@@ -126,19 +131,25 @@
                     )
                 )
 
-
-        let askPermissionAsync permission = async {
-            try
-                let! status = CrossPermissions.Current.CheckPermissionStatusAsync(permission) |> Async.AwaitTask
-                if status = PermissionStatus.Granted then
-                    return true
-                else
-                    let! status = CrossPermissions.Current.RequestPermissionsAsync([| permission |]) |> Async.AwaitTask
-                    return status.[permission] = PermissionStatus.Granted
-                           || status.[permission] = PermissionStatus.Unknown
-            with exn ->
-                return false
-        }
+        let askForStoragePermissionAsync () =
+            async {
+                try
+                    if (DeviceInfo.Version.Major >= 10) then
+                        return true;
+                    else
+                        let! statusWrite = Permissions.CheckStatusAsync<Permissions.StorageWrite>() |> Async.AwaitTask
+                   
+                        match statusWrite with
+                        | Xamarin.Essentials.PermissionStatus.Granted ->
+                            return true
+                        | _ ->
+                            let! statusWrite = Permissions.RequestAsync<Permissions.StorageWrite>() |> Async.AwaitTask
+                            return (statusWrite = Xamarin.Essentials.PermissionStatus.Granted 
+                                   || statusWrite = Xamarin.Essentials.PermissionStatus.Unknown)
+                with exn ->
+                    return false
+            }
+        
 
         // diplay action sheet an returns a command fitting
         let displayActionSheet title cancel buttons =
@@ -153,7 +164,10 @@
                     | None -> null
                     | Some label -> label
                 let buttonTexts = buttons |> Array.map (fun (txt,_)-> txt)
-                let! tapedButton = Application.Current.MainPage.DisplayActionSheet(title,cancel,null,buttonTexts) |> Async.AwaitTask
+
+                let! tapedButton = UserDialogs.Instance.ActionSheetAsync (title,cancel,null,buttons = buttonTexts) |> Async.AwaitTask
+
+                //let! tapedButton = Application.Current.MainPage.DisplayActionSheet(title,cancel,null,buttonTexts) |> Async.AwaitTask
                 let tapedButtonCmd = buttons |> Array.tryFind (fun (txt,_) -> txt = tapedButton)
                 match tapedButtonCmd with
                 | None -> return None
