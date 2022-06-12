@@ -477,9 +477,9 @@ open AudioPlayer
                 | _, Some lastTimeListend ->
                     
                     let minutesSinceLastListend =
-                        (DateTime.Now.Subtract(lastTimeListend)).TotalMinutes
+                        (DateTime.UtcNow.Subtract(lastTimeListend)).TotalMinutes
                     let secondsSinceLastListend =
-                        (DateTime.Now.Subtract(lastTimeListend)).TotalSeconds
+                        (DateTime.UtcNow.Subtract(lastTimeListend)).TotalSeconds
 
                     if (secondsSinceLastListend <= 30.0) then
                         return 0
