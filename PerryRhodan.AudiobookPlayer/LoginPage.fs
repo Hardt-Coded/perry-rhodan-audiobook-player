@@ -188,6 +188,7 @@ open Global
                                 , backgroundColor = Consts.backgroundColor
                                 , placeholderColor = Consts.secondaryTextColor                                
                                 , keyboard=Keyboard.Email
+                                , styleId = "login_username"
                                 , completed = (fun t  -> if t <> model.Username then dispatch (ChangeUsername t))
                                 , created = (fun e -> e.Unfocused.Add(fun args -> if model.Username<>e.Text then dispatch (ChangeUsername e.Text)))
                                 )
@@ -195,7 +196,8 @@ open Global
                                 , placeholder = Translations.current.Password
                                 , textColor = Consts.primaryTextColor
                                 , backgroundColor = Consts.backgroundColor
-                                , placeholderColor = Consts.secondaryTextColor                                
+                                , placeholderColor = Consts.secondaryTextColor    
+                                , styleId = "login_password"
                                 , isPassword = true
                                 , keyboard=Keyboard.Default, completed =(fun t  -> if t <> model.Password then dispatch (ChangePassword t))
                                 , created = (fun e -> e.Unfocused.Add(fun args -> if model.Password<>e.Text then dispatch (ChangePassword e.Text)))
