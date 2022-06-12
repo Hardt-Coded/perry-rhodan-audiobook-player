@@ -158,7 +158,7 @@
       <HintPath>..\packages\FSharp.Core.6.0.4\lib\netstandard2.1\FSharp.Core.dll</HintPath>
     </Reference>
     <Reference Include="FSharp.Data">
-      <HintPath>..\packages\FSharp.Data.4.2.8\lib\netstandard2.0\FSharp.Data.dll</HintPath>
+      <HintPath>..\packages\FSharp.Data.4.0.1\lib\netstandard2.0\FSharp.Data.dll</HintPath>
     </Reference>
     <Reference Include="FSharpx.Async">
       <HintPath>..\packages\FSharpx.Async.1.14.1\lib\netstandard2.0\FSharpx.Async.dll</HintPath>
