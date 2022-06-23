@@ -1,7 +1,7 @@
 ﻿module Global
 
-    let appcenterAndroidId = ""
-    let supportMessageApi = ""
+    let appcenterAndroidId = "***REMOVED***"
+    let supportMessageApi = "***REMOVED***"
     let messageEndpoint = "https://einsamedienappmessages.z1.web.core.windows.net/messages.json"
 
 
