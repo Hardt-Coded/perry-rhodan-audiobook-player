@@ -207,7 +207,6 @@
 
     open Common.MailboxExtensions
     open Common
-    open FSharpx.Control.AsyncExtensions
 
     let audioPlayerStateMailbox         
         (audioService:IAudioServiceImplementation)
@@ -437,7 +436,7 @@
                                             Filename = newState.Filename
                                             Position = newState.Position |> TimeSpanHelpers.toTimeSpan
                                         }
-                                        LastTimeListend = Some DateTime.Now
+                                        LastTimeListend = Some DateTime.UtcNow
                                 }
                         }
                         let! _ = Services.DataBase.updateAudioBookInStateFile newAb

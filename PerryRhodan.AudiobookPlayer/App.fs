@@ -55,6 +55,7 @@ module App =
 
     type Msg = 
         | Init
+        | InitMigrationDone
         | InitSuccessful of AudioBookItemNew.AudioBookItem []
         | AudioBookItemsChanged of AudioBookItemNew.AudioBookItem []
         | AudioBookItemMsg of (AudioBookItemNew.Model * AudioBookItemNew.Msg)
@@ -158,6 +159,7 @@ module App =
             fun dispatch ->
                 async {
                     do! Migrations.runMigrations ()
+                    dispatch InitMigrationDone
                 }
                 |> Async.Start
 
@@ -715,8 +717,9 @@ module App =
     let rec update msg model =
         match msg with
         | Init ->
-            model |> onInitMsg
-
+            model, Commands.runMigrations
+        | InitMigrationDone ->
+            model, Commands.loadAudioBookItemsCmd
         | InitSuccessful items ->
 
             // check if download Service is running
@@ -996,10 +999,7 @@ module App =
             model |> onQuitApplication
 
 
-    and onInitMsg model =
-        
-
-        model, Cmd.batch [ Commands.loadAudioBookItemsCmd; Commands.runMigrations ]
+    
 
 
     and onAskForAppPermissionMsg model =
