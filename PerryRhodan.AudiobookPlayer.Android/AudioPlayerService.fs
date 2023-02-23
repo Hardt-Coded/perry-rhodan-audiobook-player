@@ -62,7 +62,7 @@ module rec AudioPlayerServiceImplementation =
                 fun (k,v) -> intent.PutExtra(k,v) |> ignore
             )
             //additional intent
-            let pendingIntent = PendingIntent.GetService(Android.App.Application.Context, 0, intent, PendingIntentFlags.UpdateCurrent)
+            let pendingIntent = PendingIntent.GetService(Android.App.Application.Context, 0, intent, PendingIntentFlags.Immutable ||| PendingIntentFlags.UpdateCurrent)
             pendingIntent.Send()
 
         let inline sendCommandToServiceFloat (servicetype:System.Type) (additionalFloat:(string * float32) list) command  =
@@ -73,7 +73,7 @@ module rec AudioPlayerServiceImplementation =
                 fun (k,v) -> intent.PutExtra(k,v) |> ignore
             )
             //additional intent
-            let pendingIntent = PendingIntent.GetService(Android.App.Application.Context, 0, intent, PendingIntentFlags.UpdateCurrent)
+            let pendingIntent = PendingIntent.GetService(Android.App.Application.Context, 0, intent, PendingIntentFlags.Immutable ||| PendingIntentFlags.UpdateCurrent)
             pendingIntent.Send()
 
 
@@ -180,7 +180,7 @@ module rec AudioPlayerServiceImplementation =
             let componentName = new ComponentName(Android.App.Application.Context.PackageName, (new Receivers.RemoteControlBroadcastReceiver()).ComponentName)
             mediaButtonIntent.SetComponent(componentName) |> ignore
             
-            let mediaButtonReceiverPendingIntent = PendingIntent.GetBroadcast(Android.App.Application.Context, 0, mediaButtonIntent, PendingIntentFlags());
+            let mediaButtonReceiverPendingIntent = PendingIntent.GetBroadcast(Android.App.Application.Context, 0, mediaButtonIntent, PendingIntentFlags.Immutable ||| PendingIntentFlags.UpdateCurrent);
             mediaSession.SetMediaButtonReceiver(mediaButtonReceiverPendingIntent)
 
             
@@ -283,7 +283,7 @@ module rec AudioPlayerServiceImplementation =
             let icon = AndroidDrawable.IcMenuCloseClearCancel            
             let intent = new Intent(context, typeof<Services.AudioPlayerService>);
             intent.SetAction(QUIT_PLAYER) |> ignore
-            let startAudioPendingIntent = PendingIntent.GetService(context, 0, intent, PendingIntentFlags.UpdateCurrent)
+            let startAudioPendingIntent = PendingIntent.GetService(context, 0, intent, PendingIntentFlags.Immutable ||| PendingIntentFlags.UpdateCurrent)
             
             let builder = 
                 new Notification.Action.Builder(icon, "", startAudioPendingIntent)
@@ -294,7 +294,7 @@ module rec AudioPlayerServiceImplementation =
             //let icon = AndroidDrawable.IcMediaPlay
             let intent = new Intent(context, typeof<Services.AudioPlayerService>);
             intent.SetAction(START_PLAYER) |> ignore
-            let startAudioPendingIntent = PendingIntent.GetService(context, 0, intent, PendingIntentFlags.UpdateCurrent)
+            let startAudioPendingIntent = PendingIntent.GetService(context, 0, intent, PendingIntentFlags.Immutable ||| PendingIntentFlags.UpdateCurrent)
             
             let builder = 
                 new Notification.Action.Builder(icon, "", startAudioPendingIntent)
@@ -305,7 +305,7 @@ module rec AudioPlayerServiceImplementation =
             let icon = icon "pause_small_icon"
             let intent = new Intent(context, typeof<Services.AudioPlayerService>)
             intent.SetAction(STOP_PLAYER) |> ignore
-            let stopAudioPendingIntent = PendingIntent.GetService(context, 0, intent, PendingIntentFlags.UpdateCurrent)
+            let stopAudioPendingIntent = PendingIntent.GetService(context, 0, intent, PendingIntentFlags.Immutable ||| PendingIntentFlags.UpdateCurrent)
             
             let builder = 
                 new Notification.Action.Builder(icon, "", stopAudioPendingIntent)
@@ -317,7 +317,7 @@ module rec AudioPlayerServiceImplementation =
             let icon = icon "forward_small_icon"
             let intent = new Intent(context, typeof<Services.AudioPlayerService>)
             intent.SetAction(JUMP_FORWARD_PLAYER) |> ignore            
-            let stopAudioPendingIntent = PendingIntent.GetService(context, 0, intent, PendingIntentFlags.UpdateCurrent)
+            let stopAudioPendingIntent = PendingIntent.GetService(context, 0, intent, PendingIntentFlags.Immutable ||| PendingIntentFlags.UpdateCurrent)
             
             let builder = 
                 new Notification.Action.Builder(icon, "", stopAudioPendingIntent)
@@ -331,7 +331,7 @@ module rec AudioPlayerServiceImplementation =
 
             // ACTION_SETPOSITION_PLAYER
             intent.SetAction(JUMP_BACKWARD_PLAYER) |> ignore                        
-            let stopAudioPendingIntent = PendingIntent.GetService(context, 0, intent, PendingIntentFlags.UpdateCurrent)
+            let stopAudioPendingIntent = PendingIntent.GetService(context, 0, intent, PendingIntentFlags.Immutable ||| PendingIntentFlags.UpdateCurrent)
             
             let builder = 
                 new Notification.Action.Builder(icon, "", stopAudioPendingIntent)
@@ -345,7 +345,7 @@ module rec AudioPlayerServiceImplementation =
             let icon = icon "next_small_icon"
             let intent = new Intent(context, typeof<Services.AudioPlayerService>)
             intent.SetAction(MOVEFORWARD_PLAYER) |> ignore            
-            let stopAudioPendingIntent = PendingIntent.GetService(context, 0, intent, PendingIntentFlags.UpdateCurrent)
+            let stopAudioPendingIntent = PendingIntent.GetService(context, 0, intent, PendingIntentFlags.Immutable ||| PendingIntentFlags.UpdateCurrent)
             
             let builder = 
                 new Notification.Action.Builder(icon, "", stopAudioPendingIntent)
@@ -359,7 +359,7 @@ module rec AudioPlayerServiceImplementation =
 
             // ACTION_SETPOSITION_PLAYER
             intent.SetAction(MOVEBACKWARD_PLAYER) |> ignore                        
-            let stopAudioPendingIntent = PendingIntent.GetService(context, 0, intent, PendingIntentFlags.UpdateCurrent)
+            let stopAudioPendingIntent = PendingIntent.GetService(context, 0, intent, PendingIntentFlags.Immutable ||| PendingIntentFlags.UpdateCurrent)
             
             let builder = 
                 new Notification.Action.Builder(icon, "", stopAudioPendingIntent)
@@ -513,7 +513,7 @@ module rec AudioPlayerServiceImplementation =
                         Crashes.TrackError(ex, Map.empty)
 
 
-        [<BroadcastReceiver>]
+        [<BroadcastReceiver(Exported=true)>]
         [<IntentFilter([| Intent.ActionMediaButton |])>]
         type RemoteControlBroadcastReceiver() =
             inherit BroadcastReceiver()
@@ -963,7 +963,7 @@ module rec AudioPlayerServiceImplementation =
     
     module Services =
 
-        [<Service(Name="perry.rhodan.audioservice")>]
+        [<Service(Exported=true,Name="perry.rhodan.audioservice")>]
         type AudioPlayerService() as self =
             inherit Android.Service.Media.MediaBrowserService()
 

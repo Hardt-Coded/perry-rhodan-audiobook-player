@@ -126,7 +126,6 @@ module DataBase =
     open Consts
     open LiteDB
     open LiteDB.FSharp
-    open FSharpx.Control.AsyncExtensions
     
 
     let mapper = FSharpBsonMapper()
@@ -1143,7 +1142,6 @@ module Files =
 
 module SystemSettings =
     open SecureStorageHelper
-    open FSharpx.Control
     open Common.StringHelpers
 
     let defaultRewindWhenStartAfterShortPeriodInSec = 5
@@ -1272,7 +1270,6 @@ module DownloadService =
     open Common.MailboxExtensions
     open Common
     open FSharp.Control
-    open FSharpx.Control.AsyncExtensions
 
     type private Listener = (string * (DownloadInfo -> Async<unit>))
 

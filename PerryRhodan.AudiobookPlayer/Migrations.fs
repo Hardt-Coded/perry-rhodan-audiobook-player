@@ -62,7 +62,14 @@
 
         let mapper = FSharpBsonMapper()
 
+
+        let private removeOldStoragePath (file:string) =
+            let idx = file.IndexOf("PerryRhodan.AudioBookPlayer/data")
+            file.[idx..].Replace("PerryRhodan.AudioBookPlayer/data","")
+
+
         let private cleanupAudiobookDb (audiobookDbFile:string) =
+            let folders = Services.Consts.createCurrentFolders ()
             async {
                 use db = new LiteDatabase(audiobookDbFile, mapper)
                 let audioBooks = 
@@ -91,6 +98,21 @@
                                     x.State with
                                         Downloaded = false
                                         DownloadedFolder = None
+                                        CurrentPosition = 
+                                            x.State.CurrentPosition 
+                                            |> Option.map (fun pos -> 
+                                                let cleanedFile = removeOldStoragePath pos.Filename
+                                                let newFile = $"{folders.currentLocalDataFolder}{cleanedFile}"
+                                                
+                                                #if DEBUG
+                                                System.Diagnostics.Debug.WriteLine($"old: {pos.Filename}")
+                                                System.Diagnostics.Debug.WriteLine($"cleanedFile: {cleanedFile}")
+                                                System.Diagnostics.Debug.WriteLine($"newFile: {newFile}")
+                                                #endif
+                                                { pos with 
+                                                    Filename = newFile
+                                                }
+                                            )
                                 }
                         }
                     
@@ -99,7 +121,7 @@
                 let result = db.GetCollection<AudioBook>("audiobooks").Update(migratedBooks)
 
                 db.Dispose |> ignore
-                let folders = Services.Consts.createCurrentFolders ()
+                
                 File.Copy(audiobookDbFile, folders.audioBooksStateDataFile, true)
                 ()
             }
@@ -115,9 +137,7 @@
                         |> Seq.toArray
 
 
-                let removeOldStoragePath (file:string) =
-                    let idx = file.IndexOf("PerryRhodan.AudioBookPlayer/data")
-                    file.[idx..].Replace("PerryRhodan.AudioBookPlayer/data","")
+                let folders = Services.Consts.createCurrentFolders ()
 
                 let migratedInfos =
                     infos
@@ -126,9 +146,10 @@
                             AudioFiles = 
                                 x.AudioFiles
                                 |> List.map (fun e ->
+                                    let newFileName = $"{folders.currentLocalDataFolder}{removeOldStoragePath e.FileName}"
                                     { 
                                         e with
-                                            FileName = Path.Combine(Services.Consts.baseUrl, removeOldStoragePath e.FileName)
+                                            FileName = newFileName
                                     }
                                 )
                         }
@@ -165,7 +186,7 @@
                             |> Seq.head
 
 
-                        use dlg = UserDialogs.Instance.Progress("Migration No Media", maskType = MaskType.Gradient)
+                        use dlg = UserDialogs.Instance.Progress("Importiere Datenbank", maskType = MaskType.Gradient)
                     
                         dlg.PercentComplete <- 0
                         
@@ -433,16 +454,11 @@
 
     let runMigrations () =
         async {
-            do!
-                asyncSeq {
-                    for migration in currentMigrations do
-                        let! result = Helpers.isMigrationConfirmed migration
-                        yield (migration,result)
-                }
-                |> AsyncSeq.filter (fun (_,result) -> not result)
-                |> AsyncSeq.map fst
-                |> AsyncSeq.iterAsync runMigration
 
+            for migration in currentMigrations do
+                let! result = Helpers.isMigrationConfirmed migration
+                if result then
+                    do! runMigration migration
         }
             
 

@@ -80,6 +80,12 @@ type MainActivity() =
 
         UserDialogs.Init this
 
+        // styleId as resource id for store testing
+        Xamarin.Forms.Forms.ViewInitialized.Add(fun e -> 
+            if not (System.String.IsNullOrWhiteSpace(e.View.StyleId)) then
+                e.NativeView.ContentDescription <- e.View.StyleId
+        )
+
         let appcore  = new PerryRhodan.AudiobookPlayer.MainApp()
         this.LoadApplication (appcore)
     

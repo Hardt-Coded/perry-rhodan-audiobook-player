@@ -193,7 +193,7 @@
         let resetCmd =
             if value = 1 then
                 async {
-                    do! Async.Sleep 1000
+                    do! Async.Sleep 3000
                     return (SetDeveloperModeSwitchCounter 0)
                 } |> Cmd.ofAsyncMsg
             else
@@ -436,32 +436,6 @@
 
     let view model dispatch =
 
-        // modals
-        //model.JumpDistanceModalModel
-        //|> Option.map (fun mdl ->
-        //    let page = NumberPickerModal.view mdl (JumpDistanceMsg >> dispatch)
-        //    Common.ModalBaseHelpers.pushOrUpdateModal dispatch CloseJumpDistancePicker NumberPickerModal.modalTitle model.ShellRef page
-        //) |> ignore
-
-        //model.RewindWhenStartAfterShortPeriodInSecModalModel
-        //|> Option.map (fun mdl ->
-        //    let page = NumberPickerModal.view mdl (RewindWhenStartAfterShortPeriodInSecMsg >> dispatch)
-        //    Common.ModalBaseHelpers.pushOrUpdateModal dispatch CloseRewindWhenStartAfterShortPeriodInSecPicker NumberPickerModal.modalTitle model.ShellRef page
-        //) |> ignore
-
-        //model.RewindWhenStartAfterLongPeriodInSecModalModel
-        //|> Option.map (fun mdl ->
-        //    let page = NumberPickerModal.view mdl (RewindWhenStartAfterLongPeriodInSecMsg >> dispatch)
-        //    Common.ModalBaseHelpers.pushOrUpdateModal dispatch CloseRewindWhenStartAfterLongPeriodInSecPicker NumberPickerModal.modalTitle model.ShellRef page
-        //) |> ignore
-
-        //model.LongPeriodBeginsAfterInMinutesModalModel
-        //|> Option.map (fun mdl ->
-        //    let page = NumberPickerModal.view mdl (LongPeriodBeginsAfterInMinutesMsg >> dispatch)
-        //    Common.ModalBaseHelpers.pushOrUpdateModal dispatch CloseLongPeriodBeginsAfterInMinutesPicker NumberPickerModal.modalTitle model.ShellRef page
-        //) |> ignore
-
-
         dependsOn model (fun _ mdl ->
             View.ContentPage(
                 title=Translations.current.SettingsPage,useSafeArea=true,
@@ -470,7 +444,6 @@
                     
                     children = [
                         yield View.ScrollView(
-                                gestureRecognizers= [View.TapGestureRecognizer(command=(fun () -> dispatch (SetDeveloperModeSwitchCounter (model.DeveloperModeSwitchCounter + 1))))],
                                 verticalScrollBarVisibility=ScrollBarVisibility.Always,
                                 horizontalOptions=LayoutOptions.FillAndExpand,
                                 verticalOptions=LayoutOptions.FillAndExpand,
@@ -478,6 +451,7 @@
                                     View.Grid(
                                         coldefs=[ Star ],
                                         rowdefs=[ Auto; Auto; Auto; Auto;Auto; Auto; Auto; Auto; Auto; Auto ],
+                                        gestureRecognizers= [View.TapGestureRecognizer(command=(fun () -> dispatch (SetDeveloperModeSwitchCounter (model.DeveloperModeSwitchCounter + 1))))],
                                         children=[
 
                                             (settingsEntry 
@@ -500,34 +474,36 @@
                                                 (sprintf "%i %s" mdl.JumpDistance Translations.current.Seconds)
                                                 (fun () -> dispatch OpenJumpDistancePicker)).Row(3)
 
-                                            if mdl.DeveloperMode then
-                                                (settingsEntry 
-                                                    "DeveloperMode" 
-                                                    "Unter anderem kann man Einträge aus der DB löschen"
-                                                    (fun () -> ())).Row(4)
-
-                                                (settingsEntry 
-                                                    "Datenbank löschen" 
-                                                    "Hiermit löscht an die ganze Datenbank und initialisiert die Anwendung neu."
-                                                    (fun () -> dispatch DeleteDatabase)).Row(5)
+                                            
 
                                             View.Button(
                                                 text="Sende Feedback oder Supportanfrage",                                                                                        
                                                 command=(fun ()-> dispatch OpenFeedbackPage),
                                                 margin=Thickness(0.,10.,0.,0.)
-                                            ).Row(6)
+                                            ).Row(4)
 
                                             View.Button(
                                                 text=(if mdl.DataProtectionStuff then Translations.current.HideDataProtection else Translations.current.ShowDataProtection),
                                                 command=(fun ()-> dispatch (if mdl.DataProtectionStuff then HideDataProtectionStuff else ShowDataProtectionStuff)),
                                                 margin=Thickness(0.,10.,0.,0.)
-                                            ).Row(7)
+                                            ).Row(5)
 
                                             View.Button(
                                                 text="Import Database",
                                                 command=(fun ()-> dispatch ImportDatabase),
                                                 margin=Thickness(0.,10.,0.,0.)
-                                            ).Row(7)
+                                            ).Row(6)
+
+                                            if mdl.DeveloperMode then
+                                                (settingsEntry 
+                                                    "DeveloperMode" 
+                                                    "Unter anderem kann man Einträge aus der DB löschen"
+                                                    (fun () -> ())).Row(7)
+
+                                                (settingsEntry 
+                                                    "Datenbank löschen" 
+                                                    "Hiermit löscht an die ganze Datenbank und initialisiert die Anwendung neu."
+                                                    (fun () -> dispatch DeleteDatabase)).Row(8)
 
 
 
