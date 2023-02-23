@@ -73,6 +73,7 @@
     <AndroidCreatePackagePerAbi>false</AndroidCreatePackagePerAbi>
   </PropertyGroup>
   <ItemGroup>
+
     <None Include="Properties\AndroidManifest.xml" />
     <Compile Include="Properties\AssemblyInfo.fs" />
     <Compile Include="Common.fs" />
@@ -126,8 +127,11 @@
     <AndroidResource Include="Resources\layout\Toolbar.axml" />
     <AndroidResource Include="Resources\values\styles.xml" />
     <AndroidResource Include="Resources\values\colors.xml" />
-    <None Include="packages.config" />
+	<AndroidResource Include="Resources\xml\backup_rules.xml" />
+	<AndroidResource Include="Resources\xml\backup_rules_31.xml" />
+	<AndroidResource Include="Resources\xml\automotive_app_desc.xml" />
     <AndroidEnvironment Include="EnvironmentVariables.txt" />
+	<None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PerryRhodan.AudiobookPlayer\PerryRhodan.AudiobookPlayer.fsproj">
