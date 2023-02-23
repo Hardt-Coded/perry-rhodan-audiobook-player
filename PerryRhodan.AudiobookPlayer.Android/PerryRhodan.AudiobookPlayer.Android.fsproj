@@ -13,7 +13,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>PerryRhodan.AudiobookPlayer.Android</RootNamespace>
     <AssemblyName>PerryRhodan.AudiobookPlayer.Android</AssemblyName>
-    <TargetFrameworkVersion>v11.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v13.0</TargetFrameworkVersion>
     <TemplateGuid>{c9e5eea5-ca05-42a1-839b-61506e0a37df}</TemplateGuid>
     <AndroidApplication>True</AndroidApplication>
     <AndroidResgenFile>Resources\Resource.designer.cs</AndroidResgenFile>
@@ -27,11 +27,11 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <OtherFlags>/warnon:1182</OtherFlags>
     <WarningLevel>4</WarningLevel>
-    <SelectedDevice>pixel_5_-_api_32</SelectedDevice>
-    <DefaultDevice>pixel_5_-_api_32</DefaultDevice>
+    <SelectedDevice>pixel_5_-_api_33</SelectedDevice>
+    <DefaultDevice>pixel_5_-_api_33</DefaultDevice>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
-    <ActiveDebugProfile>Pixel 5 - API 32 (Android 12.1 - API 32)</ActiveDebugProfile>
+    <ActiveDebugProfile>Pixel 5 - API 33 (Android 13.0 - API 33)</ActiveDebugProfile>
     <SelectedPlatformGroup>Emulator</SelectedPlatformGroup>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -73,7 +73,6 @@
     <AndroidCreatePackagePerAbi>false</AndroidCreatePackagePerAbi>
   </PropertyGroup>
   <ItemGroup>
-
     <None Include="Properties\AndroidManifest.xml" />
     <Compile Include="Properties\AssemblyInfo.fs" />
     <Compile Include="Common.fs" />
@@ -127,11 +126,11 @@
     <AndroidResource Include="Resources\layout\Toolbar.axml" />
     <AndroidResource Include="Resources\values\styles.xml" />
     <AndroidResource Include="Resources\values\colors.xml" />
-	<AndroidResource Include="Resources\xml\backup_rules.xml" />
-	<AndroidResource Include="Resources\xml\backup_rules_31.xml" />
-	<AndroidResource Include="Resources\xml\automotive_app_desc.xml" />
+    <AndroidResource Include="Resources\xml\backup_rules.xml" />
+    <AndroidResource Include="Resources\xml\backup_rules_31.xml" />
+    <AndroidResource Include="Resources\xml\automotive_app_desc.xml" />
     <AndroidEnvironment Include="EnvironmentVariables.txt" />
-	<None Include="packages.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PerryRhodan.AudiobookPlayer\PerryRhodan.AudiobookPlayer.fsproj">
