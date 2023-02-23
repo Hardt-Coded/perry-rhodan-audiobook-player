@@ -27,11 +27,11 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <OtherFlags>/warnon:1182</OtherFlags>
     <WarningLevel>4</WarningLevel>
-    <SelectedDevice>android_accelerated_x64_90</SelectedDevice>
-    <DefaultDevice>android_accelerated_x64_90</DefaultDevice>
+    <SelectedDevice>pixel_5_-_api_32</SelectedDevice>
+    <DefaultDevice>pixel_5_-_api_32</DefaultDevice>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
-    <ActiveDebugProfile>android_accelerated_x64_90</ActiveDebugProfile>
+    <ActiveDebugProfile>Pixel 5 - API 32 (Android 12.1 - API 32)</ActiveDebugProfile>
     <SelectedPlatformGroup>Emulator</SelectedPlatformGroup>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
