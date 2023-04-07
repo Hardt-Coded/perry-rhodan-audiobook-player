@@ -13,7 +13,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>PerryRhodan.AudiobookPlayer.Android</RootNamespace>
     <AssemblyName>PerryRhodan.AudiobookPlayer.Android</AssemblyName>
-    <TargetFrameworkVersion>v12.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v13.0</TargetFrameworkVersion>
     <TemplateGuid>{c9e5eea5-ca05-42a1-839b-61506e0a37df}</TemplateGuid>
     <AndroidApplication>True</AndroidApplication>
     <AndroidResgenFile>Resources\Resource.designer.cs</AndroidResgenFile>
@@ -27,11 +27,11 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <OtherFlags>/warnon:1182</OtherFlags>
     <WarningLevel>4</WarningLevel>
-    <SelectedDevice>pixel_5_-_api_31</SelectedDevice>
-    <DefaultDevice>pixel_5_-_api_31</DefaultDevice>
+    <SelectedDevice>pixel_5_-_api_33</SelectedDevice>
+    <DefaultDevice>pixel_5_-_api_33</DefaultDevice>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
-    <ActiveDebugProfile>pixel_5_-_api_31</ActiveDebugProfile>
+    <ActiveDebugProfile>Pixel 5 - API 33 (Android 13.0 - API 33)</ActiveDebugProfile>
     <SelectedPlatformGroup>Emulator</SelectedPlatformGroup>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -59,7 +59,7 @@
     <ConsolePause>False</ConsolePause>
     <AndroidManagedSymbols>true</AndroidManagedSymbols>
     <AndroidUseSharedRuntime>false</AndroidUseSharedRuntime>
-    <AotAssemblies>false</AotAssemblies>
+    <AotAssemblies>true</AotAssemblies>
     <EnableLLVM>false</EnableLLVM>
     <AndroidEnableProfiledAot>true</AndroidEnableProfiledAot>
     <BundleAssemblies>false</BundleAssemblies>
@@ -128,8 +128,9 @@
     <AndroidResource Include="Resources\values\colors.xml" />
     <AndroidResource Include="Resources\xml\backup_rules.xml" />
     <AndroidResource Include="Resources\xml\backup_rules_31.xml" />
-    <None Include="packages.config" />
+    <AndroidResource Include="Resources\xml\automotive_app_desc.xml" />
     <AndroidEnvironment Include="EnvironmentVariables.txt" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PerryRhodan.AudiobookPlayer\PerryRhodan.AudiobookPlayer.fsproj">
@@ -182,7 +183,7 @@
       <HintPath>..\packages\Plugin.CurrentActivity.2.1.0.2\lib\monoandroid44\Plugin.CurrentActivity.dll</HintPath>
     </Reference>
     <Reference Include="SkiaSharp">
-      <HintPath>..\packages\SkiaSharp.1.68.3\lib\monoandroid1.0\SkiaSharp.dll</HintPath>
+      <HintPath>..\packages\SkiaSharp.1.68.1\lib\MonoAndroid\SkiaSharp.dll</HintPath>
     </Reference>
     <Reference Include="SkiaSharp.Views.Android">
       <HintPath>..\packages\SkiaSharp.Views.1.68.1\lib\MonoAndroid\SkiaSharp.Views.Android.dll</HintPath>
@@ -199,7 +200,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Text.Encodings.Web">
-      <HintPath>..\packages\System.Text.Encodings.Web.5.0.1\lib\netstandard2.1\System.Text.Encodings.Web.dll</HintPath>
+      <HintPath>..\packages\System.Text.Encodings.Web.5.0.0\lib\netstandard2.1\System.Text.Encodings.Web.dll</HintPath>
     </Reference>
     <Reference Include="System.Text.Json">
       <HintPath>..\packages\System.Text.Json.5.0.0\lib\netstandard2.0\System.Text.Json.dll</HintPath>
