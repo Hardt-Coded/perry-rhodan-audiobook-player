@@ -13,7 +13,10 @@ open Microsoft.AppCenter
 open Microsoft.AppCenter.Crashes
 open Microsoft.AppCenter.Analytics
 open Acr.UserDialogs
-    
+open AndroidX.Core.Content
+open AndroidX.Core.App
+
+
 
 
 
@@ -60,14 +63,14 @@ type MainActivity() =
         FormsAppCompatActivity.ToolbarResource <- Resources.Layout.Toolbar
         base.OnCreate (bundle)
 
-        
+
         GlobalType.typeOfMainactivity <- typeof<MainActivity>
-        
-                
+
+
         AppCenter.Start(Global.appcenterAndroidId, typeof<Analytics>, typeof<Crashes>)
-                    
+
         Xamarin.Essentials.Platform.Init(this, bundle)
-        
+
         Xamarin.Forms.Forms.Init (this, bundle)
         Xamarin.Forms.DependencyService.Register<AndroidDownloadFolder>()
         Xamarin.Forms.DependencyService.Register<AudioPlayerServiceImplementation.DecpencyService.AudioPlayer>()
@@ -75,21 +78,25 @@ type MainActivity() =
         Xamarin.Forms.DependencyService.Register<DownloadServiceImplementation.DependencyService.DownloadService>()
         Xamarin.Forms.DependencyService.Register<AndroidHttpClientHandlerService>()
         Xamarin.Forms.DependencyService.Register<CloseApplication>()
-                    
+
+
+
+
+
         Plugin.CurrentActivity.CrossCurrentActivity.Current.Init(this, bundle);
 
         UserDialogs.Init this
 
         // styleId as resource id for store testing
-        Xamarin.Forms.Forms.ViewInitialized.Add(fun e -> 
+        Xamarin.Forms.Forms.ViewInitialized.Add(fun e ->
             if not (System.String.IsNullOrWhiteSpace(e.View.StyleId)) then
                 e.NativeView.ContentDescription <- e.View.StyleId
         )
 
         let appcore  = new PerryRhodan.AudiobookPlayer.MainApp()
         this.LoadApplication (appcore)
-    
-    
+
+
     override this.OnRequestPermissionsResult(requestCode: int, permissions: string[], [<GeneratedEnum>] grantResults: Android.Content.PM.Permission[]) =
         Xamarin.Essentials.Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults)
         Plugin.Permissions.PermissionsImplementation.Current.OnRequestPermissionsResult(requestCode, permissions, grantResults)

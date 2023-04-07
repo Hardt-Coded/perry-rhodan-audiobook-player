@@ -24,7 +24,7 @@
         | Listend
 
 
-    type Model = { 
+    type Model = {
         AudioBook: AudioBook
         DownloadState: DownloadState
         ListenState: ListenState
@@ -36,7 +36,7 @@
         | OpenAudioBookActionMenu
         | AddToDownloadQueue
         | RemoveFromDownloadQueue
-        
+
         | DeleteAudiobook
         | AudioBookDeleted
         | MarkAudioBookAsListend
@@ -46,6 +46,8 @@
         | OpenAudioBookDetail
         | DeleteItemFromDb
         | DeletedFromDb
+
+        | ShareAudiobookPicture
 
         | ShowMetaData
 
@@ -76,19 +78,24 @@
                     | Downloading _  ->
                         ()
 
-                    
+
                     match model.ListenState with
                     | Unlistend ->
                         (Translations.current.MarkAsListend,MarkAudioBookAsListend)
-                    | InProgress _ 
+                    | InProgress _
                     | Listend   ->
                         (Translations.current.UnmarkAsListend,UnmarkAudioBookAsListend)
-                    
 
-                    let isDevMode = 
+                    match model.AudioBook.Picture with
+                    | None ->
+                        ()
+                    | Some picture ->
+                        ("Hörbuch-Cover teilen...", ShareAudiobookPicture)
+
+                    let isDevMode =
                         Services.SystemSettings.getDeveloperMode() |> Async.RunSynchronously
                     if isDevMode then
-                        ("Remove Item from Database", DeleteItemFromDb)  
+                        ("Remove Item from Database", DeleteItemFromDb)
                         ("Show Entry MetaData", ShowMetaData)
 
                 |]
@@ -96,11 +103,11 @@
             }
             |> Cmd.ofAsyncMsgOption
 
-    
+
         let updateAudiobookInStateFile (model:Model) =
             fun _ ->
                 async {
-                    let! res = model.AudioBook |> DataBase.updateAudioBookInStateFile            
+                    let! res = model.AudioBook |> DataBase.updateAudioBookInStateFile
                     match res with
                     | Error e ->
                         do! Common.Helpers.displayAlert(Translations.current.Error,e,"OK")
@@ -149,12 +156,27 @@
             |> Cmd.ofSub
 
 
-    
-    let init audiobook = 
-        { 
+        open Xamarin.Essentials
+
+        let shareAudiobookPicture (model:Model) =
+            fun _ ->
+                task {
+                    match model.AudioBook.Picture with
+                    | None ->
+                        do! Common.Helpers.displayAlert ("Hörbuch-Cover teilen","Hörbuch hat kein Cover zum Teilen!","OK") |> Async.StartAsTask
+                    | Some picture ->
+                        do! Share.RequestAsync(ShareFileRequest(Title = "Hörbuch-Cover teilen",File = ShareFile(picture)))
+                } |> ignore
+            |> Cmd.ofSub
+            //
+
+
+
+    let init audiobook =
+        {
             AudioBook = audiobook
             DownloadState = if audiobook.State.Downloaded then Downloaded else NotDownloaded
-            ListenState = 
+            ListenState =
                 match audiobook.State.Completed, audiobook.State.CurrentPosition with
                 | true, _           -> Listend
                 | false, Some pos   -> InProgress pos
@@ -189,7 +211,7 @@
         | UnmarkAudioBookAsListend ->
             model |> onMarkAudioBookUnlistendMsg
 
-        | UpdateDownloadProgress progress ->            
+        | UpdateDownloadProgress progress ->
             { model with DownloadState = Downloading progress }, Cmd.none
 
         | Msg.OpenAudioBookPlayer  ->
@@ -206,14 +228,17 @@
 
         | ShowMetaData ->
             model, Commands.showMetaDataCmd model
-        
-    
+
+        | ShareAudiobookPicture ->
+            model, Commands.shareAudiobookPicture model
+
+
 
     and onAudioBookDownloadedMsg result model =
         let newState = {model.AudioBook.State with Downloaded = true; DownloadedFolder = Some result.TargetFolder}
         let imageFullName = result.Images |> Option.map (fun i -> i.Image)
         let thumbnail = result.Images |> Option.map (fun i -> i.Thumbnail)
-        let newAudioBook = {model.AudioBook with State = newState; Picture = imageFullName; Thumbnail = thumbnail}                            
+        let newAudioBook = {model.AudioBook with State = newState; Picture = imageFullName; Thumbnail = thumbnail}
         let newModel = {model with AudioBook = newAudioBook; DownloadState = Downloaded }
         newModel, Commands.updateAudiobookInStateFile newModel
 
@@ -224,7 +249,7 @@
         let newModel = { model with AudioBook = newAudioBook; DownloadState = NotDownloaded }
         newModel, Commands.updateAudiobookInStateFile newModel
 
-    
+
     and onMarkAudioBookListendMsg model =
         match model.ListenState with
         | Listend ->
@@ -232,13 +257,13 @@
         | InProgress _
         | Unlistend ->
             let newState = {model.AudioBook.State with Completed = true}
-            let newAudioBook = {model.AudioBook with State = newState; }                
+            let newAudioBook = {model.AudioBook with State = newState; }
             let newModel = {model with AudioBook = newAudioBook; ListenState = Listend }
             newModel, newModel |> Commands.updateAudiobookInStateFile
 
 
-        
-    
+
+
     and onMarkAudioBookUnlistendMsg model =
         match model.ListenState with
         | Unlistend ->
@@ -247,15 +272,15 @@
         | InProgress _
         | Listend ->
             let newState = {
-                model.AudioBook.State 
-                    with 
+                model.AudioBook.State
+                    with
                         Completed = false
                         CurrentPosition = None
             }
             let newAudioBook = {model.AudioBook with State = newState;  }
             let newModel = {model with AudioBook = newAudioBook; ListenState = Unlistend }
             newModel, newModel |> Commands.updateAudiobookInStateFile
-        
+
     let audioBookDuration model =
         model.AudioFileInfos
         |> Option.map (fun fileInfo ->
@@ -263,7 +288,7 @@
         )
         |> Option.defaultValue 0
 
-    
+
     let getProgressAndTotalDuration (model:Model) =
         if model.DownloadState <> Downloaded then
             None
@@ -271,7 +296,7 @@
             match model.AudioFileInfos, model.AudioBook.State.CurrentPosition with
             | Some fileInfo, Some position ->
 
-                let audioBookDuration = fileInfo.AudioFiles |> List.sumBy (fun i -> i.Duration) |> float  
+                let audioBookDuration = fileInfo.AudioFiles |> List.sumBy (fun i -> i.Duration) |> float
 
                 let trackIndex =
                     fileInfo.AudioFiles
@@ -288,12 +313,12 @@
                 Some {| CurrentProgress = currentTimeInMs; TotalDuration = audioBookDuration; Rest = audioBookDuration - currentTimeInMs |}
             | _ ->
                 None
-    
+
     let percentageFinished (model: Model) =
         model
-        |> getProgressAndTotalDuration 
+        |> getProgressAndTotalDuration
         |> Option.map (fun x -> (x.CurrentProgress / x.TotalDuration))
-        
+
 
     module Draw =
 
@@ -308,12 +333,12 @@
 
         let loadingPie factor =
             let f32 = float32
-            
+
             Fabulous.XamarinForms.SkiaSharp.View.SKCanvasView(
-                
+
                 invalidate = true,
-                margin = Thickness(5.),                 
-                paintSurface = 
+                margin = Thickness(5.),
+                paintSurface =
                     fun args ->
                         let info = args.Info
                         let surface = args.Surface
@@ -330,8 +355,8 @@
                             use path = new SKPath()
                             use fillPaint = new SKPaint()
                             use outlinePaint = new SKPaint()
-                                    
-                            
+
+
                             path.MoveTo(center);
                             path.ArcTo(rect, startAngle, sweepAngle, false);
                             path.Close();
@@ -346,8 +371,8 @@
                             outlinePaint.Color <- color.ToSKColor() //.WithAlpha(alpha)
                             outlinePaint.IsAntialias <- false
 
-                                    
-                                    
+
+
                             // Calculate "explode" transform
                             let angle = startAngle + 0.5f * sweepAngle |> float;
                             let x = (explodeOffset |> float) * Math.Cos(Math.PI * angle / 180.0) |> float32;
@@ -368,43 +393,43 @@
                         textPaint.BlendMode <- SKBlendMode.Plus
                         textPaint.IsAntialias <- false
                         textPaint.TextAlign <- SKTextAlign.Center
-                                
-                        let text = sprintf "%i %%" ((factor * 100.0) |> int) 
+
+                        let text = sprintf "%i %%" ((factor * 100.0) |> int)
                         let y = ((info.Height  / 2) |> f32) + (textPaint.TextSize / 2.0f) - 15.0f
                         canvas.DrawText(text, (info.Width / 2) |> f32,y , textPaint)
 
                         canvas.ResetMatrix()
-                                
+
 
                         let startAngle = -90.0f
-                        let sweepAngle = 
+                        let sweepAngle =
                             let x = 360.0 * factor |> float32;
                             if x >= 360.0f then 359.99f else x
 
                         drawPie false (Color.FromHex("96FF33")) startAngle sweepAngle
-                    )    
-                
-            
+                    )
+
+
 
 
         let progressPie factor =
             let f32 = float32
-            
+
             Fabulous.XamarinForms.SkiaSharp.View.SKCanvasView(
-                
+
                 invalidate = true,
                 margin=Thickness(4.),
                 width = 20.,
                 height = 20.,
-                paintSurface = 
+                paintSurface =
                     fun args ->
                         let info = args.Info
-                        
+
                         let surface = args.Surface
                         let canvas = surface.Canvas
                         canvas.Clear()
-                        
-                        
+
+
 
 
 
@@ -417,7 +442,7 @@
                             use path = new SKPath()
                             use fillPaint = new SKPaint()
                             use outlinePaint = new SKPaint()
-                                    
+
                             path.MoveTo(center);
                             path.ArcTo(rect, startAngle, sweepAngle, false);
                             path.Close();
@@ -425,7 +450,7 @@
                             fillPaint.Style <- SKPaintStyle.StrokeAndFill
                             fillPaint.Color <- color.ToSKColor()
                             fillPaint.IsAntialias <- false
-                                    
+
                             outlinePaint.Style <- SKPaintStyle.Stroke;
                             outlinePaint.StrokeWidth <- 2.0f;
                             outlinePaint.Color <- Color.Black.ToSKColor()
@@ -433,22 +458,22 @@
 
                             canvas.DrawPath(path, fillPaint);
                             canvas.DrawPath(path, outlinePaint);
-                            
+
 
                         let startAngle = -90.0f;
-                        let sweepAngle = 
+                        let sweepAngle =
                             let x = 360.0 * factor |> float32;
                             if x >= 360.0f then 359.99f else x
 
                         drawPie Color.Yellow startAngle sweepAngle
                     )
-            
-        
-       
+
+
+
     let getHoursAndMinutes ms =
         let ts = TimeSpan.FromMilliseconds(ms |> float)
         let minutes = Math.Floor(ts.TotalHours) |> int
-        minutes, ts.Minutes   
+        minutes, ts.Minutes
 
     let view (model: Model) dispatch =
         View.Grid(
@@ -472,7 +497,7 @@
                         , width=100.
                         , margin=Thickness 10.
                         ).Column(0).Row(0)
-                
+
                 View.Grid(
                     backgroundColor = Color.Transparent,
                     margin=Thickness 10.,
@@ -490,24 +515,24 @@
                             pie
                         | Downloaded ->
                             Controls.playerSymbolLabel.Column(1).Row(1)
-                            
+
                         match model.ListenState with
                         | Unlistend ->
                             ()
                         | InProgress pos ->
                             match percentageFinished model with
                             | None -> ()
-                            | Some progress -> 
+                            | Some progress ->
                                 (Draw.progressPie progress).Column(0).Row(2)
-                                    
+
                         | Listend ->
                             Controls.listendCheckLabel.Column(2).Row(2)
                     ]
-                    , gestureRecognizers = 
+                    , gestureRecognizers =
                         [
                             View.TapGestureRecognizer(
-                                command = (fun () -> 
-                                    if model.DownloadState=Downloaded then 
+                                command = (fun () ->
+                                    if model.DownloadState=Downloaded then
                                         dispatch OpenAudioBookPlayer
                                 )
                             )
@@ -518,13 +543,13 @@
 
                 View.Grid(
                     rowdefs = [Star; Auto; Auto; Star],
-                    verticalOptions = LayoutOptions.Center, 
-                    horizontalOptions = LayoutOptions.Fill, 
+                    verticalOptions = LayoutOptions.Center,
+                    horizontalOptions = LayoutOptions.Fill,
                     children= [
-                        View.Label(text=model.AudioBook.FullName, 
-                            fontSize = FontSize.fromValue 15., 
-                            verticalOptions = LayoutOptions.Fill, 
-                            horizontalOptions = LayoutOptions.Fill, 
+                        View.Label(text=model.AudioBook.FullName,
+                            fontSize = FontSize.fromValue 15.,
+                            verticalOptions = LayoutOptions.Fill,
+                            horizontalOptions = LayoutOptions.Fill,
                             verticalTextAlignment = TextAlignment.Center,
                             horizontalTextAlignment = TextAlignment.Center,
                             textColor = Consts.primaryTextColor,
@@ -535,15 +560,15 @@
                         | InProgress _ ->
                             match getProgressAndTotalDuration model with
                             | Some totalTimes ->
-                                
+
 
                                 let (m,s) = totalTimes.Rest |> getHoursAndMinutes
                                 let progressStr = sprintf "insgesamt noch %i h %i min übrig" m s
 
-                                View.Label(text=progressStr, 
-                                    fontSize = FontSize.fromValue 11., 
-                                    verticalOptions = LayoutOptions.Fill, 
-                                    horizontalOptions = LayoutOptions.Fill, 
+                                View.Label(text=progressStr,
+                                    fontSize = FontSize.fromValue 11.,
+                                    verticalOptions = LayoutOptions.Fill,
+                                    horizontalOptions = LayoutOptions.Fill,
                                     verticalTextAlignment = TextAlignment.Center,
                                     horizontalTextAlignment = TextAlignment.Center,
                                     textColor = Consts.secondaryTextColor,
@@ -557,17 +582,17 @@
                 ).Column(1).Row(0)
 
                 View.Grid(
-                    verticalOptions = LayoutOptions.Fill, 
+                    verticalOptions = LayoutOptions.Fill,
                     horizontalOptions = LayoutOptions.Fill,
                     gestureRecognizers = [
                         View.TapGestureRecognizer(command = fun () -> dispatch OpenAudioBookActionMenu)
                     ],
                     children = [
                         View.Label(text="\uf142",fontFamily = Controls.faFontFamilyName true,
-                            fontSize=FontSize.fromValue 35., 
-                            margin = Thickness(10., 0. ,10. ,0.),                    
-                            verticalOptions = LayoutOptions.Fill, 
-                            horizontalOptions = LayoutOptions.Fill, 
+                            fontSize=FontSize.fromValue 35.,
+                            margin = Thickness(10., 0. ,10. ,0.),
+                            verticalOptions = LayoutOptions.Fill,
+                            horizontalOptions = LayoutOptions.Fill,
                             verticalTextAlignment = TextAlignment.Center,
                             horizontalTextAlignment = TextAlignment.Center,
                             textColor = Consts.secondaryTextColor
@@ -576,12 +601,12 @@
                 ).Column(2).Row(0)
 
         ]
-        )    
+        )
 
 
 
     module Helpers =
-        
+
         let getNew toDispatch (audiobookItems:AudioBookItem []) (audiobooks:Domain.AudioBook []) =
             let currentItems = audiobookItems |> Array.map (fun i -> i.Model.AudioBook)
             let newAudioBooks = Domain.filterNewAudioBooks currentItems audiobooks
@@ -599,11 +624,11 @@
             let newAudioBooks = Domain.filterNewAudioBooks currentItems audiobooks
             let namesToFix = Domain.findDifferentAudioBookNames currentItems audiobooks
             let newAudioBookItems =
-                getNew toDispatch audiobookItems audiobooks 
+                getNew toDispatch audiobookItems audiobooks
             Array.concat [audiobookItems; newAudioBookItems]
 
 
 
 
-    
+
 

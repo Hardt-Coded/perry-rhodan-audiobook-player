@@ -5,19 +5,22 @@
     open Android.App
     open Android.OS
     open Android.Content
+    open AndroidX.Core.Content
+    open AndroidX.Core.App
+    open Android.Content.PM
 
     [<AutoOpen>]
     module private Settings =
 
         open PerryRhodan.AudiobookPlayer.Android
 
-        let icon name = 
+        let icon name =
             typeof<Resources.Drawable>.GetField(name).GetValue(null) :?> int
 
 
         let smallIcon = icon "einsa_small_icon"
-    
-        let logo = 
+
+        let logo =
             Android.Graphics.BitmapFactory.DecodeResource(Android.App.Application.Context.Resources ,icon "eins_a_medien_logo")
 
         let downloadServiceNotificationId = 234254
@@ -35,10 +38,10 @@
 
                 let buildNotification (title:string) (text:string) =
                     let intent = new Intent(self, typeof<FormsAppCompatActivity>)
-                    let pendingIntentId = 83475
-                    let pendingIntent = PendingIntent.GetActivity(self, pendingIntentId, intent, PendingIntentFlags.Immutable ||| PendingIntentFlags.UpdateCurrent)
-                   
-                    let builder = 
+                    let pendingIntentId = 54893
+                    let pendingIntent = PendingIntent.GetActivity(self, pendingIntentId, intent, PendingIntentFlags.Mutable ||| PendingIntentFlags.UpdateCurrent)
+
+                    let builder =
                         if (Build.VERSION.SdkInt >= BuildVersionCodes.O) then
                             (new Notification.Builder(Android.App.Application.Context, downloadServiceChannelId))
                                 .SetContentIntent(pendingIntent)
@@ -46,7 +49,7 @@
                                 .SetContentText(text)
                                 .SetSmallIcon(smallIcon)
                                 .SetLargeIcon(logo)
-                                
+
                         else
                             (new Notification.Builder(Android.App.Application.Context, downloadServiceChannelId))
                                 .SetContentIntent(pendingIntent)
@@ -60,7 +63,7 @@
 
 
 
-                               
+
                     builder.Build()
 
                 let createDownloadServiceNotification () =
@@ -83,11 +86,11 @@
 
                     createNotificationChannel manager
                     notify manager
-                    
-            
+
+
                 let updateNotification =
                     createDownloadServiceNotification ()
-                
+
 
                 let shutDownService () =
                     self.StopForeground(true)
@@ -105,21 +108,23 @@
                     null
 
                 override this.OnCreate () =
+                    if (ContextCompat.CheckSelfPermission(this, Android.Manifest.Permission.PostNotifications) <> Permission.Granted) then
+                        ActivityCompat.RequestPermissions(Xamarin.Essentials.Platform.CurrentActivity, [| Android.Manifest.Permission.PostNotifications |], 0)
                     this.StartForeground(downloadServiceNotificationId, buildNotification "Download" "Starte Download!");
-                
-                
-                
+
+
+
                 override this.OnStartCommand (_,_,_) =
-                
+
                     let serviceListener = Services.DownloadService.External.downloadServiceListener downloadServiceMailbox
 
-                    serviceListener |> Services.DownloadService.registerServiceListener 
+                    serviceListener |> Services.DownloadService.registerServiceListener
 
                     StartCommandResult.Sticky
 
 
     module DependencyService =
-        
+
         open AndroidCommon.ServiceHelpers
 
         type DownloadService () =
