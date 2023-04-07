@@ -8,7 +8,7 @@
     open Fabulous.XamarinForms
     open System.Net.Http.Headers
     open Xamarin.Essentials
-    
+
 
     type ComError =
     | SessionExpired of string
@@ -16,24 +16,24 @@
     | Exception of exn
     | Network of string
 
-    let (|InvariantEqual|_|) (str:string) arg = 
+    let (|InvariantEqual|_|) (str:string) arg =
         if String.Compare(str, arg, StringComparison.InvariantCultureIgnoreCase) = 0
         then Some() else None
 
 
-    let (|OrdinalEqual|_|) (str:string) arg = 
+    let (|OrdinalEqual|_|) (str:string) arg =
         if String.Compare(str, arg, StringComparison.OrdinalIgnoreCase) = 0
         then Some() else None
 
 
-    let (|InvariantContains|_|) (str:string) (arg:string) = 
+    let (|InvariantContains|_|) (str:string) (arg:string) =
         if arg.IndexOf(str, StringComparison.InvariantCultureIgnoreCase) > -1
         then Some() else None
 
 
-    let (|OrdinalContains|_|) (str:string) (arg:string) = 
+    let (|OrdinalContains|_|) (str:string) (arg:string) =
         if arg.IndexOf(str, StringComparison.OrdinalIgnoreCase) > -1
-        then Some() else None    
+        then Some() else None
 
 
 
@@ -49,19 +49,19 @@
             ]
         )
 
-    let asyncFunc f = 
-        async {  
+    let asyncFunc f =
+        async {
             let original = System.Threading.SynchronizationContext.Current
-            do! Async.SwitchToNewThread() 
-            let result = f() 
+            do! Async.SwitchToNewThread()
+            let result = f()
             do! Async.SwitchToContext(original)
-            return result 
+            return result
         }
 
     module Extensions =
         open System.Collections.Generic
         open System.Threading
-        
+
         let debounce<'T> =
             let memoizations = Dictionary<obj, CancellationTokenSource>(HashIdentity.Structural)
             fun (timeout: int) (fn: 'T -> unit) value ->
@@ -84,7 +84,7 @@
                     with
                     | _ -> ()
                 })
-                |> (fun task -> Async.StartImmediate(task, cts.Token)) 
+                |> (fun task -> Async.StartImmediate(task, cts.Token))
 
 
     module Helpers =
@@ -94,11 +94,11 @@
         open Microsoft.AppCenter.Crashes
         open Fabulous
         open Acr.UserDialogs
-        
+
         let displayAlert(title, message, cancel) =
             Async.FromContinuations <| fun (resolve, reject, _) ->
                 Device.BeginInvokeOnMainThread(
-                    (fun () -> 
+                    (fun () ->
                         async {
                             try
                                 do! UserDialogs.Instance.AlertAsync(message, title, cancel) |> Async.AwaitTask
@@ -116,10 +116,10 @@
         let displayAlertWithConfirm(title, message, accept, cancel:string) =
             Async.FromContinuations <| fun (resolve, reject, _) ->
                 Device.BeginInvokeOnMainThread(
-                    (fun () -> 
+                    (fun () ->
                         async {
                             try
-                                
+
                                 let! res = UserDialogs.Instance.ConfirmAsync(message, title, accept, cancel)  |> Async.AwaitTask
                                 //let! res = Application.Current.MainPage.DisplayAlert(title, message, accept, cancel) |> Async.AwaitTask
                                 resolve res
@@ -131,25 +131,8 @@
                     )
                 )
 
-        let askForStoragePermissionAsync () =
-            async {
-                try
-                    if (DeviceInfo.Version.Major >= 10) then
-                        return true;
-                    else
-                        let! statusWrite = Permissions.CheckStatusAsync<Permissions.StorageWrite>() |> Async.AwaitTask
-                   
-                        match statusWrite with
-                        | Xamarin.Essentials.PermissionStatus.Granted ->
-                            return true
-                        | _ ->
-                            let! statusWrite = Permissions.RequestAsync<Permissions.StorageWrite>() |> Async.AwaitTask
-                            return (statusWrite = Xamarin.Essentials.PermissionStatus.Granted 
-                                   || statusWrite = Xamarin.Essentials.PermissionStatus.Unknown)
-                with exn ->
-                    return false
-            }
-        
+
+
 
         // diplay action sheet an returns a command fitting
         let displayActionSheet title cancel buttons =
@@ -176,25 +159,25 @@
             }
 
 
-        
-                
 
 
-            
+
+
+
 
     module Cmd =
         open Fabulous
 
         let ofAsyncMsgWithInternalDispatch (p: (Dispatch<'msg> -> Async<'msg>)) : Cmd<'msg> =
-            [ fun dispatch -> async { let! msg = (p dispatch)  in dispatch msg } |> Async.StartImmediate ] 
+            [ fun dispatch -> async { let! msg = (p dispatch)  in dispatch msg } |> Async.StartImmediate ]
 
         let ofAsyncMsgOptionWithInternalDispatch (p: (Dispatch<'msg> -> Async<'msg option>)) : Cmd<'msg> =
             [ fun dispatch -> async { let! msg = (p dispatch)  in match msg with None -> () | Some msg -> dispatch msg } |> Async.StartImmediate ]
-        
-        
+
+
         let ofMultipleAsyncMsgWithInternalDispatch (p: (Dispatch<'msg> -> Async<#seq<'msg>>)) : Cmd<'msg> =
-            [ fun dispatch -> async { let! msgs = (p dispatch) in msgs |> Seq.iter (fun msg -> dispatch msg) } |> Async.StartImmediate ] 
-        
+            [ fun dispatch -> async { let! msgs = (p dispatch) in msgs |> Seq.iter (fun msg -> dispatch msg) } |> Async.StartImmediate ]
+
         let ofAsyncMsgOption (p: Async<'msg option>) : Cmd<'msg> =
             [ fun dispatch -> async { let! msg = p in match msg with None -> () | Some msg -> dispatch msg } |> Async.StartImmediate ]
 
@@ -204,20 +187,20 @@
         let ofMultipleAsyncMsgOptions (p: Async<#seq<'msg option>>) : Cmd<'msg> =
             [ fun dispatch -> async { let! msgs = p in msgs |> Seq.iter (fun msg -> match msg with None -> () | Some msg -> dispatch msg) } |> Async.StartImmediate ]
 
-        
+
         /// Message with specifiy item as fst of tuple
         let map2 (item:'item) (f: 'item * 'a -> 'msg) (cmd: Fabulous.Cmd<'a>) : Fabulous.Cmd<'msg> =
-            cmd 
+            cmd
             |> List.map (
                 fun g ->
-                    (fun dispatch -> 
-                        let msg mainMsg = f (item,mainMsg)    
-                        msg >> dispatch 
-                        )  >> g                       
+                    (fun dispatch ->
+                        let msg mainMsg = f (item,mainMsg)
+                        msg >> dispatch
+                        )  >> g
             )
 
 
-    module Consts =        
+    module Consts =
 
         let backgroundColor = Color.FromHex("#303030")
 
@@ -234,17 +217,17 @@
 
         let disabledTextColor = Color.FromHex("#61FFFFFF")
 
-    
+
     module HttpHelpers =
-        
+
         let getFileSizeFromHttpHeadersOrDefaultValue defaultValue (headers:HttpContentHeaders) : int =
             // Get FileSize from Download
-            headers.ContentLength 
-            |> Option.ofNullable 
-            |> Option.defaultValue defaultValue 
+            headers.ContentLength
+            |> Option.ofNullable
+            |> Option.defaultValue defaultValue
             |> int32
-            
-            
+
+
 
 
     module StringHelpers =
@@ -287,7 +270,7 @@
         let regexMatchGroupOpt pattern group input =
             input
             |> Option.bind (regexMatchGroup group pattern)
-            
+
 
 
     module AppCenter =
@@ -304,7 +287,7 @@
             let traceError (message, exn) =
                 Crashes.TrackError(exn, dict [ ("Message", message) ])
 
-            { program with                 
+            { program with
                 onError = traceError }
 
 
@@ -312,9 +295,15 @@
 
         open ICSharpCode.SharpZipLib.Zip
 
-        let (|Mp3File|PicFile|Other|) (z:ZipEntry) = 
-            if (z.Name.Contains(".mp3")) then Mp3File
-            elif (z.Name.Contains(".jpg")) then PicFile
+        let (|Mp3File|PicFile|ToIgnoreFile|Other|) (z:ZipEntry) =
+            let filename =
+                if z.IsFile then
+                    Path.GetFileName z.Name
+                else ""
+
+            if filename.StartsWith "." then ToIgnoreFile
+            elif filename.Trim().EndsWith ".mp3" then Mp3File
+            elif filename.Trim().EndsWith ".jpg" then PicFile
             else Other
 
 
@@ -326,7 +315,7 @@
 
         let fromTimeSpan (ts:TimeSpan) =
             ts.TotalMilliseconds |> int
-        
+
         let fromTimeSpanOpt (ts:TimeSpan option) =
             ts
             |> Option.defaultValue TimeSpan.Zero
@@ -336,7 +325,7 @@
     module MailboxExtensions =
 
         let PostWithDelay msg (ms:int) (mailbox:MailboxProcessor<_>) =
-            let post () = 
+            let post () =
                 async {
                     do! Async.Sleep ms
                     mailbox.Post(msg)
@@ -352,15 +341,15 @@
 
 
     module ModalBaseHelpers =
-        
+
         let private pushModalPage dispatch (sr:Shell) closeEventMsg (page:ViewElement) =
-            let p = page.Create() :?> Page    
+            let p = page.Create() :?> Page
             p.Disappearing.Add(fun e-> dispatch closeEventMsg)
             sr.Navigation.PushModalAsync(p) |> Async.AwaitTask |> Async.StartImmediate
-        
+
         let private tryFindModal (sr:Shell) title =
             sr.Navigation.ModalStack |> Seq.tryFind (fun i -> i.Title = title)
-        
+
         let pushModal dispatch closeMessage pageTitle (shellRef:ViewRef<Shell>) page =
             shellRef.TryValue
             |> Option.map (fun sr ->
@@ -369,9 +358,9 @@
                 match hasLoginPageInStack with
                 | None ->
                     // creates a new page and push it to the modal stack
-                    page |> pushModalPage dispatch sr closeMessage 
+                    page |> pushModalPage dispatch sr closeMessage
                     ()
-                | _e -> 
+                | _e ->
                     ()
             )
             |> ignore
@@ -384,8 +373,8 @@
                 match hasLoginPageInStack with
                 | None ->
                     ()
-                | Some pushedPage -> 
-                    // this uses the new view Element and through model updated Page 
+                | Some pushedPage ->
+                    // this uses the new view Element and through model updated Page
                     // and updates the current viewed from the shel modal stack :) nice!
                     page.Update(pushedPage)
             )
@@ -411,7 +400,7 @@
         let headerLabel =   Device.GetNamedSize(NamedSize.Header,typeof<Label>)
         let largeLabel =    Device.GetNamedSize(NamedSize.Large,typeof<Label>)
         let mediumLabel =   Device.GetNamedSize(NamedSize.Medium,typeof<Label>)
-        
+
         let smallLabel =    Device.GetNamedSize(NamedSize.Small,typeof<Label>)
         let microLabel =    Device.GetNamedSize(NamedSize.Micro,typeof<Label>)
         let titleLabel =    Device.GetNamedSize(NamedSize.Title,typeof<Label>)
@@ -423,24 +412,24 @@
 
 
     module EventHelper =
-        
-        
 
-        type CountedEvent<'a>() = 
+
+
+        type CountedEvent<'a>() =
             let evt = new Event<'a>()
             let mutable counter = 0
-            let published = { 
+            let published = {
                 new IEvent<'a> with
-                    member x.AddHandler(h) = 
+                    member x.AddHandler(h) =
                         evt.Publish.AddHandler(h)
-                        counter <- counter + 1; 
-                    member x.RemoveHandler(h) = 
+                        counter <- counter + 1;
+                    member x.RemoveHandler(h) =
                         evt.Publish.RemoveHandler(h)
-                        counter <- counter - 1; 
-                    member x.Subscribe(s) = 
+                        counter <- counter - 1;
+                    member x.Subscribe(s) =
                         let h = new Handler<_>(fun _ -> s.OnNext)
                         x.AddHandler(h)
-                        { new System.IDisposable with 
+                        { new System.IDisposable with
                             member y.Dispose() = x.RemoveHandler(h) } }
             member x.Trigger(v) = evt.Trigger(v)
             member x.Publish = published
@@ -449,9 +438,15 @@
 
 
     module String =
-        
-        let concatStr (str:string list) = System.String.Join ("", str)
-        
-        
 
-       
+        let concatStr (str:string list) = System.String.Join ("", str)
+
+
+
+    module DatabaseHelper =
+
+        let toLiteDbConnectionString (filename:string) =
+            $"Filename={filename};Collation=en-US/None;Upgrade=true"
+
+
+
