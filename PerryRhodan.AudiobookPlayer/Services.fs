@@ -983,7 +983,7 @@ module WebAccess =
 
                                         let fileSize =
                                             (resp.content.Headers
-                                            |> HttpHelpers.getFileSizeFromHttpHeadersOrDefaultValue 0)
+                                            |> HttpHelpers.getFileSizeFromHttpHeadersOrDefaultValue 0L)
 
                                         let! responseStream = resp |> Response.toStreamAsync
                                         use zipStream = new ZipInputStream(responseStream)

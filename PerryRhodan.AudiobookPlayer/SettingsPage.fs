@@ -208,7 +208,7 @@
                                         FullName = model.ExternalAudioBookName
                                         EpisodenTitel =
                                             if model.ExternalAudioBookName.Contains ("-") then
-                                                model.ExternalAudioBookName.Split([| '-' |])[1]
+                                                model.ExternalAudioBookName.Split([| '-' |]).[1]
                                             else
                                                 ""
                                         DownloadUrl = Some model.ExternalAudioBookFileUrl
