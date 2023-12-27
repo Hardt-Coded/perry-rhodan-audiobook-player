@@ -1,6 +1,22 @@
 ﻿namespace PerryRhodan.AudiobookPlayer.ViewModels
 
-type MainViewModel() =
-    inherit ViewModelBase()
+open ReactiveElmish
+open PerryRhodan.AudiobookPlayer.ViewModels.App
+open ReactiveElmish.Avalonia
 
-    member this.Greeting = "Welcome to Avalonia!"
+type MainViewModel(root:CompositionRoot) =
+    inherit ReactiveElmishViewModel()
+
+    member this.ContentView = 
+        this.BindOnChanged (app, _.View, fun m -> 
+            match m.View with
+            | View.HomeView -> root.GetView<HomeViewModel>()
+            | View.PlayerView -> root.GetView<PlayerViewModel>()
+            
+        )
+        
+    member this.GoHome() = app.Dispatch (GoHome)   
+    member this.GoPlayer() = app.Dispatch (SetView View.PlayerView)   
+        
+    static member DesignVM = new MainViewModel(Design.stub)
+    
