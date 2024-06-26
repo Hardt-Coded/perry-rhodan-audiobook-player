@@ -6,6 +6,7 @@
     open Fabulous.XamarinForms
     open Common
     open Xamarin.Essentials
+    open Domain
 
 
     let hideLastListendSettingsKey = "Rhodan_HideLastListendWhenOnlyOneAudioBookOnDevice"
@@ -14,18 +15,18 @@
         | English
         | German
 
-    
-    type Model = { 
-        Language: Language 
+
+    type Model = {
+        Language: Language
         FirstStart: bool
         DataProtectionStuff: bool
-        
+
         RewindWhenStartAfterShortPeriodInSec:int
         RewindWhenStartAfterShortPeriodInSecModalModel:NumberPickerModal.Model option
-        
+
         RewindWhenStartAfterLongPeriodInSec:int
         RewindWhenStartAfterLongPeriodInSecModalModel:NumberPickerModal.Model option
-        
+
         LongPeriodBeginsAfterInMinutes:int
         LongPeriodBeginsAfterInMinutesModalModel:NumberPickerModal.Model option
 
@@ -35,32 +36,35 @@
         DeveloperModeSwitchCounter:int
         DeveloperMode:bool
 
+        ExternalAudioBookFileUrl: string
+        ExternalAudioBookName: string
+
         ShellRef:ViewRef<Shell>
     }
 
-    
+
     type Msg =
         | SetLanguage of Language
         | ShowDataProtectionStuff
         | HideDataProtectionStuff
-        
 
-        | OpenJumpDistancePicker 
+
+        | OpenJumpDistancePicker
         | JumpDistanceMsg of NumberPickerModal.Msg
         | CloseJumpDistancePicker
         | SetJumpDistanceValue of int
 
-        | OpenRewindWhenStartAfterShortPeriodInSecPicker 
+        | OpenRewindWhenStartAfterShortPeriodInSecPicker
         | RewindWhenStartAfterShortPeriodInSecMsg of NumberPickerModal.Msg
         | CloseRewindWhenStartAfterShortPeriodInSecPicker
         | SetRewindWhenStartAfterShortPeriodInSecValue of int
 
-        | OpenRewindWhenStartAfterLongPeriodInSecPicker 
+        | OpenRewindWhenStartAfterLongPeriodInSecPicker
         | RewindWhenStartAfterLongPeriodInSecMsg of NumberPickerModal.Msg
         | CloseRewindWhenStartAfterLongPeriodInSecPicker
         | SetRewindWhenStartAfterLongPeriodInSecValue of int
 
-        | OpenLongPeriodBeginsAfterInMinutesPicker 
+        | OpenLongPeriodBeginsAfterInMinutesPicker
         | LongPeriodBeginsAfterInMinutesMsg of NumberPickerModal.Msg
         | CloseLongPeriodBeginsAfterInMinutesPicker
         | SetLongPeriodBeginsAfterInMinutesValue of int
@@ -70,39 +74,46 @@
         | DeleteDatabase
         | ImportDatabase
 
+        | AddExternalAudioBookZipFile
+        | ChangeExternalAudioBookFileUrl of url:string
+        | ChangeExternalAudioBookName of name:string
+
         | OpenFeedbackPage
 
 
     let strToOptInt (str:string) =
         let (isInt,value) = System.Int32.TryParse(str)
         if isInt then Some value else None
-    
-    let initModel shellref firstStart = 
-        { 
+
+    let initModel shellref firstStart =
+        {
             Language = English
-            FirstStart = firstStart 
+            FirstStart = firstStart
             DataProtectionStuff = false
-            RewindWhenStartAfterShortPeriodInSec = 
-                Services.SystemSettings.getRewindWhenStartAfterShortPeriodInSec() 
+            RewindWhenStartAfterShortPeriodInSec =
+                Services.SystemSettings.getRewindWhenStartAfterShortPeriodInSec()
                 |> Async.RunSynchronously
             RewindWhenStartAfterShortPeriodInSecModalModel = None
-            RewindWhenStartAfterLongPeriodInSec = 
-                Services.SystemSettings.getRewindWhenStartAfterLongPeriodInSec() 
+            RewindWhenStartAfterLongPeriodInSec =
+                Services.SystemSettings.getRewindWhenStartAfterLongPeriodInSec()
                 |> Async.RunSynchronously
             RewindWhenStartAfterLongPeriodInSecModalModel = None
-            LongPeriodBeginsAfterInMinutes = 
-                Services.SystemSettings.getLongPeriodBeginsAfterInMinutes() 
+            LongPeriodBeginsAfterInMinutes =
+                Services.SystemSettings.getLongPeriodBeginsAfterInMinutes()
                 |> Async.RunSynchronously
             LongPeriodBeginsAfterInMinutesModalModel = None
             JumpDistance =
-                (Services.SystemSettings.getJumpDistance() 
+                (Services.SystemSettings.getJumpDistance()
                 |> Async.RunSynchronously) / 1000
             JumpDistanceModalModel = None
             ShellRef = shellref
-            DeveloperMode = 
-                (Services.SystemSettings.getDeveloperMode() 
+            DeveloperMode =
+                (Services.SystemSettings.getDeveloperMode()
                 |> Async.RunSynchronously)
             DeveloperModeSwitchCounter = 0
+
+            ExternalAudioBookFileUrl = ""
+            ExternalAudioBookName = ""
         }
 
 
@@ -118,7 +129,7 @@
             model |> onShowDataProtectionStuffMsg
         | HideDataProtectionStuff ->
             model |> onHideDataProtectionStuffMsg
-        
+
 
         | OpenJumpDistancePicker ->
             model |> onOpenJumpDistancePicker
@@ -167,10 +178,10 @@
         | DeleteDatabase ->
             model, Cmd.none, None
         | ImportDatabase ->
-            let cmd = 
+            let cmd =
                 fun dispatch ->
                     async {
-                        let fileTypes = 
+                        let fileTypes =
                             [
                                 (DevicePlatform.Android, ["*/*"] |> List.toSeq )
                             ] |> dict
@@ -182,6 +193,43 @@
                     |> Async.StartImmediate
                 |> Cmd.ofSub
             model, cmd, None
+
+        | AddExternalAudioBookZipFile ->
+            let cmd =
+                fun dispatch ->
+                    async {
+                        if (model.ExternalAudioBookFileUrl = "" || model.ExternalAudioBookName = "") then
+                            do! Common.Helpers.displayAlert("Externes Audiobook hinzufügen", "Bitte Namen und Url angeben!", "OK!")
+                        else
+
+                            let audioBook =
+                                {
+                                    AudioBook.Empty with
+                                        FullName = model.ExternalAudioBookName
+                                        EpisodenTitel =
+                                            if model.ExternalAudioBookName.Contains ("-") then
+                                                model.ExternalAudioBookName.Split([| '-' |]).[1]
+                                            else
+                                                ""
+                                        DownloadUrl = Some model.ExternalAudioBookFileUrl
+                                        Id = 16000000 + (System.Random().Next(500000))
+                                        Group = "External Audiobooks"
+
+                                }
+                            let! res =  Services.DataBase.insertNewAudioBooksInStateFile [| audioBook |]
+                            match res with
+                            | Error e ->
+                                do! Common.Helpers.displayAlert("Externes Audiobook hinzufügen", e, "OK!")
+                            | Ok _ ->
+                                do! Common.Helpers.displayAlert("Externes Audiobook hinzufügen", "Erfolgreich!", "OK!")
+                    }
+                    |> Async.StartImmediate
+                |> Cmd.ofSub
+            model, cmd, None
+        | ChangeExternalAudioBookFileUrl url ->
+            { model with ExternalAudioBookFileUrl = url }, Cmd.none, None
+        | ChangeExternalAudioBookName name ->
+            { model with ExternalAudioBookName = name }, Cmd.none, None
 
 
     and onSetDeveloperSwitchCounter value model  =
@@ -200,7 +248,7 @@
                 Cmd.none
 
         {model with DeveloperModeSwitchCounter = value},Cmd.batch [ switchCmd; resetCmd ],None
-    
+
     and onSetDeveloperMode value model =
         Services.SystemSettings.setDeveloperMode value |> Async.RunSynchronously
         {model with DeveloperMode = value;},Cmd.none,None
@@ -389,28 +437,28 @@
 
 
             {model with LongPeriodBeginsAfterInMinutesModalModel = Some mdl},Cmd.batch [ updateCmd;cmd;exCmd],None
-    
-    
-    
-    
+
+
+
+
     and onSetLanguageMsg language (model:Model) =
         { model with Language = language }, Cmd.none, None
-    
-    
+
+
     and onShowDataProtectionStuffMsg model =
         { model with DataProtectionStuff = true }, Cmd.none, None
-    
+
 
     and onHideDataProtectionStuffMsg model =
         { model with DataProtectionStuff = false }, Cmd.none, None
 
 
-    
+
 
 
 
     let settingsEntry label value onTap =
-        
+
         View.Grid(
             rowdefs=[Auto;Auto;Absolute 1.0],
             horizontalOptions=LayoutOptions.Start,
@@ -441,7 +489,7 @@
                 title=Translations.current.SettingsPage,useSafeArea=true,
                 backgroundColor = Consts.backgroundColor,
                 content = View.Grid(
-                    
+
                     children = [
                         yield View.ScrollView(
                                 verticalScrollBarVisibility=ScrollBarVisibility.Always,
@@ -450,34 +498,34 @@
                                 content=
                                     View.Grid(
                                         coldefs=[ Star ],
-                                        rowdefs=[ Auto; Auto; Auto; Auto;Auto; Auto; Auto; Auto; Auto; Auto ],
+                                        rowdefs=[ Auto; Auto; Auto; Auto;Auto; Auto; Auto; Auto; Auto; Auto; Auto; Auto; Auto ],
                                         gestureRecognizers= [View.TapGestureRecognizer(command=(fun () -> dispatch (SetDeveloperModeSwitchCounter (model.DeveloperModeSwitchCounter + 1))))],
                                         children=[
 
-                                            (settingsEntry 
-                                                Translations.current.RewindWhenStartAfterShortPeriodInSec 
+                                            (settingsEntry
+                                                Translations.current.RewindWhenStartAfterShortPeriodInSec
                                                 (sprintf "%i %s" mdl.RewindWhenStartAfterShortPeriodInSec Translations.current.Seconds)
                                                 (fun ()->dispatch OpenRewindWhenStartAfterShortPeriodInSecPicker)).Row(0)
 
-                                            (settingsEntry 
-                                                Translations.current.RewindWhenStartAfterLongPeriodInSec 
+                                            (settingsEntry
+                                                Translations.current.RewindWhenStartAfterLongPeriodInSec
                                                 (sprintf "%i %s" mdl.RewindWhenStartAfterLongPeriodInSec Translations.current.Seconds)
                                                 (fun ()->dispatch OpenRewindWhenStartAfterLongPeriodInSecPicker)).Row(1)
 
-                                            (settingsEntry 
-                                                Translations.current.LongPeriodBeginsAfterInMinutes 
+                                            (settingsEntry
+                                                Translations.current.LongPeriodBeginsAfterInMinutes
                                                 (sprintf "%i %s" mdl.LongPeriodBeginsAfterInMinutes Translations.current.Minutes)
                                                 (fun ()->dispatch OpenLongPeriodBeginsAfterInMinutesPicker)).Row(2)
 
-                                            (settingsEntry 
-                                                Translations.current.JumpDistance 
+                                            (settingsEntry
+                                                Translations.current.JumpDistance
                                                 (sprintf "%i %s" mdl.JumpDistance Translations.current.Seconds)
                                                 (fun () -> dispatch OpenJumpDistancePicker)).Row(3)
 
-                                            
+
 
                                             View.Button(
-                                                text="Sende Feedback oder Supportanfrage",                                                                                        
+                                                text="Sende Feedback oder Supportanfrage",
                                                 command=(fun ()-> dispatch OpenFeedbackPage),
                                                 margin=Thickness(0.,10.,0.,0.)
                                             ).Row(4)
@@ -495,15 +543,41 @@
                                             ).Row(6)
 
                                             if mdl.DeveloperMode then
-                                                (settingsEntry 
-                                                    "DeveloperMode" 
+                                                (settingsEntry
+                                                    "DeveloperMode"
                                                     "Unter anderem kann man Einträge aus der DB löschen"
                                                     (fun () -> ())).Row(7)
 
-                                                (settingsEntry 
-                                                    "Datenbank löschen" 
+                                                (settingsEntry
+                                                    "Datenbank löschen"
                                                     "Hiermit löscht an die ganze Datenbank und initialisiert die Anwendung neu."
                                                     (fun () -> dispatch DeleteDatabase)).Row(8)
+
+                                                View.Entry(text = model.ExternalAudioBookFileUrl
+                                                , placeholder = "external audiobook url"
+                                                , textColor = Consts.primaryTextColor
+                                                , backgroundColor = Consts.backgroundColor
+                                                , placeholderColor = Consts.secondaryTextColor
+                                                , keyboard=Keyboard.Email
+                                                , styleId = "login_username"
+                                                , completed = (fun t  -> if t <> model.ExternalAudioBookFileUrl then dispatch (ChangeExternalAudioBookFileUrl t))
+                                                , created = (fun e -> e.Unfocused.Add(fun args -> if model.ExternalAudioBookFileUrl<>e.Text then dispatch (ChangeExternalAudioBookFileUrl e.Text)))
+                                                ).Row(9)
+
+                                                View.Entry(text = model.ExternalAudioBookName
+                                                , placeholder = "external audiobook name"
+                                                , textColor = Consts.primaryTextColor
+                                                , backgroundColor = Consts.backgroundColor
+                                                , placeholderColor = Consts.secondaryTextColor
+                                                , keyboard=Keyboard.Email
+                                                , styleId = "login_username"
+                                                , completed = (fun t  -> if t <> model.ExternalAudioBookName then dispatch (ChangeExternalAudioBookName t))
+                                                , created = (fun e -> e.Unfocused.Add(fun args -> if model.ExternalAudioBookName<>e.Text then dispatch (ChangeExternalAudioBookName e.Text)))
+                                                ).Row(10)
+                                                (settingsEntry
+                                                "Externes Hörbuch hinzufügen"
+                                                "Hiermit wird ein externe Url für ein Hörbuch hinzugefügt. Debugging Zwecke"
+                                                (fun () -> dispatch AddExternalAudioBookZipFile)).Row(11)
 
 
 
@@ -523,14 +597,14 @@
                                                 ).Row(9)
                                         ]
                                     )
-                            )                    
+                            )
                     ]
                 )
             )
         )
-        
 
-    
+
+
 
 
 

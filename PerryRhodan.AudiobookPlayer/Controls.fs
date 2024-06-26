@@ -7,7 +7,7 @@ open Xamarin
 open Domain
 open Common
 
-let faFontFamilyName bold = 
+let faFontFamilyName bold =
     match Device.RuntimePlatform,bold with
     | Device.Android, false -> "fa-regular-400.ttf#Font Awesome 5 Free"
     | Device.Android, true -> "fa-solid-900.ttf#Font Awesome 5 Free"
@@ -18,13 +18,13 @@ let faFontFamilyName bold =
     | _, false -> "/#Font Awesome 5 Free"
 
 
-let audioBookEntryActionSheet    
+let audioBookEntryActionSheet
     cmdDownload
     cmdRemoveFromDownloadQueue
     cmdDelete
     cmdMarkAsListend
     cmdMarkAsUnlistend
-    cmdDownloadOnlyPicture 
+    cmdDownloadOnlyPicture
     cmdDescription
     cmdDeleteFromDatabase
     isOnDownloadQueue
@@ -40,42 +40,42 @@ let audioBookEntryActionSheet
                 yield (Translations.current.RemoveFromDownloaQueue,cmdRemoveFromDownloadQueue audiobook)
             elif (not isOnDownloadQueue && not audiobook.State.Downloaded) then
                 yield (Translations.current.DownloadAudioBook,cmdDownload audiobook)
-            
 
-            
+
+
 
             if audiobook.State.Completed then
-                yield (Translations.current.UnmarkAsListend,cmdMarkAsUnlistend audiobook)                
+                yield (Translations.current.UnmarkAsListend,cmdMarkAsUnlistend audiobook)
             else
                 yield (Translations.current.MarkAsListend,cmdMarkAsListend audiobook)
 
 
             let isDevMode = Services.SystemSettings.getDeveloperMode() |> Async.RunSynchronously
             if isDevMode then
-                yield ("Remove Item from Database",cmdDeleteFromDatabase audiobook)  
+                yield ("Remove Item from Database",cmdDeleteFromDatabase audiobook)
 
         |]
         return! Helpers.displayActionSheet (Some Translations.current.PleaseSelect) (Some Translations.current.Cancel) buttons
     }
-    
-let listendCheckLabel = 
+
+let listendCheckLabel =
     View.Label(text="\uf058",
         fontFamily=faFontFamilyName true,
         fontSize=FontSize.fromValue 25.,
         textColor=Color.White,
-        verticalOptions = LayoutOptions.Fill, 
-        horizontalOptions = LayoutOptions.Fill, 
+        verticalOptions = LayoutOptions.Fill,
+        horizontalOptions = LayoutOptions.Fill,
         verticalTextAlignment = TextAlignment.Center,
         horizontalTextAlignment = TextAlignment.Center
         )
 
-let arrowDownLabel = 
+let arrowDownLabel =
     View.Label(text="\uf358",
         fontFamily=faFontFamilyName false,
         fontSize=FontSize.fromValue 25.,
         textColor=Consts.primaryTextColor,
-        verticalOptions = LayoutOptions.Fill, 
-        horizontalOptions = LayoutOptions.Fill, 
+        verticalOptions = LayoutOptions.Fill,
+        horizontalOptions = LayoutOptions.Fill,
         verticalTextAlignment = TextAlignment.Center,
         horizontalTextAlignment = TextAlignment.Center
         )
@@ -85,8 +85,8 @@ let inDownloadQueueLabel =
         fontFamily=faFontFamilyName true,
         fontSize=FontSize.fromValue 25.,
         textColor=Consts.primaryTextColor,
-        verticalOptions = LayoutOptions.Fill, 
-        horizontalOptions = LayoutOptions.Fill, 
+        verticalOptions = LayoutOptions.Fill,
+        horizontalOptions = LayoutOptions.Fill,
         verticalTextAlignment = TextAlignment.Center,
         horizontalTextAlignment = TextAlignment.Center
         )
@@ -96,158 +96,14 @@ let playerSymbolLabel =
         fontFamily=faFontFamilyName false,
         fontSize=FontSize.fromValue 25.,
         textColor=Consts.primaryTextColor,
-        verticalOptions = LayoutOptions.Fill, 
-        horizontalOptions = LayoutOptions.Fill, 
+        verticalOptions = LayoutOptions.Fill,
+        horizontalOptions = LayoutOptions.Fill,
         verticalTextAlignment = TextAlignment.Center,
         horizontalTextAlignment = TextAlignment.Center
         )
 
-let showDownloadProgress (f:int,t:int) =
-    let factor = (f |> float) / (t |> float)
-    View.Grid(
-        children = [
-            View.ProgressBar(
-                progress = (factor),
-                verticalOptions = LayoutOptions.End, 
-                horizontalOptions = LayoutOptions.Fill,
-                height = 12.,
-                created = (
-                    fun e ->
-                        e.ProgressColor <- Color.Green
-                )
-            )
-            View.Label(text=(sprintf "%i %%" ((factor * 100.0) |> int)),
-                //fontFamily=faFontFamilyName true,
-                fontSize=FontSize.fromValue 11.,
-                margin=Thickness 3.,
-                textColor=Consts.primaryTextColor,
-                verticalOptions = LayoutOptions.Fill, 
-                horizontalOptions = LayoutOptions.Fill, 
-                verticalTextAlignment = TextAlignment.End,
-                horizontalTextAlignment = TextAlignment.Center
-                )    
-        ]
-    )
-    
 
 
-
-let audioBookStateOverlay 
-    isDownloaded 
-    isLoading 
-    isComplete 
-    isInDownloadQueue 
-    (progress: (int * int) option) 
-    openAudioBookPlayerCmd =
-    View.Grid(
-        backgroundColor = Color.Transparent,
-        margin=Thickness 10.,
-        coldefs = [Star; Star; Star],
-        rowdefs = [Star; Star; Star],
-        children = [
-
-            match isComplete,isInDownloadQueue, isLoading, isDownloaded with
-            | true,_,_,_ ->
-                yield listendCheckLabel.Column(2).Row(2)
-            | false,true,false,false ->
-                yield inDownloadQueueLabel.Column(2).Row(2)
-            | false,false,false,false ->
-                yield arrowDownLabel.Column(2).Row(2)
-            | false,false,false,true ->
-                yield playerSymbolLabel.Column(1).Row(1)
-            | false,_,true,false ->
-                match progress with
-                | None -> ()
-                | Some progress ->
-                    let f,t = progress
-                    yield ((f,t) |> showDownloadProgress).ColumnSpan(3).Row(2).Column(0)
-            | _ ->
-                ()
-           
-            
-        ]
-        , gestureRecognizers = 
-            [
-                View.TapGestureRecognizer(
-                    command = (fun () -> 
-                        if isDownloaded then 
-                            openAudioBookPlayerCmd ()
-                        else
-                        ()
-                    )
-                )
-        ]
-    )
-    
-let renderAudiobookEntry
-    openActionMenuCmd
-    openAudioBookPlayerCmd
-    isLoading
-    isInDownloadQueue
-    (progress: (int * int) option)
-    audiobook =
-        View.Grid(
-            backgroundColor = Consts.cardColor,
-            margin=Thickness 5.,
-            height = 120.,
-            coldefs = [Auto; Star; Auto],
-            rowdefs = [Auto],
-            children = [
-                match audiobook.Thumbnail with
-                | None ->
-                    yield View.Image(source=Image.fromPath "AudioBookPlaceholder_Dark.png"
-                        , aspect = Aspect.AspectFit
-                        , height=100.
-                        , width=100.
-                        , margin=Thickness 10.).Column(0).Row(0)
-                | Some thumb ->
-                    yield View.Image(source=Image.fromPath thumb
-                        , aspect = Aspect.AspectFit
-                        , height=100.
-                        , width=100.
-                        , margin=Thickness 10.
-                        ).Column(0).Row(0)
-                
-                // audioBook state
-                yield (audioBookStateOverlay 
-                    audiobook.State.Downloaded 
-                    isLoading 
-                    audiobook.State.Completed 
-                    isInDownloadQueue 
-                    progress
-                    openAudioBookPlayerCmd
-                    ).Column(0).Row(0)
-
-                yield View.Label(text=audiobook.FullName, 
-                    fontSize = FontSize.fromValue 15., 
-                    verticalOptions = LayoutOptions.Fill, 
-                    horizontalOptions = LayoutOptions.Fill, 
-                    verticalTextAlignment = TextAlignment.Center,
-                    horizontalTextAlignment = TextAlignment.Center,
-                    textColor = Consts.secondaryTextColor,
-                    lineBreakMode = LineBreakMode.WordWrap
-                    ).Column(1).Row(0)
-                yield View.Grid(
-                    verticalOptions = LayoutOptions.Fill, 
-                    horizontalOptions = LayoutOptions.Fill,
-                    gestureRecognizers = [
-                        View.TapGestureRecognizer(command = openActionMenuCmd)
-                    ],
-                    children = [
-                        View.Label(text="\uf142",fontFamily = faFontFamilyName true,
-                            fontSize=FontSize.fromValue 35., 
-                            margin = Thickness(10., 0. ,10. ,0.),                    
-                            verticalOptions = LayoutOptions.Fill, 
-                            horizontalOptions = LayoutOptions.Fill, 
-                            verticalTextAlignment = TextAlignment.Center,
-                            horizontalTextAlignment = TextAlignment.Center,
-                            textColor = Consts.secondaryTextColor
-                            )
-                    ]
-                ).Column(2).Row(0)
-
-        ]
-        )
 
 
 
@@ -263,7 +119,7 @@ let tapLabelWithFaIcon faIcon faBold onTab textColor fontSize text =
                 margin = Thickness(0., 0., 4., 0.)
             )
             View.Label(text=text,
-                textColor=textColor,                
+                textColor=textColor,
                 verticalOptions = LayoutOptions.Center,
                 verticalTextAlignment = TextAlignment.Center,
                 fontSize=FontSize.fromValue (fontSize + 2.)
@@ -273,7 +129,8 @@ let tapLabelWithFaIcon faIcon faBold onTab textColor fontSize text =
             View.TapGestureRecognizer(command = onTab)
         ])
 
-let primaryTextColorLabel size text = 
+
+let primaryTextColorLabel size text =
     View.Label(text=text,
         fontSize=FontSize.fromValue size,
         textColor=Consts.primaryTextColor,
@@ -283,7 +140,8 @@ let primaryTextColorLabel size text =
         verticalTextAlignment=TextAlignment.Center
         )
 
-let secondaryTextColorLabel size text = 
+
+let secondaryTextColorLabel size text =
     View.Label(text=text,
         fontSize=FontSize.fromValue size,
         textColor=Consts.secondaryTextColor,
@@ -293,7 +151,8 @@ let secondaryTextColorLabel size text =
         verticalTextAlignment=TextAlignment.Center
         )
 
-let primaryColorSymbolLabelWithTapCommand command size solid text = 
+
+let primaryColorSymbolLabelWithTapCommand command size solid text =
     View.Label(text=text,
         fontSize=FontSize.fromValue size,
         fontFamily=faFontFamilyName solid,
@@ -307,7 +166,8 @@ let primaryColorSymbolLabelWithTapCommand command size solid text =
         ]
         )
 
-let primaryColorSymbolLabelWithTapCommandRightAlign command size solid text = 
+
+let primaryColorSymbolLabelWithTapCommandRightAlign command size solid text =
     View.Label(text=text,
         fontSize=FontSize.fromValue size,
         fontFamily=faFontFamilyName solid,
@@ -322,11 +182,11 @@ let primaryColorSymbolLabelWithTapCommandRightAlign command size solid text =
         )
 
 
-let contentPageWithBottomOverlay 
-    (pageRef:ViewRef<CustomContentPage>) 
-    (bottomOverlay:ViewElement option) 
-    (content:ViewElement) 
-    isBusy 
+let contentPageWithBottomOverlay
+    (pageRef:ViewRef<CustomContentPage>)
+    (bottomOverlay:ViewElement option)
+    (content:ViewElement)
+    isBusy
     title
     uniqueId =
     View.ContentPage(
@@ -334,7 +194,7 @@ let contentPageWithBottomOverlay
         backgroundColor = Consts.backgroundColor,
         isBusy = isBusy,
         ref=pageRef,
-        content = 
+        content =
             View.Grid(rowdefs = [Star; Auto],
                 rowSpacing = 0.,
                 children = [
@@ -353,7 +213,7 @@ let contentPageWithBottomOverlayW (pageRef:ViewRef<CustomContentPage>) (bottomOv
         backgroundColor = Consts.backgroundColor,
         isBusy = isBusy,
         ref=pageRef,
-        content = 
+        content =
             View.Grid(rowdefs = [Star; Auto],
                 rowSpacing = 0.,
                 children = [
@@ -370,14 +230,14 @@ let navPageWithBottomOverlay (pageRef:ViewRef<NavigationPage>) (bottomOverlay:Vi
     View.NavigationPage(
         title=title,
         backgroundColor = Consts.backgroundColor,
-        isBusy = isBusy,        
-        ref=pageRef,        
+        isBusy = isBusy,
+        ref=pageRef,
         pages=[
             View.ContentPage(
                 title=title,
                 backgroundColor = Consts.backgroundColor,
-                isBusy = isBusy,                
-                content = 
+                isBusy = isBusy,
+                content =
                     View.Grid(rowdefs = [Star; Auto],
                         rowSpacing = 0.,
                         children = [
@@ -408,9 +268,9 @@ let tickerBand (fontSize:float) text =
             maxLines = 1
         ),
         created=(fun e ->
-            
+
             async {
-                
+
                 while (e.ContentSize.Width <= 0.0) do
                     do! Async.Sleep 200
 
@@ -426,7 +286,7 @@ let tickerBand (fontSize:float) text =
                             let anim = Animation((fun v -> e.ScrollToAsync(v, 0.0, false) |> ignore), start=(0.0 - additionWidthForWaitingRepeat), ``end``= (scrollWidth + additionWidthForWaitingRepeat))
                             anim.Commit(e,"mini-player-ticker",rate=24u,length=(duration |> uint32),easing=Easing.Linear,repeat=(fun ()-> true))
                         ) |> Async.AwaitTask
-                
+
             }
             |> Async.Start
         )
@@ -434,9 +294,9 @@ let tickerBand (fontSize:float) text =
 
 
 type MyContentPage (cp:ContentPage, onBackButton) as self =
-    inherit ContentPage() 
+    inherit ContentPage()
 
-    do  
+    do
         self.Title <- cp.Title
         self.BackgroundColor <- cp.BackgroundColor
         self.IsBusy <- cp.IsBusy
@@ -445,7 +305,7 @@ type MyContentPage (cp:ContentPage, onBackButton) as self =
     override this.OnBackButtonPressed()=
         onBackButton()
 
-   
 
-    
+
+
 

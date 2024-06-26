@@ -11,24 +11,27 @@ module NotificationService =
     open Android.OS
     open Services.DependencyServices
     open Android.Content
+    open AndroidX.Core.Content
+    open AndroidX.Core.App
+    open Android.Content.PM
 
-    let icon name = 
+    let icon name =
         typeof<Resources.Drawable>.GetField(name).GetValue(null) :?> int
-    
+
     type NotificationService () =
         let channelId = "perryrhodan.audiobookplayer.bla.notification"
         let channelName = "perryrhodan.audiobookplayer.bla.notification"
         let channelDescription = "perryrhodan.audiobookplayer.bla.notification"
-        let pendingIntentId = 0815
+        let pendingIntentId = System.Random().Next(40000)
 
         let titleKey = "title"
         let messageKey = "message"
 
         let smallIcon = icon "einsa_small_icon"
-        let logo = 
+        let logo =
             //Android.Graphics.BitmapFactory.DecodeFile("@drawable/eins_a_medien_logo.png")
             Android.Graphics.BitmapFactory.DecodeResource(Android.App.Application.Context.Resources ,icon "eins_a_medien_logo")
-            
+
         let mutable messageId = -1
         let mutable (manager:NotificationManager option) = None
 
@@ -39,7 +42,7 @@ module NotificationService =
                 let channel = new NotificationChannel(channelId,channelNameJava,NotificationImportance.Default, Description = channelDescription)
                 channel.SetSound(null,null)
                 channel.SetVibrationPattern(null)
-                
+
                 manager
                 |> Option.map (fun m ->
                     m.CreateNotificationChannel(channel)
@@ -48,7 +51,7 @@ module NotificationService =
             ()
 
         interface INotificationService with
-            
+
             override this.ShowMessage title message =
 
                 let buildNotification (manager:NotificationManager) =
@@ -56,9 +59,9 @@ module NotificationService =
                     let intent = new Intent(Android.App.Application.Context, typeof<FormsAppCompatActivity>)
                     intent.PutExtra(titleKey,title) |> ignore
                     intent.PutExtra(messageKey,message) |> ignore
-                    
+
                     let pendingIntent = PendingIntent.GetActivity(Android.App.Application.Context, pendingIntentId, intent,PendingIntentFlags.Immutable ||| PendingIntentFlags.UpdateCurrent)
-                    let builder = 
+                    let builder =
                         if (Build.VERSION.SdkInt >= BuildVersionCodes.O) then
                             (new Notification.Builder(Android.App.Application.Context, channelId))
                                 .SetContentIntent(pendingIntent)
@@ -66,7 +69,7 @@ module NotificationService =
                                 .SetContentText(message)
                                 .SetSmallIcon(smallIcon)
                                 .SetLargeIcon(logo)
-                            
+
                         else
                             (new Notification.Builder(Android.App.Application.Context, channelId))
                                     .SetContentIntent(pendingIntent)
@@ -79,22 +82,24 @@ module NotificationService =
 
                     let notification = builder.Build()
                     manager.Notify(messageId,notification)
-                    
-                        
-                    
+
+
+
 
 
                 match manager with
                 | None ->
+                    if (ContextCompat.CheckSelfPermission(Android.App.Application.Context, Android.Manifest.Permission.PostNotifications) <> Permission.Granted) then
+                        ActivityCompat.RequestPermissions(Xamarin.Essentials.Platform.CurrentActivity, [| Android.Manifest.Permission.PostNotifications |], 0)
                     createNotificationChannel ()
                     buildNotification manager.Value
                 | Some manager ->
                     buildNotification manager
                 ()
 
-            
-            
-            
-        
-    
+
+
+
+
+
 
