@@ -1,0 +1,2 @@
+﻿module PerryRhodan.AudiobookPlayer.ViewModels.AudioBookItemViewModel
+
