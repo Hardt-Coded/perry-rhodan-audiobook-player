@@ -15,8 +15,16 @@ open PerryRhodan.AudiobookPlayer
     ConfigurationChanges = (ConfigChanges.Orientation ||| ConfigChanges.ScreenSize ||| ConfigChanges.UiMode))>]
 type MainActivity() =
     inherit AvaloniaMainActivity<App>()
+    
+    
 
     override _.CustomizeAppBuilder(builder) =
+        // register services
+        
+        
+        
         base.CustomizeAppBuilder(builder)
             .WithInterFont()
             .UseReactiveUI()
+            
+           

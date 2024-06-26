@@ -13,7 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia.iOS" Version="$(AvaloniaVersion)" />
+    <PackageReference Include="Avalonia.iOS" Version="11.0.7" />
     <ProjectReference Include="..\PerryRhodan.AudiobookPlayer\PerryRhodan.AudiobookPlayer.fsproj" />
     <Compile Include="AppDelegate.fs"/>
     <Compile Include="Main.fs"/>

@@ -7,6 +7,7 @@
         mc:Ignorable="d" d:DesignWidth="540" d:DesignHeight="1170"
         x:Class="PerryRhodan.AudiobookPlayer.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
-        Title="PerryRhodan.AudiobookPlayer">
+        Title="PerryRhodan.AudiobookPlayer"
+        Width="540 " Height="1170">
         
 </Window>

@@ -7,7 +7,8 @@
              x:Class="PerryRhodan.AudiobookPlayer.Views.AudioBookItemView"
              Design.DataContext="{Binding Source={x:Static vm:AudioBookItemViewModel.DesignVM}}"
              x:DataType="vm:AudioBookItemViewModel">
-  <Grid>
-      <TextBlock Text="{Binding Title}"></TextBlock>
+  <Grid ColumnDefinitions="*,Auto">
+      <TextBlock Grid.Column="0" Text="{Binding Title}"></TextBlock>
+      <Button Grid.Column="1" Command="{Binding OpenDialog}">Click</Button>
   </Grid>
 </UserControl>

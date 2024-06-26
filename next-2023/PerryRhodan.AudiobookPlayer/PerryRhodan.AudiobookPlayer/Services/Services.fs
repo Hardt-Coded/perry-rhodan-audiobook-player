@@ -12,6 +12,7 @@ open ICSharpCode.SharpZipLib.Zip
 open Common
 open FsHttp
 open SkiaSharp
+open Dependencies
 
 
 
@@ -41,7 +42,6 @@ module DependencyServices =
 
 module Consts =
     
-    open DependencyServices
 
     let isToInternalStorageMigrated () =
         File.Exists (Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),".migrated"))
@@ -102,13 +102,13 @@ module Consts =
 
 
 
-(*module Notifications =
+module Notifications =
 
     let private notificationService = lazy (DependencyService.Get<DependencyServices.INotificationService>())
 
     let showNotification title message =
         let ns = notificationService.Force()
-        ns.ShowMessage title message*)
+        ns.ShowMessage title message
 
 
 module DataBase =
