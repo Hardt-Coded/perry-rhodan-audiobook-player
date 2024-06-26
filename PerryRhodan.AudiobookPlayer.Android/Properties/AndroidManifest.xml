@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionName="1.61.0" package="hits.rhodan.audiobooks" android:installLocation="auto" android:versionCode="400050">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionName="1.61.1" package="hits.rhodan.audiobooks" android:installLocation="auto" android:versionCode="400060">
 	<uses-sdk android:minSdkVersion="21" android:targetSdkVersion="33" />
 	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.WAKE_LOCK" />
 	<uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-	<uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+	<uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 	<application android:label="Eins A Medien Audiobook Player" android:icon="@drawable/eins_a_launcher" android:requestLegacyExternalStorage="true" android:allowBackup="true" android:fullBackupContent="@xml/backup_rules">
 		<!--android:dataExtractionRules="@xml/backup_rules_31"-->
 		<!--<service android:name="Perry.Rhodan.AudioService" android:stopWithTask="true" android:foregroundServiceType="mediaPlayback"></service>-->
