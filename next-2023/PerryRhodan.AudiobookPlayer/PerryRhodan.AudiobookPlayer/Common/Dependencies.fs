@@ -4,11 +4,13 @@ open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Hosting
 
 
-let builder = Host.CreateApplicationBuilder([||])
+let sp = ServiceCollection()
 
 
 type DependencyService() =
     
     static member Get<'a>()=
-        builder.Services.BuildServiceProvider().GetService<'a>()
+        sp.BuildServiceProvider().GetService<'a>()
+        
+    static member ServiceCollection with get() = sp
 

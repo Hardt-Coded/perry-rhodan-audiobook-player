@@ -12,6 +12,7 @@ type App() =
     
     let appRoot = AppCompositionRoot()
 
+    
     override this.Initialize() =
             AvaloniaXamlLoader.Load(this)
        

@@ -2,7 +2,33 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="PerryRhodan.AudiobookPlayer.Views.HomeView">
-  Hallo Home!
+             xmlns:vm="clr-namespace:PerryRhodan.AudiobookPlayer.ViewModels"
+             xmlns:views="clr-namespace:PerryRhodan.AudiobookPlayer.Views"
+             mc:Ignorable="d" d:DesignWidth="540" d:DesignHeight="1170"
+             x:Class="PerryRhodan.AudiobookPlayer.Views.HomeView"
+             Design.DataContext="{Binding Source={x:Static vm:HomeViewModel.DesignVM}}"
+             x:DataType="vm:HomeViewModel">
+    <Grid RowDefinitions="Auto,*">
+        <!-- Last Listened -->
+        <Grid Grid.Row="0" IsVisible="{Binding HasLastListenedAudioBook}">
+            <!-- <TextBlock Text="{Binding LastTimeListenedAudioBook.Value.Title}" HorizontalAlignment="Center" VerticalAlignment="Center"/> -->
+        </Grid>
+        
+        <!-- Audio Books -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden"> 
+            <ItemsControl Grid.Row="1" ItemsSource="{Binding AudioBooks}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <views:AudioBookItemView DataContext="{Binding .}"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>    
+        </ScrollViewer>
+        
+        
+        <!-- Loading -->
+        <Grid Grid.Row="0" Grid.RowSpan="2" IsVisible="{Binding IsLoading}">
+            <TextBlock Text="Loading..." HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        </Grid>
+    </Grid>
 </UserControl>

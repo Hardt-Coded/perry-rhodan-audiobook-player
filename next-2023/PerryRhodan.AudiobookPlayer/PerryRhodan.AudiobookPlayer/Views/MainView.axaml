@@ -3,11 +3,12 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:PerryRhodan.AudiobookPlayer.ViewModels"
+             xmlns:controls="clr-namespace:CherylUI.Controls;assembly=CherylUI"
              mc:Ignorable="d" d:DesignWidth="540 " d:DesignHeight="1170"
              x:Class="PerryRhodan.AudiobookPlayer.Views.MainView"
              Design.DataContext="{Binding Source={x:Static vm:MainViewModel.DesignVM}}"
              x:DataType="vm:MainViewModel">
-
+    <controls:InteractiveContainer>
     <Border BorderBrush="Aqua" BorderThickness="2">
         <Grid RowDefinitions="*, Auto"
               ColumnDefinitions="*,*">
@@ -16,5 +17,6 @@
             <Button Grid.Row="1" Grid.Column="1" Content="Player" Command="{Binding GoPlayer}" />
         </Grid>
     </Border>
+    </controls:InteractiveContainer>
                                   
 </UserControl>

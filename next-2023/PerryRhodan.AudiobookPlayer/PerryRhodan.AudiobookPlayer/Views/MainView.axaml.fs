@@ -2,7 +2,7 @@ namespace PerryRhodan.AudiobookPlayer.Views
 
 open Avalonia.Controls
 open Avalonia.Markup.Xaml
-open PerryRhodan.AudiobookPlayer.ViewModels
+open PerryRhodan.AudiobookPlayer
 
 type MainView () as this = 
     inherit UserControl ()

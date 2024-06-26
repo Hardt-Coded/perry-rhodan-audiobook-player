@@ -24,41 +24,51 @@
    
     <Compile Include="Domain\Translations.fs" />
     <Compile Include="Services\Services.fs" />
-    <Compile Include="ViewModels\App.fs" />
-    <Compile Include="ViewModels\HomeViewModel.fs" />
-    <Compile Include="ViewModels\PlayerViewModel.fs" />
-    <Compile Include="ViewModels\ViewModelBase.fs" />
-    <Compile Include="ViewModels\MainViewModel.fs" />
+   
+    <Compile Include="Views\ActionMenuView.axaml.fs" />
+    <Compile Include="Views\AudioBookItemView.axaml.fs" />
     <Compile Include="Views\PlayerView.axaml.fs" />
     <Compile Include="Views\HomeView.axaml.fs" />
     <Compile Include="Views\MainWindow.axaml.fs" />
     <Compile Include="Views\MainView.axaml.fs" />
+
+    <Compile Include="ViewModels\App.fs" />
+    <Compile Include="ViewModels\ActionMenuViewModel.fs" />
+    <Compile Include="ViewModels\AudioBookItemViewModel.fs" />
+    <Compile Include="ViewModels\HomeViewModel.fs" />
+    <Compile Include="ViewModels\PlayerViewModel.fs" />
+    <Compile Include="ViewModels\ViewModelBase.fs" />
+    <Compile Include="ViewModels\MainViewModel.fs" />
+    
     <Compile Include="ViewLocator.fs" />
     <Compile Include="AppCompositionRoot.fs" />
     <Compile Include="App.axaml.fs" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
-    <PackageReference Include="Avalonia.Themes.Fluent" Version="$(AvaloniaVersion)" />
-    <PackageReference Include="Avalonia.Fonts.Inter" Version="$(AvaloniaVersion)" />
-    <PackageReference Include="Avalonia.ReactiveUI" Version="$(AvaloniaVersion)" />
+    <PackageReference Include="Avalonia" Version="11.0.7" />
+    <PackageReference Include="Avalonia.Controls.ItemsRepeater" Version="11.0.7" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.7" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.0.7" />
+    <PackageReference Include="Avalonia.ReactiveUI" Version="11.0.7" />
     <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="$(AvaloniaVersion)" />
-    <PackageReference Include="Material.Avalonia" Version="3.1.2" />
+    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.0.7" />
+    <PackageReference Include="CherylUI" Version="1.2.0" />
+    <PackageReference Include="Material.Avalonia" Version="3.2.2" />
+    <PackageReference Include="Material.Avalonia.Dialogs" Version="3.2.2" />
     <PackageReference Include="ReactiveElmish.Avalonia" Version="1.0.2" />
 
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
 
-    <PackageReference Include="FsHttp" Version="12.1.0" />
-    <PackageReference Include="Microsoft.AppCenter" Version="3.4.0" />
+    <PackageReference Include="FsHttp" Version="14.4.0" />
+    <PackageReference Include="Microsoft.AppCenter" Version="5.0.3" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="FSharp.Control.AsyncSeq" Version="3.2.1" />
     <PackageReference Include="FSharp.Data" Version="6.3.0" />
     <PackageReference Include="FSharpx.Async" Version="1.14.1" />
     <PackageReference Include="LiteDB" Version="4.1.4" />
-    <PackageReference Include="Microsoft.AppCenter.Analytics" Version="3.4.0" />
-    <PackageReference Include="Microsoft.AppCenter.Crashes" Version="3.4.0" />
+    <PackageReference Include="Microsoft.AppCenter.Analytics" Version="5.0.3" />
+    <PackageReference Include="Microsoft.AppCenter.Crashes" Version="5.0.3" />
     <PackageReference Include="SharpZipLib" Version="1.4.2" />
     <PackageReference Include="SkiaSharp" Version="2.88.6" />
     <PackageReference Include="taglib-sharp-netstandard2.0" Version="2.1.0" />
