@@ -1,7 +1,10 @@
 ﻿module PerryRhodan.AudiobookPlayer.ViewModels.App
 
+open Avalonia.Controls
+open CherylUI.Controls
 open Elmish
 open ReactiveElmish.Avalonia
+
 
 
 type Model = {
@@ -17,11 +20,13 @@ and [<RequireQualifiedAccess>] View =
 type Msg =
     | SetView of View
     | GoHome
+    | Login
     
   
 [<RequireQualifiedAccess>]  
 type SideEffect =
     | None
+    | OpenLoginView
   
     
     
@@ -35,6 +40,8 @@ let update msg state =
         { state with View = view }, SideEffect.None
     | GoHome ->
         { state with View = View.HomeView }, SideEffect.None
+    | Login ->
+        state, SideEffect.OpenLoginView
     
     
 let runSideEffect sideEffect state dispatch =
@@ -42,6 +49,13 @@ let runSideEffect sideEffect state dispatch =
         match sideEffect with
         | SideEffect.None ->
             return ()    
+
+        | SideEffect.OpenLoginView ->
+            let control = PerryRhodan.AudiobookPlayer.Views.LoginView()
+            let vm = new LoginViewModel()
+            control.DataContext <- vm
+           
+            InteractiveContainer.ShowDialog (control, true)
     }
     
     
