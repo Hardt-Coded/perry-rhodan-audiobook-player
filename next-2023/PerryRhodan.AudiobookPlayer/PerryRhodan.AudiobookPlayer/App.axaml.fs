@@ -7,6 +7,8 @@ open Avalonia.Markup.Xaml
 open PerryRhodan.AudiobookPlayer.ViewModels
 open PerryRhodan.AudiobookPlayer.Views
 
+
+
 type App() =
     inherit Application()
     

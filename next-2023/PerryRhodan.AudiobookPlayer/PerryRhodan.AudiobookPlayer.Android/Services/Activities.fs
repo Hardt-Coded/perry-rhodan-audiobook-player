@@ -5,7 +5,12 @@ open Android.Content.PM
 open Avalonia
 open Avalonia.ReactiveUI
 open Avalonia.Android
+open Dependencies
 open PerryRhodan.AudiobookPlayer
+open Microsoft.Extensions.DependencyInjection
+open Services
+open PerryRhodan.AudiobookPlayer.Android.Services
+
 
 [<Activity(
     Label = "PerryRhodan.AudiobookPlayer.Android",
@@ -20,6 +25,10 @@ type MainActivity() =
 
     override _.CustomizeAppBuilder(builder) =
         // register services
+        
+        DependencyService.ServiceCollection
+            .AddSingleton<DependencyServices.IScreenService, ScreenService>()
+            |> ignore
         
         
         

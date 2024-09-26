@@ -21,8 +21,6 @@
     <controls:Card VerticalAlignment="Top">
         <StackPanel Margin="10">
             <TextBlock Classes="headline4" Text="Login" HorizontalAlignment="Center" />
-            <TextBlock Classes="headline4" Text="{Binding InputPaneHeight}" HorizontalAlignment="Center" />
-            <TextBlock Classes="headline4" Text="{Binding ScreenWidth}" HorizontalAlignment="Center" />
             <TextBox p1:TextFieldAssist.Label="Username" Text="{Binding Username}" Watermark="Username" />
             <TextBox p1:TextFieldAssist.Label="Password" Text="{Binding Password}" Watermark="Password" />
             <ToggleSwitch Margin="0,5,0,5" Content="Login merken" IsChecked="{Binding RememberLogin}" />
