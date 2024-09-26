@@ -2,8 +2,10 @@
 
 open System
 open System.IO
+open Avalonia.Controls.Platform
 open Domain
 open System.Net
+open FSharp.Control
 open Newtonsoft.Json
 open FSharp.Data
 open System.Net.Http
@@ -39,6 +41,8 @@ module DependencyServices =
     type ICloseApplication =
         abstract member CloseApplication: unit -> unit
 
+    type IScreenService =
+        abstract member GetScreenSize: unit -> {| Width:int; Height:int |}
 
 module Consts =
     
@@ -615,7 +619,7 @@ module WebAccess =
 
 
     let handleException f =
-        async {
+        task {
             try
                 let! res = f()
                 return (Ok res)
@@ -637,7 +641,7 @@ module WebAccess =
     open FsHttp.DslCE
     
     let login username password =
-        async {
+        task {
             
             let! res =
                 fun () -> 
@@ -651,7 +655,7 @@ module WebAccess =
                         ]
                         config_transformHttpClient (useAndroidHttpClient false)
                     }
-                    |> Request.sendAsync
+                    |> Request.sendTAsync
                 |> handleException
 
             return 
@@ -685,18 +689,18 @@ module WebAccess =
 
 
     let getDownloadPage (cc:Map<string,string>) =
-        async {       
+        task {       
             let seqCC = cc |> Map.toSeq
 
             let! res =
                 fun () ->
-                    async {
+                    task {
                         let! resp = 
                             http {
                                 GET $"{baseUrl}index.php?id=61"
                                 config_transformHttpClient (useAndroidHttpClient true)
                             }
-                            |> Request.sendAsync
+                            |> Request.sendTAsync
                         
                         return! resp |> Response.toTextAsync
                     }
@@ -715,7 +719,7 @@ module WebAccess =
         asyncResult {
             initAppFolders ()        
            
-            let! html = getDownloadPage cookies
+            let! html = getDownloadPage cookies |> Async.AwaitTask
             let audioBooks =
                 html
                 |> parseDownloadData
@@ -725,7 +729,7 @@ module WebAccess =
 
 
     let private getDownloadUrl cookies url =
-        async {
+        task {
             let seqCC = cookies |> Map.toSeq
 
             let! res =
@@ -734,7 +738,7 @@ module WebAccess =
                         GET $"{baseUrl}{url}"
                         config_transformHttpClient (useAndroidHttpClient false)
                     }
-                    |> Request.sendAsync
+                    |> Request.sendTAsync
                 |> handleException
 
             return
@@ -873,7 +877,7 @@ module WebAccess =
 
 
         let downloadAudiobook cookies updateProgress audiobook =
-            async {
+            task {
                 try
                     Microsoft.AppCenter.Analytics.Analytics.TrackEvent("download audiobook")
 
@@ -1011,7 +1015,7 @@ module WebAccess =
 
 
     let loadDescription audiobook =
-        async {
+        task {
             match audiobook.ProductSiteUrl with
             | None -> return Ok (None,None)
             | Some ps ->
@@ -1019,13 +1023,13 @@ module WebAccess =
 
                 let! productPageRes = 
                     fun () -> 
-                        async {
+                        task {
                             let! res =
                                 http {
                                     GET productPageUri.AbsoluteUri
                                     config_transformHttpClient (useAndroidHttpClient true)
                                 }
-                                |> Request.sendAsync
+                                |> Request.sendTAsync
                             if (res.statusCode <> HttpStatusCode.OK) then 
                                 return ""
                             else
@@ -1059,7 +1063,7 @@ module WebAccess =
 
 module SecureStorageHelper =
     let getSecuredValue key =
-        async {
+        task {
             //let! value =  SecureStorage.GetAsync(key) |> Async.AwaitTask
             // TODO: access secure storage
             let value = ""
@@ -1067,7 +1071,7 @@ module SecureStorageHelper =
         }
 
     let setSecuredValue value key =
-        async {
+        task {
             // TODO: Secure Storage
             //do! SecureStorage.SetAsync(key,value) |> Async.AwaitTask
             return ()            
@@ -1082,7 +1086,7 @@ module SecureLoginStorage =
     let private secStoreRememberLoginKey = "perryRhodanAudioBookRememberLogin"
 
     let saveLoginCredentials username password rememberLogin =
-        async {
+        task {
             try
                 do! secStoreUsernameKey |> setSecuredValue username
                 do! secStorePasswordKey |> setSecuredValue password
@@ -1093,7 +1097,7 @@ module SecureLoginStorage =
         }
     
     let loadLoginCredentials () =
-        async {
+        task {
             try
                 let! username =  secStoreUsernameKey |> getSecuredValue
                 let! password =  secStorePasswordKey|> getSecuredValue
@@ -1153,14 +1157,17 @@ module SystemSettings =
     let getRewindWhenStartAfterShortPeriodInSec () =
         keyRewindWhenStartAfterShortPeriodInSec 
         |> getSecuredValue
+        |> Async.AwaitTask
         |> Async.map (fun result ->
             result |> optToInt defaultRewindWhenStartAfterShortPeriodInSec
         )
+        
 
 
     let getRewindWhenStartAfterLongPeriodInSec () =
         keykeyRewindWhenStartAfterLongPeriodInSec 
         |> getSecuredValue
+        |> Async.AwaitTask
         |> Async.map (fun result ->
             result |> optToInt defaultRewindWhenStartAfterLongPeriodInSec
         )
@@ -1169,6 +1176,7 @@ module SystemSettings =
     let getLongPeriodBeginsAfterInMinutes () =
         keyLongPeriodBeginsAfterInMinutes 
         |> getSecuredValue
+        |> Async.AwaitTask
         |> Async.map (fun result ->
             result |> optToInt defaultLongPeriodBeginsAfterInMinutes
         )
@@ -1177,6 +1185,7 @@ module SystemSettings =
     let getJumpDistance () =
         keyAudioJumpDistance 
         |> getSecuredValue
+        |> Async.AwaitTask
         |> Async.map (fun result ->
             result |> optToInt defaultAudioJumpDistance
         )
@@ -1184,6 +1193,7 @@ module SystemSettings =
     let getDeveloperMode () =
         keyDeveloperMode 
         |> getSecuredValue
+        |> Async.AwaitTask
         |> Async.map (fun result ->
             result |> Option.map(fun v -> v = "true") |> Option.defaultValue false
         )
@@ -1661,7 +1671,7 @@ module DownloadService =
                                     | Running _
                                     | Finished _ ->
                                         return! loop state
-                                    | Open _ 
+                                    | Open 
                                     | Failed _ ->
                                         return! loop { state with Downloads = state.Downloads |> List.filter (fun i -> i.AudioBook.Id <> item.AudioBook.Id ) }
 
@@ -1716,65 +1726,66 @@ module DownloadService =
 
 
         let startDownload (inbox:MailboxProcessor<Msg>) (info:DownloadInfo) =
-
+                    
+            let updateStateDownloadInfo newState (downloadInfo:DownloadInfo) =
+                    {downloadInfo with State = newState}
                     
 
-                    
-                    let updateStateDownloadInfo newState (downloadInfo:DownloadInfo) =
-                            {downloadInfo with State = newState}
-                            
+            task {
 
-                    async {
+                //let mutable mutDemoData = info
 
-                        //let mutable mutDemoData = info
+                let updateProgress (c,a) =
+                    let factor = if a = 0 then 0.0 else (c |> float) / (a |> float)
+                    let percent = factor * 100.0 |> int
+                    inbox.Post <| UpdateNotification (info,percent)
+                    let newState = updateStateDownloadInfo  (Running (a,c)) info
+                    sendInfo newState
 
-                        let updateProgress (c,a) =
-                            let factor = if a = 0 then 0.0 else (c |> float) / (a |> float)
-                            let percent = factor * 100.0 |> int
-                            inbox.Post <| UpdateNotification (info,percent)
-                            let newState = updateStateDownloadInfo  (Running (a,c)) info
-                            sendInfo newState
+                match info.CookieContainer with
+                | None ->
+                    inbox.Post (DownloadError <| ComError.SessionExpired "session expired")
+                | Some cc ->
 
-                        match info.CookieContainer with
-                        | None ->
-                            inbox.Post (DownloadError <| ComError.SessionExpired "session expired")
-                        | Some cc ->
+                    let! res = 
+                        WebAccess.Downloader.downloadAudiobook 
+                            cc
+                            updateProgress
+                            info.AudioBook
 
-                            let! res = 
-                                WebAccess.Downloader.downloadAudiobook 
-                                    cc
-                                    updateProgress
-                                    info.AudioBook
-
-                            match res with
-                            | Error error ->
-                                inbox.Post <| DownloadError error
-                            | Ok result ->
-                                
-                                let newAb = 
-                                    { info.AudioBook with 
-                                        Thumbnail = result.Images |> Option.map (fun i -> i.Thumbnail)
-                                        Picture = result.Images |> Option.map (fun i -> i.Image)
-                                        State =
-                                            { info.AudioBook.State with 
-                                                Downloaded = true
-                                                DownloadedFolder = Some result.TargetFolder
-                                            }
+                    match res with
+                    | Error error ->
+                        inbox.Post <| DownloadError error
+                    | Ok result ->
+                        
+                        let newAb = 
+                            { info.AudioBook with 
+                                Thumbnail = result.Images |> Option.map (fun i -> i.Thumbnail)
+                                Picture = result.Images |> Option.map (fun i -> i.Image)
+                                State =
+                                    { info.AudioBook.State with 
+                                        Downloaded = true
+                                        DownloadedFolder = Some result.TargetFolder
                                     }
+                            }
 
-                                let! saveResult = DataBase.updateAudioBookInStateFile newAb
-                                let newInfo = {
-                                    info with AudioBook = newAb
-                                }
-                                match saveResult with
-                                | Error msg ->
-                                    inbox.Post <| DownloadError (ComError.Other msg)
-                                | Ok _ ->
-                                    inbox.Post <| FinishedDownload (newInfo,result)
-                    }
+                        let! saveResult = DataBase.updateAudioBookInStateFile newAb
+                        let newInfo = {
+                            info with AudioBook = newAb
+                        }
+                        match saveResult with
+                        | Error msg ->
+                            inbox.Post <| DownloadError (ComError.Other msg)
+                        | Ok _ ->
+                            inbox.Post <| FinishedDownload (newInfo,result)
+            }
 
 
-
+module Helpers =
+    
+    type InputPaneService() =
+        // static member for IInputPane
+        static member val InputPane:IInputPane = null with get, set
 
 
 

@@ -2,13 +2,40 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="540" d:DesignHeight="104"
              xmlns:vm="clr-namespace:PerryRhodan.AudiobookPlayer.ViewModels"
+             xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+             xmlns:asyncImageLoader="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
              x:Class="PerryRhodan.AudiobookPlayer.Views.AudioBookItemView"
              Design.DataContext="{Binding Source={x:Static vm:AudioBookItemViewModel.DesignVM}}"
-             x:DataType="vm:AudioBookItemViewModel">
-  <Grid ColumnDefinitions="*,Auto">
-      <TextBlock Grid.Column="0" Text="{Binding Title}"></TextBlock>
-      <Button Grid.Column="1" Command="{Binding OpenDialog}">Click</Button>
-  </Grid>
+             x:DataType="vm:AudioBookItemViewModel"
+             Height="104" MinHeight="104" MaxHeight="104">
+  
+      <controls:Card MaxHeight="100" MinHeight="100" VerticalAlignment="Center" Margin="2">
+          <Grid ColumnDefinitions="80,*,Auto">
+              <Grid Grid.Column="0" Background="{DynamicResource MaterialDesignPaper}">
+                  <asyncImageLoader:AdvancedImage Source="{Binding Thumbnail}" />
+                  <Image Source="{Binding LoadingPie}"/>
+                  <Image Source="{Binding ProgressPie}" Width="20" Height="20" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="5"/>
+              </Grid>
+              <Grid Grid.Column="1" Background="{DynamicResource MaterialDesignPaper}" Margin="2,0,0,0">
+                  <StackPanel Orientation="Vertical" Margin="3">
+                      <TextBlock VerticalAlignment="Center"  Grid.Column="0" Text="{Binding Title}" TextWrapping="Wrap" />
+                      <TextBlock VerticalAlignment="Center"  Grid.Column="0" Text="{Binding EpisodeTitle}" TextWrapping="Wrap"/>
+                  </StackPanel>
+                  
+              </Grid>
+              <Grid Grid.Column="2" Background="{DynamicResource MaterialDesignPaper}" >
+                  <Button Theme="{StaticResource MaterialFlatButton}"
+                          Width="45"
+                          Height="30"
+                          Margin="3"
+                          Command="{Binding OpenDialog}">...</Button>
+              </Grid>
+              
+              
+          </Grid>
+      </controls:Card>
+      
+  
 </UserControl>
