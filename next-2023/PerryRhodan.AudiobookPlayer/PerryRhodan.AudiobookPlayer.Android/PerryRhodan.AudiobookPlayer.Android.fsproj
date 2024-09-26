@@ -2,10 +2,11 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0-android</TargetFramework>
-    <SupportedOSPlatformVersion>30</SupportedOSPlatformVersion>
-    <ApplicationId>com.CompanyName.PerryRhodan.AudiobookPlayer</ApplicationId>
-    <ApplicationVersion>1</ApplicationVersion>
-    <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+    <SupportedOSPlatformVersion>31</SupportedOSPlatformVersion>
+    <ApplicationId>hits.rhodan.audiobooks</ApplicationId>
+    <ApplicationVersion>400040</ApplicationVersion>
+    
+    <ApplicationDisplayVersion>1.60.0</ApplicationDisplayVersion>
     <AndroidPackageFormat>apk</AndroidPackageFormat>
     <AndroidEnableProfiledAot>False</AndroidEnableProfiledAot>
   </PropertyGroup>
@@ -17,15 +18,20 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="Activities.fs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Avalonia.Android" Version="11.0.7" />
+    <PackageReference Include="Avalonia.Android" Version="11.1.3" />
     <PackageReference Include="Xamarin.AndroidX.Core.SplashScreen" Version="1.0.1.5" />
   </ItemGroup>
   
   <ItemGroup>
     <ProjectReference Include="..\PerryRhodan.AudiobookPlayer\PerryRhodan.AudiobookPlayer.fsproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Content Include="Properties\AndroidManifest.xml" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Compile Include="Services\ScreenService.fs" />
+    <Compile Include="Services\Activities.fs" />
   </ItemGroup>
 </Project>

@@ -1,5 +1,6 @@
 ﻿namespace PerryRhodan.AudiobookPlayer.ViewModels
 
+open PerryRhodan.AudiobookPlayer
 open ReactiveElmish
 open PerryRhodan.AudiobookPlayer.ViewModels.App
 open ReactiveElmish.Avalonia
@@ -15,8 +16,9 @@ type MainViewModel(root:CompositionRoot) =
             
         )
         
-    member this.GoHome() = app.Dispatch (GoHome)   
-    member this.GoPlayer() = app.Dispatch (SetView View.PlayerView)   
+    member this.GoHome() = app.Dispatch GoHome   
+    member this.GoPlayer() = app.Dispatch <| SetView View.PlayerView   
+    member this.OpenLogin() = app.Dispatch Login   
         
     static member DesignVM = new MainViewModel(Design.stub)
     

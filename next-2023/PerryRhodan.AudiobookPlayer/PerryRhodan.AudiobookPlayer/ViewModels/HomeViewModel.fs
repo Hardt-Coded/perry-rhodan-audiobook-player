@@ -90,8 +90,13 @@ module HomePage =
                             {
                                 AudioBook.Empty with
                                     Id = 1000
-                                    FullName = $"Random AudioBook {Guid.NewGuid()}"
-                                    State = { AudioBook.Empty.State with Downloaded = true }
+                                    FullName = $"""Random AudioBook {Guid.NewGuid().ToString("N")}"""
+                                    EpisodenTitel = $"""Episode {Guid.NewGuid().ToString("N")}""" 
+                                    State = {
+                                        AudioBook.Empty.State with
+                                            Downloaded = true
+                                            CurrentPosition = Some {AudioBookPosition.Filename = ""; Position = TimeSpan.FromMinutes 1 }
+                                    }
                             }
                             
                         let randomAudioBooks =
