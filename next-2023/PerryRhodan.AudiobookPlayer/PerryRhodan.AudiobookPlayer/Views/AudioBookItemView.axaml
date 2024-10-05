@@ -6,36 +6,83 @@
              xmlns:vm="clr-namespace:PerryRhodan.AudiobookPlayer.ViewModels"
              xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
              xmlns:asyncImageLoader="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
+             xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:viewModel="clr-namespace:PerryRhodan.AudiobookPlayer.ViewModel"
              x:Class="PerryRhodan.AudiobookPlayer.Views.AudioBookItemView"
-             Design.DataContext="{Binding Source={x:Static vm:AudioBookItemViewModel.DesignVM}}"
-             x:DataType="vm:AudioBookItemViewModel"
-             Height="104" MinHeight="104" MaxHeight="104">
-  
-      <controls:Card MaxHeight="100" MinHeight="100" VerticalAlignment="Center" Margin="2">
-          <Grid ColumnDefinitions="80,*,Auto">
-              <Grid Grid.Column="0" Background="{DynamicResource MaterialDesignPaper}">
-                  <asyncImageLoader:AdvancedImage Source="{Binding Thumbnail}" />
-                  <Image Source="{Binding LoadingPie}"/>
-                  <Image Source="{Binding ProgressPie}" Width="20" Height="20" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="5"/>
-              </Grid>
-              <Grid Grid.Column="1" Background="{DynamicResource MaterialDesignPaper}" Margin="2,0,0,0">
-                  <StackPanel Orientation="Vertical" Margin="3">
-                      <TextBlock VerticalAlignment="Center"  Grid.Column="0" Text="{Binding Title}" TextWrapping="Wrap" />
-                      <TextBlock VerticalAlignment="Center"  Grid.Column="0" Text="{Binding EpisodeTitle}" TextWrapping="Wrap"/>
-                  </StackPanel>
-                  
-              </Grid>
-              <Grid Grid.Column="2" Background="{DynamicResource MaterialDesignPaper}" >
-                  <Button Theme="{StaticResource MaterialFlatButton}"
-                          Width="45"
-                          Height="30"
-                          Margin="3"
-                          Command="{Binding OpenDialog}">...</Button>
-              </Grid>
-              
-              
-          </Grid>
-      </controls:Card>
-      
-  
+             Design.DataContext="{Binding Source={x:Static viewModel:AudioBookItemViewModel.DesignVM}}"
+             x:DataType="viewModel:AudioBookItemViewModel"
+             Height="104" MinHeight="104" MaxHeight="104"
+             Background="Black">
+    <UserControl.Styles>
+        <Style Selector="avalonia|MaterialIcon">
+            <Setter Property="Width" Value="32" />
+            <Setter Property="Height" Value="32" />
+            <Setter Property="Foreground" Value="#c0c0c0" />
+        </Style>
+        <Style Selector="Button">
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+            <Setter Property="Theme" Value="{StaticResource MaterialFlatButton}" />
+            <Setter Property="Height" Value="44" />
+            <Setter Property="Width" Value="44" />
+            <Setter Property="Margin" Value="3" />
+            <Setter Property="Foreground" Value="#c0c0c0" />
+        </Style>
+
+    </UserControl.Styles>
+
+    <Border CornerRadius="10" Margin="5" ClipToBounds="True" BorderThickness="1">
+        <Border.BorderBrush>
+            <LinearGradientBrush StartPoint="30%,60%" EndPoint="0%,0%">
+                <GradientStop Color="{Binding AmbientColor}" Offset="0.0" />
+                <GradientStop Color="Black" Offset="1.0" />
+            </LinearGradientBrush>
+        </Border.BorderBrush>
+        <Border.Background>
+            <LinearGradientBrush StartPoint="0%,0%" EndPoint="30%,60%">
+                <GradientStop Color="{Binding AmbientColor}" Offset="0.0" />
+                <GradientStop Color="Black" Offset="1.0" />
+            </LinearGradientBrush>
+        </Border.Background>
+        <Grid ColumnDefinitions="100,*,Auto,Auto">
+
+            <Border CornerRadius="15" Margin="5" Padding="1" ClipToBounds="True">
+                <Grid Grid.Column="0" Margin="0,0,0,0">
+
+                    <asyncImageLoader:AdvancedImage Source="{Binding Thumbnail}" Stretch="Uniform" />
+
+                    <Image Source="{Binding LoadingPie}" />
+                    <Image Source="{Binding ProgressPie}" Width="20" Height="20" HorizontalAlignment="Left"
+                           VerticalAlignment="Bottom" Margin="10,0,0,5" />
+                    <avalonia:MaterialIcon
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Bottom"
+                        Margin="0,0,5,2"
+                        Width="20"
+                        Height="20"
+                        Kind="Download"
+                        Foreground="{DynamicResource MaterialSecondaryMidBrush}"
+                        IsVisible="{Binding !IsDownloaded}" />
+
+                </Grid>
+            </Border>
+            <Grid Grid.Column="1" Margin="2,0,0,0">
+                <StackPanel Orientation="Vertical" Margin="3" VerticalAlignment="Center">
+                    <TextBlock VerticalAlignment="Center" Grid.Column="0" Text="{Binding Title}" TextWrapping="Wrap" />
+                </StackPanel>
+
+            </Grid>
+            <Grid Grid.Column="2">
+                <Button Command="{Binding OpenPlayer}">
+                    <avalonia:MaterialIcon Kind="PlayCircle" />
+                </Button>
+            </Grid>
+            <Grid Grid.Column="3">
+                <Button Command="{Binding OpenDialog}">
+                    <avalonia:MaterialIcon Kind="DotsVertical" />
+                </Button>
+            </Grid>
+
+        </Grid>
+    </Border>
+
 </UserControl>

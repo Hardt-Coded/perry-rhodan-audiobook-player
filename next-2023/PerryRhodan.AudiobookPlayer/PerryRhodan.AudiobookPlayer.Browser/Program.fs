@@ -17,10 +17,11 @@ module Program =
     [<EntryPoint>]
     let main argv =
         task {
-            do! (buildAvaloniaApp()
-            .WithInterFont()
-            .UseReactiveUI()
-            .StartBrowserAppAsync("out"))
+            do!
+                   buildAvaloniaApp()
+                       .WithInterFont()
+                       .UseReactiveUI()
+                        .StartBrowserAppAsync("out")
         }
         |> ignore
         0

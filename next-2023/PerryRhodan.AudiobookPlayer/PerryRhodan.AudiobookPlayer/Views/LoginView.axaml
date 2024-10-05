@@ -6,29 +6,36 @@
              xmlns:p1="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
              xmlns:vm="clr-namespace:PerryRhodan.AudiobookPlayer.ViewModels"
              xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+             xmlns:glassMorphism="clr-namespace:CherylUI.Controls.GlassMorphism;assembly=CherylUI"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="PerryRhodan.AudiobookPlayer.Views.LoginView"
              Design.DataContext="{Binding Source={x:Static vm:LoginViewModel.DesignVM}}"
              x:DataType="vm:LoginViewModel"
-             Width="{Binding ScreenWidth}">
+             Width="{Binding DialogWidth}">
     <UserControl.Styles>
         <Style Selector="TextBox">
             <Setter Property="Margin" Value="0,5,0,5" />
             <Setter Property="UseFloatingWatermark" Value="True" />
         </Style>
     </UserControl.Styles>
-    
-    <controls:Card VerticalAlignment="Top">
-        <StackPanel Margin="10">
-            <TextBlock Classes="headline4" Text="Login" HorizontalAlignment="Center" />
-            <TextBox p1:TextFieldAssist.Label="Username" Text="{Binding Username}" Watermark="Username" />
-            <TextBox p1:TextFieldAssist.Label="Password" Text="{Binding Password}" Watermark="Password" />
-            <ToggleSwitch Margin="0,5,0,5" Content="Login merken" IsChecked="{Binding RememberLogin}" />
-            <Button Margin="0,5,0,5" Content="Login" Command="{Binding TryLogin}" />
-            <Button Margin="0,2,0,0" Theme="{StaticResource MaterialFlatButton}" Content="Cancel"
-                    Command="{Binding Cancel}" />
-            <Grid Height="{Binding InputPaneHeight}" />
-        </StackPanel>
+
+    <controls:Card VerticalAlignment="Top" CornerRadius="20">
+        <Grid>
+            <StackPanel Margin="10">
+                <TextBlock Classes="headline4" Text="Login" HorizontalAlignment="Center" />
+                <TextBox p1:TextFieldAssist.Label="E-Mail" Text="{Binding Username}" Watermark="E-Mail eingeben" />
+                <TextBox p1:TextFieldAssist.Label="Passwort" Text="{Binding Password}" Watermark="Passwort eingeben" />
+                <ToggleSwitch Margin="0,5,0,5" Content="Login merken" IsChecked="{Binding RememberLogin}"
+                              HorizontalAlignment="Center" />
+                <Button Margin="0,5,0,5" Content="Login" Command="{Binding TryLogin}" />
+                <Button Margin="0,2,0,0" Theme="{StaticResource MaterialFlatButton}" Content="Cancel"
+                        Command="{Binding Cancel}" />
+                <Grid Height="{Binding InputPaneHeight}" />
+            </StackPanel>
+            <Grid IsVisible="{Binding IsLoading}">
+                <ProgressBar Classes="circular" IsIndeterminate="True" />
+            </Grid>
+        </Grid>
     </controls:Card>
-    
+
 </UserControl>

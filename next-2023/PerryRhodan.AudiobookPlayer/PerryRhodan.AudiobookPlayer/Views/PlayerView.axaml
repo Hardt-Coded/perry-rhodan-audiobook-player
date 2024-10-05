@@ -2,7 +2,83 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="PerryRhodan.AudiobookPlayer.Views.PlayerView">
-  Player
+             xmlns:vm="clr-namespace:PerryRhodan.AudiobookPlayer.ViewModels"
+             xmlns:asyncImageLoader="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
+             xmlns:controls="clr-namespace:PerryRhodan.AudiobookPlayer.Controls"
+             xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="800"
+             x:Class="PerryRhodan.AudiobookPlayer.Views.PlayerView"
+             Design.DataContext="{Binding Source={x:Static vm:PlayerViewModel.DesignVM}}"
+             x:DataType="vm:PlayerViewModel">
+    <UserControl.Styles>
+        <Style Selector="Button">
+            <Setter Property="Theme" Value="{StaticResource MaterialFlatButton}" />
+            <Setter Property="Foreground" Value="#c0c0c0" />
+        </Style>
+    </UserControl.Styles>
+    <Grid RowDefinitions="*,*">
+        <Grid.Background>
+            <LinearGradientBrush StartPoint="60%,0%" EndPoint="0%,100%">
+                <GradientStop Color="{Binding AudioBook.AmbientColor}" Offset="0.0" />
+                <GradientStop Color="Black" Offset="0.25" />
+            </LinearGradientBrush>
+        </Grid.Background>
+        <!-- cover -->
+        
+        <asyncImageLoader:AdvancedImage Margin="50" Grid.Row="0" Source="{Binding Picture}" Stretch="UniformToFill" />
+        
+        <!-- controls -->
+        <Grid Grid.Row="1"
+              Background="Black"
+              ColumnDefinitions="*, *, *, *, *"
+              RowDefinitions="Auto,*,*,*">
+            <StackPanel Grid.Row="0"
+                        HorizontalAlignment="Center"
+                        Grid.ColumnSpan="5">
+                <TextBlock Text="{Binding AudioBook.AudioBook.FullName}" />
+                <TextBlock Text="{Binding CurrentTrackNumberString}" />
+                <TextBlock Text="{Binding PositionString}" />
+                <TextBlock Text="{Binding TotalPositionString}" />
+                <TextBlock Text="{Binding SliderIsDragging}" />
+            </StackPanel>
+            <controls:MySlider Grid.ColumnSpan="5"
+                               Grid.Row="1" Margin="30"
+                               Value="{Binding CurrentPositionMs}"
+                               IsSnapToTickEnabled="True"
+                               TickPlacement="Outside"
+                               TickFrequency="1000"
+                               IsSeeking="{Binding SliderIsDragging}"
+                               Maximum="{Binding CurrentDurationMs}"
+                               IsEnabled="{Binding !IsLoading}" 
+                               Foreground="#c0c0c0"/>
+
+
+            <Button Grid.Row="2" Grid.Column="0" Command="{Binding Previous}" IsEnabled="{Binding !IsLoading}">
+                <avalonia:MaterialIcon Width="50" Height="50" Kind="PreviousTitle" />
+            </Button>
+            <Button Grid.Row="2" Grid.Column="1" Command="{Binding JumpBackwards}" IsEnabled="{Binding !IsLoading}">
+                <avalonia:MaterialIcon Width="50" Height="50" Kind="Rewind" />
+            </Button>
+            <Button Grid.Row="2" Grid.Column="2" Command="{Binding Play}" IsVisible="{Binding IsStopped}"
+                    IsEnabled="{Binding !IsLoading}">
+                <avalonia:MaterialIcon Width="50" Height="50" Kind="PlayCircle" />
+            </Button>
+            <Button Grid.Row="2" Grid.Column="2" Command="{Binding Stop}" IsVisible="{Binding IsPlaying}"
+                    IsEnabled="{Binding !IsLoading}">
+                <avalonia:MaterialIcon Width="50" Height="50" Kind="StopCircle" />
+            </Button>
+
+            <Button Grid.Row="2" Grid.Column="3" Command="{Binding JumpForward}" IsEnabled="{Binding !IsLoading}">
+                <avalonia:MaterialIcon Width="50" Height="50" Kind="FastForward" />
+            </Button>
+
+            <ProgressBar Grid.Row="2" Grid.Column="2" Classes="circular" IsIndeterminate="True" Height="50" Width="50"
+                         IsVisible="{Binding IsLoading}" />
+
+            <Button Grid.Row="2" Grid.Column="4" Command="{Binding Next}" IsEnabled="{Binding !IsLoading}">
+                <avalonia:MaterialIcon Width="50" Height="50" Kind="NextTitle" />
+            </Button>
+
+        </Grid>
+    </Grid>
 </UserControl>

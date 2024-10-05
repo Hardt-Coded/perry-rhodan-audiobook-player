@@ -1,6 +1,5 @@
 ﻿namespace Elmish.SideEffect
 
-open Elmish
 open ReactiveElmish.Avalonia
 
 
@@ -13,16 +12,24 @@ module Program =
             [
                 fun dispatch ->
                     async {
-                        do! runSideEffect sideEffect state dispatch |> Async.AwaitTask
+                        try
+                            do! runSideEffect sideEffect state dispatch |> Async.AwaitTask
+                        with
+                        | ex ->
+                            // log
+                            Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
+                            raise ex
+                            return ()
+                            
                     } |> Async.StartImmediate
             ]
         
         let init () =
-            let (state, sideEffect) = init ()
+            let state, sideEffect = init ()
             state, runSideEffect sideEffect state
             
         let update msg state =
-            let (state, sideEffect) = update msg state
+            let state, sideEffect = update msg state
             state, runSideEffect sideEffect state
         
         Program.mkAvaloniaProgram init update

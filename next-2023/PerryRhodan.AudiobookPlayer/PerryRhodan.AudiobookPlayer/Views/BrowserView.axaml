@@ -1,0 +1,56 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:views="clr-namespace:PerryRhodan.AudiobookPlayer.Views"
+             xmlns:vm="clr-namespace:PerryRhodan.AudiobookPlayer.ViewModels"
+             xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="520" d:DesignHeight="800"
+             x:Class="PerryRhodan.AudiobookPlayer.Views.BrowserView"
+             Background="Black"
+             Design.DataContext="{Binding Source={x:Static vm:BrowserViewModel.DesignVM}}"
+             x:DataType="vm:BrowserViewModel">
+    <Grid RowDefinitions="Auto,Auto,*">
+        <!-- Last Listened -->
+        <Grid Grid.Row="0" Margin="5,5,5,25">
+            <Button Command="{Binding LoadOnlineAudiobooks}">Mit Shop synchronisieren</Button>
+        </Grid>
+        <!-- Audio Books -->
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Hidden" IsVisible="{Binding HasAudioBooks}"> 
+            <ItemsControl Grid.Row="1" ItemsSource="{Binding AudioBooks}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <views:AudioBookItemView DataContext="{Binding .}"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>    
+        </ScrollViewer>
+        
+        <TextBlock Grid.Row="1" HorizontalAlignment="Center" Text="Kategorie auswählen" IsVisible="{Binding !HasAudioBooks}" FontSize="25" Margin="0,0,0,10"/>
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Hidden" IsVisible="{Binding !HasAudioBooks}"> 
+            <ItemsControl Grid.Row="1" ItemsSource="{Binding AvailableGroups}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Button Theme="{StaticResource MaterialFlatButton}" 
+                                FontSize="16"
+                                HorizontalContentAlignment="Left"
+                                Margin="55,0,55,0"
+                                Command="{Binding $parent[ItemsControl].((vm:BrowserViewModel)DataContext).SelectAdditionalGroup }" CommandParameter="{Binding .}">
+                            <StackPanel Orientation="Horizontal">
+                                <avalonia:MaterialIcon Kind="Folder" Margin="0,0,10,0"/>
+                                <TextBlock Text="{Binding .}"/>    
+                            </StackPanel>
+                            
+                        </Button>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>    
+        </ScrollViewer>
+        
+        
+        <!-- Loading -->
+        <Grid Grid.Row="0" Grid.RowSpan="3" IsVisible="{Binding IsLoading}">
+            <ProgressBar Classes="circular" IsIndeterminate="True" />
+        </Grid>
+    </Grid>
+</UserControl>

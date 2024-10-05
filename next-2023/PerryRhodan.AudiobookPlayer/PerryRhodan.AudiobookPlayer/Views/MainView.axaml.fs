@@ -2,7 +2,6 @@ namespace PerryRhodan.AudiobookPlayer.Views
 
 open Avalonia.Controls
 open Avalonia.Markup.Xaml
-open PerryRhodan.AudiobookPlayer
 open Services.Helpers
 
 type MainView () as this = 

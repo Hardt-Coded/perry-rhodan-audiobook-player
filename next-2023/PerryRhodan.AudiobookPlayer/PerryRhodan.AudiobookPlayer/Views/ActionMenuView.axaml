@@ -3,13 +3,109 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:viewModels="clr-namespace:PerryRhodan.AudiobookPlayer.ViewModels"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+             xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="450"
              x:Class="PerryRhodan.AudiobookPlayer.Views.ActionMenuView"
              Design.DataContext="{Binding Source={x:Static viewModels:ActionMenuViewModel.DesignVM}}"
-             x:DataType="viewModels:ActionMenuViewModel">
-  <Grid RowDefinitions="*,*">
-      <TextBlock Text="Action Menu" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-      <Button Classes="accent" Grid.Row="1" Content="Close" VerticalAlignment="Center" HorizontalAlignment="Center" Command="{Binding CloseDialog}"/>
-  </Grid>
+             x:DataType="viewModels:ActionMenuViewModel"
+             Width="{Binding DialogWidth}">
+    <UserControl.Styles>
+        <Style Selector="Button">
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+            <Setter Property="Theme" Value="{StaticResource MaterialFlatButton}" />
+            <Setter Property="Margin" Value="5,0,0,0" />
+            <Setter Property="Foreground" Value="#c0c0c0" />
+        </Style>
+        <Style Selector="StackPanel">
+            <Setter Property="Margin" Value="0,2,0,0" />
+        </Style>
+        <Style Selector="Label">
+            <Setter Property="Margin" Value="5,0,0,0" />
+        </Style>
+    </UserControl.Styles>
+    <controls:Card VerticalAlignment="Top" CornerRadius="20">
+        <Grid>
+            <StackPanel Margin="10">
+                <TextBlock Classes="caption" Margin="0,0,0,20" Text="{Binding AudioBook.AudioBook.FullName}" HorizontalAlignment="Center" />
+                
+                
+                <Button IsVisible="{Binding AudioBook.StartDownloadVisible}" 
+                        Command="{Binding AudioBook.StartDownload}">
+                    <StackPanel Orientation="Horizontal">
+                        <avalonia:MaterialIcon Kind="DownloadCircle" />
+                        <Label>Download starten</Label>
+                    </StackPanel>
+                </Button>
+                
+                <Button IsVisible="{Binding AudioBook.RemoveDownloadVisible}" 
+                        Command="{Binding AudioBook.RemoveDownload}">
+                    <StackPanel Orientation="Horizontal">
+                        <avalonia:MaterialIcon Kind="SelectionEllipseRemove" />
+                        <Label>Download aus Warteschlange entfernen</Label>
+                    </StackPanel>
+                </Button>
+                
+                <Button Command="{Binding AudioBook.OpenDetail}" >
+                    <StackPanel Orientation="Horizontal">
+                        <avalonia:MaterialIcon Kind="Book" />
+                        <Label>Titeldetails ansehen</Label>
+                    </StackPanel>
+                </Button>
+                
+                <Button  IsVisible="{Binding AudioBook.MarkAsListendVisible}" 
+                         Command="{Binding AudioBook.MarkAsListend}" >
+                    <StackPanel Orientation="Horizontal">
+                        <avalonia:MaterialIcon Kind="Book" />
+                        <Label>Hörbuch als gelesen markieren"</Label>
+                    </StackPanel>
+                </Button>
+                
+                <Button IsVisible="{Binding AudioBook.MarkAsUnlistendVisible}" 
+                        Command="{Binding AudioBook.MarkAsUnlistend}" >
+                    <StackPanel Orientation="Horizontal">
+                        <avalonia:MaterialIcon Kind="BookOpenPageVariant" />
+                        <Label>Hörbuch als ungelesen markieren</Label>
+                    </StackPanel>
+                </Button>
+                
+                <Button  IsVisible="{Binding AudioBook.RemoveAudiobookFromDeviceVisible}" 
+                         Command="{Binding AudioBook.RemoveAudiobookFromDevice}" >
+                    <StackPanel Orientation="Horizontal">
+                        <avalonia:MaterialIcon Kind="DeleteCircle" />
+                        <Label>Hörbuch vom Gerät entfernen</Label>
+                    </StackPanel>
+                </Button>
+                
+                <Button  IsVisible="{Binding AudioBook.OpenPlayerVisible}" 
+                         Command="{Binding AudioBook.OpenPlayer}" >
+                    <StackPanel Orientation="Horizontal">
+                        <avalonia:MaterialIcon Kind="PlayCircle" />
+                        <Label>Abspielen</Label>
+                    </StackPanel>
+                </Button>
+                
+                <Button Command="{Binding AudioBook.ShowMetaData}" >
+                    <StackPanel Orientation="Horizontal">
+                        <avalonia:MaterialIcon Kind="Database" />
+                        <Label>Metadata</Label>
+                    </StackPanel>
+                </Button>
+                
+                <Button Classes="accent" 
+                        Command="{Binding AudioBook.CloseDialog}" >
+                    <StackPanel Orientation="Horizontal">
+                        <avalonia:MaterialIcon Kind="CloseCircle" />
+                        <Label>Schließen</Label>
+                    </StackPanel>
+                </Button>    
+                <!-- TODO: Add Debug Functions -->
+                
+            </StackPanel>
+            <!--<Grid IsVisible="{Binding IsLoading}">
+                <ProgressBar Classes="circular" IsIndeterminate="True" />
+            </Grid>-->
+        </Grid>
+    </controls:Card>
     
 </UserControl>

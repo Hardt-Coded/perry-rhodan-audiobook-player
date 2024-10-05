@@ -4,14 +4,13 @@ namespace LiteDB.FSharp
 open LiteDB
 open System
 open System.Collections.Generic
-open System.Linq.Expressions
 open Newtonsoft.Json
 
 [<AutoOpen>]
 module ReflectionAdapters =
     open System.Reflection
 
-    type System.Type with
+    type Type with
         member this.IsValueType = this.GetTypeInfo().IsValueType
         member this.IsGenericType = this.GetTypeInfo().IsGenericType
         member this.GetMethod(name) = this.GetTypeInfo().GetMethod(name)
@@ -20,14 +19,8 @@ module ReflectionAdapters =
         member this.GetCustomAttributes(inherits : bool) : obj[] =
             downcast box(CustomAttributeExtensions.GetCustomAttributes(this.GetTypeInfo(), inherits) |> Seq.toArray)
 
-open System
 open FSharp.Reflection
-open Newtonsoft.Json
-open Newtonsoft.Json.Converters
-open System.Reflection
-open System.Collections.Generic
 open System.Collections.Concurrent
-open System.Text.RegularExpressions
 
 type Kind =
     | Other = 0
@@ -95,7 +88,7 @@ open System.Globalization
 /// A derivative of Fable's JsonConverter. Code adapted from Lev Gorodinski's original.
 /// See https://goo.gl/F6YiQk
 type FSharpJsonConverter() =
-    inherit Newtonsoft.Json.JsonConverter()
+    inherit JsonConverter()
     let advance(reader: JsonReader) =
         reader.Read() |> ignore
 
@@ -104,7 +97,7 @@ type FSharpJsonConverter() =
             match reader.TokenType with
             | JsonToken.EndArray -> acc
             | _ ->
-                let value = serializer.Deserialize(reader, itemTypes.[index])
+                let value = serializer.Deserialize(reader, itemTypes[index])
                 advance reader
                 read (index + 1) (acc @ [value])
         advance reader
@@ -130,7 +123,7 @@ type FSharpJsonConverter() =
                 then Kind.Long
                 elif t.FullName = "System.Double"
                 then Kind.Double
-                elif t = typeof<LiteDB.ObjectId>
+                elif t = typeof<ObjectId>
                 then Kind.ObjectId
                 elif t.FullName = "System.Numerics.BigInteger"
                 then Kind.BigInt
@@ -161,7 +154,7 @@ type FSharpJsonConverter() =
                 serializer.Serialize(writer, value)
             | true, Kind.Long ->
                 let numberLong = JObject()
-                let value = sprintf "%+i" (value :?> int64)
+                let value = $"%+i{value :?> int64}"
                 numberLong.Add(JProperty("$numberLong", value))
                 numberLong.WriteTo(writer)
             | true, Kind.Double ->
@@ -196,7 +189,7 @@ type FSharpJsonConverter() =
                 numberDecimal.WriteTo(writer)
             | true, Kind.Option ->
                 let _,fields = FSharpValue.GetUnionFields(value, t)
-                serializer.Serialize(writer, fields.[0])
+                serializer.Serialize(writer, fields[0])
             | true, Kind.Tuple ->
                 let values = FSharpValue.GetTupleFields(value)
                 serializer.Serialize(writer, values)
@@ -208,7 +201,7 @@ type FSharpJsonConverter() =
                     writer.WriteStartObject()
                     writer.WritePropertyName(uci.Name)
                     if fields.Length = 1
-                    then serializer.Serialize(writer, fields.[0])
+                    then serializer.Serialize(writer, fields[0])
                     else serializer.Serialize(writer, fields)
                     writer.WriteEndObject()
             | true, Kind.MapOrDictWithNonStringKey ->
@@ -225,37 +218,37 @@ type FSharpJsonConverter() =
             serializer.Deserialize(reader, t)
         | true, Kind.Guid ->
             let jsonObject = JObject.Load(reader)
-            let value = jsonObject.["$guid"].Value<string>()
+            let value = jsonObject["$guid"].Value<string>()
             upcast Guid.Parse(value)
         | true, Kind.ObjectId ->
             let jsonObject = JObject.Load(reader)
-            let value = jsonObject.["$oid"].Value<string>()
+            let value = jsonObject["$oid"].Value<string>()
             upcast ObjectId(value)
         | true, Kind.Decimal ->
             let jsonObject = JObject.Load(reader)
-            let value = jsonObject.["$numberDecimal"].Value<string>()
+            let value = jsonObject["$numberDecimal"].Value<string>()
             upcast Decimal.Parse(value)
         | true, Kind.Binary ->
             let jsonObject =  JObject.Load(reader)
-            let base64 = jsonObject.["$binary"].Value<string>()
+            let base64 = jsonObject["$binary"].Value<string>()
             let bytes = Convert.FromBase64String(base64)
             upcast bytes
         | true, Kind.Long ->
             let jsonObject = JObject.Load(reader)
-            let value = jsonObject.["$numberLong"].Value<string>()
+            let value = jsonObject["$numberLong"].Value<string>()
             upcast Int64.Parse(value)
         | true, Kind.Double ->
             let value = serializer.Deserialize(reader, typeof<string>) :?> string
             upcast Double.Parse(value)
         | true, Kind.DateTime ->
             let jsonObject = JObject.Load(reader)
-            let dateValue = jsonObject.["$date"].Value<string>()
+            let dateValue = jsonObject["$date"].Value<string>()
             upcast DateTime.Parse(dateValue, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind)
         | true, Kind.Option ->
             let innerType = t.GetGenericArguments().[0]
             let innerType =
                 if innerType.IsValueType
-                then (typedefof<Nullable<_>>).MakeGenericType([|innerType|])
+                then typedefof<Nullable<_>>.MakeGenericType([|innerType|])
                 else innerType
             
             let value = 
@@ -272,8 +265,8 @@ type FSharpJsonConverter() =
 
             let cases = FSharpType.GetUnionCases(t)
             if isNull value
-            then FSharpValue.MakeUnion(cases.[0], [||])
-            else FSharpValue.MakeUnion(cases.[1], [|value|])
+            then FSharpValue.MakeUnion(cases[0], [||])
+            else FSharpValue.MakeUnion(cases[1], [|value|])
         | true, Kind.Tuple ->
             match reader.TokenType with
             | JsonToken.StartArray ->
@@ -290,14 +283,14 @@ type FSharpJsonConverter() =
                 let name = reader.Value :?> string
                 let uci = getUci t name
                 advance reader
-                let itemTypes = uci.GetFields() |> Array.map (fun pi -> pi.PropertyType)
+                let itemTypes = uci.GetFields() |> Array.map (_.PropertyType)
                 if itemTypes.Length > 1
                 then
                     let values = readElements(reader, itemTypes, serializer)
                     advance reader
                     FSharpValue.MakeUnion(uci, List.toArray values)
                 else
-                    let value = serializer.Deserialize(reader, itemTypes.[0])
+                    let value = serializer.Deserialize(reader, itemTypes[0])
                     advance reader
                     FSharpValue.MakeUnion(uci, [|value|])
             | JsonToken.Null -> null // for { "union": null }
@@ -308,9 +301,9 @@ type FSharpJsonConverter() =
             let mapDeserializeMethod = mapSerializer.GetMethod("Deserialize")
             mapDeserializeMethod.Invoke(null, [| t; reader; serializer |])
         | true, Kind.Other when isRegisteredParentType t ->  
-            let inheritedTypes = inheritedConverterTypes.[t.FullName]
+            let inheritedTypes = inheritedConverterTypes[t.FullName]
             let jObject = JObject.Load(reader)
-            let jsonFields = jObject.Properties() |> Seq.map (fun prop -> prop.Name) |> List.ofSeq
+            let jsonFields = jObject.Properties() |> Seq.map (_.Name) |> List.ofSeq
             let inheritedType = inheritedTypeQuickAccessor.GetOrAdd((t.FullName,jsonFields),fun (_,jsonFields) ->
                 let findType (jsonFields: seq<string>) =
                     inheritedTypes |> Seq.maxBy (fun tp ->

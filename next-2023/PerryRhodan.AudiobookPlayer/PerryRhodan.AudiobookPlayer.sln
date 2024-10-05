@@ -17,6 +17,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Directory.Build.props = Directory.Build.props
 	EndProjectSection
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "PerryRhodan.AudiobookPlayer.Tests", "PerryRhodan.AudiobookPlayer.Tests\PerryRhodan.AudiobookPlayer.Tests.fsproj", "{57121491-8F5A-4B5D-B327-2F8E6EB90255}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,11 +49,17 @@ Global
 		{A01CFE14-3798-4333-A1D9-8E9451CE92D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A01CFE14-3798-4333-A1D9-8E9451CE92D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A01CFE14-3798-4333-A1D9-8E9451CE92D2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{57121491-8F5A-4B5D-B327-2F8E6EB90255}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57121491-8F5A-4B5D-B327-2F8E6EB90255}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57121491-8F5A-4B5D-B327-2F8E6EB90255}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{57121491-8F5A-4B5D-B327-2F8E6EB90255}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FA975F72-10BF-449E-AF8E-03F927A4CBCB}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
 	EndGlobalSection
 EndGlobal

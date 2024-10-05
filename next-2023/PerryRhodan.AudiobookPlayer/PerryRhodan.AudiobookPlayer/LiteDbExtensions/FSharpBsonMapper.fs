@@ -24,7 +24,7 @@ type FSharpBsonMapper() =
     static member UseCustomJsonConverters(converters: JsonConverter[]) = 
         Bson.converters <- converters   
 
-    override self.ToObject(entityType: System.Type, entity: BsonDocument) = Bson.deserializeByType entity entityType 
+    override self.ToObject(entityType: Type, entity: BsonDocument) = Bson.deserializeByType entity entityType 
     override self.ToObject<'t>(entity: BsonDocument) = Bson.deserialize<'t> entity
     override self.ToDocument<'t>(entity: 't) = 
         //Add DBRef Feature :set field value with $ref  
@@ -34,7 +34,7 @@ type FSharpBsonMapper() =
                 if not (isNull memberMapper.Serialize) then  
                     let value = memberMapper.Getter.Invoke(entity)
                     let serialized = memberMapper.Serialize.Invoke(value, self)
-                    doc.RawValue.[memberMapper.FieldName] <- serialized
+                    doc.RawValue[memberMapper.FieldName] <- serialized
             doc
         Bson.serialize<'t> entity
         |> withEntityMap 

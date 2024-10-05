@@ -1,8 +1,6 @@
 ﻿module Common
 
     open System
-    open System.IO
-    open System.Threading.Tasks
     open System.Net.Http.Headers
     open Avalonia.Media
     
@@ -51,7 +49,7 @@
                 | _ -> ()
                  // Create a new cancellation token and memoize it
                 let cts = new CancellationTokenSource()
-                memoizations.[key] <- cts
+                memoizations[key] <- cts
                  // Start a new debouncer
                 (async {
                     try
@@ -66,9 +64,8 @@
                 |> (fun task -> Async.StartImmediate(task, cts.Token)) 
 
 
-    module Helpers =
-        open Microsoft.AppCenter.Analytics
-        open Microsoft.AppCenter.Crashes
+    //module Helpers =
+
         
    
 
@@ -108,7 +105,7 @@
         let optToInt defaultValue (optStr:string option) =
             optStr
             |> Option.map (fun v ->
-                let (isInt,value) = Int32.TryParse(v)
+                let isInt,value = Int32.TryParse(v)
                 match isInt with
                 | true ->
                     value
@@ -136,7 +133,7 @@
         let regexMatchGroup pattern group input =
             let res = Regex.Match(input,pattern)
             if res.Success && res.Groups.Count >= group then
-                Some res.Groups.[group].Value
+                Some res.Groups[group].Value
             else
                 None
 
@@ -153,8 +150,8 @@
         open ICSharpCode.SharpZipLib.Zip
 
         let (|Mp3File|PicFile|Other|) (z:ZipEntry) = 
-            if (z.Name.Contains(".mp3")) then Mp3File
-            elif (z.Name.Contains(".jpg")) then PicFile
+            if z.Name.Contains(".mp3") then Mp3File
+            elif z.Name.Contains(".jpg") then PicFile
             else Other
 
 
@@ -187,7 +184,7 @@
     module PatternMatchHelpers =
 
         let (|StringContains|_|) (str:string) (input:string) =
-            if (input.Contains(str)) then Some () else None
+            if input.Contains(str) then Some () else None
 
 
 
@@ -212,7 +209,7 @@
                         evt.Publish.RemoveHandler(h)
                         counter <- counter - 1; 
                     member x.Subscribe(s) = 
-                        let h = new Handler<_>(fun _ -> s.OnNext)
+                        let h = Handler<_>(fun _ -> s.OnNext)
                         x.AddHandler(h)
                         { new System.IDisposable with 
                             member y.Dispose() = x.RemoveHandler(h) } }
