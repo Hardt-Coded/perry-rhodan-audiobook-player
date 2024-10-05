@@ -6,6 +6,7 @@
              xmlns:views="clr-namespace:PerryRhodan.AudiobookPlayer.Views"
              mc:Ignorable="d" d:DesignWidth="540" d:DesignHeight="1170"
              x:Class="PerryRhodan.AudiobookPlayer.Views.HomeView"
+             Background="Black"
              Design.DataContext="{Binding Source={x:Static vm:HomeViewModel.DesignVM}}"
              x:DataType="vm:HomeViewModel">
     <Grid RowDefinitions="Auto,*">

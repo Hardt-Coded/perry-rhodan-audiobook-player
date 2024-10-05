@@ -1,6 +1,5 @@
 ﻿namespace PerryRhodan.AudiobookPlayer.Views
 
-open Avalonia
 open Avalonia.Controls
 open Avalonia.Markup.Xaml
 

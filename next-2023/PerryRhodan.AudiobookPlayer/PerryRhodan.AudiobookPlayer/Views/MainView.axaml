@@ -2,41 +2,101 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             
-             xmlns:vm="clr-namespace:PerryRhodan.AudiobookPlayer.ViewModels"
+             xmlns:glassMorphism="clr-namespace:CherylUI.Controls.GlassMorphism;assembly=CherylUI"
              xmlns:controls="clr-namespace:CherylUI.Controls;assembly=CherylUI"
+             xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+             xmlns:vm="clr-namespace:PerryRhodan.AudiobookPlayer.ViewModels"
+             xmlns:nvms="clr-namespace:PerryRhodan.AudiobookPlayer.Notification.ViewModels"
              mc:Ignorable="d" d:DesignWidth="540 " d:DesignHeight="1170"
              x:Class="PerryRhodan.AudiobookPlayer.Views.MainView"
              Design.DataContext="{Binding Source={x:Static vm:MainViewModel.DesignVM}}"
+             Background="#202020"
              x:DataType="vm:MainViewModel">
+    <UserControl.Styles>
+        <Style Selector="avalonia|MaterialIcon.mainButton">
+            <Setter Property="Width" Value="32" />
+            <Setter Property="Height" Value="32" />
+        </Style>
+    </UserControl.Styles>
     
-    <dialogHostAvalonia:DialogHost>
+    <dialogHostAvalonia:DialogHost Background="Transparent">
         <dialogHostAvalonia:DialogHost.DataTemplates>
-            <DataTemplate DataType="vm:MessageBoxViewModel">
-                <StackPanel>
-                    <TextBlock Classes="headline6" TextAlignment="Center" Text="{Binding Title}" />
-                    <TextBlock Classes="Body1"
-                               TextAlignment="Center"
-                               TextWrapping="Wrap"
-                               Text="{Binding Message}" />
-                    <Button Margin="0 8 0 0"
-                            Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=dialogHostAvalonia:DialogHost}, Path=CloseDialogCommand}">
-                        OK
-                    </Button>
-                </StackPanel>
+            <DataTemplate DataType="nvms:MessageBoxViewModel">
+                <Border Background="#101010" CornerRadius="10">
+                    <StackPanel>
+                        <TextBlock Classes="headline6" TextAlignment="Center" Text="{Binding Title}" Margin="0,0,0,10"/>
+                        <ScrollViewer MaxHeight="400" Margin="5">
+                            <TextBlock Classes="Body1"
+                                       TextAlignment="Center"
+                                       TextWrapping="Wrap"
+                                       Text="{Binding Message}" />    
+                        </ScrollViewer>
+                        
+                        <Button Margin="0 8 0 0"
+                                Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=dialogHostAvalonia:DialogHost}, Path=CloseDialogCommand}">
+                            OK
+                        </Button>
+                    </StackPanel>
+                </Border>
+            </DataTemplate>
+            <DataTemplate DataType="nvms:QuestionBoxViewModel">
+                <Border Background="#101010" CornerRadius="10">
+                    <StackPanel>
+                        <TextBlock Classes="headline6" TextAlignment="Center" Text="{Binding Title}"  Margin="0,0,0,10" />
+                        <ScrollViewer MaxHeight="400" Margin="5">
+                            <TextBlock Classes="Body1"
+                                       TextAlignment="Center"
+                                       TextWrapping="Wrap"
+                                       Text="{Binding Message}" />    
+                        </ScrollViewer>
+                        
+                        <Button Margin="0 8 0 0"
+                                Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=dialogHostAvalonia:DialogHost}, Path=CloseDialogCommand}"
+                                CommandParameter="OK" 
+                                Content="{Binding OkButton}"/>
+                        
+                        <Button Margin="0 3 0 0"
+                                Theme="{StaticResource MaterialFlatButton}"
+                                Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=dialogHostAvalonia:DialogHost}, Path=CloseDialogCommand}"
+                                CommandParameter="CANCEL"
+                                Content="{Binding CancelButton}"/>
+                        
+                    </StackPanel>
+                </Border>
             </DataTemplate>
         </dialogHostAvalonia:DialogHost.DataTemplates>
     
     <controls:InteractiveContainer HorizontalAlignment="Stretch">
-    <Border Background="#202020">
+    <Border Background="Black">
         <Grid RowDefinitions="*, Auto"
-              ColumnDefinitions="*,*, *">
-            <ContentControl Grid.ColumnSpan="2" Grid.Row="0" Content="{Binding ContentView}" />
-            <Button Grid.Row="1" Grid.Column="0" Content="Home" Command="{Binding GoHome}" />
-            <Button Grid.Row="1" Grid.Column="1" Content="Player" Command="{Binding GoPlayer}" />
-            <Button Grid.Row="1" Grid.Column="2" Content="Login" Command="{Binding OpenLogin}" />
+              ColumnDefinitions="*, *, *, *">
+            <ContentControl Grid.ColumnSpan="4" Grid.Row="0" Content="{Binding ContentView}" />
+            <Button Grid.Row="1" 
+                    Grid.Column="0" 
+                    Theme="{StaticResource MaterialFlatButton}"
+                    Command="{Binding GoHome}">
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                    <avalonia:MaterialIcon Classes="mainButton" Kind="Home" />
+                    <TextBlock>Home</TextBlock>
+                </StackPanel>
+                
+            </Button>
+            
+            <Button Grid.Row="1" 
+                    Grid.Column="3" 
+                    Theme="{StaticResource MaterialFlatButton}"
+                    Command="{Binding OpenBrowserView}" >
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                    <avalonia:MaterialIcon Kind="Globe" Classes="mainButton" />
+                    <TextBlock>Browse</TextBlock>
+                </StackPanel>
+            </Button>
+            <Grid IsVisible="{Binding IsLoading}">
+                <ProgressBar Classes="circular" IsIndeterminate="True" />
+            </Grid>
         </Grid>
+        
     </Border>
     </controls:InteractiveContainer>
     </dialogHostAvalonia:DialogHost>

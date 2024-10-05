@@ -6,7 +6,6 @@
 module Bson =
 
     open System
-    open System.Globalization
     
     open FSharp.Reflection
     open Newtonsoft.Json
@@ -14,15 +13,15 @@ module Bson =
 
     /// Returns the value of entry in the BsonDocument by it's key
     let read key (doc: BsonDocument) =
-        doc.[key]
+        doc[key]
 
     /// Reads a property from a BsonDocument by it's key as a string
     let readStr key (doc: BsonDocument) = 
-        doc.[key].AsString
+        doc[key].AsString
 
     /// Reads a property from a BsonDocument by it's key and converts it to an integer
     let readInt key (doc: BsonDocument) = 
-        doc.[key].AsString |> int
+        doc[key].AsString |> int
 
     /// Adds an entry to a `BsonDocument` given a key and a BsonValue
     let withKeyValue key value (doc: BsonDocument) = 
@@ -31,7 +30,7 @@ module Bson =
 
     /// Reads a field from a BsonDocument as DateTime
     let readDate (key: string) (doc: BsonDocument) = 
-        doc.[key].AsDateTime
+        doc[key].AsDateTime
 
     /// Removes an entry (property) from a `BsonDocument` by the key of that property
     let removeEntryByKey (key:string) (doc: BsonDocument) = 
@@ -46,7 +45,7 @@ module Bson =
     let serialize<'t> (entity: 't) = 
         let typeName = typeof<'t>.Name
         let json = JsonConvert.SerializeObject(entity, converters)
-        let doc = LiteDB.JsonSerializer.Deserialize(json) |> unbox<LiteDB.BsonDocument>
+        let doc = JsonSerializer.Deserialize(json) |> unbox<BsonDocument>
         doc.Keys
         |> Seq.tryFind (fun key -> key = "Id" || key = "id")
         |> function
@@ -55,7 +54,7 @@ module Bson =
              |> withKeyValue "_id" (read key doc) 
              |> removeEntryByKey key
           | None -> 
-              let error = sprintf "Exected type %s to have a unique identifier property of 'Id' or 'id' (exact name)" typeName
+              let error = $"Exected type %s{typeName} to have a unique identifier property of 'Id' or 'id' (exact name)"
               failwith error
 
     /// Converts a BsonDocument to a typed entity given the document the type of the CLR entity.
@@ -85,7 +84,7 @@ module Bson =
                     | []  -> ()
                     | y :: ys -> 
                         let continueToNext() = rewriteKey ys entity entityType key 
-                        match y, entity.RawValue.[y] with 
+                        match y, entity.RawValue[y] with 
                         // during deserialization, turn key-prop _id back into original Id or id
                         | "_id", id ->
                             entity
@@ -124,12 +123,12 @@ module Bson =
                 entity
 
             rewriteIdentityKeys entity 
-            |> LiteDB.JsonSerializer.Serialize
+            |> JsonSerializer.Serialize
             |> fun json -> JsonConvert.DeserializeObject(json, entityType, converters)
     let serializeField(any: obj) : BsonValue = 
         // Entity => Json => Bson
         let json = JsonConvert.SerializeObject(any, Formatting.None, converters);
-        LiteDB.JsonSerializer.Deserialize(json);
+        JsonSerializer.Deserialize(json);
 
     /// Deserializes a field of a BsonDocument to a typed entity
     let deserializeField<'t> (value: BsonValue) = 
@@ -137,7 +136,7 @@ module Bson =
         let typeInfo = typeof<'t>
         value
         // Bson to Json
-        |> LiteDB.JsonSerializer.Serialize
+        |> JsonSerializer.Serialize
         // Json to 't
         |> fun json -> JsonConvert.DeserializeObject(json, typeInfo, converters)
         |> unbox<'t>

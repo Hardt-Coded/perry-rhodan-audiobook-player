@@ -1,6 +1,5 @@
 ﻿namespace global  // note use of GLOBAL namespace
 
-open System
 
 //==============================================
 // Helpers for Result type and AsyncResult type
@@ -393,7 +392,7 @@ module AsyncResult =
         x |> Async.retn
 
     let ofAsyncResult x : AsyncResult<_,_> =
-        x |> Async.map (id)
+        x |> Async.map id
 
     /// Lift a Async into an AsyncResult
     let ofAsync x : AsyncResult<_,_> = 

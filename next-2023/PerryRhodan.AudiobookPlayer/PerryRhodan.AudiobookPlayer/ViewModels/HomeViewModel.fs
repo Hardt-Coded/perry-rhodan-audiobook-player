@@ -1,11 +1,8 @@
 ﻿namespace PerryRhodan.AudiobookPlayer.ViewModels
 
-open System
 open System.Collections.ObjectModel
 open Domain
-open Microsoft.FSharp.Linq
-
-
+open PerryRhodan.AudiobookPlayer.ViewModel
 
 
 module HomePage =
@@ -42,7 +39,7 @@ module HomePage =
             let lastListenAudioBook =
                 audiobooks 
                 |> Array.filter (fun i -> i.DownloadState = AudioBookItem.Downloaded)
-                |> Array.sortByDescending (fun i -> i.AudioBook.State.LastTimeListend) 
+                |> Array.sortByDescending (_.AudioBook.State.LastTimeListend) 
                 |> Array.tryHead
                 |> Option.bind (fun i -> 
                     match i.AudioBook.State.LastTimeListend with
@@ -75,7 +72,6 @@ module HomePage =
     
     module SideEffects =
         
-        open System.Threading.Tasks
         
         let runSideEffects (sideEffect:SideEffect) (state:State) (dispatch:Msg -> unit) =
             task {
@@ -85,30 +81,10 @@ module HomePage =
                     
                 | SideEffect.LoadAudioBooks ->
                     try
-                        let! ab = Services.DataBase.loadAudioBooksStateFile ()
-                        let getRandomAudioBook() =
-                            {
-                                AudioBook.Empty with
-                                    Id = 1000
-                                    FullName = $"""Random AudioBook {Guid.NewGuid().ToString("N")}"""
-                                    EpisodenTitel = $"""Episode {Guid.NewGuid().ToString("N")}""" 
-                                    State = {
-                                        AudioBook.Empty.State with
-                                            Downloaded = true
-                                            CurrentPosition = Some {AudioBookPosition.Filename = ""; Position = TimeSpan.FromMinutes 1 }
-                                    }
-                            }
-                            
-                        let randomAudioBooks =
-                            Seq.init 100 (fun i -> getRandomAudioBook())
-                            |> Seq.toArray
-                            |> Array.map (fun i -> new AudioBookItemViewModel(Some i))
-                            
-                        let abVm =
-                            ab
-                            |> Array.map (fun i -> new AudioBookItemViewModel(Some i))
+                        let audioBooks =
+                            AudioBookStore.globalAudiobookStore.Model.Audiobooks
                         
-                        dispatch <| AudioBooksLoaded randomAudioBooks
+                        dispatch <| AudioBooksLoaded audioBooks                         
                         return ()
                     with
                     | ex ->
@@ -123,7 +99,6 @@ open HomePage
 open ReactiveElmish.Avalonia
 open ReactiveElmish
 open Elmish.SideEffect
-open System
 
 type HomeViewModel() =
     inherit ReactiveElmishViewModel()
@@ -140,10 +115,10 @@ type HomeViewModel() =
         this.Bind(local, _.LastTimeListenedAudioBook)
     
     member this.HasLastListenedAudioBook =
-        this.Bind(local, fun s -> s.LastTimeListenedAudioBook.IsSome)
+        this.Bind(local, _.LastTimeListenedAudioBook.IsSome)
         
     member this.IsLoading =
-        this.Bind(local, fun s -> s.IsLoading)
+        this.Bind(local, _.IsLoading)
         
         
     static member DesignVM = new HomeViewModel()
