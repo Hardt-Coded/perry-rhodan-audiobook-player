@@ -17,7 +17,7 @@ type Model = {
     
 and [<RequireQualifiedAccess>] View =
     | HomeView
-    | PlayerView of AudioBookItemViewModel
+    | PlayerView of viewModel:AudioBookItemViewModel * startPlaying:bool
     | BrowserView
     
 

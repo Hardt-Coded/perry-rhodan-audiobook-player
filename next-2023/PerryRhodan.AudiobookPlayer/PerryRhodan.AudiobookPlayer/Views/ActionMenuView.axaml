@@ -92,6 +92,13 @@
                     </StackPanel>
                 </Button>
                 
+                <Button Command="{Binding AudioBook.ToggleAmbientColor}" >
+                    <StackPanel Orientation="Horizontal">
+                        <avalonia:MaterialIcon Kind="Database" />
+                        <Label>Random Ambient Color</Label>
+                    </StackPanel>
+                </Button>
+                
                 <Button Classes="accent" 
                         Command="{Binding AudioBook.CloseDialog}" >
                     <StackPanel Orientation="Horizontal">

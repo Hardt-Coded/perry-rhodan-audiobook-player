@@ -50,12 +50,19 @@ module DependencyServices =
     type INavigationService =
         // abstract property
         abstract BackbuttonPressedAction:(unit->unit) option with get
+        
         abstract member RegisterBackbuttonPressed: (unit -> unit) -> unit
+        /// resets the back button callback to none
         abstract member ResetBackbuttonPressed: unit -> unit
+        /// resets the back button callback to none, but memorize the current callback
+        abstract member MemorizeBackbuttonCallback: memoId:string -> unit
+        /// restores the back button callback from the memorized callback, the current one will overwritten
+        abstract member RestoreBackbuttonCallback: memoId:string -> unit
 
 
     type NavigationService() =
         let mutable backbuttonPressedAction = None
+        let concurrentDict = System.Collections.Concurrent.ConcurrentDictionary<string,(unit->unit)>()
         interface INavigationService with
             member this.BackbuttonPressedAction
                 with get() = backbuttonPressedAction
@@ -64,7 +71,27 @@ module DependencyServices =
                 backbuttonPressedAction <- Some action
 
             member this.ResetBackbuttonPressed() = 
-                backbuttonPressedAction <- None 
+                backbuttonPressedAction <- None
+
+            member this.MemorizeBackbuttonCallback(memoId) =
+                let this = this :> INavigationService
+                match this.BackbuttonPressedAction with
+                | None ->
+                    // nothing to memorize
+                    this.ResetBackbuttonPressed()
+                | Some action ->
+                    let func = Func<string,(unit->unit),(unit->unit)>(fun _ _ -> action)
+                    concurrentDict.AddOrUpdate(memoId, action, func) |> ignore
+                    this.ResetBackbuttonPressed()
+                
+                
+            member this.RestoreBackbuttonCallback(memoId) =
+                let this = this :> INavigationService
+                let gotAction, storedAction = concurrentDict.TryGetValue(memoId)
+                if gotAction then
+                    this.RegisterBackbuttonPressed storedAction
+                else
+                    this.ResetBackbuttonPressed()
 
 module Consts =
     
@@ -1574,24 +1601,30 @@ module DownloadService =
                                      if not (state.Listeners |> List.exists (fun (k,_) -> k = key)) then
                                          return! loop { state with Listeners = state.Listeners @ [(key,handler)] }
                                      else
-                                         return! loop state
+                                        // replace listener
+                                        return! loop { state with Listeners = state.Listeners |> List.map (fun (k,h) -> if k = key then (key,handler) else (k,h)) }
+                                        
                                  | RemoveInfoListener key ->
                                      let newState =
                                          { state with Listeners = state.Listeners |> List.filter (fun (k,_) -> k <> key) }
                                      return! loop newState
                                  | SendInfo info ->
-                                     state.Listeners 
-                                     |> List.map (fun (_,handler) -> async { do! handler(info) })
-                                     |> Async.Sequential
-                                     |> Async.RunSynchronously
-                                     |> ignore
+                                     // send info only to listener with proper name
+                                     let listenerName = $"AudioBook{info.AudioBook.Id}Listener"
+                                     do! 
+                                         state.Listeners 
+                                         |> List.tryFind (fun (k,_) -> k = listenerName)
+                                         |> Option.map (fun (_,handler) -> async { do! handler(info) })
+                                         |> Option.defaultValue (async { return () })
 
                                      return! loop state
+                                     
                                  | GetState reply ->
                                      match state.ServiceListener with
                                      | None ->
                                          reply.Reply(None)
                                          return! loop state
+                                         
                                      | Some listener ->
                                          listener <| ServiceMessages.GetState reply
                                          return! loop state

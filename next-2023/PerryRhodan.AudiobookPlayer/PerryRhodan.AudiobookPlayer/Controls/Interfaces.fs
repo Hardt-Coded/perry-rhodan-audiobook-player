@@ -16,7 +16,7 @@ type IActionMenuService =
     abstract member ShowAudiobookActionMenu:IAudioBookItemViewModel->unit
     
 type IMainViewModel =
-    abstract member GoPlayerPage:IAudioBookItemViewModel->unit
+    abstract member GoPlayerPage:viewModel:IAudioBookItemViewModel->startPlaying:bool->unit
 
 type IMainViewAccessService =
     abstract member GetMainViewModel:unit->IMainViewModel

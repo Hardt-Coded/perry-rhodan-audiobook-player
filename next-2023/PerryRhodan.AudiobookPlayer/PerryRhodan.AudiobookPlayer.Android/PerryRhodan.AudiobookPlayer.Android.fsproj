@@ -1,24 +1,37 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0-android</TargetFramework>
     <SupportedOSPlatformVersion>31</SupportedOSPlatformVersion>
     <ApplicationId>hits.rhodan.audiobooks.dev</ApplicationId>
-    <ApplicationVersion>400040</ApplicationVersion>
-    
-    <ApplicationDisplayVersion>1.60.0</ApplicationDisplayVersion>
+    <ApplicationVersion>49990</ApplicationVersion>
+
+    <ApplicationDisplayVersion>2.0.0-beta</ApplicationDisplayVersion>
     <AndroidPackageFormat>apk</AndroidPackageFormat>
-    <AndroidEnableProfiledAot>False</AndroidEnableProfiledAot>
+
     <AndroidResgenFile>Resources\Resource.designer.cs</AndroidResgenFile>
     <AndroidResgenClass>Resource</AndroidResgenClass>
-
     <UseMauiEssentials>true</UseMauiEssentials>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <IsAotCompatible>True</IsAotCompatible>
+    <AndroidPackageFormat>apk</AndroidPackageFormat>
+    <AndroidDexTool>d8</AndroidDexTool>
+    <DebugSymbols>False</DebugSymbols>
+    <EnableLLVM>False</EnableLLVM>
+    <AndroidUseAapt2>True</AndroidUseAapt2>
+    <RunAOTCompilation>False</RunAOTCompilation>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <IsAotCompatible>True</IsAotCompatible>
+    <OptimizationPreference>Speed</OptimizationPreference>
+    <!--<PublishAot>true</PublishAot>-->
+    <AndroidPackageFormat>apk</AndroidPackageFormat>
+    <AndroidDexTool>d8</AndroidDexTool>
+    <DebugSymbols>True</DebugSymbols>
+    <EnableLLVM>False</EnableLLVM>
+    <AndroidUseAapt2>True</AndroidUseAapt2>
+    <RunAOTCompilation>True</RunAOTCompilation>
+    <!-- <AndroidLinkTool>r8</AndroidLinkTool> -->
+    <!--<AndroidEnableProfiledAot>True</AndroidEnableProfiledAot>-->
   </PropertyGroup>
 
   <ItemGroup>
@@ -29,25 +42,26 @@
 
   <ItemGroup>
     <PackageReference Include="Avalonia.Android" Version="11.1.3" />
-    <PackageReference Include="Plugin.MediaManager" Version="1.2.2" />
+    <PackageReference Include="Microsoft.NET.Runtime.MonoAOTCompiler.Task" Version="8.0.8" />
     <PackageReference Include="Xamarin.AndroidX.Core.SplashScreen" Version="1.0.1.12" />
     <PackageReference Update="Microsoft.Maui.Essentials" Version="8.0.91" />
+    <PackageReference Include="Xamarin.AndroidX.Media3.ExoPlayer" Version="1.4.1" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <ProjectReference Include="..\PerryRhodan.AudiobookPlayer\PerryRhodan.AudiobookPlayer.fsproj" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <Content Include="Properties\AndroidManifest.xml" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <Compile Include="Services\ScreenService.fs" />
     <Compile Include="Services\Common.fs" />
-    <Compile Include="Services\AudioPlayerService.fs" />
     <Compile Include="Services\NotificationService.fs" />
     <Compile Include="Services\DownloadService.fs" />
+    <Compile Include="Services\AudioPlayer.fs" />
     <Compile Include="Activities.fs" />
   </ItemGroup>
 </Project>

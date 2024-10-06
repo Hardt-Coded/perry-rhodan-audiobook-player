@@ -390,7 +390,10 @@ module BrowserPage =
                         match input with
                         | Ok (newAudioBookItems,currentAudioBooks) ->
                             do! newAudioBookItems |> notifyAfterSync
-                            dispatch <| AudioBookItemsChanged (Array.concat [newAudioBookItems;currentAudioBooks])
+                            let audioBooks =(Array.concat [newAudioBookItems;currentAudioBooks])
+                            dispatch <| AudioBookItemsChanged audioBooks
+                            // also sync with global store
+                            AudioBookStore.globalAudiobookStore.Dispatch (AudioBookStore.AudioBookElmish.AudiobooksLoaded audioBooks)
                         | Error err ->
                             match err with
                             | NoSessionAvailable ->
@@ -449,8 +452,7 @@ module BrowserPage =
                     
                 | SideEffect.LoadOnlineAudioBooks ->
                     do! synchronizeWithCloudCmd state dispatch
-                    // sync with global store
-                    AudioBookStore.globalAudiobookStore.Dispatch (AudioBookStore.AudioBookElmish.AudiobooksLoaded state.AudioBookItems)
+                    
                     return ()
                     
                 | SideEffect.OpenLoginPage ->

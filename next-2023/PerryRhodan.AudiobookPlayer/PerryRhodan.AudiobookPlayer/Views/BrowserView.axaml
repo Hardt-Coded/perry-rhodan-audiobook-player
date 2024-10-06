@@ -38,7 +38,7 @@
                                 Command="{Binding $parent[ItemsControl].((vm:BrowserViewModel)DataContext).SelectAdditionalGroup }" CommandParameter="{Binding .}">
                             <StackPanel Orientation="Horizontal">
                                 <avalonia:MaterialIcon Kind="Folder" Margin="0,0,10,0"/>
-                                <TextBlock Text="{Binding .}"/>    
+                                <TextBlock Text="{Binding .}" TextWrapping="Wrap"/>    
                             </StackPanel>
                             
                         </Button>

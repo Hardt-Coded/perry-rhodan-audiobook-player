@@ -5,19 +5,16 @@
     open Android.App
     open Android.OS
     open Android.Content
+    open _Microsoft.Android.Resource.Designer
 
     [<AutoOpen>]
     module private Settings =
-        open Android
-
-        let icon name = 
-            typeof<Resource.Drawable>.GetField(name).GetValue(null) :?> int
 
 
-        let smallIcon = icon "einsa_small_icon"
+        let smallIcon = Resource.Drawable.einsa_small_icon
     
         let logo = 
-            Android.Graphics.BitmapFactory.DecodeResource(Application.Context.Resources ,icon "eins_a_medien_logo")
+            Android.Graphics.BitmapFactory.DecodeResource(Application.Context.Resources ,Resource.Drawable.eins_a_medien_logo)
 
         let downloadServiceNotificationId = 234254
         let downloadServiceChannelId = "perry.rhodan.download.notification"

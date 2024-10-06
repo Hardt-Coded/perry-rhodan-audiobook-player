@@ -33,13 +33,17 @@
               ColumnDefinitions="*, *, *, *, *"
               RowDefinitions="Auto,*,*,*">
             <StackPanel Grid.Row="0"
-                        HorizontalAlignment="Center"
                         Grid.ColumnSpan="5">
-                <TextBlock Text="{Binding AudioBook.AudioBook.FullName}" />
-                <TextBlock Text="{Binding CurrentTrackNumberString}" />
-                <TextBlock Text="{Binding PositionString}" />
-                <TextBlock Text="{Binding TotalPositionString}" />
-                <TextBlock Text="{Binding SliderIsDragging}" />
+                <StackPanel.Styles>
+                    <Style Selector="TextBlock">
+                        <Setter Property="Margin" Value="0,0,0,5" />
+                        <Setter Property="FontSize" Value="16" />
+                    </Style>
+                </StackPanel.Styles>
+                <TextBlock Text="{Binding AudioBook.AudioBook.FullName}" HorizontalAlignment="Center"/>
+                <TextBlock Text="{Binding CurrentTrackNumberString}" HorizontalAlignment="Center" />
+                <TextBlock Text="{Binding PositionString}" HorizontalAlignment="Center" />
+                <TextBlock Foreground="#606060" Text="{Binding TotalPositionString}" HorizontalAlignment="Center" />
             </StackPanel>
             <controls:MySlider Grid.ColumnSpan="5"
                                Grid.Row="1" Margin="30"
