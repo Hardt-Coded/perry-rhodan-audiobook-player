@@ -141,11 +141,12 @@ module AudioBookItem =
         | MarkAudioBookAsListend
         | UnmarkAudioBookAsListend
         
-        | OpenAudioBookPlayer
+        | OpenAudioBookPlayer of startPlaying:bool
         | OpenAudioBookDetail
         | DeleteItemFromDb
 
         | ShowMetaData
+        | ToggleAmbientColor
 
         | UpdateDownloadProgress of current:int * total:int
         | DownloadCompleted of WebAccess.Downloader.DownloadResult
@@ -160,7 +161,7 @@ module AudioBookItem =
         | Init
         | OpenAudioBookActionMenu
         | CloseAudioBookActionMenu
-        | OpenAudioBookPlayer
+        | OpenAudioBookPlayer of startPlaying:bool
         
         | StartDownload
         | DownloadCompleted
@@ -217,16 +218,12 @@ module AudioBookItem =
         | DownloadCompleted result ->
             let imageFullName = result.Images |> Option.map (_.Image)
             let thumbnail = result.Images |> Option.map (_.Thumbnail)
-            let newAudioBook = {
-                state.Audiobook with
-                    State.Downloaded = true
-                    State.DownloadedFolder = Some result.TargetFolder
-                    Picture = imageFullName
-                    Thumbnail = thumbnail
-            }                          
             let newModel = {
                 state with
-                    Audiobook = newAudioBook
+                    Audiobook.State.Downloaded = true
+                    Audiobook.State.DownloadedFolder = Some result.TargetFolder
+                    Audiobook.Picture = imageFullName
+                    Audiobook.Thumbnail = thumbnail
                     DownloadState = Downloaded
             }
             newModel, SideEffect.DownloadCompleted
@@ -270,8 +267,8 @@ module AudioBookItem =
         | UpdateDownloadProgress (current, total) ->            
             { state with DownloadState = Downloading (current, total) }, SideEffect.None
 
-        | Msg.OpenAudioBookPlayer  ->
-            state, SideEffect.OpenAudioBookPlayer 
+        | Msg.OpenAudioBookPlayer startPlaying  ->
+            state, SideEffect.OpenAudioBookPlayer startPlaying
 
         | Msg.OpenAudioBookDetail ->
             state, SideEffect.OpenAudioBookDetail
@@ -289,6 +286,7 @@ module AudioBookItem =
                 { state with
                     Audiobook.State.CurrentPosition = Some position
                     ListenState = InProgress position
+                    Audiobook.State.LastTimeListend = Some DateTime.Now 
                 }, SideEffect.UpdateDatabase
             | None ->
                 // position can only set, if we have a current filename
@@ -301,15 +299,23 @@ module AudioBookItem =
                 { state with
                     Audiobook.State.CurrentPosition = Some position
                     ListenState = InProgress position
+                    Audiobook.State.LastTimeListend = Some DateTime.Now 
                 }, SideEffect.UpdateDatabase
             | None ->
                 // if we have no position, set it to 0
                 { state with
                     Audiobook.State.CurrentPosition = Some { Filename =  filename; Position = TimeSpan.Zero }
                     ListenState = InProgress { Filename = filename; Position = TimeSpan.Zero }
+                    Audiobook.State.LastTimeListend = Some DateTime.Now 
                 }, SideEffect.UpdateDatabase
 
         | SetAmbientColor color ->
+            { state with AmbientColor = Some color }, SideEffect.None
+
+        | ToggleAmbientColor ->
+            // generate random 6 digit hex  string
+            let random = System.Random()
+            let color = $"#{random.Next(0x1000000):X6}"
             { state with AmbientColor = Some color }, SideEffect.None
             
         
@@ -317,138 +323,149 @@ module AudioBookItem =
         
     module SideEffects =
         
+        [<AutoOpen>]
+        module private Helpers =
         
-        let private openLoginForm () =
-            Dispatcher.UIThread.Invoke<unit> (fun _ ->
-                let control = PerryRhodan.AudiobookPlayer.Views.LoginView()
-                let vm = DependencyService.Get<ILoginViewModel>()
-                control.DataContext <- vm
-                InteractiveContainer.ShowDialog (control, true)
-                let navigationService = DependencyService.Get<INavigationService>()
-                navigationService
-                    .RegisterBackbuttonPressed (fun _ ->
+            let openLoginForm () =
+                Dispatcher.UIThread.Invoke<unit> (fun _ ->
+                    let control = PerryRhodan.AudiobookPlayer.Views.LoginView()
+                    let vm = DependencyService.Get<ILoginViewModel>()
+                    control.DataContext <- vm
+                    InteractiveContainer.ShowDialog (control, true)
+                    let navigationService = DependencyService.Get<INavigationService>()
+                    navigationService
+                        .RegisterBackbuttonPressed (fun _ ->
+                            InteractiveContainer.CloseDialog()
+                            navigationService.ResetBackbuttonPressed()              
+                        )
+                )
+                
+           
+             
+            let removeDownloadFromQueue (ab:AudioBook) =
+                DownloadService.removeDownload <| DownloadService.DownloadInfo.Create ab
+
+
+            let downloadAudiobook (audiobook:IAudioBookItemViewModel) dispatch =
+                task {
+                    match! SecureLoginStorage.loadCookie() with                
+                    | Error _ ->
                         InteractiveContainer.CloseDialog()
-                        navigationService.ResetBackbuttonPressed()              
-                    )
-            )
-            
-       
-         
-        let private removeDownloadFromQueue (ab:AudioBook) =
-            DownloadService.removeDownload <| DownloadService.DownloadInfo.Create ab
-
-
-        let private downloadAudiobook (audiobook:IAudioBookItemViewModel) dispatch =
-            task {
-                match! SecureLoginStorage.loadCookie() with                
-                | Error _ ->
-                    InteractiveContainer.CloseDialog()
-                    openLoginForm ()
-                    dispatch <| RemoveDownloadFromQueue
-                    
-                    
-                | Ok _ ->
-
-                    DownloadService.startService ()
-                    DownloadService.addInfoListener "downloadQueueListener" (fun info ->
-                        async {
-
-                            match info.State with
-                            | DownloadService.Running (total,current) ->
-                                audiobook.SetUploadDownloadState (current,total)
-                            | DownloadService.Open ->
-                                ()
-                            | DownloadService.Finished result ->
-                                audiobook.SetDownloadCompleted result
-                            | _ ->
-                                ()
-                        }
-                    )
-
-                    DownloadService.registerErrorListener (fun (_,error) ->
-                        async {
-                            match error with
-                            | ComError.SessionExpired _ ->
-                                DownloadService.shutDownService ()
-                                openLoginForm ()
-                                dispatch <| RemoveDownloadFromQueue
-
-                            | ComError.Other msg ->
-                                do! Notifications.showErrorMessage msg |> Async.AwaitTask
-
-                            | ComError.Network msg ->
-                                // the download service restarts network error automatically
-                                do! Notifications.showErrorMessage msg |> Async.AwaitTask
-                                ()
-                            | ComError.Exception e ->
-                                let ex = e.GetBaseException()
-                                let msg = ex.Message + "|" + ex.StackTrace
-                                do! Notifications.showErrorMessage msg |> Async.AwaitTask
-                                    
-                            
-                        }
-                    )
-
-                    DownloadService.addDownload <| DownloadService.DownloadInfo.Create audiobook.AudioBook
-
-                    DownloadService.startDownloads ()
-                    
-                    InteractiveContainer.CloseDialog()
+                        openLoginForm ()
+                        dispatch <| RemoveDownloadFromQueue
                         
-            }
+                        
+                    | Ok _ ->
 
+                        DownloadService.startService ()
+                        let listenerName = $"AudioBook{audiobook.AudioBook.Id}Listener"
+                        DownloadService.addInfoListener listenerName (fun info ->
+                            async {
+
+                                match info.State with
+                                | DownloadService.Running (total,current) ->
+                                    audiobook.SetUploadDownloadState (current,total)
+                                | DownloadService.Open ->
+                                    ()
+                                | DownloadService.Finished result ->
+                                    audiobook.SetDownloadCompleted result
+                                    DownloadService.removeInfoListener listenerName
+                                | _ ->
+                                    ()
+                            }
+                        )
+
+                        DownloadService.registerErrorListener (fun (_,error) ->
+                            async {
+                                match error with
+                                | ComError.SessionExpired _ ->
+                                    DownloadService.shutDownService ()
+                                    openLoginForm ()
+                                    dispatch <| RemoveDownloadFromQueue
+                                    DownloadService.removeInfoListener listenerName
+
+                                | ComError.Other msg ->
+                                    do! Notifications.showErrorMessage msg |> Async.AwaitTask
+                                    DownloadService.removeInfoListener listenerName
+
+                                | ComError.Network msg ->
+                                    // the download service restarts network error automatically
+                                    do! Notifications.showErrorMessage msg |> Async.AwaitTask
+                                    ()
+                                | ComError.Exception e ->
+                                    let ex = e.GetBaseException()
+                                    let msg = ex.Message + "|" + ex.StackTrace
+                                    do! Notifications.showErrorMessage msg |> Async.AwaitTask
+                                    DownloadService.removeInfoListener listenerName
+                                        
+                                
+                            }
+                        )
+
+                        DownloadService.addDownload <| DownloadService.DownloadInfo.Create audiobook.AudioBook
+
+                        DownloadService.startDownloads ()
+                        
+                        InteractiveContainer.CloseDialog()
+                            
+                }
+
+              
+            let updateDatabase audiobook =
+                task {
+                    let! result =  DataBase.updateAudioBookInStateFile audiobook
+                    match result with
+                    | Ok _ ->
+                        return ()
+                    | Error e ->
+                        do! Notifications.showErrorMessage e    
+                }
+              
+              
+            let getAmbientColorFromPicture (picture:string) =
+                let bitmap = SkiaSharp.SKBitmap.Decode picture
+                if bitmap = null then
+                    "#ff483d8b"
+                else
+                    let bitmap = bitmap.Resize(SkiaSharp.SKImageInfo(5,5), SkiaSharp.SKFilterQuality.Low)
+                    
+                    let getHue (x,_,_) = x
+                    
+                    let hues =
+                        [
+                            bitmap.GetPixel(0,1).ToHsv() |> getHue
+                            bitmap.GetPixel(0,2).ToHsv() |> getHue
+                            bitmap.GetPixel(0,3).ToHsv() |> getHue
+                            bitmap.GetPixel(0,4).ToHsv() |> getHue
+                            bitmap.GetPixel(1,4).ToHsv() |> getHue
+                            bitmap.GetPixel(2,4).ToHsv() |> getHue
+                            bitmap.GetPixel(3,4).ToHsv() |> getHue
+                            bitmap.GetPixel(4,4).ToHsv() |> getHue
+                            bitmap.GetPixel(4,3).ToHsv() |> getHue
+                            bitmap.GetPixel(4,2).ToHsv() |> getHue
+                            bitmap.GetPixel(4,1).ToHsv() |> getHue
+                            bitmap.GetPixel(4,0).ToHsv() |> getHue
+                            bitmap.GetPixel(3,0).ToHsv() |> getHue
+                            bitmap.GetPixel(2,0).ToHsv() |> getHue
+                            bitmap.GetPixel(3,3).ToHsv() |> getHue
+                        ]
+                        
+                    let avgeHue = hues |> List.average
+                    let aboveAvg = hues |> List.filter (fun x -> x > avgeHue)
+                    let belowAvg = hues |> List.filter (fun x -> x < avgeHue)
+                    let avgHue =
+                        if aboveAvg.Length > belowAvg.Length then
+                            aboveAvg |> List.average
+                        else
+                            belowAvg |> List.average
+                        
+                        
+                        
+                        //|> List.average
+                        
+                    let avgHueColor = SkiaSharp.SKColor.FromHsv(avgHue, 100.0f, 50.0f)
+                    avgHueColor.ToString()
           
-        let private updateDatabase audiobook =
-            task {
-                let! result =  DataBase.updateAudioBookInStateFile audiobook
-                match result with
-                | Ok _ ->
-                    return ()
-                | Error e ->
-                    do! Notifications.showErrorMessage e    
-            }
-          
-          
-        let private getAmbientColorFromPicture (picture:string) =
-            let bitmap = SkiaSharp.SKBitmap.Decode picture
-            if bitmap = null then
-                "#ff483d8b"
-            else
-                let bitmap = bitmap.Resize(SkiaSharp.SKImageInfo(5,5), SkiaSharp.SKFilterQuality.Low)
-                
-                let getHue (x,_,_) = x
-                
-                let hues =
-                    [
-                        bitmap.GetPixel(0,1).ToHsv() |> getHue
-                        bitmap.GetPixel(0,2).ToHsv() |> getHue
-                        bitmap.GetPixel(0,3).ToHsv() |> getHue
-                        bitmap.GetPixel(0,4).ToHsv() |> getHue
-                        bitmap.GetPixel(1,4).ToHsv() |> getHue
-                        bitmap.GetPixel(2,4).ToHsv() |> getHue
-                        bitmap.GetPixel(3,4).ToHsv() |> getHue
-                        bitmap.GetPixel(4,4).ToHsv() |> getHue
-                        bitmap.GetPixel(4,3).ToHsv() |> getHue
-                        bitmap.GetPixel(4,2).ToHsv() |> getHue
-                        bitmap.GetPixel(4,1).ToHsv() |> getHue
-                        bitmap.GetPixel(4,0).ToHsv() |> getHue
-                    ]
-                    
-                let avgeHue = hues |> List.average
-                let aboveAvg = hues |> List.filter (fun x -> x > avgeHue)
-                let belowAvg = hues |> List.filter (fun x -> x < avgeHue)
-                let avgHue =
-                    if aboveAvg.Length > belowAvg.Length then
-                        aboveAvg |> List.average
-                    else
-                        belowAvg |> List.average
-                    
-                    
-                    
-                    //|> List.average
-                    
-                let avgHueColor = SkiaSharp.SKColor.FromHsv(avgHue, 100.0f, 50.0f)
-                avgHueColor.ToString()
           
         let runSideEffects (sideEffect:SideEffect) (state:State) (dispatch:Msg -> unit) =
             let navigationService = DependencyService.Get<INavigationService>()
@@ -468,25 +485,26 @@ module AudioBookItem =
                         return ()
                     
                     | SideEffect.OpenAudioBookActionMenu ->
-                        let service = DependencyService.Get<IActionMenuService>()
-                        service.ShowAudiobookActionMenu state.ViewModel
+                        let menuService = DependencyService.Get<IActionMenuService>()
+                        menuService.ShowAudiobookActionMenu state.ViewModel
                         
+                        navigationService.MemorizeBackbuttonCallback "PreviousToActionMenu"
                         navigationService
                             .RegisterBackbuttonPressed (fun _ ->
                                 InteractiveContainer.CloseDialog()
-                                navigationService.ResetBackbuttonPressed()
+                                navigationService.RestoreBackbuttonCallback "PreviousToActionMenu"
                             )
                         return ()
                         
                     | SideEffect.CloseAudioBookActionMenu ->
                         InteractiveContainer.CloseDialog()
-                        DependencyService.Get<INavigationService>().ResetBackbuttonPressed()
+                        DependencyService.Get<INavigationService>().RestoreBackbuttonCallback "PreviousToActionMenu"
                         return()
 
-                    | SideEffect.OpenAudioBookPlayer ->
+                    | SideEffect.OpenAudioBookPlayer startPlaying ->
                         let mainViewAccessService = DependencyService.Get<IMainViewAccessService>()
                         let mainViewModel = mainViewAccessService.GetMainViewModel()
-                        mainViewModel.GoPlayerPage state.ViewModel
+                        mainViewModel.GoPlayerPage state.ViewModel startPlaying
                         InteractiveContainer.CloseDialog()
                         return()
                         
@@ -559,7 +577,7 @@ module AudioBookItem =
 
 
 
-module private  DemoData =
+module private DemoData =
     let designAudioBook = {
             Id = 1
             FullName = "Perry Rhodan 3000 - Mythos Erde" 
@@ -632,13 +650,15 @@ module private Draw =
             path.ArcTo(rect, startAngle, sweepAngle, false);
             path.Close();
 
+            let alphaColor = color.WithAlpha(calcAlpha factor)
+            
             fillPaint.Style <- SKPaintStyle.Fill
-            fillPaint.Color <- color.WithAlpha(calcAlpha factor)
+            fillPaint.Color <- alphaColor
             fillPaint.BlendMode <- SKBlendMode.Plus
             fillPaint.IsAntialias <- false
 
             outlinePaint.Style <- SKPaintStyle.Stroke;
-            outlinePaint.StrokeWidth <- 6.0f;
+            outlinePaint.StrokeWidth <- 1.0f;
             outlinePaint.Color <- color //.WithAlpha(alpha)
             outlinePaint.IsAntialias <- false
 
@@ -684,54 +704,6 @@ module private Draw =
         let image = new Bitmap(stream)
         image
         
-
-    let progressPie factor =
-        let f32 = float32
-
-        let width = 250
-        let height = 250
-        use bitmap =  new SKBitmap(width, height, SKColorType.Rgba8888, SKAlphaType.Premul)
-        use canvas =  new SKCanvas(bitmap)
-        canvas.Clear()
-
-        let center = SKPoint((width |> f32) / 2.0f, (height |> f32) / 2.0f);
-        let margin = 0;
-        let radius = (Math.Min(width / 2, height  / 2) - (2 * margin)) |> f32
-        let rect = SKRect(center.X - radius, center.Y - radius, center.X + radius, center.Y + radius);
-
-        let drawPie (color:SKColor) startAngle sweepAngle =
-            use path = new SKPath()
-            use fillPaint = new SKPaint()
-            use outlinePaint = new SKPaint()
-
-            path.MoveTo(center);
-            path.ArcTo(rect, startAngle, sweepAngle, false);
-            path.Close();
-
-            fillPaint.Style <- SKPaintStyle.StrokeAndFill
-            fillPaint.Color <- color
-            fillPaint.IsAntialias <- false
-
-            outlinePaint.Style <- SKPaintStyle.Stroke;
-            outlinePaint.StrokeWidth <- 2.0f;
-            outlinePaint.Color <- SKColors.Black
-            outlinePaint.IsAntialias <- false
-
-            canvas.DrawPath(path, fillPaint);
-            canvas.DrawPath(path, outlinePaint);
-
-
-        let startAngle = -90.0f;
-        let sweepAngle =
-            let x = 360.0 * factor |> float32;
-            if x >= 360.0f then 359.99f else x
-
-        drawPie SKColors.Yellow startAngle sweepAngle
-        canvas.Save() |> ignore
-        let data = bitmap.Encode(SKEncodedImageFormat.Png, 100)
-        use stream = data.AsStream()
-        let image = new Bitmap(stream)
-        image
 
 
 module private Helpers =
@@ -783,6 +755,9 @@ type AudioBookItemViewModel(audiobook: AudioBook) as self =
     member this.AudioBook       = this.Bind(local, _.Audiobook)
     member this.DownloadState   = this.Bind(local, _.DownloadState)
     member this.IsDownloaded    = this.Bind(local, fun s -> s.DownloadState = Downloaded)
+    member this.IsQueued        = this.Bind(local, fun s -> s.DownloadState = Queued)
+    member this.IsDownloading   = this.Bind(local, fun s -> match s.DownloadState with | Downloading _ -> true | _ -> false)
+    member this.IsNotDownloaded = this.Bind(local, fun s -> s.DownloadState = NotDownloaded)
     member this.IsComplete      = this.Bind(local, fun s -> s.ListenState = Listend)
     member this.ListenState     = this.Bind(local, _.ListenState)
     member this.AmbientColor    = this.BindOnChanged(local, _.AmbientColor, (fun i ->
@@ -797,13 +772,14 @@ type AudioBookItemViewModel(audiobook: AudioBook) as self =
     member this.RemoveAudiobookFromDevice() = local.Dispatch RemoveAudiobookFromDevice
     member this.MarkAsListend()             = local.Dispatch MarkAudioBookAsListend
     member this.MarkAsUnlistend()           = local.Dispatch UnmarkAudioBookAsListend
-    member this.OpenPlayer()                = local.Dispatch OpenAudioBookPlayer
+    member this.OpenPlayerAndPlay()         = local.Dispatch <| OpenAudioBookPlayer true
+    member this.OpenPlayer()                = local.Dispatch <| OpenAudioBookPlayer false
     member this.OpenDetail()                = local.Dispatch OpenAudioBookDetail
     member this.DeleteItemFromDb()          = local.Dispatch DeleteItemFromDb
     member this.ShowMetaData()              = local.Dispatch ShowMetaData
     member this.UpdateAudioBookPosition pos = local.Dispatch (UpdateAudioBookPosition pos)
     member this.UpdateCurrentListenFilename filename = local.Dispatch (UpdateCurrentListenFilename filename)
-    
+    member this.ToggleAmbientColor()        =  local.Dispatch (ToggleAmbientColor)
     
     member this.StartDownloadVisible    = this.Bind(local, fun s -> s.DownloadState = NotDownloaded)
     member this.RemoveDownloadVisible   = this.Bind(local, fun s -> s.DownloadState = Queued)
@@ -830,18 +806,17 @@ type AudioBookItemViewModel(audiobook: AudioBook) as self =
         | _ -> Unchecked.defaultof<Bitmap>
     )
     
-    member this.ProgressPie = this.Bind(local, fun s ->
-        let percentageFinished (s: State) =
+    member this.ListendenProgress = this.Bind(local, fun s ->
+        match s.ListenState with
+        | InProgress pos ->
             s
             |> Helpers.getProgressAndTotalDuration
-            |> Option.map (fun x -> (x.CurrentProgress / x.TotalDuration))
-        
-        match percentageFinished s with
-        | Some progress -> Draw.progressPie progress 
-        | _ ->
-            match s.ListenState with
-            | Listend -> Draw.progressPie 1.0
-            | _ -> Unchecked.defaultof<Bitmap>)
+            |> Option.map (fun x -> x.CurrentProgress / x.TotalDuration * 100.)
+            |> Option.defaultValue 0.
+        | _ -> 0.
+    )
+    
+    
     
     static member DesignVM = new AudioBookItemViewModel(DemoData.designAudioBook)
     static member DesignVM2 = new AudioBookItemViewModel(DemoData.designAudioBook2)

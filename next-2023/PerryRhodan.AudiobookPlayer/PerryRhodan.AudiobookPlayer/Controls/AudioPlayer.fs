@@ -37,6 +37,7 @@ module PlayerElmish =
             ServiceState: AudioPlayerServiceState
             TimeUntilSleep: TimeSpan option 
             PlaybackSpeed:float
+            IsBusy: bool
         }
         
         static member Empty = {
@@ -52,6 +53,7 @@ module PlayerElmish =
               ServiceState = AudioPlayerServiceState.Stopped
               TimeUntilSleep = None 
               PlaybackSpeed = 1.0
+              IsBusy = false
         }
 
     type State = AudioPlayerInfo 
@@ -75,8 +77,10 @@ module PlayerElmish =
         | StartSleepTimer of TimeSpan option
         | DecreaseSleepTimer
         | SetPlaybackSpeed of float
+        | SetPlayerStateExternal of AudioPlayerState
         
         | UpdateAudioBookPosition of pos:TimeSpan
+        | SetBusy of bool
 
         | QuitAudioPlayer
         
@@ -107,9 +111,7 @@ module PlayerElmish =
         AudioPlayerInfo.Empty, SideEffect.None
         
        
-    let updatePositionStateEvent = Event<AudioPlayerInfo>()
-    let updatePositionStateEventPub = updatePositionStateEvent.Publish
-       
+         
        
     module Helpers =
             
@@ -185,6 +187,7 @@ module PlayerElmish =
                     Duration = duration
                     CurrentTrackNumber = index
                     Mp3FileList = mp3List
+                    AudioBook =  Some ab
                     ServiceState = AudioPlayerServiceState.Started
                 }, SideEffect.StartAudioService
                 
@@ -209,23 +212,26 @@ module PlayerElmish =
             }, SideEffect.StopAudioService
             
         | AudioPlayerServiceState.Started, StartAudioPlayer ->
-            if state.Filename = "" then
-                let filename,duration = state.Mp3FileList |> Helpers.getFileFromIndex 0
-                { state with
-                    Filename = filename
-                    ResumeOnAudioFocus = false
-                    PlaybackDelayed = false
-                    Position = TimeSpan.Zero
-                    Duration = duration
-                    CurrentTrackNumber = 0
-                    State = AudioPlayerState.Playing
-                }, SideEffect.StartAudioPlayer
+            if state.State = AudioPlayerState.Stopped then
+                if state.Filename = "" then
+                    let filename,duration = state.Mp3FileList |> Helpers.getFileFromIndex 0
+                    { state with
+                        Filename = filename
+                        ResumeOnAudioFocus = false
+                        PlaybackDelayed = false
+                        Position = TimeSpan.Zero
+                        Duration = duration
+                        CurrentTrackNumber = 0
+                        State = AudioPlayerState.Playing
+                    }, SideEffect.StartAudioPlayer
+                else
+                    { state with
+                        State = AudioPlayerState.Playing
+                        ResumeOnAudioFocus = false
+                        PlaybackDelayed = false
+                    }, SideEffect.StartAudioPlayer
             else
-                { state with
-                    State = AudioPlayerState.Playing
-                    ResumeOnAudioFocus = false
-                    PlaybackDelayed = false
-                }, SideEffect.StartAudioPlayer
+                state, SideEffect.None
         
         | AudioPlayerServiceState.Started, StartAudioPlayerExtern (filename, pos) ->
             // recalc pos and maybe file when pos below zero (for jumpback on press play
@@ -254,24 +260,30 @@ module PlayerElmish =
             }, SideEffect.TogglePlayPause
             
         | AudioPlayerServiceState.Started, MoveToNextTrack  ->
-            let newIndex = state.CurrentTrackNumber + 1
-            if state.Mp3FileList.Length < newIndex + 1 then
-                { state with State = AudioPlayerState.Stopped; Position = state.Duration }, SideEffect.StopPlayingAndFinishAudioBook
+            if state.IsBusy then
+                state, SideEffect.None
             else
-                let newFileName, duration = state.Mp3FileList |> Helpers.getFileFromIndex (state.CurrentTrackNumber + 1) 
-                { state with Filename = newFileName; CurrentTrackNumber = state.CurrentTrackNumber + 1; Duration = duration }, SideEffect.MoveToNextTrack |> Helpers.sideEffectOnlyWhenPlaying state 
-                
+                let newIndex = state.CurrentTrackNumber + 1
+                if state.Mp3FileList.Length < newIndex + 1 then
+                    { state with State = AudioPlayerState.Stopped; Position = state.Duration }, SideEffect.StopPlayingAndFinishAudioBook
+                else
+                    let newFileName, duration = state.Mp3FileList |> Helpers.getFileFromIndex (state.CurrentTrackNumber + 1) 
+                    { state with Filename = newFileName; CurrentTrackNumber = state.CurrentTrackNumber + 1; Duration = duration }, SideEffect.MoveToNextTrack |> Helpers.sideEffectOnlyWhenPlaying state 
+                    
         | AudioPlayerServiceState.Started, MoveToPreviousTrack ->
-            if state.Position > TimeSpan.FromMilliseconds 2000 then
-                { state with Position = TimeSpan.Zero }, SideEffect.GotoPosition TimeSpan.Zero
+            if state.IsBusy then
+                state, SideEffect.None
             else
-                let newIndex = state.CurrentTrackNumber - 1
-                if newIndex < 0 then
+                if state.Position > TimeSpan.FromMilliseconds 2000 then
                     { state with Position = TimeSpan.Zero }, SideEffect.GotoPosition TimeSpan.Zero
                 else
-                    let newFileName, duration = state.Mp3FileList |> Helpers.getFileFromIndex newIndex
-                    { state with Filename = newFileName; CurrentTrackNumber = newIndex; Duration = duration }, SideEffect.MoveToPreviousTrack |> Helpers.sideEffectOnlyWhenPlaying state
-                    
+                    let newIndex = state.CurrentTrackNumber - 1
+                    if newIndex < 0 then
+                        { state with Position = TimeSpan.Zero }, SideEffect.GotoPosition TimeSpan.Zero
+                    else
+                        let newFileName, duration = state.Mp3FileList |> Helpers.getFileFromIndex newIndex
+                        { state with Filename = newFileName; CurrentTrackNumber = newIndex; Duration = duration }, SideEffect.MoveToPreviousTrack |> Helpers.sideEffectOnlyWhenPlaying state
+                        
         | AudioPlayerServiceState.Started, JumpForward ->
             // calculate, that a track can be ended, and a next one could start
             let newPosition = state.Position + TimeSpan.FromMilliseconds 5000
@@ -348,6 +360,12 @@ module PlayerElmish =
         | _, UpdateInfoDataFromOutside info ->
             info, SideEffect.StartAudioService
             
+        | _, SetBusy b ->
+            { state with IsBusy = b }, SideEffect.None
+            
+        | _, SetPlayerStateExternal pstate ->
+            { state with State = pstate }, SideEffect.None
+            
         | _ -> state, SideEffect.None
         
         
@@ -393,7 +411,7 @@ module PlayerElmish =
                             dispatch MoveToNextTrack
                         ) |> ignore
                         
-                        let disposable =
+                        let posDisposable =
                             CrossMediaManager.Current.PositionChanged.Subscribe(fun pos ->
                                 // update audiobook view model
                                 // avoid that on stop the position is set to zero
@@ -405,7 +423,18 @@ module PlayerElmish =
                                     dispatch (UpdateAudioBookPosition pos.Position)
                             )
                             
-                        disposables.Add disposable
+                        let stateDisposable =
+                            CrossMediaManager.Current.StateChanged.Subscribe(fun state ->
+                                match state.State with
+                                | MediaManager.Player.MediaPlayerState.Playing ->
+                                    dispatch <| SetPlayerStateExternal AudioPlayerState.Playing
+                                | MediaManager.Player.MediaPlayerState.Stopped ->
+                                    dispatch <| SetPlayerStateExternal AudioPlayerState.Stopped
+                                | _ -> ()
+                            )
+                            
+                        disposables.Add posDisposable
+                        disposables.Add stateDisposable
                         
                         return ()
                         
@@ -415,33 +444,47 @@ module PlayerElmish =
                         return ()
                         
                     | SideEffect.StartAudioPlayer ->
+                        dispatch <| SetBusy true
                         state.AudioBook |> Option.iter (fun i -> i.UpdateCurrentListenFilename state.Filename)
                         let! _ = CrossMediaManager.Current.Play(state.Filename)
                         do! CrossMediaManager.Current.SeekTo state.Position
+                        dispatch <| SetBusy false
                         return ()
                         
                     | SideEffect.StartAudioPlayerExtern ->
+                        dispatch <| SetBusy true
                         state.AudioBook |> Option.iter (fun i -> i.UpdateCurrentListenFilename state.Filename)
                         let! _ = CrossMediaManager.Current.Play state.Filename
                         do! CrossMediaManager.Current.SeekTo state.Position
+                        dispatch <| SetBusy false
                         return ()
                         
                     | SideEffect.StopAudioPlayer ->
+                        state.AudioBook |> Option.iter (fun i -> i.UpdateAudioBookPosition state.Position)
                         do! CrossMediaManager.Current.Stop()
                         return ()
                         
                     | SideEffect.TogglePlayPause ->
+                        state.AudioBook |> Option.iter (fun i -> i.UpdateAudioBookPosition state.Position)
                         do! CrossMediaManager.Current.PlayPause()
                         return ()
                         
                     | SideEffect.MoveToNextTrack ->
+                        dispatch <| SetBusy true
                         state.AudioBook |> Option.iter (fun i -> i.UpdateCurrentListenFilename state.Filename)
+                        let! _ = CrossMediaManager.Current.Stop()
+                        CrossMediaManager.Current.Queue.Clear()
                         let! _ = CrossMediaManager.Current.Play state.Filename
+                        dispatch <| SetBusy false
                         return ()
                         
                     | SideEffect.MoveToPreviousTrack ->
+                        dispatch <| SetBusy true
                         state.AudioBook |> Option.iter (fun i -> i.UpdateCurrentListenFilename state.Filename)
+                        let! _ = CrossMediaManager.Current.Stop()
+                        CrossMediaManager.Current.Queue.Clear()
                         let! _ = CrossMediaManager.Current.Play state.Filename
+                        dispatch <| SetBusy false
                         return ()
                         
                     | SideEffect.GotoPositionWithNewTrack ->
@@ -490,10 +533,7 @@ module AudioPlayer =
         Program.mkAvaloniaProgrammWithSideEffect init update (SideEffects.createSideEffectsProcessor ())
         |> Program.mkStore        
        
-    do
-        globalAudioPlayerStore.Observable.Subscribe(fun state ->
-            updatePositionStateEvent.Trigger state
-        ) |> ignore
+    
              
     let startAudioService ab mp3List =
         globalAudioPlayerStore.Dispatch (StartAudioService (ab,mp3List))

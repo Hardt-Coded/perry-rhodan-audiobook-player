@@ -1,6 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionName="1.60.0" package="hits.rhodan.audiobooks.dev" android:installLocation="auto" android:versionCode="400040">
-	<uses-sdk android:minSdkVersion="31" android:targetSdkVersion="34" />
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionName="2.0.0-beta" package="hits.rhodan.audiobooks.dev" android:installLocation="auto" android:versionCode="49990">
 	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -8,12 +7,8 @@
 	<uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 	<uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
 	<uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
-	<uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
-	<application android:label="Eins A Medien Audiobook Player" 
-				 android:icon="@drawable/eins_a_launcher" 
-				 android:requestLegacyExternalStorage="true" 
-				 android:allowBackup="true" 
-				 android:fullBackupContent="@xml/backup_rules">
+	<uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+	<application android:label="Eins A Medien Audiobook Player" android:icon="@drawable/eins_a_launcher" android:requestLegacyExternalStorage="true" android:allowBackup="true" android:fullBackupContent="@xml/backup_rules">
 		<!--android:dataExtractionRules="@xml/backup_rules_31"-->
 		<!--<service android:name="Perry.Rhodan.AudioService" 
 				 android:stopWithTask="true" 

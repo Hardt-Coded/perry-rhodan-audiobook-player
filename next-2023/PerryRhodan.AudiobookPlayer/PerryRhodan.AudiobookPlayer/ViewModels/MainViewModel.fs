@@ -13,7 +13,7 @@ type MainViewModel(root:CompositionRoot) =
     inherit ReactiveElmishViewModel()
 
     interface IMainViewModel with
-        member this.GoPlayerPage audiobook = this.GoPlayer (audiobook :?> AudioBookItemViewModel)
+        member this.GoPlayerPage audiobook startPlayer = this.GoPlayer (audiobook :?> AudioBookItemViewModel) startPlayer
     
     member this.ContentView = 
         this.BindOnChanged (app, _.View, fun m -> 
@@ -27,10 +27,10 @@ type MainViewModel(root:CompositionRoot) =
             | View.HomeView ->
                 root.GetView<HomeViewModel>()
             
-            | View.PlayerView audiobook  ->
+            | View.PlayerView (audiobook, startPlaying)  ->
                 try
                     let view = PlayerView()
-                    let viewModel = new PlayerViewModel(audiobook)
+                    let viewModel = new PlayerViewModel(audiobook, startPlaying)
                     view.DataContext <- viewModel
                     view
                 with
@@ -48,7 +48,7 @@ type MainViewModel(root:CompositionRoot) =
     member this.IsLoading = this.Bind (app, _.IsLoading)
     
     member this.GoHome() = app.Dispatch GoHome   
-    member this.GoPlayer audiobook = app.Dispatch <| SetView (View.PlayerView audiobook)   
+    member this.GoPlayer audiobook startPlaying = app.Dispatch <| SetView (View.PlayerView (audiobook, startPlaying))   
     member this.OpenLogin() = app.Dispatch Login   
     member this.OpenBrowserView() = app.Dispatch <| SetView View.BrowserView   
        

@@ -31,6 +31,7 @@ module PlayerPage =
         AudioPlayerBusy:bool 
         HasPlayedBeforeDragSlider:bool
         SliderIsDragging:bool
+        StartPlayingOnOpen:bool
         IsLoading: bool
     }
       
@@ -89,26 +90,28 @@ module PlayerPage =
         
         
     
-    let initModel audioBook = 
-        { AudioBook = audioBook; 
-          CurrentAudioFile = ""
-          CurrentAudioFileIndex = 0
-          CurrentPosition= TimeSpan.Zero    
-          CurrentDuration= TimeSpan.Zero    
-          CurrentState = AudioPlayerState.Stopped
-          AudioFileList = []
-          IsLoading=false
-          TimeUntilSleeps = None
-          AudioPlayerBusy = false 
-          HasPlayedBeforeDragSlider = false
-          SliderIsDragging = false 
-          PlaybackSpeed = 1.0 }
+    let initModel startPlaying audioBook  = {
+        AudioBook = audioBook; 
+        CurrentAudioFile = ""
+        CurrentAudioFileIndex = 0
+        CurrentPosition= TimeSpan.Zero    
+        CurrentDuration= TimeSpan.Zero    
+        CurrentState = AudioPlayerState.Stopped
+        AudioFileList = []
+        IsLoading=false
+        TimeUntilSleeps = None
+        AudioPlayerBusy = false 
+        HasPlayedBeforeDragSlider = false
+        SliderIsDragging = false 
+        StartPlayingOnOpen = startPlaying 
+        PlaybackSpeed = 1.0
+    }
 
 
     
 
-    let init audioBook = 
-        let model = audioBook |> initModel
+    let init audioBook startPlaying = 
+        let model = audioBook |> initModel startPlaying
         model, SideEffect.InitAudioPlayer
 
 
@@ -117,7 +120,9 @@ module PlayerPage =
         match msg with
         | Play -> 
             let model = state |> fixModelWhenCurrentTrackGreaterThanNumberOfTracks
-            { model with CurrentState = AudioPlayerState.Playing }, SideEffect.Play
+            { model with
+                CurrentState = AudioPlayerState.Playing
+                CurrentAudioFileIndex = if state.CurrentAudioFileIndex < 0 then 0 else state.CurrentAudioFileIndex }, SideEffect.Play
             
         | PlayWithoutRewind ->
             let model = state |> fixModelWhenCurrentTrackGreaterThanNumberOfTracks
@@ -242,6 +247,7 @@ module PlayerPage =
                 CurrentState = info.State
                 CurrentAudioFile = info.Filename
                 CurrentAudioFileIndex = info.CurrentTrackNumber
+                IsLoading = info.IsBusy 
             }, SideEffect.None
             
             
@@ -342,6 +348,10 @@ module PlayerPage =
                                     return! state.AudioBook.AudioBook |> loadFiles
                         }
                     
+                    // stop current Audioplayer and Service
+                    AudioPlayer.stopAudioPlayer false
+                    AudioPlayer.stopAudioService()
+                    
                     //do! addAudioServiceInfoHandler()
                     let! stateMsg = decideOnAudioPlayerStateCommand state
                     match stateMsg with
@@ -350,7 +360,10 @@ module PlayerPage =
                         dispatch <| FileListLoaded files
                         AudioPlayer.startAudioService state.AudioBook files
                     | Some stateMsg ->
-                        dispatch <| stateMsg 
+                        dispatch <| stateMsg
+                        
+                    if state.StartPlayingOnOpen then
+                        dispatch Play
                         
                     return ()
                     
@@ -361,8 +374,12 @@ module PlayerPage =
                     | _ ->
                         let file,_ = state.AudioFileList[state.CurrentAudioFileIndex]
                         let currentPosition = state.CurrentPosition
-                        let! rewindInSec = rewindInSec state
-                        AudioPlayer.startAudioPlayerExtern file (currentPosition - (TimeSpan.FromSeconds rewindInSec))
+                        let! rewindInSec = rewindInSec state |> Async.map (TimeSpan.FromSeconds)
+                        let newPosition =
+                            let p = currentPosition - rewindInSec
+                            if p < TimeSpan.Zero then TimeSpan.Zero else p
+                            
+                        AudioPlayer.startAudioPlayerExtern file newPosition
                         return ()
                     
                 | SideEffect.PlayWithoutRewind ->
@@ -397,7 +414,7 @@ module PlayerPage =
                 | SideEffect.StartAudioBookService fileList ->
                     AudioPlayer.stopAudioPlayer false
                     AudioPlayer.startAudioService state.AudioBook fileList
-                    dispatch Play
+                    return ()
                     
                 | SideEffect.UpdatePositionOnDatabase ->
                     // Todo?
@@ -489,10 +506,10 @@ module Extension =
             let v = p.GetValue(this)
             v :?> bool
 
-type PlayerViewModel(audiobook:AudioBookItemViewModel) as self =
+type PlayerViewModel(audiobook:AudioBookItemViewModel, startPlaying) as self =
     inherit ReactiveElmishViewModel()
     
-    let init () = init audiobook
+    let init () = init audiobook startPlaying
     let local =
         Program.mkAvaloniaProgrammWithSideEffect init update SideEffects.runSideEffects
         |> Program.mkStore
@@ -536,7 +553,7 @@ type PlayerViewModel(audiobook:AudioBookItemViewModel) as self =
         this.Bind(local,
             fun s ->
                 let pos = getPositionAudioBookTotal s
-                $"CurrentTotal: {pos.CurrentPos:``hh\:mm``} / Rest: {pos.Rest:``hh\:mm``}"
+                $"Gesamt: {pos.CurrentPos:``hh\:mm\:ss``} / {pos.Total:``hh\:mm\:ss``}"
         )
     member this.PositionString =
         this.Bind(local,
@@ -568,5 +585,5 @@ type PlayerViewModel(audiobook:AudioBookItemViewModel) as self =
         //if not dragging then
         //local.Dispatch <| SetTrackPosition (TimeSpan.FromMilliseconds e.NewValue)
         
-    static member DesignVM = new PlayerViewModel(AudioBookItemViewModel.DesignVM)
+    static member DesignVM = new PlayerViewModel(AudioBookItemViewModel.DesignVM, false)
 

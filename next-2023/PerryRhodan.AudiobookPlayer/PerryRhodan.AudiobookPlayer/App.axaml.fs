@@ -37,7 +37,7 @@ type App() =
             .AddSingleton<IMainViewAccessService>(mainAccessViewService)
         |> ignore
         
-        AppCenter.Start(Global.appcenterAndroidId, typeof<Analytics>, typeof<Crashes>) |> ignore
+        
         
     
     override this.Initialize() =

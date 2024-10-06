@@ -55,6 +55,7 @@ type CloseApplication() =
     Theme = "@style/MyTheme.NoActionBar",
     Icon = "@drawable/eins_a_launcher",
     MainLauncher = true,
+    LaunchMode = LaunchMode.SingleTop,
     ConfigurationChanges = (ConfigChanges.Orientation ||| ConfigChanges.ScreenSize ||| ConfigChanges.UiMode))>]
 type MainActivity() =
     inherit AvaloniaMainActivity<App>()
@@ -82,6 +83,9 @@ type MainActivity() =
     override this.OnCreate(savedInstanceState) =
         base.OnCreate savedInstanceState
         
+        AppCenter.Start(Global.appcenterAndroidId, typeof<Analytics>, typeof<Crashes>)
+        Microsoft.AppCenter.Analytics.Analytics.TrackEvent("App started")
+                
         (*// set complete to build service provider here, to avoid that the dependencies,
         // which are registered in app.xaml.fs are also included in the service provider
         DependencyService.SetComplete()*)
