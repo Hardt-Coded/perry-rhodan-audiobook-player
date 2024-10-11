@@ -9,6 +9,7 @@ open Avalonia.Controls.Primitives
 open Domain
 open PerryRhodan.AudiobookPlayer.Services.AudioPlayer
 open PerryRhodan.AudiobookPlayer.Services.AudioPlayer.PlayerElmish
+open PerryRhodan.AudiobookPlayer.Services.Interfaces
 open PerryRhodan.AudiobookPlayer.ViewModel
 open ReactiveElmish
 

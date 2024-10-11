@@ -26,6 +26,7 @@
    
     <Compile Include="Domain\Translations.fs" />
     <Compile Include="Services\Services.fs" />
+    <Compile Include="Services\Interfaces.fs" />
    
     <Compile Include="Views\ActionMenuView.axaml.fs" />
     <Compile Include="Views\AudioBookItemView.axaml.fs" />
@@ -88,11 +89,7 @@
     <PackageReference Include="SkiaSharp" Version="2.88.8" />
     <PackageReference Include="taglib-sharp-netstandard2.0" Version="2.1.0" />
   </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\third-party\XamarinMediaManager\MediaManager\MediaManager.csproj" />
-  </ItemGroup>
-
+  
   <!--<ItemGroup>
     <Reference Include="PerryRhodan.AudiobookPlayer">
       <HintPath>..\PerryRhodan.AudiobookPlayer.Desktop\bin\Debug\net8.0\PerryRhodan.AudiobookPlayer.dll</HintPath>

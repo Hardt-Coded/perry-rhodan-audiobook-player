@@ -65,11 +65,11 @@
                         Kind="Download"
                         Foreground="{DynamicResource MaterialSecondaryMidBrush}"
                         IsVisible="{Binding !IsDownloaded}" />
-                    <Interaction.Behaviors>
+                    <!--<Interaction.Behaviors>
                         <EventTriggerBehavior EventName="PointerPressed">
                             <InvokeCommandAction Command="{Binding OpenPlayer}" />
                         </EventTriggerBehavior>
-                    </Interaction.Behaviors>
+                    </Interaction.Behaviors>-->
                 </Grid>
             </Border>
             <Grid Grid.Column="1" Margin="2,0,0,0">
