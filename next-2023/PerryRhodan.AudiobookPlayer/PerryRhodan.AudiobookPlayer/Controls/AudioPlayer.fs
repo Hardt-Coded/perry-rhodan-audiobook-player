@@ -373,8 +373,7 @@ module PlayerElmish =
                 
         let createSideEffectsProcessor ()  =
             let mutable sleepTime: TimeSpan option = None
-            let audioPlayer = DependencyService.Get<IAudioPlayer>()
-            
+             
                         
             let sleepTimer: System.Timers.Timer = new System.Timers.Timer(1000.)
             sleepTimer.Stop()
@@ -384,7 +383,7 @@ module PlayerElmish =
                     if t <= TimeSpan.Zero then
                         sleepTimer.Stop()
                         sleepTime <- None
-                        audioPlayer.Stop() |> ignore
+                        DependencyService.Get<IAudioPlayer>().Stop() |> ignore
                     else
                         sleepTime <- Some (t.Subtract(TimeSpan.FromSeconds(1.)))
                 )
@@ -402,18 +401,20 @@ module PlayerElmish =
                         return ()
                         
                     | SideEffect.StartAudioService ->
-                        audioPlayer.StartService()
-                        audioPlayer.Init state.AudioBook.Value.AudioBook state.CurrentTrackNumber
+                        //do! DependencyService.Get<IAudioPlayer>().StopService()   
+                        //do! DependencyService.Get<IAudioPlayer>().StartService()
+                        // get instance which is running as a service in the background
+                        DependencyService.Get<IAudioPlayer>().SetMetaData state.AudioBook.Value.AudioBook state.Mp3FileList.Length state.CurrentTrackNumber 
                         
                        
                         let finishedDisp =
-                            audioPlayer.AudioPlayerFinishedTrack.Subscribe(fun _ ->
+                            DependencyService.Get<IAudioPlayer>().AudioPlayerFinishedTrack.Subscribe(fun _ ->
                                 dispatch MoveToNextTrack
                             )
                             
                         
                         let posDisposable =
-                            audioPlayer.AudioPlayerInformation.Subscribe(fun info ->
+                            DependencyService.Get<IAudioPlayer>().AudioPlayerInformation.Subscribe(fun info ->
                                 // update audiobook view model
                                 // avoid that on stop the position is set to zero
                                 if info.CurrentPosition > TimeSpan.Zero then
@@ -438,61 +439,71 @@ module PlayerElmish =
                     | SideEffect.StopAudioService ->
                         disposables |> Seq.iter (_.Dispose())
                         disposables.Clear()
-                        audioPlayer.StopService()
+                        DependencyService.Get<IAudioPlayer>().SetMetaData state.AudioBook.Value.AudioBook state.Mp3FileList.Length state.CurrentTrackNumber
+                        
                         return ()
                         
                     | SideEffect.StartAudioPlayer ->
                         dispatch <| SetBusy true
                         state.AudioBook |> Option.iter (fun i -> i.UpdateCurrentListenFilename state.Filename)
-                        audioPlayer.Play(state.Filename)
-                        audioPlayer.SeekTo state.Position
+                        DependencyService.Get<IAudioPlayer>().Play(state.Filename)
+                        DependencyService.Get<IAudioPlayer>().SeekTo state.Position
+                        DependencyService.Get<IAudioPlayer>().SetMetaData state.AudioBook.Value.AudioBook state.Mp3FileList.Length state.CurrentTrackNumber
                         dispatch <| SetBusy false
                         return ()
                         
                     | SideEffect.StartAudioPlayerExtern ->
                         dispatch <| SetBusy true
                         state.AudioBook |> Option.iter (fun i -> i.UpdateCurrentListenFilename state.Filename)
-                        audioPlayer.Play state.Filename
-                        audioPlayer.SeekTo state.Position
+                        DependencyService.Get<IAudioPlayer>().Play state.Filename
+                        DependencyService.Get<IAudioPlayer>().SeekTo state.Position
+                        DependencyService.Get<IAudioPlayer>().SetMetaData state.AudioBook.Value.AudioBook state.Mp3FileList.Length state.CurrentTrackNumber
                         dispatch <| SetBusy false
                         return ()
                         
                     | SideEffect.StopAudioPlayer ->
                         state.AudioBook |> Option.iter (fun i -> i.UpdateAudioBookPosition state.Position)
-                        audioPlayer.Stop()
+                        DependencyService.Get<IAudioPlayer>().Stop()
+                        DependencyService.Get<IAudioPlayer>().SetMetaData state.AudioBook.Value.AudioBook state.Mp3FileList.Length state.CurrentTrackNumber
                         return ()
                         
                     | SideEffect.TogglePlayPause ->
                         state.AudioBook |> Option.iter (fun i -> i.UpdateAudioBookPosition state.Position)
-                        audioPlayer.PlayPause()
+                        DependencyService.Get<IAudioPlayer>().PlayPause()
+                        DependencyService.Get<IAudioPlayer>().SetMetaData state.AudioBook.Value.AudioBook state.Mp3FileList.Length state.CurrentTrackNumber                                                
+
                         return ()
                         
                     | SideEffect.MoveToNextTrack ->
                         dispatch <| SetBusy true
                         state.AudioBook |> Option.iter (fun i -> i.UpdateCurrentListenFilename state.Filename)
-                        audioPlayer.Stop()
-                        audioPlayer.Play state.Filename
+                        DependencyService.Get<IAudioPlayer>().Stop()
+                        DependencyService.Get<IAudioPlayer>().Play state.Filename
+                        DependencyService.Get<IAudioPlayer>().SetMetaData state.AudioBook.Value.AudioBook state.Mp3FileList.Length state.CurrentTrackNumber
                         dispatch <| SetBusy false
                         return ()
                         
                     | SideEffect.MoveToPreviousTrack ->
                         dispatch <| SetBusy true
                         state.AudioBook |> Option.iter (fun i -> i.UpdateCurrentListenFilename state.Filename)
-                        audioPlayer.Stop()
-                        audioPlayer.Play state.Filename
+                        DependencyService.Get<IAudioPlayer>().Stop()
+                        DependencyService.Get<IAudioPlayer>().Play state.Filename
+                        DependencyService.Get<IAudioPlayer>().SetMetaData state.AudioBook.Value.AudioBook state.Mp3FileList.Length state.CurrentTrackNumber
                         dispatch <| SetBusy false
                         return ()
                         
                     | SideEffect.GotoPositionWithNewTrack ->
                         state.AudioBook |> Option.iter (fun i -> i.UpdateCurrentListenFilename state.Filename)
                         state.AudioBook |> Option.iter (fun i -> i.UpdateAudioBookPosition state.Position)
-                        audioPlayer.Play state.Filename
-                        audioPlayer.SeekTo state.Position
+                        DependencyService.Get<IAudioPlayer>().Play state.Filename
+                        DependencyService.Get<IAudioPlayer>().SeekTo state.Position
+                        DependencyService.Get<IAudioPlayer>().SetMetaData state.AudioBook.Value.AudioBook state.Mp3FileList.Length state.CurrentTrackNumber
                         return ()
                         
                     | SideEffect.GotoPosition position ->
                         state.AudioBook |> Option.iter (fun i -> i.UpdateAudioBookPosition position)
-                        audioPlayer.SeekTo position
+                        DependencyService.Get<IAudioPlayer>().SeekTo position
+                        DependencyService.Get<IAudioPlayer>().SetMetaData state.AudioBook.Value.AudioBook state.Mp3FileList.Length state.CurrentTrackNumber
                         return ()
                         
                     | SideEffect.StartSleepTimer timeSpanOption ->
@@ -500,18 +511,20 @@ module PlayerElmish =
                         return ()
                         
                     | SideEffect.SetPlaybackSpeed f ->
-                        audioPlayer.SetPlaybackSpeed f
+                        DependencyService.Get<IAudioPlayer>().SetPlaybackSpeed f
+                        DependencyService.Get<IAudioPlayer>().SetMetaData state.AudioBook.Value.AudioBook state.Mp3FileList.Length state.CurrentTrackNumber
                         return ()
                         
                     | SideEffect.StopPlayingAndFinishAudioBook ->
-                        audioPlayer.Stop()
+                        DependencyService.Get<IAudioPlayer>().Stop()
                         state.AudioBook
                         |> Option.iter (_.MarkAsListend()
                         )
+                        DependencyService.Get<IAudioPlayer>().SetMetaData state.AudioBook.Value.AudioBook state.Mp3FileList.Length state.CurrentTrackNumber
                         return ()
                         
                     | SideEffect.QuitAudioPlayer -> 
-                        audioPlayer.Stop()
+                        DependencyService.Get<IAudioPlayer>().Stop()
                         return ()
                         
                     | SideEffect.SendAudioBookInfoEvent ->

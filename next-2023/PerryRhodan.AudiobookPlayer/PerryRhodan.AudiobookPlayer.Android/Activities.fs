@@ -93,8 +93,14 @@ type MainActivity() =
         
         
         Microsoft.Maui.ApplicationModel.Platform.Init(this, savedInstanceState)
+        DependencyService.Get<IAudioPlayer>().StartService() |> Async.AwaitTask |> ignore
         AppCompatDelegate.DefaultNightMode <- AppCompatDelegate.ModeNightYes
 
+    override this.OnStop() =
+        base.OnStop()
+        DependencyService.Get<IAudioPlayer>().StopService() |> Async.AwaitTask |> ignore
+    
+    
     override this.OnBackPressed() =
         match DependencyService.Get<INavigationService>().BackbuttonPressedAction with
         | Some action ->

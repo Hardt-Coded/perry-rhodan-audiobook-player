@@ -1,6 +1,7 @@
 ﻿module PerryRhodan.AudiobookPlayer.Services.Interfaces
 
     open System
+    open System.Threading.Tasks
     open Domain
     
     [<RequireQualifiedAccess>]
@@ -13,13 +14,17 @@
         State: AudioPlayerState
         Duration: TimeSpan
         CurrentPosition: TimeSpan
-    }
+    } with static member Empty = {
+            State = AudioPlayerState.Stopped
+            Duration = TimeSpan.Zero
+            CurrentPosition = TimeSpan.Zero
+        }
         
     
     type IAudioPlayer =
-        abstract member StartService : unit -> unit
-        abstract member StopService : unit -> unit
-        abstract member Init: audiobook:AudioBook -> cuurentTrack:int -> unit
+        abstract member StartService : unit -> Task<unit>
+        abstract member StopService : unit -> Task<unit>
+        abstract member SetMetaData: audiobook:AudioBook -> numberOfTracks:int -> curentTrack:int -> unit
         abstract member Play : string -> unit
         abstract member Pause : unit -> unit
         abstract member PlayPause : unit -> unit
