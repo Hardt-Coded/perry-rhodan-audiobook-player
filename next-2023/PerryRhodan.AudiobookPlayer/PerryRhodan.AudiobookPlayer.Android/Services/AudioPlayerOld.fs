@@ -1,6 +1,7 @@
 ﻿namespace PerryRhodan.AudiobookPlayer.Android
 
 
+(*
 // implement an audio player service for Android and use the IAudioPlayer interface
 // the player should have a notification to control the player from the notification bar
 // also the player should automatically stop, if the audio device changes or a call came in or another app starts playing audio
@@ -66,7 +67,7 @@ type MediaSessionCallback() =
 [<Service(Exported = true,
           Name = "perry.rhodan.audioplayer.mediaplayer",
           ForegroundServiceType = PM.ForegroundService.TypeMediaPlayback)>]
-type AudioPlayerService() as self =
+type AudioPlayerService2() as self =
     inherit Service()
 
     let mutable audioBook: AudioBook option = None
@@ -424,4 +425,5 @@ type AudioPlayerService() as self =
         member _.AudioPlayerInformation = audioPlayerInformationSubject
         
         member _.AudioPlayerFinishedTrack = audioPlayerFinishedTrackSubject
+        *)
         

@@ -17,7 +17,6 @@ type DependencyService() =
     static member ServiceCollection with get() = sc
 
     static member SetComplete() =
-        if serviceProvider = null then
-            serviceProvider <- sc.BuildServiceProvider()
+        serviceProvider <- sc.BuildServiceProvider()
             
     static member IsComplete with get() = serviceProvider <> null
