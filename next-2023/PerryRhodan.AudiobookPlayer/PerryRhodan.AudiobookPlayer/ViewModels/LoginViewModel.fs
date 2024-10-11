@@ -32,9 +32,6 @@ module LoginPage =
         | CloseDialog
         | KeyboardStateChanged
 
-    
-    type ExternalMsg = 
-        | GotoForwardToBrowsing of Map<string,string> * LoginRequestCameFrom
         
     
     [<RequireQualifiedAccess>]

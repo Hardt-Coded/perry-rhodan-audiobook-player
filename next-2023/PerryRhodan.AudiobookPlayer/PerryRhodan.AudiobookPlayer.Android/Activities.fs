@@ -7,13 +7,13 @@ open Avalonia
 open Avalonia.ReactiveUI
 open Avalonia.Android
 open Dependencies
-open MediaManager
 open Microsoft.AppCenter.Analytics
 open Microsoft.AppCenter
 open Microsoft.AppCenter.Crashes.Android
 open PerryRhodan.AudiobookPlayer
 open Microsoft.Extensions.DependencyInjection
 //open PerryRhodan.AudiobookPlayer.Android.AudioPlayerServiceImplementation.DecpencyService
+open PerryRhodan.AudiobookPlayer.Services.Interfaces
 open Services
 open Services.DependencyServices
 open Xamarin.Android.Net
@@ -72,6 +72,7 @@ type MainActivity() =
             .AddSingleton<INavigationService, NavigationService>()
             .AddSingleton<IDownloadService, DownloadServiceImplementation.DependencyService.DownloadService>()
             .AddSingleton<INotificationService, NotificationService.NotificationService>()
+            .AddSingleton<IAudioPlayer, AudioPlayerService>()
             //.AddSingleton<IAudioPlayer,AudioPlayer>()
             |> ignore
         
@@ -92,7 +93,6 @@ type MainActivity() =
         
         
         Microsoft.Maui.ApplicationModel.Platform.Init(this, savedInstanceState)
-        CrossMediaManager.Current.Init(this)
         AppCompatDelegate.DefaultNightMode <- AppCompatDelegate.ModeNightYes
 
     override this.OnBackPressed() =

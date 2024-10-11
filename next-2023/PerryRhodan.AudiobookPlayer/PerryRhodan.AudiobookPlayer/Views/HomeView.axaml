@@ -12,7 +12,7 @@
     <Grid RowDefinitions="Auto,*">
         <!-- Last Listened -->
         <Grid Grid.Row="0" IsVisible="{Binding HasLastListenedAudioBook}">
-            <!-- <TextBlock Text="{Binding LastTimeListenedAudioBook.Value.Title}" HorizontalAlignment="Center" VerticalAlignment="Center"/> -->
+            <views:AudioBookItemView DataContext="{Binding LastListendAudiobook}"/>
         </Grid>
         
         <!-- Audio Books -->

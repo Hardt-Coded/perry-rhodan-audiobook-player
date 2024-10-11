@@ -111,6 +111,9 @@ type HomeViewModel() =
     member this.AudioBooks =
         this.Bind(local, fun s -> ObservableCollection(s.Audiobooks))
     
+    member this.LastListendAudiobook =
+        this.Bind(local, fun i -> i.LastTimeListenedAudioBook |> Option.defaultValue AudioBookItemViewModel.DesignVM)
+    
     member this.LastTimeListenedAudioBook =
         this.Bind(local, _.LastTimeListenedAudioBook)
     
