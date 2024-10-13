@@ -1443,7 +1443,7 @@ module DownloadService =
     type DownloadState =
         | Open
         | Running of int * int
-        | Finished of WebAccess.Downloader.DownloadResult
+        | Finished of WebAccess.Downloader.DownloadResult * AudioBookAudioFilesInfo option
         | Failed of ComError
 
 
@@ -1810,10 +1810,28 @@ module DownloadService =
                                     | None ->
                                         return! loop state
                                     | Some download ->
+                                        
+                                        
+                                        // store file infos
+                                        let! audioFileInformation =
+                                            async {
+                                                match info.AudioBook.State.DownloadedFolder with
+                                                | None ->
+                                                    return None
+                                                | Some folder ->
+                                                    let! files = Files.getMp3FileList folder
+                                                    let fileInfo = {
+                                                        Id = download.AudioBook.Id
+                                                        AudioFiles = files |> List.sortBy (_.FileName)
+                                                    }
+                                                    let! _ = DataBase.insertAudioBookFileInfos [| fileInfo |]
+                                                    return Some fileInfo    
+                                            }
+                                        
                                         let download = 
                                             { download 
                                                 with 
-                                                    State = Finished downloadResult
+                                                    State = Finished (downloadResult,audioFileInformation)
                                             }
 
                                         let newState = 
@@ -1821,21 +1839,6 @@ module DownloadService =
                                                 CurrentDownload = None 
                                                 Downloads = state.Downloads |> List.map (fun i -> if i.AudioBook.Id = download.AudioBook.Id then download else i) 
                                             }
-                                        
-                                        // store file infos
-                                        match info.AudioBook.State.DownloadedFolder with
-                                        | None ->
-                                            ()
-                                        | Some folder ->
-                                            let! files = Files.getMp3FileList folder
-                                            let fileInfo = {
-                                                Id = download.AudioBook.Id
-                                                AudioFiles = files |> List.sortBy (_.FileName)
-                                            }
-                                            let! _ = DataBase.insertAudioBookFileInfos [| fileInfo |] 
-                                            ()
-                                        
-
 
                                         // send info that the download is complete
                                         sendInfo download

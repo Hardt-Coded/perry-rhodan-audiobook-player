@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:glassMorphism="clr-namespace:CherylUI.Controls.GlassMorphism;assembly=CherylUI"
              xmlns:controls="clr-namespace:CherylUI.Controls;assembly=CherylUI"
+             xmlns:views="clr-namespace:PerryRhodan.AudiobookPlayer.Views"
              xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              xmlns:vm="clr-namespace:PerryRhodan.AudiobookPlayer.ViewModels"
@@ -69,13 +70,20 @@
     
     <controls:InteractiveContainer HorizontalAlignment="Stretch">
     <Border Background="Black">
-        <Grid RowDefinitions="*, Auto"
+        <Grid RowDefinitions="*, Auto, Auto"
               ColumnDefinitions="*, *, *, *">
+            
             <ContentControl Grid.ColumnSpan="4" Grid.Row="0" Content="{Binding ContentView}" />
-            <Button Grid.Row="1" 
+            
+            
+            <!-- Mini Player -->
+            <ContentControl Grid.ColumnSpan="4" Grid.Row="1" Content="{Binding MiniplayerControl}" IsVisible="{Binding MiniplayerIsVisible}" />
+            
+            <!-- Bottom Navigation -->
+            <Button Grid.Row="2" 
                     Grid.Column="0" 
                     Theme="{StaticResource MaterialFlatButton}"
-                    Command="{Binding GoHome}">
+                    Command="{Binding GotoHomePage}">
                 <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
                     <avalonia:MaterialIcon Classes="mainButton" Kind="Home" />
                     <TextBlock>Home</TextBlock>
@@ -83,10 +91,10 @@
                 
             </Button>
             
-            <Button Grid.Row="1" 
+            <Button Grid.Row="2" 
                     Grid.Column="3" 
                     Theme="{StaticResource MaterialFlatButton}"
-                    Command="{Binding OpenBrowserView}" >
+                    Command="{Binding GotoBrowserPage}" >
                 <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
                     <avalonia:MaterialIcon Kind="Globe" Classes="mainButton" />
                     <TextBlock>Browse</TextBlock>

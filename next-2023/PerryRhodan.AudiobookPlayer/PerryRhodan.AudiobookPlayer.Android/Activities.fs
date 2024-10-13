@@ -1,11 +1,15 @@
 namespace PerryRhodan.AudiobookPlayer.Android
 
+open System
 open Android.App
+open Android.Content
 open Android.Content.PM
+open Android.OS
 open AndroidX.AppCompat.App
 open Avalonia
 open Avalonia.ReactiveUI
 open Avalonia.Android
+open Avalonia.Vulkan
 open Dependencies
 open Microsoft.AppCenter.Analytics
 open Microsoft.AppCenter
@@ -13,6 +17,7 @@ open Microsoft.AppCenter.Crashes.Android
 open PerryRhodan.AudiobookPlayer
 open Microsoft.Extensions.DependencyInjection
 //open PerryRhodan.AudiobookPlayer.Android.AudioPlayerServiceImplementation.DecpencyService
+open PerryRhodan.AudiobookPlayer.Services.AudioPlayer
 open PerryRhodan.AudiobookPlayer.Services.Interfaces
 open Services
 open Services.DependencyServices
@@ -49,17 +54,71 @@ type CloseApplication() =
 
 
 
+type ServiceConnectedEventArgs(binder: IBinder) =
+    inherit System.EventArgs()
+    member val Binder = binder with get, set
+
+type ServiceConnection() =
+    inherit Java.Lang.Object()
+    
+    let serviceConnected = Event<EventHandler<ServiceConnectedEventArgs>, ServiceConnectedEventArgs>()
+    member val ServiceConnected = serviceConnected.Publish
+    
+    interface IServiceConnection with
+        
+        
+        member this.OnServiceConnected(name: ComponentName, service: IBinder) =
+            serviceConnected.Trigger(this, ServiceConnectedEventArgs(service))
+            
+        member this.OnServiceDisconnected(name: ComponentName) = ()
+
+
 
 [<Activity(
     Label = "PerryRhodan.AudiobookPlayer.Android",
     Theme = "@style/MyTheme.NoActionBar",
+    //Theme = "@style/Theme.AppCompat.NoActionBar",
     Icon = "@drawable/eins_a_launcher",
     MainLauncher = true,
+    NoHistory = true,
     LaunchMode = LaunchMode.SingleTop,
     ConfigurationChanges = (ConfigChanges.Orientation ||| ConfigChanges.ScreenSize ||| ConfigChanges.UiMode))>]
-type MainActivity() =
+type MainActivity() as self =
     inherit AvaloniaMainActivity<App>()
+
+    let mutable serviceConnection: ServiceConnection option = None
+    let mutable isBound = false 
     
+    
+    let bindToService() =
+        let serviceConnection = 
+            match serviceConnection with
+            | Some sc ->
+                sc
+            | None ->
+                let sc = new ServiceConnection()
+                serviceConnection <- Some sc
+                sc.ServiceConnected.Subscribe(fun args ->
+                    match args.Binder with
+                    | :? AudioPlayerBinder as binder ->
+                        // make dependency injection aware of this instance of the service
+                        let service = binder.GetService()
+                        DependencyService.ServiceCollection.AddSingleton<IAudioPlayer>(service) |> ignore
+                        DependencyService.ServiceCollection.AddSingleton<IMediaPlayer>(service) |> ignore
+                        DependencyService.SetComplete()
+                        
+                        isBound <- true
+                    | _ -> ()
+                ) |> ignore
+                sc
+            
+            
+        let intent = new Intent(self, typeof<AudioPlayerService>)
+        self.BindService(intent, serviceConnection, Bind.AutoCreate) |> ignore
+
+        
+    
+            
 
     override _.CustomizeAppBuilder(builder) =
         
@@ -72,18 +131,26 @@ type MainActivity() =
             .AddSingleton<INavigationService, NavigationService>()
             .AddSingleton<IDownloadService, DownloadServiceImplementation.DependencyService.DownloadService>()
             .AddSingleton<INotificationService, NotificationService.NotificationService>()
-            .AddSingleton<IAudioPlayer, AudioPlayerService>()
-            //.AddSingleton<IAudioPlayer,AudioPlayer>()
+            .AddSingleton<IAudioPlayerServiceController, AudioPlayerServiceController>()
             |> ignore
         
         base.CustomizeAppBuilder(builder)
+            .UseAndroid()
             .WithInterFont()
+            //.UseSkia()
             .UseReactiveUI()
             
             
+    override this.OnResume() =
+        base.OnResume()
+        
+            
     override this.OnCreate(savedInstanceState) =
         base.OnCreate savedInstanceState
-        
+        AppDomain.CurrentDomain.UnhandledException.Subscribe(fun args ->
+            let ex = args.ExceptionObject :?> Exception
+            Microsoft.AppCenter.Crashes.Crashes.TrackError(ex)
+        ) |> ignore
         AppCenter.Start(Global.appcenterAndroidId, typeof<Analytics>, typeof<Crashes>)
         Microsoft.AppCenter.Analytics.Analytics.TrackEvent("App started")
                 
@@ -93,12 +160,25 @@ type MainActivity() =
         
         
         Microsoft.Maui.ApplicationModel.Platform.Init(this, savedInstanceState)
-        DependencyService.Get<IAudioPlayer>().StartService() |> Async.AwaitTask |> ignore
+        
+        // start audioplayer foreground service 
+        let intent = new Intent(Application.Context, typeof<AudioPlayerService>)
+        Application.Context.StartService(intent) |> ignore
+        bindToService()
         AppCompatDelegate.DefaultNightMode <- AppCompatDelegate.ModeNightYes
 
+    override _.OnDestroy() =
+        base.OnDestroy()
+        match serviceConnection with
+        | Some sc when isBound ->
+            self.UnbindService sc
+            isBound <- false
+            serviceConnection <- None
+        | _ -> ()
+    
     override this.OnStop() =
         base.OnStop()
-        DependencyService.Get<IAudioPlayer>().StopService() |> Async.AwaitTask |> ignore
+        
     
     
     override this.OnBackPressed() =
@@ -110,12 +190,14 @@ type MainActivity() =
             |> Async.AwaitTask
             |> Async.map (fun result ->
                 if result then
+                    DependencyService.Get<IAudioPlayerServiceController>().StopService()
                     this.FinishAffinity()
+                    
             )
             |> Async.StartImmediate
-                   
-            
-            
+       
+       
+
             
         
         

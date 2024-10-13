@@ -15,6 +15,10 @@
             <Setter Property="Theme" Value="{StaticResource MaterialFlatButton}" />
             <Setter Property="Foreground" Value="#c0c0c0" />
         </Style>
+        <Style Selector="avalonia|MaterialIcon">
+            <Setter Property="Width" Value="50" />
+            <Setter Property="Height" Value="50" />
+        </Style>
     </UserControl.Styles>
     <Grid RowDefinitions="*,*">
         <Grid.Background>
@@ -58,29 +62,29 @@
 
 
             <Button Grid.Row="2" Grid.Column="0" Command="{Binding Previous}" IsEnabled="{Binding !IsLoading}">
-                <avalonia:MaterialIcon Width="50" Height="50" Kind="PreviousTitle" />
+                <avalonia:MaterialIcon Kind="PreviousTitle" />
             </Button>
             <Button Grid.Row="2" Grid.Column="1" Command="{Binding JumpBackwards}" IsEnabled="{Binding !IsLoading}">
-                <avalonia:MaterialIcon Width="50" Height="50" Kind="Rewind" />
+                <avalonia:MaterialIcon Kind="Rewind" />
             </Button>
             <Button Grid.Row="2" Grid.Column="2" Command="{Binding Play}" IsVisible="{Binding IsStopped}"
                     IsEnabled="{Binding !IsLoading}">
-                <avalonia:MaterialIcon Width="50" Height="50" Kind="PlayCircle" />
+                <avalonia:MaterialIcon Kind="PlayCircle" />
             </Button>
             <Button Grid.Row="2" Grid.Column="2" Command="{Binding Stop}" IsVisible="{Binding IsPlaying}"
                     IsEnabled="{Binding !IsLoading}">
-                <avalonia:MaterialIcon Width="50" Height="50" Kind="StopCircle" />
+                <avalonia:MaterialIcon Kind="StopCircle" />
             </Button>
 
             <Button Grid.Row="2" Grid.Column="3" Command="{Binding JumpForward}" IsEnabled="{Binding !IsLoading}">
-                <avalonia:MaterialIcon Width="50" Height="50" Kind="FastForward" />
+                <avalonia:MaterialIcon Kind="FastForward" />
             </Button>
 
             <ProgressBar Grid.Row="2" Grid.Column="2" Classes="circular" IsIndeterminate="True" Height="50" Width="50"
                          IsVisible="{Binding IsLoading}" />
 
             <Button Grid.Row="2" Grid.Column="4" Command="{Binding Next}" IsEnabled="{Binding !IsLoading}">
-                <avalonia:MaterialIcon Width="50" Height="50" Kind="NextTitle" />
+                <avalonia:MaterialIcon Kind="NextTitle" />
             </Button>
 
         </Grid>
