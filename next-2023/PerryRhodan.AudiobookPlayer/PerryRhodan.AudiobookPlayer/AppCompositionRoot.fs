@@ -22,7 +22,6 @@ type AppCompositionRoot() =
         Map [
             VM.Key<MainViewModel>(), View.Singleton(mainView)
             VM.Key<HomeViewModel>(), View.Transient<HomeView>()
-            VM.Key<PlayerViewModel>(), View.Transient<PlayerView>()
             VM.Key<LoginViewModel>(), View.Transient<LoginView>()
             //VM.Key<BrowserViewModel>(), View.Transient<BrowserView>()
             (*VM.Key<CounterViewModel>(), View.Singleton<CounterView>()

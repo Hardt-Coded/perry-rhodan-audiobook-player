@@ -1,6 +1,7 @@
 namespace PerryRhodan.AudiobookPlayer
 
 open Avalonia
+open Avalonia.Controls
 open Avalonia.Controls.ApplicationLifetimes
 open Avalonia.Markup.Xaml
 open Dependencies
@@ -21,8 +22,10 @@ type App() =
     
     let appRoot = AppCompositionRoot()
     
+    let mainViewModel = new MainViewModel(appRoot)
+    let mainView = MainView()
     
-    let mainView =appRoot.GetView<MainViewModel>()
+    
     
     let mainAccessViewService =
         {
@@ -31,10 +34,13 @@ type App() =
         }
     
     do
+        mainView.DataContext <- mainViewModel
+        
         DependencyService.ServiceCollection
             .AddTransient<ILoginViewModel, LoginViewModel>()
             .AddSingleton<IActionMenuService, ActionMenuService>()
             .AddSingleton<IMainViewAccessService>(mainAccessViewService)
+            .AddSingleton<IMainViewModel>(mainViewModel)
         |> ignore
         
         

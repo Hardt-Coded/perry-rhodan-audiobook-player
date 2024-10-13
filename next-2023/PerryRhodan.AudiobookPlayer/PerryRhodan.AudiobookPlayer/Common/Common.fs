@@ -2,6 +2,7 @@
 
     open System
     open System.Net.Http.Headers
+    open Avalonia.Controls
     open Avalonia.Media
     
 
@@ -34,7 +35,7 @@
 
  
 
-    
+
     module Extensions =
         open System.Collections.Generic
         open System.Threading
@@ -64,6 +65,10 @@
                 |> (fun task -> Async.StartImmediate(task, cts.Token)) 
 
 
+        
+        
+        
+    
     //module Helpers =
 
         

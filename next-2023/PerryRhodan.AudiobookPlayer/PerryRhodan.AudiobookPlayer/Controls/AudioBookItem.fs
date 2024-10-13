@@ -152,6 +152,7 @@ module AudioBookItem =
         | DownloadCompleted of WebAccess.Downloader.DownloadResult
         | UpdateAudioBookPosition of position:TimeSpan
         | UpdateCurrentListenFilename of filename:string
+        | UpdateCurrentAudioFileList of audioFiles:AudioBookAudioFilesInfo
         | SetAmbientColor of color:string
         
         
@@ -317,6 +318,9 @@ module AudioBookItem =
             let random = System.Random()
             let color = $"#{random.Next(0x1000000):X6}"
             { state with AmbientColor = Some color }, SideEffect.None
+
+        | UpdateCurrentAudioFileList audioFiles ->
+            { state with AudioFileInfos = Some audioFiles }, SideEffect.None
             
         
         
@@ -367,8 +371,10 @@ module AudioBookItem =
                                     audiobook.SetUploadDownloadState (current,total)
                                 | DownloadService.Open ->
                                     ()
-                                | DownloadService.Finished result ->
+                                | DownloadService.Finished (result, audiofileinfo) ->
                                     audiobook.SetDownloadCompleted result
+                                    audiofileinfo |> Option.iter audiobook.SetAudioFileList
+                                    
                                     DownloadService.removeInfoListener listenerName
                                 | _ ->
                                     ()
@@ -504,8 +510,7 @@ module AudioBookItem =
                     | SideEffect.OpenAudioBookPlayer startPlaying ->
                         let mainViewAccessService = DependencyService.Get<IMainViewAccessService>()
                         let mainViewModel = mainViewAccessService.GetMainViewModel()
-                        mainViewModel.GoPlayerPage state.ViewModel startPlaying
-                        InteractiveContainer.CloseDialog()
+                        mainViewModel.GotoPlayerPage state.ViewModel startPlaying
                         return()
                         
                     | SideEffect.StartDownload ->
@@ -515,39 +520,32 @@ module AudioBookItem =
                     | SideEffect.RemoveDownloadFromQueue ->
                         removeDownloadFromQueue state.Audiobook
                         Notifications.showToasterMessage "Download von Warteschlange entfernt"
-                        InteractiveContainer.CloseDialog()
                         return()
                     
                     | SideEffect.OpenAudioBookDetail ->
                         Notifications.showToasterMessage "TODO: Open Details"
-                        InteractiveContainer.CloseDialog()
                         return()
                     
                     | SideEffect.RemoveAudioBookFromDevice ->
                         AudioBookStore.globalAudiobookStore.Dispatch <| AudioBookStore.AudioBookElmish.RemoveAudiobookFromDevice state.Audiobook
                         do! updateDatabase state.Audiobook
-                        InteractiveContainer.CloseDialog()
                         return()
                     
                     | SideEffect.MarkAsUnlistend ->
                         do! updateDatabase state.Audiobook
-                        InteractiveContainer.CloseDialog()
                         
                         return()
                     
                     | SideEffect.MarkAsListend ->
                         do! updateDatabase state.Audiobook
-                        InteractiveContainer.CloseDialog()
                         
                         return()
                     
                     | SideEffect.DeleteItemFromDb ->
-                        InteractiveContainer.CloseDialog()
                         return()
                     
                     | SideEffect.ShowMetaData ->
                         do! Notifications.showMessage "Metadata" (state.Audiobook.ToString())
-                        InteractiveContainer.CloseDialog()
                         return()
                         
                     | SideEffect.UpdateDatabase ->
@@ -751,6 +749,7 @@ type AudioBookItemViewModel(audiobook: AudioBook) as self =
         member this.SetUploadDownloadState newState = local.Dispatch (UpdateDownloadProgress newState)
         member this.SetDownloadCompleted result     = local.Dispatch (DownloadCompleted result)
         member this.AudioBook                       = this.AudioBook
+        member this.SetAudioFileList audioFiles     = local.Dispatch (UpdateCurrentAudioFileList audioFiles)
     
     member this.AudioBook       = this.Bind(local, _.Audiobook)
     member this.DownloadState   = this.Bind(local, _.DownloadState)

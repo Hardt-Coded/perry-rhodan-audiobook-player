@@ -6,9 +6,9 @@ open System.IO
 open System.Reflection
 open Avalonia.Controls
 open Avalonia.Controls.Primitives
+open Dependencies
 open Domain
 open PerryRhodan.AudiobookPlayer.Services.AudioPlayer
-open PerryRhodan.AudiobookPlayer.Services.AudioPlayer.PlayerElmish
 open PerryRhodan.AudiobookPlayer.Services.Interfaces
 open PerryRhodan.AudiobookPlayer.ViewModel
 open ReactiveElmish
@@ -45,7 +45,7 @@ module PlayerPage =
         | Previous
         | JumpForward
         | JumpBackwards
-        | RestoreStateFormAudioService of AudioPlayerInfo
+        | RestoreStateFormAudioService of PlayerElmish.AudioPlayerInfo
         | FileListLoaded of (string * TimeSpan) list
         
         | OpenSleepTimerActionMenu
@@ -61,6 +61,8 @@ module PlayerPage =
         | UpdateScreenInformation of info:PlayerElmish.State
 
         | ChangeBusyState of bool
+        
+        | ClosePlayerPage
 
     [<RequireQualifiedAccess>]
     type SideEffect =
@@ -69,7 +71,6 @@ module PlayerPage =
         | SliderDragStarted
         
         | StartAudioBookService of fileList:(string * TimeSpan) list
-        | StopAudioBookService
         
         | Play
         | PlayWithoutRewind
@@ -88,6 +89,8 @@ module PlayerPage =
         
         | OpenSleepTimerActionMenu
         | OpenPlaybackSpeedActionMenu
+        
+        | ClosePlayerPage
         
         
     
@@ -250,6 +253,9 @@ module PlayerPage =
                 CurrentAudioFileIndex = info.CurrentTrackNumber
                 IsLoading = info.IsBusy 
             }, SideEffect.None
+
+        | ClosePlayerPage ->
+            state, SideEffect.ClosePlayerPage
             
             
     // repair model, if current track is greater than the actually count of files
@@ -295,77 +301,88 @@ module PlayerPage =
         let private loadFiles (model:AudioBook) =
             task {
                 match model.State.DownloadedFolder with
-                | None -> return None
-                | Some folder ->
-
-                let! audioFileInfo = DataBase.getAudioBookFileInfo model.Id
-                match audioFileInfo with
                 | None ->
-                    try
-                        let files =
-                            Directory.EnumerateFiles(folder, "*.mp3")
-                            |> Seq.toArray
-                            |> Array.Parallel.map (
-                                fun i ->
-                                    use tfile = TagLib.File.Create(i)
-                                    (i,tfile.Properties.Duration)
-                            )
-                            |> Array.sortBy (fun (f,_) -> f)
-                            |> Array.toList
-                
-                        return FileListLoaded files |> Some
-                    with
-                    | ex ->
-                        do! Notifications.showErrorMessage "Konnte Hörbuch Dateien nicht finden."
-                        Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
-                        return None 
-                | Some audioFileInfo ->
-                    return Some <| FileListLoaded (audioFileInfo.AudioFiles |> List.map (fun i -> (i.FileName,i.Duration) ))
+                    return None
+                | Some folder ->
+                    let! audioFileInfo = DataBase.getAudioBookFileInfo model.Id
+                    match audioFileInfo with
+                    | None ->
+                        try
+                            let files =
+                                Directory.EnumerateFiles(folder, "*.mp3")
+                                |> Seq.toArray
+                                |> Array.Parallel.map (
+                                    fun i ->
+                                        use tfile = TagLib.File.Create(i)
+                                        (i,tfile.Properties.Duration)
+                                )
+                                |> Array.sortBy (fun (f,_) -> f)
+                                |> Array.toList
+                    
+                            return files |> Some
+                        with
+                        | ex ->
+                            do! Notifications.showErrorMessage "Konnte Hörbuch Dateien nicht finden."
+                            Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
+                            return None
+                        
+                    | Some audioFileInfo ->
+                        return
+                            audioFileInfo.AudioFiles
+                            |> List.map (fun i -> (i.FileName,i.Duration) )
+                            |> Some
             }
         
         let runSideEffects (sideEffect:SideEffect) (state:State) (dispatch:Msg -> unit) =
             
             task {
+                let audioPlayer = DependencyService.Get<IAudioPlayer>()
+                
                 match sideEffect with
                 | SideEffect.None ->
                     return ()
                     
                 | SideEffect.InitAudioPlayer ->
-                    let decideOnAudioPlayerStateCommand state =
-                        task {
-                            let info = AudioPlayer.globalAudioPlayerStore.Model
-                            match info.AudioBook with
-                            | None ->
-                                return! state.AudioBook.AudioBook |> loadFiles
-                            | Some infoAudioBook ->                    
-                                match info.ServiceState with
-                                | AudioPlayerServiceState.Started ->
-                                    // if the same audio is active, restore else start a new one
-                                    if infoAudioBook.AudioBook.FullName <> state.AudioBook.AudioBook.FullName then
-                                        return! state.AudioBook.AudioBook |> loadFiles
-                                    else
-                                        return Some (RestoreStateFormAudioService info)
-                                | _ ->
-                                    return! state.AudioBook.AudioBook |> loadFiles
-                        }
+                    dispatch <| ChangeBusyState true
                     
-                    // stop current Audioplayer and Service
-                    AudioPlayer.stopAudioPlayer false
-                    AudioPlayer.stopAudioService()
-                    
-                    //do! addAudioServiceInfoHandler()
-                    let! stateMsg = decideOnAudioPlayerStateCommand state
-                    match stateMsg with
-                    | None -> ()
-                    | Some (FileListLoaded files) ->
-                        dispatch <| FileListLoaded files
-                        AudioPlayer.startAudioService state.AudioBook files
-                    | Some stateMsg ->
-                        dispatch <| stateMsg
+                    // check if the global audio player is active and already an audiobook is loaded
+                    match audioPlayer.AudioPlayerInformation.AudioBook with
+                    // when the user tapped on the already active audiobook
+                    | Some audioBook when (audioBook.AudioBook.Id = state.AudioBook.AudioBook.Id) ->
+                        dispatch <| RestoreStateFormAudioService audioPlayer.AudioPlayerInformation
+                        if state.StartPlayingOnOpen && audioPlayer.AudioPlayerInformation.State = AudioPlayerState.Stopped then
+                            dispatch Play
+                       
+                    // the user tapped on a different audiobook                        
+                    | Some infoAudioBook  ->
+                        let! files = state.AudioBook.AudioBook |> loadFiles
+                        match files with
+                        | None ->
+                            dispatch ClosePlayerPage
+                            ()
+                        | Some files ->
+                            dispatch <| FileListLoaded files
+                            // stop current Audioplayer, Disconnect Service then reconnect to the new audiobook
+                            audioPlayer.Stop false
+                            audioPlayer.Init state.AudioBook files
+                            if state.StartPlayingOnOpen then
+                                dispatch Play
+                            
+                    | _ ->
+                        // there is no current state in the store, so load the files and connect to the service
+                        let! files = state.AudioBook.AudioBook |> loadFiles
+                        match files with
+                        | None ->
+                            dispatch ClosePlayerPage
+                            ()
+                        | Some files ->
+                            audioPlayer.Init state.AudioBook files
+                            dispatch <| FileListLoaded files
+                            if state.StartPlayingOnOpen then
+                                dispatch Play    
                         
-                    if state.StartPlayingOnOpen then
-                        dispatch Play
                         
+                    dispatch <| ChangeBusyState false
                     return ()
                     
                 | SideEffect.Play ->
@@ -380,7 +397,7 @@ module PlayerPage =
                             let p = currentPosition - rewindInSec
                             if p < TimeSpan.Zero then TimeSpan.Zero else p
                             
-                        AudioPlayer.startAudioPlayerExtern file newPosition
+                        audioPlayer.PlayExtern file newPosition
                         return ()
                     
                 | SideEffect.PlayWithoutRewind ->
@@ -389,32 +406,32 @@ module PlayerPage =
                         do! Notifications.showErrorMessage "Keine Dateien gefunden."
                     | _ ->
                         let file,_ = state.AudioFileList[state.CurrentAudioFileIndex]
-                        AudioPlayer.startAudioPlayerExtern file state.CurrentPosition
+                        audioPlayer.PlayExtern file state.CurrentPosition
                         return ()
                     
                 | SideEffect.Stop ->
-                    AudioPlayer.stopAudioPlayer false
+                    audioPlayer.Stop false
                     return ()
                     
                 | SideEffect.Next ->
-                    AudioPlayer.moveToNextTrack()
+                    audioPlayer.Next ()
                     return ()
                     
                 | SideEffect.Previous ->
-                    AudioPlayer.moveToPreviousTrack()
+                    audioPlayer.Previous ()
                     return ()
                     
                 | SideEffect.JumpForward ->
-                    AudioPlayer.jumpForward()
+                    audioPlayer.JumpForward ()
                     return ()
                     
                 | SideEffect.JumpBackwards ->
-                    AudioPlayer.jumpBackwards()
+                    audioPlayer.JumpBackwards()
                     return ()
                     
                 | SideEffect.StartAudioBookService fileList ->
-                    AudioPlayer.stopAudioPlayer false
-                    AudioPlayer.startAudioService state.AudioBook fileList
+                    audioPlayer.Stop false
+                    audioPlayer.Init state.AudioBook fileList
                     return ()
                     
                 | SideEffect.UpdatePositionOnDatabase ->
@@ -432,29 +449,30 @@ module PlayerPage =
                     return ()
                     
                 | SideEffect.StartSleepTimer sleepTime ->
-                    AudioPlayer.startSleepTimer sleepTime
+                    audioPlayer.StartSleepTimer sleepTime
                     return ()
                     
                 | SideEffect.SetPlaybackSpeed speed ->
-                    AudioPlayer.setPlaybackSpeed speed
+                    audioPlayer.SetPlaybackSpeed speed
                     
                 | SideEffect.SetAudioPositionAbsolute pos ->
-                    AudioPlayer.setPosition pos
-                    AudioPlayer.startAudioPlayer ()
+                    audioPlayer.SeekTo pos
+                    audioPlayer.Play ()
                     return ()
                     
                 | SideEffect.ContinuePlayingAfterSlide pos ->
-                    AudioPlayer.setPosition pos
+                    audioPlayer.SeekTo pos
                     dispatch <| PlayWithoutRewind
                     return ()
 
                 | SideEffect.SliderDragStarted ->
-                    AudioPlayer.stopAudioPlayer false
+                    audioPlayer.Stop false
                     return ()
                     
-                | SideEffect.StopAudioBookService ->
-                    //AudioPlayer.stopAudioService()
-                    return ()
+                | SideEffect.ClosePlayerPage ->
+                    audioPlayer.Stop false
+                    DependencyService.Get<IMainViewModel>().GotoHomePage()
+                    return ()                    
                     
             }
     
@@ -498,14 +516,6 @@ open PlayerPage
 open ReactiveElmish.Avalonia
 open Elmish.SideEffect
 
-[<AutoOpen>]
-module Extension =
-    type Slider with
-        member this.Dragging with get() =
-            let t = this.GetType()
-            let p = t.GetProperty("IsDragging", BindingFlags.Instance ||| BindingFlags.NonPublic)
-            let v = p.GetValue(this)
-            v :?> bool
 
 type PlayerViewModel(audiobook:AudioBookItemViewModel, startPlaying) as self =
     inherit ReactiveElmishViewModel()
@@ -517,8 +527,8 @@ type PlayerViewModel(audiobook:AudioBookItemViewModel, startPlaying) as self =
         
         
     do
-        let disposable = AudioPlayer.globalAudioPlayerStore.Observable.Subscribe (fun state -> local.Dispatch (UpdateScreenInformation state))
-        self.AddDisposable disposable
+        let audioPlayer = DependencyService.Get<IAudioPlayer>()
+        self.AddDisposable <| audioPlayer.AudioPlayerInfoChanged.Subscribe (fun info -> local.Dispatch (UpdateScreenInformation info))
     
         
     member this.AudioBook                   = this.Bind(local, _.AudioBook)
@@ -575,16 +585,23 @@ type PlayerViewModel(audiobook:AudioBookItemViewModel, startPlaying) as self =
     member this.OpenSleepTimerActionMenu()      = local.Dispatch OpenSleepTimerActionMenu
     member this.OpenPlaybackSpeedActionMenu()   = local.Dispatch OpenPlaybackSpeedActionMenu
     member this.OnDraggingChanged b             = local.Dispatch (SetDragging b)
-    member this.SilderValueChanged (e:RangeBaseValueChangedEventArgs) =
-        match e.Source with
-        | :? Slider as s ->
-            local.Dispatch <| SetDragging s.Dragging
-        | _ ->
-            local.Dispatch <| SetDragging false
-            
-            
-        //if not dragging then
-        //local.Dispatch <| SetTrackPosition (TimeSpan.FromMilliseconds e.NewValue)
+    
         
     static member DesignVM = new PlayerViewModel(AudioBookItemViewModel.DesignVM, false)
 
+
+
+module PlayerViewModelStore =
+    let mutable private viewmodel:PlayerViewModel option = None
+    
+    /// creates only a new viewmodel if the audiobook is different
+    let create (audiobook:AudioBookItemViewModel) startPlaying =
+        match viewmodel with
+        | Some viewmodel when viewmodel.AudioBook.AudioBook.Id = audiobook.AudioBook.Id ->
+            if startPlaying then
+                viewmodel.Play()
+            viewmodel
+        | _ ->
+            let vm = new PlayerViewModel(audiobook, startPlaying)
+            viewmodel <- Some vm
+            vm
