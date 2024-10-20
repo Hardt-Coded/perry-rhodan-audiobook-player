@@ -38,6 +38,13 @@
                     </StackPanel>
                 </Button>
                 
+                <Button Command="{Binding ShowProductPage}" >
+                    <StackPanel Orientation="Horizontal">
+                        <avalonia:MaterialIcon Kind="Globe" />
+                        <Label>Zeige Titelinformationen</Label>
+                    </StackPanel>
+                </Button>
+                
                 <Button IsVisible="{Binding AudioBook.RemoveDownloadVisible}" 
                         Command="{Binding RemoveDownload}">
                     <StackPanel Orientation="Horizontal">

@@ -35,6 +35,7 @@ module PlayerElmish =
         TimeUntilSleep: TimeSpan option
         PlaybackSpeed: float
         IsBusy: bool
+        JumpDistance: int
     } with
 
         member this.NumOfTracks = this.Mp3FileList.Length
@@ -52,6 +53,7 @@ module PlayerElmish =
             TimeUntilSleep = None
             PlaybackSpeed = 1.0
             IsBusy = false
+            JumpDistance = 30000
         }
 
     type State = AudioPlayerInfo
@@ -69,22 +71,21 @@ module PlayerElmish =
         | JumpBackwards
         | GotoPosition of pos: TimeSpan
         | UpdatePlayingState of pos: TimeSpan * duration: TimeSpan * state: AudioPlayerState
-        | UpdatePositionExternal of pos: TimeSpan * track: int
         | UpdateInfoDataFromOutside of info: AudioPlayerInfo
         | StartSleepTimer of TimeSpan option
         | DecreaseSleepTimer
         | SetPlaybackSpeed of float
-        | SetPlayerStateExternal of AudioPlayerState
 
-        | UpdateAudioBookPosition of pos: TimeSpan
         | SetBusy of bool
 
         | QuitAudioPlayer
+        | SetJumpDistance of int
 
 
     [<RequireQualifiedAccess>]
     type SideEffect =
         | None
+        | InitAudioPlayer
         | StartAudioPlayer
         | StartAudioPlayerExtern
         | StopAudioPlayer
@@ -97,8 +98,8 @@ module PlayerElmish =
         | SetPlaybackSpeed of float
         | StopPlayingAndFinishAudioBook
 
-        | SendAudioBookInfoEvent
         | GotUpdateInfoDataFromOutside
+        | UpdateAudioBookViewModelPosition
 
         | QuitAudioPlayer
     // side effects are the same as the message itself, so we can use the same type
@@ -192,7 +193,7 @@ module PlayerElmish =
                         Mp3FileList = mp3List
                         AudioBook = Some ab
                 },
-                SideEffect.None
+                SideEffect.InitAudioPlayer
 
             | _ ->
                 let filename, duration = mp3List |> Helpers.getFileFromIndex 0
@@ -322,7 +323,7 @@ module PlayerElmish =
 
         | JumpForward ->
             // calculate, that a track can be ended, and a next one could start
-            let newPosition = state.Position + TimeSpan.FromMilliseconds 5000
+            let newPosition = state.Position + TimeSpan.FromMilliseconds state.JumpDistance
 
             if newPosition > state.Duration then
                 let rest = newPosition - state.Duration
@@ -347,7 +348,7 @@ module PlayerElmish =
                 { state with Position = newPosition }, SideEffect.GotoPosition newPosition
 
         | JumpBackwards ->
-            let newPosition = state.Position - TimeSpan.FromMilliseconds 5000
+            let newPosition = state.Position - TimeSpan.FromMilliseconds state.JumpDistance
 
             if newPosition < TimeSpan.Zero then
                 let newIndex = state.CurrentTrackNumber - 1
@@ -373,19 +374,6 @@ module PlayerElmish =
 
         | GotoPosition pos ->
             { state with Position = pos }, SideEffect.GotoPosition pos
-
-        | UpdatePositionExternal(pos, meantTrack) ->
-            let filename, _ = Helpers.getFileFromIndex meantTrack state.Mp3FileList
-
-            {
-                state with
-                    Filename = filename
-                    Position = pos
-                    CurrentTrackNumber = meantTrack
-            },
-            SideEffect.GotoPositionWithNewTrack
-
-        
 
         | StartSleepTimer sleepTime ->
             {
@@ -416,13 +404,9 @@ module PlayerElmish =
         | QuitAudioPlayer ->
             AudioPlayerInfo.Empty, SideEffect.QuitAudioPlayer
 
-        | UpdateAudioBookPosition pos -> { state with Position = pos }, SideEffect.None
-
         | UpdateInfoDataFromOutside info -> info, SideEffect.GotUpdateInfoDataFromOutside
 
         | SetBusy b -> { state with IsBusy = b }, SideEffect.None
-
-        | SetPlayerStateExternal pstate -> { state with State = pstate }, SideEffect.None
 
         | UpdatePlayingState(pos, duration, apstate) ->
             {
@@ -430,8 +414,10 @@ module PlayerElmish =
                     Position = pos
                     Duration = duration
                     State = apstate
-            },
-            SideEffect.None
+            }, SideEffect.UpdateAudioBookViewModelPosition
+
+        | SetJumpDistance jd ->
+            { state with JumpDistance = jd }, SideEffect.None
 
         
 
@@ -471,6 +457,10 @@ module PlayerElmish =
                     match sideEffect with
                     | SideEffect.None -> return ()
 
+                    | SideEffect.InitAudioPlayer ->
+                        let! jumpDistance = Services.SystemSettings.getJumpDistance()
+                        dispatch <| SetJumpDistance jumpDistance
+                        return ()
                     
                     | SideEffect.StartAudioPlayer ->
                         dispatch <| SetBusy true
@@ -559,7 +549,7 @@ module PlayerElmish =
                         return ()
 
                     | SideEffect.SetPlaybackSpeed f ->
-                        audioPlayer.SetPlaybackSpeed f
+                        do! audioPlayer.SetPlaybackSpeed f
 
                         return ()
 
@@ -573,8 +563,6 @@ module PlayerElmish =
                         audioPlayer.Stop()
                         return ()
 
-                    | SideEffect.SendAudioBookInfoEvent -> return ()
-
                     | SideEffect.GotUpdateInfoDataFromOutside ->
                         // open Playerpage
                         match state.AudioBook with
@@ -585,6 +573,15 @@ module PlayerElmish =
                                 audiobook
                                 false
                         | None -> ()
+                        
+                    | SideEffect.UpdateAudioBookViewModelPosition ->
+                        
+                        state.AudioBook |> Option.iter (fun i ->
+                            i.UpdateAudioBookPosition state.Position
+                            i.ToggleIsPlaying (state.State = AudioPlayerState.Playing)
+                        )
+                        return ()
+
 
 
 
@@ -592,6 +589,7 @@ module PlayerElmish =
 
 
 type IAudioPlayer =
+    inherit IAudioPlayerPause
     //abstract member SetMetaData: audiobook:AudioBook -> numberOfTracks:int -> curentTrack:int -> unit
     abstract member Init : audioBook:AudioBookItemViewModel -> fileList:PlayerElmish.Mp3FileList -> unit
     abstract member Play : unit -> unit

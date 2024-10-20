@@ -6,7 +6,12 @@
              xmlns:asyncImageLoader="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
              xmlns:controls="clr-namespace:PerryRhodan.AudiobookPlayer.Controls"
              xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
-             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="800"
+             xmlns:mobilePicker="clr-namespace:CherylUI.Controls.MobilePicker;assembly=CherylUI"
+             xmlns:objectModel="clr-namespace:System.Collections.ObjectModel;assembly=System.ObjectModel"
+             xmlns:system="clr-namespace:System;assembly=System.Runtime"
+             xmlns:speedSelector="clr-namespace:PerryRhodan.AudiobookPlayer.SpeedSelector"
+             xmlns:valueSelector="clr-namespace:PerryRhodan.AudiobookPlayer.ValueSelector"
+             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="1000"
              x:Class="PerryRhodan.AudiobookPlayer.Views.PlayerView"
              Design.DataContext="{Binding Source={x:Static vm:PlayerViewModel.DesignVM}}"
              x:DataType="vm:PlayerViewModel">
@@ -20,19 +25,25 @@
             <Setter Property="Height" Value="50" />
         </Style>
     </UserControl.Styles>
-    <Grid RowDefinitions="*,*">
+    <Grid RowDefinitions="Auto,*,*">
         <Grid.Background>
             <LinearGradientBrush StartPoint="60%,0%" EndPoint="0%,100%">
                 <GradientStop Color="{Binding AudioBook.AmbientColor}" Offset="0.0" />
                 <GradientStop Color="Black" Offset="0.25" />
             </LinearGradientBrush>
         </Grid.Background>
+        <Button Grid.Row="0" Theme="{StaticResource MaterialFlatButton}" HorizontalAlignment="Left">
+            <StackPanel Orientation="Horizontal">
+                <avalonia:MaterialIcon Kind="ArrowLeftCircle" Width="24" Height="24" Margin="0,0,10,0" />
+                <TextBlock FontSize="24">Player</TextBlock>
+            </StackPanel>
+        </Button>
         <!-- cover -->
         
-        <asyncImageLoader:AdvancedImage Margin="50" Grid.Row="0" Source="{Binding Picture}" Stretch="UniformToFill" />
+        <asyncImageLoader:AdvancedImage Margin="50" Grid.Row="1" Source="{Binding Picture}" Stretch="UniformToFill" />
         
         <!-- controls -->
-        <Grid Grid.Row="1"
+        <Grid Grid.Row="2"
               Background="Black"
               ColumnDefinitions="*, *, *, *, *"
               RowDefinitions="Auto,*,*,*">
@@ -65,7 +76,7 @@
                 <avalonia:MaterialIcon Kind="PreviousTitle" />
             </Button>
             <Button Grid.Row="2" Grid.Column="1" Command="{Binding JumpBackwards}" IsEnabled="{Binding !IsLoading}">
-                <avalonia:MaterialIcon Kind="Rewind" />
+                <avalonia:MaterialIcon Kind="Rewind30" />
             </Button>
             <Button Grid.Row="2" Grid.Column="2" Command="{Binding Play}" IsVisible="{Binding IsStopped}"
                     IsEnabled="{Binding !IsLoading}">
@@ -73,11 +84,11 @@
             </Button>
             <Button Grid.Row="2" Grid.Column="2" Command="{Binding Stop}" IsVisible="{Binding IsPlaying}"
                     IsEnabled="{Binding !IsLoading}">
-                <avalonia:MaterialIcon Kind="StopCircle" />
+                <avalonia:MaterialIcon Kind="PauseCircle" />
             </Button>
 
             <Button Grid.Row="2" Grid.Column="3" Command="{Binding JumpForward}" IsEnabled="{Binding !IsLoading}">
-                <avalonia:MaterialIcon Kind="FastForward" />
+                <avalonia:MaterialIcon Kind="FastForward30" />
             </Button>
 
             <ProgressBar Grid.Row="2" Grid.Column="2" Classes="circular" IsIndeterminate="True" Height="50" Width="50"
@@ -87,6 +98,21 @@
                 <avalonia:MaterialIcon Kind="NextTitle" />
             </Button>
 
+            <speedSelector:SpeedSelector Grid.Row="3" Grid.Column="1" 
+                                         Minimum="0.1" 
+                                         Maximum="2.5"
+                                         Value="{Binding PlaybackSpeed}"
+                                         IsEnabled="{Binding !IsLoading}" />
+
+            
+            <valueSelector:ValueSelector Grid.Row="3" Grid.Column="3"
+                                         Value="{Binding SleepTimer}"
+                                         ItemList="{Binding SleeptimerValues}">
+                <avalonia:MaterialIcon Kind="Clock" />   
+            </valueSelector:ValueSelector>
+            <!--<Button Grid.Row="3" Grid.Column="3" Command="{Binding OpenSleepTimerActionMenu}" IsEnabled="{Binding !IsLoading}">
+                <avalonia:MaterialIcon Kind="Clock" />
+            </Button>-->
         </Grid>
     </Grid>
 </UserControl>

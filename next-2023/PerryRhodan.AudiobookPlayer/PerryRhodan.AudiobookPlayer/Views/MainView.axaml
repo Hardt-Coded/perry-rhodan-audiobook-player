@@ -5,6 +5,8 @@
              xmlns:glassMorphism="clr-namespace:CherylUI.Controls.GlassMorphism;assembly=CherylUI"
              xmlns:controls="clr-namespace:CherylUI.Controls;assembly=CherylUI"
              xmlns:views="clr-namespace:PerryRhodan.AudiobookPlayer.Views"
+             xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             xmlns:mobileNumberPicker="clr-namespace:CherylUI.Controls.MobileNumberPicker;assembly=CherylUI"
              xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              xmlns:vm="clr-namespace:PerryRhodan.AudiobookPlayer.ViewModels"
@@ -18,6 +20,34 @@
         <Style Selector="avalonia|MaterialIcon.mainButton">
             <Setter Property="Width" Value="32" />
             <Setter Property="Height" Value="32" />
+        </Style>
+        <Style Selector="mobileNumberPicker|MobileNumberPickerPopup > Border > Grid > Grid">
+            <Setter Property="RenderTransform" Value="scale(2)" />
+        </Style>
+        <Style Selector="mobileNumberPicker|MobileNumberPickerPopup > Border">
+            <Setter Property="Background" Value="#303030" />
+            <Setter Property="CornerRadius" Value="20" />
+            <Setter Property="Width" Value="500" />
+            <Setter Property="Height" Value="400" />
+        </Style>
+        <Style Selector="mobileNumberPicker|MobileNumberPickerPopup > Border > Grid > Button">
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="Padding" Value="16 6" />
+            <Setter Property="assists:ShadowAssist.ShadowDepth" Value="Depth0" />
+            <Setter Property="assists:ButtonAssist.HoverColor" Value="{DynamicResource MaterialBodyBrush}" />
+            <Setter Property="assists:ButtonAssist.ClickFeedbackColor" Value="{Binding $self.Foreground}" />
+            <Setter Property="Foreground" Value="{DynamicResource MaterialSecondaryMidBrush}" />
+            <Setter Property="ContentTemplate">
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <avalonia:MaterialIcon Kind="CloseCircle" />
+                        <Label Classes="accent" VerticalAlignment="Center">Schließen</Label>
+                    </StackPanel>    
+                </DataTemplate>
+            </Setter>
         </Style>
     </UserControl.Styles>
     
@@ -73,11 +103,19 @@
         <Grid RowDefinitions="*, Auto, Auto"
               ColumnDefinitions="*, *, *, *">
             
-            <ContentControl Grid.ColumnSpan="4" Grid.Row="0" Content="{Binding ContentView}" />
+            <TransitioningContentControl Grid.ColumnSpan="4" Grid.Row="0" Content="{Binding ContentView}">
+                <TransitioningContentControl.PageTransition>
+                    <CrossFade Duration="00:00:00.500" />
+                </TransitioningContentControl.PageTransition>
+            </TransitioningContentControl>
             
             
             <!-- Mini Player -->
-            <ContentControl Grid.ColumnSpan="4" Grid.Row="1" Content="{Binding MiniplayerControl}" IsVisible="{Binding MiniplayerIsVisible}" />
+            <TransitioningContentControl IsVisible="{Binding MiniplayerIsVisible}" Grid.ColumnSpan="4" Grid.Row="1" Content="{Binding MiniplayerControl}" >
+                <TransitioningContentControl.PageTransition>
+                    <CrossFade Duration="00:00:00.500" />
+                </TransitioningContentControl.PageTransition>
+            </TransitioningContentControl>
             
             <!-- Bottom Navigation -->
             <Button Grid.Row="2" 
@@ -87,6 +125,17 @@
                 <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
                     <avalonia:MaterialIcon Classes="mainButton" Kind="Home" />
                     <TextBlock>Home</TextBlock>
+                </StackPanel>
+                
+            </Button>
+            
+            <Button Grid.Row="2" 
+                    Grid.Column="2" 
+                    Theme="{StaticResource MaterialFlatButton}"
+                    Command="{Binding GotoOptionPage}">
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                    <avalonia:MaterialIcon Classes="mainButton" Kind="Gear" />
+                    <TextBlock>Einstellungen</TextBlock>
                 </StackPanel>
                 
             </Button>

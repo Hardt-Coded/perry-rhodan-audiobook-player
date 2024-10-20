@@ -1,0 +1,76 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="PerryRhodan.AudiobookPlayer.SpeedSelector.SpeedSelectorPopup"
+             x:Name="Popup">
+    <Border Height="400" Width="500">
+        <Grid>
+
+            <Grid
+                Background="{DynamicResource DialogBackground}"
+                Height="110"
+                HorizontalAlignment="Center"
+                Margin="20"
+                VerticalAlignment="Top"
+                PointerPressed="PointerPressed"
+                PointerReleased="PointerReleased"
+                PointerMoved="PointerMoved"
+                Width="300">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+
+                    <TextBlock
+                        FontSize="10"
+                        FontWeight="Thin"
+                        HorizontalAlignment="Center"
+                        Name="CurrentValueTextMinus2"
+                        Text="-2"
+                        VerticalAlignment="Center" />
+                    <TextBlock
+                        FontSize="15"
+                        HorizontalAlignment="Center"
+                        Name="CurrentValueTextMinus1"
+                        Text="-1"
+                        VerticalAlignment="Center" />
+                    <TextBlock
+                        FontSize="48"
+                        FontWeight="Bold"
+                        Foreground="{DynamicResource Accent}"
+                        HorizontalAlignment="Center"
+                        Margin="4"
+                        Name="CurrentValueText"
+                        Text="0"
+                        VerticalAlignment="Center" />
+                    <TextBlock
+                        FontSize="15"
+                        HorizontalAlignment="Center"
+                        Name="CurrentValueTextPlus1"
+                        Text="1"
+                        VerticalAlignment="Center" />
+                    <TextBlock
+                        FontSize="10"
+                        FontWeight="Thin"
+                        HorizontalAlignment="Center"
+                        Name="CurrentValueTextPlus2"
+                        Text="2"
+                        VerticalAlignment="Center" />
+                </StackPanel>
+            </Grid>
+
+            <Button
+                Classes="accent"
+                Theme="{StaticResource MaterialFlatButton}"
+                Click="DoneClick"
+                VerticalAlignment="Bottom">
+                <StackPanel Orientation="Horizontal">
+                    <avalonia:MaterialIcon Kind="CloseCircle" />
+                    <Label Classes="accent" VerticalAlignment="Center">Schließen</Label>
+                </StackPanel>    
+            </Button>
+
+
+        </Grid>
+    </Border>
+</UserControl>

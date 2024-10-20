@@ -12,6 +12,7 @@ open Dependencies
 open Domain
 open Elmish.SideEffect
 open Microsoft.AppCenter
+open PerryRhodan.AudiobookPlayer.ViewModels
 open ReactiveElmish.Avalonia
 open Microsoft.Extensions.DependencyInjection
 open PerryRhodan.AudiobookPlayer.Services.AudioPlayer
@@ -70,21 +71,24 @@ type AudioPlayerService() as self =
 
             let stateBuilder = new PlaybackState.Builder();
 
+            
+
             let stateAction =
                 match state.State with
                 | AudioPlayerState.Playing ->
                     PlaybackState.ActionPlayPause |||
                     PlaybackState.ActionPause |||
-                    PlaybackState.ActionStop |||
                     PlaybackState.ActionSkipToNext |||
                     PlaybackState.ActionSkipToPrevious |||
                     PlaybackState.ActionRewind |||
-                    PlaybackState.ActionFastForward
+                    PlaybackState.ActionFastForward |||
+                    PlaybackState.ActionSeekTo
                 | AudioPlayerState.Stopped ->
                     PlaybackState.ActionPlayPause |||
                     PlaybackState.ActionPlay |||
                     PlaybackState.ActionSkipToNext |||
-                    PlaybackState.ActionSkipToPrevious
+                    PlaybackState.ActionSkipToPrevious |||
+                    PlaybackState.ActionSeekTo
 
 
             stateBuilder.SetActions(stateAction) |> ignore
@@ -125,17 +129,18 @@ type AudioPlayerService() as self =
         | _ -> ()
 
 
+    let sendCurrentPlayerState () =
+        if player.IsPlaying then
+            let duration = TimeSpan.FromMilliseconds(float player.Duration)
+            let currentPosition = TimeSpan.FromMilliseconds(float player.CurrentPosition)
+            store.Dispatch <| PlayerElmish.Msg.UpdatePlayingState (currentPosition, duration, AudioPlayerState.Playing)
+            
     let updateAudioPlayerInformation () =
-        let state =
-            if player.IsPlaying then
-                AudioPlayerState.Playing
-            else
-                AudioPlayerState.Stopped
-
-        let duration = TimeSpan.FromMilliseconds(float player.Duration)
-        let currentPosition = TimeSpan.FromMilliseconds(float player.CurrentPosition)
-
-        store.Dispatch <| PlayerElmish.Msg.UpdatePlayingState (currentPosition, duration, state)
+        match player.IsPlaying with
+        | false ->
+            store.Dispatch <| PlayerElmish.Msg.UpdatePlayingState (store.Model.Position, store.Model.Duration, AudioPlayerState.Stopped)
+        | true ->
+            sendCurrentPlayerState ()
 
 
     let createAction (icon: int) (title: string) (intentAction: string) =
@@ -164,6 +169,8 @@ type AudioPlayerService() as self =
         let style =
             (new Notification.MediaStyle())
 
+        
+        
         match state.AudioBook |> Option.map (_.AudioBook), mediaSession with
         | Some audioBook, Some mediaSession ->
             style.SetMediaSession(mediaSession.SessionToken) |> ignore
@@ -213,7 +220,10 @@ type AudioPlayerService() as self =
         |> ignore
 
 
-        disposables.Add <| store.Observable.Subscribe (fun state -> updateNotification state)
+        disposables.Add <| store.Observable.Subscribe (fun state ->
+            if state.IsBusy |> not then
+                updateNotification state
+        )
         disposables.Add <| player.Completion.Subscribe (fun _ ->
             store.Dispatch <| PlayerElmish.Msg.MoveToNextTrack
         )
@@ -231,6 +241,12 @@ type AudioPlayerService() as self =
 
 
     override this.OnStartCommand(intent: Intent, _: StartCommandFlags, _: int) =
+        //Acquire wake lock
+        let pm = PowerManager.FromContext(this)
+        let wakeLock = pm.NewWakeLock(WakeLockFlags.Partial, "AudioPlayerService")
+        wakeLock.Acquire()
+        
+        
         let audioPlayer = this :> IAudioPlayer
         match intent.Action with
         | "ACTION_PAUSE" ->
@@ -262,7 +278,7 @@ type AudioPlayerService() as self =
             StartCommandResult.Sticky
 
         | "ACTION_SEEK" ->
-            let pos = intent.GetIntExtra("position", 0)
+            let pos = intent.GetLongExtra("position", 0L)
             audioPlayer.SeekTo(TimeSpan.FromMilliseconds(float pos))
             StartCommandResult.Sticky
 
@@ -289,6 +305,13 @@ type AudioPlayerService() as self =
                 try
                     player.Reset()
                     player.SetDataSource(file)
+                    let playbackParams =
+                        (new PlaybackParams())
+                            .SetSpeed(currentPlaybackSpeed)
+                            .SetPitch(1.0f)
+                            .SetAudioFallbackMode(0)
+                        
+                    player.PlaybackParams <- playbackParams
                     do! Helper.prepareMediaplayerAsync player
                     player.Start()
                     updateAudioPlayerInformation ()
@@ -301,6 +324,7 @@ type AudioPlayerService() as self =
 
         member this.Pause() =
             try
+                sendCurrentPlayerState () // send state right before pausing
                 player.Pause()
                 updateAudioPlayerInformation ()
             with
@@ -311,6 +335,7 @@ type AudioPlayerService() as self =
         member this.PlayPause() =
             try
                 if player.IsPlaying then
+                    sendCurrentPlayerState () // send state right before pausing
                     player.Pause()
                 else
                     player.Start()
@@ -322,6 +347,7 @@ type AudioPlayerService() as self =
 
         member this.Stop() =
             try
+                sendCurrentPlayerState () // send state right before pausing
                 player.Stop ()
                 updateAudioPlayerInformation ()
             with
@@ -331,6 +357,7 @@ type AudioPlayerService() as self =
 
         member this.SeekTo(position: TimeSpan) =
             try
+                sendCurrentPlayerState () // send state right before pausing
                 player.SeekTo(position.TotalMilliseconds |> int)
                 updateAudioPlayerInformation ()
             with
@@ -339,14 +366,37 @@ type AudioPlayerService() as self =
                  reraise()
 
         member this.SetPlaybackSpeed(speed: float) =
-            try
-                player.PlaybackParams.SetSpeed(speed |> float32) |> ignore
-                currentPlaybackSpeed <- speed |> float32
-            with
-            | ex ->
-                 Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
-                 reraise()
-
+            task {
+                try
+                    currentPlaybackSpeed <- speed |> float32
+                    let currentPos =
+                        if player.IsPlaying then
+                            player.CurrentPosition
+                        else
+                            store.Model.Position.TotalMilliseconds |> int
+                    
+                    player.Stop()
+                    player.Reset()
+                    player.SetDataSource store.Model.Filename
+                    let playbackParams =
+                        (new PlaybackParams())
+                            .SetSpeed(currentPlaybackSpeed)
+                            .SetPitch(1.0f)
+                            .SetAudioFallbackMode(0)
+                    player.PlaybackParams <- playbackParams
+                    do! Helper.prepareMediaplayerAsync player
+                    player.SeekTo currentPos
+                    player.Start()
+                    updateAudioPlayerInformation ()
+                with
+                | ex ->
+                     Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
+                     raise ex    
+            }
+            
+    interface IAudioPlayerPause with
+        member this.Pause() =
+            store.Dispatch <| PlayerElmish.Msg.Stop false
 
     interface IAudioPlayer  with
 
@@ -400,8 +450,7 @@ type AudioPlayerService() as self =
         member this.AudioPlayerInformation = store.Model
         member this.AudioPlayerInfoChanged = store.Observable
 
-
-
+    
 
 and MediaSessionCallback() =
     inherit MediaSession.Callback()

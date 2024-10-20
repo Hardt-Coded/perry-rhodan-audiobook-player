@@ -43,13 +43,13 @@
                 <GradientStop Color="Black" Offset="1.0" />
             </LinearGradientBrush>
         </Border.Background>
-        <Grid ColumnDefinitions="100,*,Auto,Auto"
+        <Grid ColumnDefinitions="100,*,44,44"
               RowDefinitions="*,Auto">
 
-            <Border CornerRadius="15" Margin="5" Padding="1" ClipToBounds="True">
-                <Grid Grid.Column="0" Margin="0,0,0,0">
+            <Border CornerRadius="15" Margin="0,3,0,0" Padding="1" ClipToBounds="True">
+                <Grid Grid.Column="0" Margin="0">
 
-                    <asyncImageLoader:AdvancedImage Source="{Binding Thumbnail}" Stretch="Uniform">
+                    <asyncImageLoader:AdvancedImage Source="{Binding Thumbnail}">
                         
                     </asyncImageLoader:AdvancedImage>
 
@@ -59,7 +59,7 @@
                     <avalonia:MaterialIcon
                         HorizontalAlignment="Right"
                         VerticalAlignment="Bottom"
-                        Margin="0,0,5,2"
+                        Margin="0,0,8,2"
                         Width="20"
                         Height="20"
                         Kind="Download"
@@ -79,22 +79,29 @@
                 </StackPanel>
                 <Interaction.Behaviors>
                     <EventTriggerBehavior EventName="PointerPressed">
-                        <InvokeCommandAction Command="{Binding OpenPlayer}" />
+                        <InvokeCommandAction Command="{Binding OpenPlayer}"  />
                     </EventTriggerBehavior>
                 </Interaction.Behaviors>
             </Grid>
             <Grid Grid.Column="2">
-                <Button Command="{Binding OpenPlayerAndPlay}" IsVisible="{Binding IsDownloaded}">
+                <Button Command="{Binding OpenPlayerAndPlay}" 
+                        IsVisible="{Binding IsPlayButtonVisible}">
                     <avalonia:MaterialIcon Kind="PlayCircle" />
                 </Button>
-                <Button Command="{Binding StartDownload}" IsVisible="{Binding IsNotDownloaded}">
+                <Button Command="{Binding PauseAudiobook}" 
+                        IsVisible="{Binding IsPlaying}">
+                    <avalonia:MaterialIcon Kind="PauseCircle" />
+                </Button>
+                <Button Command="{Binding StartDownload}" 
+                        IsVisible="{Binding IsNotDownloaded}">
                     <avalonia:MaterialIcon Kind="DownloadCircle" />
                 </Button>
-                <Button Command="{Binding RemoveDownload}" IsVisible="{Binding IsQueued}">
+                <Button Command="{Binding RemoveDownload}" 
+                        IsVisible="{Binding IsQueued}">
                     <avalonia:MaterialIcon Kind="SelectionEllipseRemove" />
                 </Button>
                 <Button IsVisible="{Binding IsDownloading}">
-                    <avalonia:MaterialIcon Kind="PlayCircle" Foreground="Chartreuse" />
+                    <avalonia:MaterialIcon Kind="DownloadCircle" Foreground="Chartreuse" />
                 </Button>
             </Grid>
             <Grid Grid.Column="3">

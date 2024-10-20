@@ -6,7 +6,6 @@
              xmlns:p1="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
              xmlns:vm="clr-namespace:PerryRhodan.AudiobookPlayer.ViewModels"
              xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
-             xmlns:glassMorphism="clr-namespace:CherylUI.Controls.GlassMorphism;assembly=CherylUI"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="PerryRhodan.AudiobookPlayer.Views.LoginView"
              Design.DataContext="{Binding Source={x:Static vm:LoginViewModel.DesignVM}}"

@@ -1,7 +1,9 @@
 ﻿namespace PerryRhodan.AudiobookPlayer.ViewModels
 
+open System
 open CherylUI.Controls
 open Dependencies
+open Microsoft.Maui.ApplicationModel
 open PerryRhodan.AudiobookPlayer.ViewModel
 open ReactiveElmish
 open Services.DependencyServices
@@ -42,6 +44,17 @@ type ActionMenuViewModel(audioBook: AudioBookItemViewModel) =
     member this.ShowMetaData() =
         this.AudioBook.ShowMetaData()
         InteractiveContainer.CloseDialog()
+        
+    member this.ShowProductPage() =
+        // open web browser url
+        this.AudioBook.AudioBook.ProductSiteUrl
+        |> Option.iter (fun url ->
+            let uri = Uri(Services.Consts.baseUrl + url)
+            Browser.Default.OpenAsync(uri, BrowserLaunchMode.SystemPreferred) |> ignore
+        )
+        InteractiveContainer.CloseDialog()
+        
+        
         
     member this.ToggleAmbientColor() =
         this.AudioBook.ToggleAmbientColor()

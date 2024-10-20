@@ -13,46 +13,46 @@ module HomePage =
         IsLoading:bool
     }
 
-    type Msg = 
+    type Msg =
         //| LoadAudioBooks
         | AudioBooksLoaded of AudioBookItemViewModel array
         | ChangeBusyState of bool
         | OnError of string
-        
-        
+
+
     [<RequireQualifiedAccess>]
     type SideEffect =
         | None
         | LoadAudioBooks
-        
-        
+
+
     let emptyModel = { Audiobooks = [||] ; LastTimeListenedAudioBook = None; IsLoading = true }
-    
+
     let init () =
         { emptyModel with IsLoading = true }, SideEffect.LoadAudioBooks
-        
-        
+
+
     let update (msg:Msg) (state:State) =
         match msg with
         //| LoadAudioBooks -> { state with IsLoading = true }, SideEffect.LoadAudioBooks
         | AudioBooksLoaded audiobooks ->
             let lastListenAudioBook =
-                audiobooks 
+                audiobooks
                 |> Array.filter (fun i -> i.DownloadState = AudioBookItem.Downloaded)
-                |> Array.sortByDescending (_.AudioBook.State.LastTimeListend) 
+                |> Array.sortByDescending (_.AudioBook.State.LastTimeListend)
                 |> Array.tryHead
-                |> Option.bind (fun i -> 
+                |> Option.bind (fun i ->
                     match i.AudioBook.State.LastTimeListend with
                     | None -> None
                     | Some _ -> Some i
                 )
-                
+
             let newState = {
-                Audiobooks = 
+                Audiobooks =
                     audiobooks
                     |> Array.filter (fun x -> match x.DownloadState with | AudioBookItem.Downloaded | AudioBookItem.Downloading _ -> true | _ -> false)
-                    |> Array.filter (fun i -> 
-                        lastListenAudioBook 
+                    |> Array.filter (fun i ->
+                        lastListenAudioBook
                         |> Option.map (fun o -> o.AudioBook.Id <> i.AudioBook.Id)
                         |> Option.defaultValue true
                     )
@@ -60,40 +60,40 @@ module HomePage =
                 IsLoading = false
             }
             newState, SideEffect.None
-            
+
         | ChangeBusyState isBusy ->
             { state with IsLoading = isBusy }, SideEffect.None
-            
+
         | OnError error ->
             { state with IsLoading = false }, SideEffect.None
-        
-    
-    
-    
+
+
+
+
     module SideEffects =
-        
-        
+
+
         let runSideEffects (sideEffect:SideEffect) (state:State) (dispatch:Msg -> unit) =
             task {
                 match sideEffect with
                 | SideEffect.None ->
                     return ()
-                    
+
                 | SideEffect.LoadAudioBooks ->
                     try
                         let audioBooks =
                             AudioBookStore.globalAudiobookStore.Model.Audiobooks
-                        
-                        dispatch <| AudioBooksLoaded audioBooks                         
+
+                        dispatch <| AudioBooksLoaded audioBooks
                         return ()
                     with
                     | ex ->
                         dispatch <| OnError ex.Message
                         return ()
-                    
+
             }
-            
-            
+
+
 
 open HomePage
 open ReactiveElmish.Avalonia
@@ -102,28 +102,48 @@ open Elmish.SideEffect
 
 type HomeViewModel() =
     inherit ReactiveElmishViewModel()
-    
+
     let local =
         Program.mkAvaloniaProgrammWithSideEffect init update SideEffects.runSideEffects
         |> Program.mkStore
-        
-        
+
+
     member this.AudioBooks =
         this.Bind(local, fun s -> ObservableCollection(s.Audiobooks))
-    
+
     member this.LastListendAudiobook =
         this.Bind(local, fun i -> i.LastTimeListenedAudioBook |> Option.defaultValue AudioBookItemViewModel.DesignVM)
-    
+
     member this.LastTimeListenedAudioBook =
         this.Bind(local, _.LastTimeListenedAudioBook)
-    
+
     member this.HasLastListenedAudioBook =
         this.Bind(local, _.LastTimeListenedAudioBook.IsSome)
-        
+
     member this.IsLoading =
         this.Bind(local, _.IsLoading)
-        
-        
+
+    member this.SelectorValues =
+        [|
+            (1,"eins")
+            (2,"zwei")
+            (3,"drei")
+            (4,"vier")
+            (5,"fünf")
+            (6,"sechs")
+            (7,"sieben")
+            (8,"acht")
+            (9,"neun")
+            (1,"zehn")
+        |]
+
+    member this.SelectorValue
+        with get():int = 0
+        and set(value:int) =
+            ()
+
+
+
     static member DesignVM = new HomeViewModel()
-    
+
 

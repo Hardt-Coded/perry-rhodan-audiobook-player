@@ -22,6 +22,7 @@ and [<RequireQualifiedAccess>] View =
     | HomePage
     | PlayerPage of viewModel: AudioBookItemViewModel * startPlaying: bool
     | BrowserPage
+    | SettingsPage
 
 
 
@@ -29,6 +30,9 @@ type Msg =
     | SetView of View
     | GotoHomePage
     | OpenLoginView
+    | GotoOptionPage
+    | CloseMiniplayer
+    | OpenMiniplayer of audiobook:AudioBookItemViewModel * startPlaying: bool
     | IsLoading of bool
     | SetMiniPlayerViewModel of PlayerViewModel
 
@@ -37,6 +41,7 @@ type Msg =
 type SideEffect =
     | None
     | InitApplication
+    | OpenMiniplayer of audiobook:AudioBookItemViewModel * startPlaying:bool
     | OpenLoginView
 
 
@@ -54,6 +59,11 @@ let update msg state =
     match msg with
     | SetView view ->
         { state with View = view }, SideEffect.None
+    | OpenMiniplayer (viewModel, startPlaying) ->
+        state, SideEffect.OpenMiniplayer (viewModel, startPlaying)
+    | CloseMiniplayer ->
+        { state with MiniPlayerViewModel = None }, SideEffect.None
+        
     | GotoHomePage ->
         { state with View = View.HomePage }, SideEffect.None
     | OpenLoginView ->
@@ -66,6 +76,8 @@ let update msg state =
                 MiniPlayerViewModel = Some playerViewModel
         },
         SideEffect.None
+    | GotoOptionPage ->
+        { state with View = View.SettingsPage }, SideEffect.None
 
 
 let runSideEffect sideEffect state dispatch =
@@ -87,27 +99,36 @@ let runSideEffect sideEffect state dispatch =
             )
             |> ignore
 
-            do!
-                Task.Delay 5000
-#if ANROID
-                let! a = Permissions.CheckStatusAsync<Permissions.PostNotifications>()
+            do! Task.Delay 5000
+        
+            #if ANROID
+            let! a = Permissions.CheckStatusAsync<Permissions.PostNotifications>()
 
-                match a with
-                | PermissionStatus.Granted ->
-                    Services.Notifications.showToasterMessage "Permission granted"
-                | _ ->
-                    // Todo: check if user already saw this message
-                    let! result =
-                        Services.Notifications.showQuestionDialog
-                            "Benachrichtigungen"
-                            "Benachrichtungen sind deaktiviert, damit wird der Downloadfortschritt nicht außerhalb der App angezeigt. In den Telefon-Einstellung zur App, können diese aktiviert werden."
-                            "Einstellungen"
-                            "Abbrechen"
+            match a with
+            | PermissionStatus.Granted ->
+                Services.Notifications.showToasterMessage "Permission granted"
+            | _ ->
+                // Todo: check if user already saw this message
+                let! result =
+                    Services.Notifications.showQuestionDialog
+                        "Benachrichtigungen"
+                        "Benachrichtungen sind deaktiviert, damit wird der Downloadfortschritt nicht außerhalb der App angezeigt. In den Telefon-Einstellung zur App, können diese aktiviert werden."
+                        "Einstellungen"
+                        "Abbrechen"
 
-                    if result then
-                        AppInfo.ShowSettingsUI()
-#endif
+                if result then
+                    AppInfo.ShowSettingsUI()
+            #endif
 
+    
+        | SideEffect.OpenMiniplayer(audioBookItemViewModel, startPlaying) ->
+            let viewModel = PlayerViewModelStore.create audioBookItemViewModel startPlaying
+            dispatch <| SetMiniPlayerViewModel viewModel
+            return ()
+            
+            
+        
+    
     }
 
 
