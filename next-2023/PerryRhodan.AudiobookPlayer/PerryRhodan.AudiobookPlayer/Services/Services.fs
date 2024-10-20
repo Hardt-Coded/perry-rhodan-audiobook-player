@@ -763,7 +763,7 @@ module WebAccess =
     )
 
 
-    let handleException f =
+    let private handleException f =
         task {
             try
                 let! res = f()
@@ -1223,11 +1223,14 @@ module SecureStorageHelper =
                 let! value =  SecureStorage.GetAsync(key)
                 return value |> Option.ofObj
             elif OperatingSystem.IsWindows() then
-                let! value =  File.ReadAllTextAsync($"store-{key}.txt")
-                return value |> Option.ofObj
+                try
+                    let! value =  File.ReadAllTextAsync($"store-{key}.txt")
+                    return value |> Option.ofObj
+                with
+                | _ ->
+                    return None
             else
                 return None
-            
         }
 
     let setSecuredValue value key =

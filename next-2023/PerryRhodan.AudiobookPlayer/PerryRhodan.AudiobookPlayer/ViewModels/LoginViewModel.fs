@@ -1,5 +1,6 @@
 ﻿namespace PerryRhodan.AudiobookPlayer.ViewModels
 
+open System
 open CherylUI.Controls
 open Dependencies
 open Global
@@ -99,7 +100,8 @@ module LoginPage =
                 | SideEffect.TryLogin ->
                     dispatch <| ChangeBusyState true
                     try
-                        let! cc = WebAccess.login state.Username state.Password
+                        let username = state.Username.Trim()
+                        let! cc = WebAccess.login username state.Password
                         match cc with
                         | Ok cc ->
                             match cc with
@@ -193,18 +195,20 @@ module LoginPage =
  
 open LoginPage
 
-type LoginViewModel() =
+type LoginViewModel(?designView) =
     inherit ReactiveElmishViewModel()
     
     let local =
         Program.mkAvaloniaProgrammWithSideEffect init update SideEffects.runSideEffects
         |> Program.mkStore
         
+    let designView = defaultArg designView false    
     do
-        base.Subscribe(InputPaneService.InputPane.StateChanged, fun _ -> local.Dispatch KeyboardStateChanged)
-        let notificationService = DependencyService.Get<INavigationService>()
-        notificationService.RegisterBackbuttonPressed (fun () -> local.Dispatch CloseDialog)
-        ()
+        if OperatingSystem.IsAndroid() && not designView then
+            base.Subscribe(InputPaneService.InputPane.StateChanged, fun _ -> local.Dispatch KeyboardStateChanged)
+            let notificationService = DependencyService.Get<INavigationService>()
+            notificationService.RegisterBackbuttonPressed (fun () -> local.Dispatch CloseDialog)
+            ()
     
     interface ILoginViewModel
             
@@ -236,4 +240,4 @@ type LoginViewModel() =
         | null -> 0.0
         | ip -> ip.OccludedRect.Height
         )
-    static member DesignVM = new LoginViewModel()
+    static member DesignVM = new LoginViewModel(true)

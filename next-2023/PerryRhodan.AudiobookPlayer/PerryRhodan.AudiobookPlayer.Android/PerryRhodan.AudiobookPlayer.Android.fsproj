@@ -5,7 +5,6 @@
     <SupportedOSPlatformVersion>21</SupportedOSPlatformVersion>
     <ApplicationId>hits.rhodan.audiobooks.dev</ApplicationId>
     <ApplicationVersion>49990</ApplicationVersion>
-    <TargetFrameworkVersion>v13.0</TargetFrameworkVersion>
     <ApplicationDisplayVersion>2.0.0-beta</ApplicationDisplayVersion>
     <AndroidPackageFormat>apk</AndroidPackageFormat>
 
@@ -14,21 +13,25 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <AndroidPackageFormat>apk</AndroidPackageFormat>
-    <AndroidDexTool>d8</AndroidDexTool>
-    <DebugSymbols>False</DebugSymbols>
+    <AndroidDexTool>r8</AndroidDexTool>
+    <DebugSymbols>True</DebugSymbols>
     <EnableLLVM>False</EnableLLVM>
     <AndroidUseAapt2>True</AndroidUseAapt2>
-    <RunAOTCompilation>False</RunAOTCompilation>
+    <RunAOTCompilation>false</RunAOTCompilation>
+    <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <OptimizationPreference>Speed</OptimizationPreference>
     <!--<PublishAot>true</PublishAot>-->
     <AndroidPackageFormat>apk</AndroidPackageFormat>
-    <AndroidDexTool>d8</AndroidDexTool>
-    <DebugSymbols>True</DebugSymbols>
+    <AndroidDexTool>r8</AndroidDexTool>
+    <DebugSymbols>False</DebugSymbols>
     <EnableLLVM>False</EnableLLVM>
     <AndroidUseAapt2>True</AndroidUseAapt2>
-    <RunAOTCompilation>True</RunAOTCompilation>
+    <RunAOTCompilation>false</RunAOTCompilation>
+    <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
+    <PublishTrimmed>false</PublishTrimmed>
+    <TrimMode>partial</TrimMode>
     <!-- <AndroidLinkTool>r8</AndroidLinkTool> -->
     <!--<AndroidEnableProfiledAot>True</AndroidEnableProfiledAot>-->
   </PropertyGroup>
@@ -41,9 +44,11 @@
 
   <ItemGroup>
     <PackageReference Include="Avalonia.Android" Version="11.2.0-rc1" />
-    <PackageReference Include="Microsoft.NET.Runtime.MonoAOTCompiler.Task" Version="8.0.8" />
     <PackageReference Include="Xamarin.AndroidX.Core.SplashScreen" Version="1.0.1.12" />
     <PackageReference Update="Microsoft.Maui.Essentials" Version="8.0.91" />
+  </ItemGroup>
+  <ItemGroup>
+    <TrimmerRootDescriptor Include="TrimmerRoots.xml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -63,4 +68,28 @@
   <ItemGroup>
     <ProjectReference Include="..\PerryRhodan.AudiobookPlayer\PerryRhodan.AudiobookPlayer.fsproj" />
   </ItemGroup>
+
+  <!-- copy file to ..\PerryRhodan.AudiobookPlayer\obj\ -->
+
+
+
+  <Target Name="CopyFileToCustomDirectory" AfterTargets="AfterCompile">
+    <Copy
+            SourceFiles="$(SolutionDir)PerryRhodan.AudiobookPlayer\obj\$(Configuration)\net8.0\Avalonia\PerryRhodan.AudiobookPlayer.dll"
+            DestinationFolder="$(SolutionDir)PerryRhodan.AudiobookPlayer\obj\$(Configuration)\net8.0\" />
+    <Copy
+            SourceFiles="$(SolutionDir)PerryRhodan.AudiobookPlayer\obj\$(Configuration)\net8.0\Avalonia\PerryRhodan.AudiobookPlayer.dll"
+            DestinationFolder="$(SolutionDir)PerryRhodan.AudiobookPlayer\obj\$(Configuration)\net8.0\refint" />
+  </Target> 
+            
+  
+  
+  
+  
+<!--    <ItemGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+        <None Include="..\PerryRhodan.AudiobookPlayer\obj\Avalonia\*.dll">
+        <Link>%(Filename)%(Extension)</Link>
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+    </ItemGroup> -->
 </Project>

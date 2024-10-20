@@ -4,6 +4,7 @@
              xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              xmlns:audiobookPlayer="clr-namespace:PerryRhodan.AudiobookPlayer"
              xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             
              x:Class="PerryRhodan.AudiobookPlayer.App"
              RequestedThemeVariant="Dark">
              <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
@@ -35,7 +36,10 @@
         <StyleInclude Source="avares://CherylUI/Styles/TextBoxStyles.axaml" />
         <StyleInclude Source="avares://CherylUI/Styles/TabControlStyles.axaml" />-->
         
-        <themes:MaterialTheme BaseTheme="Dark" PrimaryColor="Purple" SecondaryColor="Pink" />
+        <!--<themes:MaterialTheme BaseTheme="Dark" PrimaryColor="Purple" SecondaryColor="Pink" />-->
+        <themes:MaterialTheme PrimaryColor="Purple" SecondaryColor="Pink">
+            
+        </themes:MaterialTheme>
         <dialogHostAvalonia:DialogHostStyles />
         <avalonia:MaterialIconStyles />
     </Application.Styles>

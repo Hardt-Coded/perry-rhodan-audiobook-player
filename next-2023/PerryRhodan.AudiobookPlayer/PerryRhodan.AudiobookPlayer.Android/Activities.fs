@@ -19,6 +19,7 @@ open Microsoft.Extensions.DependencyInjection
 //open PerryRhodan.AudiobookPlayer.Android.AudioPlayerServiceImplementation.DecpencyService
 open PerryRhodan.AudiobookPlayer.Services.AudioPlayer
 open PerryRhodan.AudiobookPlayer.Services.Interfaces
+open PerryRhodan.AudiobookPlayer.ViewModels
 open Services
 open Services.DependencyServices
 open Xamarin.Android.Net
@@ -80,7 +81,6 @@ type ServiceConnection() =
     //Theme = "@style/Theme.AppCompat.NoActionBar",
     Icon = "@drawable/eins_a_launcher",
     MainLauncher = true,
-    NoHistory = true,
     LaunchMode = LaunchMode.SingleTop,
     ConfigurationChanges = (ConfigChanges.Orientation ||| ConfigChanges.ScreenSize ||| ConfigChanges.UiMode))>]
 type MainActivity() as self =
@@ -104,6 +104,7 @@ type MainActivity() as self =
                         // make dependency injection aware of this instance of the service
                         let service = binder.GetService()
                         DependencyService.ServiceCollection.AddSingleton<IAudioPlayer>(service) |> ignore
+                        DependencyService.ServiceCollection.AddSingleton<IAudioPlayerPause>(service) |> ignore
                         DependencyService.ServiceCollection.AddSingleton<IMediaPlayer>(service) |> ignore
                         DependencyService.SetComplete()
                         

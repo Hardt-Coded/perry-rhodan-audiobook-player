@@ -7,6 +7,7 @@
              xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:views="clr-namespace:PerryRhodan.AudiobookPlayer.Views"
              mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="80"
+             Height="80" MinHeight="80" MaxHeight="80"
              x:Class="PerryRhodan.AudiobookPlayer.Views.MiniPlayerView"
              Design.DataContext="{Binding Source={x:Static vm:PlayerViewModel.DesignVM}}"
              x:DataType="vm:PlayerViewModel"
@@ -40,77 +41,65 @@
                 <GradientStop Color="Black" Offset="1.0" />
             </LinearGradientBrush>
         </Border.Background>
-        <Grid ColumnDefinitions=".2*,*">
+        <Grid ColumnDefinitions="80, *, Auto">
             <!-- cover -->
             <Border CornerRadius="15" Margin="5" Padding="1" ClipToBounds="True">
                 <Grid Grid.Column="0" Margin="0,0,0,0">
                     <asyncImageLoader:AdvancedImage Source="{Binding Picture}"
                                                     Stretch="Uniform" />
                 </Grid>
+                <!-- Command On Tap -->
+                <Interaction.Behaviors>
+                    <EventTriggerBehavior EventName="Tapped">
+                        <InvokeCommandAction Command="{Binding OpenMainPlayerPage}" />
+                    </EventTriggerBehavior>
+                </Interaction.Behaviors>
             </Border>
 
-
-            <!-- controls -->
-            <Grid Grid.Column="1"
-                  ColumnDefinitions="*, Auto">
-                <Border Grid.Row="0"
-                        Grid.Column="0" ClipToBounds="True">
-                    <StackPanel Grid.Row="0"
-                                Grid.Column="0"
-                                VerticalAlignment="Center"
-                                HorizontalAlignment="Center"
-                                x:Name="TextPanel">
-                        <StackPanel.Styles>
-                            <Style Selector="TextBlock">
-                                <Setter Property="Margin" Value="0,0,0,2" />
-                                <Setter Property="FontSize" Value="13" />
-                            </Style>
-                        </StackPanel.Styles>
-                        <TextBlock Text="{Binding AudioBook.AudioBook.FullName}" 
-                                   x:Name="Title"
-                                   TextWrapping="Wrap">
-                            <TextBlock.Styles>
-                                <Style Selector="TextBlock">
-
-                                    <!--<Style.Animations>
-                                        <Animation Duration="0:0:10" IterationCount="INFINITE">
-                                            <KeyFrame Cue="0%">
-                                                ~1~<Setter Property="(TranslateTransform.X)" Value="{Binding ElementName=Title, Path=Bounds.Width}" />@1@
-                                                <Setter Property="Margin" Value="150,0,0,0" />
-                                            </KeyFrame>
-                                            <KeyFrame Cue="100%">
-                                                <Setter Property="Margin" Value="-150,0,0,0" />
-                                                ~1~<Setter Property="(TranslateTransform.X)" Value="{Binding ElementName=Title, Path=Bounds.Width, Converter={StaticResource NegativeConverter}}" />@1@
-                                            </KeyFrame>
-                                        </Animation>
-                                    </Style.Animations>-->
-                                </Style>
-                            </TextBlock.Styles>
-                        </TextBlock>
-                        <!--<TextBlock Text="{Binding CurrentTrackNumberString}" HorizontalAlignment="Center" />
-                    <TextBlock Text="{Binding PositionString}" HorizontalAlignment="Center" />-->
-                        <TextBlock Foreground="#606060" Text="{Binding TotalPositionString}" />
-                    </StackPanel>
-                </Border>
-                <StackPanel Grid.Column="1" Orientation="Horizontal">
-                    <Button Command="{Binding Previous}" IsEnabled="{Binding !IsLoading}">
-                        <avalonia:MaterialIcon Kind="PreviousTitle" />
-                    </Button>
-                    <Button Command="{Binding Play}" IsVisible="{Binding IsStopped}"
-                            IsEnabled="{Binding !IsLoading}">
-                        <avalonia:MaterialIcon Kind="PlayCircle" />
-                    </Button>
-                    <Button Command="{Binding Stop}" IsVisible="{Binding IsPlaying}"
-                            IsEnabled="{Binding !IsLoading}">
-                        <avalonia:MaterialIcon Kind="StopCircle" />
-                    </Button>
-                    <Button Command="{Binding Next}" IsEnabled="{Binding !IsLoading}">
-                        <avalonia:MaterialIcon Kind="NextTitle" />
-                    </Button>
+            <!-- title -->
+            <Border Grid.Row="0"
+                    Grid.Column="1" ClipToBounds="True">
+                <StackPanel Grid.Row="0"
+                            Grid.Column="0"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Center"
+                            x:Name="TextPanel">
+                    <StackPanel.Styles>
+                        <Style Selector="TextBlock">
+                            <Setter Property="Margin" Value="0,0,0,2" />
+                            <Setter Property="FontSize" Value="13" />
+                        </Style>
+                    </StackPanel.Styles>
+                    <TextBlock Text="{Binding AudioBook.AudioBook.FullName}"
+                               x:Name="Title"
+                               TextWrapping="Wrap">
+                    </TextBlock>
+                    <TextBlock Foreground="#606060" Text="{Binding TotalPositionString}" />
                 </StackPanel>
-
-
-            </Grid>
+                <!-- Command On Tap -->
+                <Interaction.Behaviors>
+                    <EventTriggerBehavior EventName="Tapped">
+                        <InvokeCommandAction Command="{Binding OpenMainPlayerPage}" />
+                    </EventTriggerBehavior>
+                </Interaction.Behaviors>
+            </Border>
+            <!-- controls -->
+            <StackPanel Grid.Column="2" Orientation="Horizontal">
+                <Button Command="{Binding JumpBackwards}" IsEnabled="{Binding !IsLoading}">
+                    <avalonia:MaterialIcon Kind="Rewind30" />
+                </Button>
+                <Button Command="{Binding Play}" IsVisible="{Binding IsStopped}"
+                        IsEnabled="{Binding !IsLoading}">
+                    <avalonia:MaterialIcon Kind="PlayCircle" />
+                </Button>
+                <Button Command="{Binding Stop}" IsVisible="{Binding IsPlaying}"
+                        IsEnabled="{Binding !IsLoading}">
+                    <avalonia:MaterialIcon Kind="PauseCircle" />
+                </Button>
+                <Button Command="{Binding JumpForward}" IsEnabled="{Binding !IsLoading}">
+                    <avalonia:MaterialIcon Kind="FastForward30" />
+                </Button>
+            </StackPanel>
         </Grid>
     </Border>
 

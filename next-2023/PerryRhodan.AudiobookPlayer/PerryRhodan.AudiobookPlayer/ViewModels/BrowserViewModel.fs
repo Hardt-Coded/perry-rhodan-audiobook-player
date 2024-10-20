@@ -3,6 +3,7 @@
 open System.Collections.ObjectModel
 open System.Threading.Tasks
 open CherylUI.Controls
+open Common
 open Dependencies
 open Domain
 open PerryRhodan.AudiobookPlayer.ViewModel
@@ -18,7 +19,8 @@ module BrowserPage =
         AvailableGroups: string list
         SelectedGroups:string list
         SelectedGroupItems: AudioBookListType
-        IsLoading:bool 
+        IsLoading:bool
+        SearchText:string
     }
 
 
@@ -31,6 +33,8 @@ module BrowserPage =
         | ShowErrorMessage of string
         | ChangeBusyState of bool
         | OpenLoginPage
+        | SetSearchText of string
+        | SetSearchResult of AudioBookItemViewModel []
 
 
     [<RequireQualifiedAccess>]
@@ -41,6 +45,7 @@ module BrowserPage =
         | OpenLoginPage
         | ShowErrorMessage of string
         | OnSelectedGroupChanged
+        | StartSearch
     
 
 
@@ -90,6 +95,7 @@ module BrowserPage =
             SelectedGroupItems = filterResult.FilteredAudioBooks
             PreviousGroups = filterResult.PreviousAvailableGroups 
             AvailableGroups = filterResult.AvailableGroups
+            SearchText = ""
         }
     
         newModel, if initAudioBooks = [||] then SideEffect.LoadCurrentAudioBooks else SideEffect.None
@@ -123,6 +129,10 @@ module BrowserPage =
             { state with IsLoading = bstate}, SideEffect.None
         | OpenLoginPage ->
             state, SideEffect.OpenLoginPage
+        | SetSearchText s ->
+            { state with SearchText = s }, SideEffect.StartSearch
+        | SetSearchResult audioBookItemViewModels ->
+            { state with AudioBookItems = audioBookItemViewModels }, SideEffect.None
         
         
     module SideEffects =
@@ -476,12 +486,85 @@ module BrowserPage =
                         navService.RegisterBackbuttonPressed (fun () -> dispatch (RemoveLastSelectGroup (List.last state.SelectedGroups)))
                     
                     return ()
+
+                | SideEffect.StartSearch ->
+                    if state.SearchText = "" then
+                        loadCurrentAudiobooks ()
+                    else
+                        // search for audio books with the given search text
+                        let filteredAudioBooks =
+                            AudioBookStore.globalAudiobookStore.Model.Audiobooks
+                            |> Array.filter (_.AudioBook.FullName.ToLower().Contains(state.SearchText.ToLower()))
+                            
+                        dispatch <| Msg.SetSearchResult filteredAudioBooks
+                        
+                     
+                    
             }
 
 open BrowserPage
 open ReactiveElmish.Avalonia
 open ReactiveElmish
 open Elmish.SideEffect
+
+module private DemoData =
+    let designAudioBook = {
+            Id = 1
+            FullName = "Perry Rhodan 3000 - Mythos Erde"
+            EpisodeNo = Some 3000
+            EpisodenTitel = "Mythos Erde"
+            Group = "Perry Rhodan"
+            Picture = Some "avares://PerryRhodan.AudiobookPlayer/Assets/AudioBookPlaceholder_Dark.png"
+            Thumbnail = Some "avares://PerryRhodan.AudiobookPlayer/Assets/AudioBookPlaceholder_Dark.png"
+            DownloadUrl = None
+            ProductSiteUrl = None
+            State = {
+                Completed = true
+                CurrentPosition = None
+                Downloaded = true
+                DownloadedFolder = None
+                LastTimeListend = None
+            }
+        }
+
+    let designAudioBook2 = {
+            Id = 2
+            FullName = "Perry Rhodan 3001 - Mythos Erde2"
+            EpisodeNo = Some 3000
+            EpisodenTitel = "Mythos Erde2"
+            Group = "Perry Rhodan"
+            Picture = Some "avares://PerryRhodan.AudiobookPlayer/Assets/AudioBookPlaceholder_Dark.png"
+            Thumbnail = Some "avares://PerryRhodan.AudiobookPlayer/Assets/AudioBookPlaceholder_Dark.png"
+            DownloadUrl = None
+            ProductSiteUrl = None
+            State = {
+                Completed = true
+                CurrentPosition = None
+                Downloaded = true
+                DownloadedFolder = None
+                LastTimeListend = None
+            }
+        }
+    
+    let designAudioBook3 = {
+            Id = 3
+            FullName = "Perry Rhodan 3003 - Mythos Erde2"
+            EpisodeNo = Some 3000
+            EpisodenTitel = "Mythos Erde3"
+            Group = "Perry Rhodan - Dies ist ein ganz langer Titel, der nicht in das Fenster passt"
+            Picture = Some "avares://PerryRhodan.AudiobookPlayer/Assets/AudioBookPlaceholder_Dark.png"
+            Thumbnail = Some "avares://PerryRhodan.AudiobookPlayer/Assets/AudioBookPlaceholder_Dark.png"
+            DownloadUrl = None
+            ProductSiteUrl = None
+            State = {
+                Completed = true
+                CurrentPosition = None
+                Downloaded = true
+                DownloadedFolder = None
+                LastTimeListend = None
+            }
+        }
+
 
 type BrowserViewModel(selectedGroups, audiobookItems) =
     inherit ReactiveElmishViewModel()
@@ -491,6 +574,9 @@ type BrowserViewModel(selectedGroups, audiobookItems) =
     let local =
         Program.mkAvaloniaProgrammWithSideEffect init update SideEffects.runSideEffects
         |> Program.mkStore
+        
+        
+    let searchStringDebouncer = Extensions.debounce<string>
     
     new(selectedGroups) = 
         new BrowserViewModel(selectedGroups, [||])
@@ -504,8 +590,24 @@ type BrowserViewModel(selectedGroups, audiobookItems) =
     member this.GroupItems = this.Bind(local, fun s -> ObservableCollection(match s.SelectedGroupItems with | GroupList grp -> grp | _ -> [||]))
     member this.IsLoading:bool = this.Bind(local, _.IsLoading)
     member this.HasAudioBooks = this.Bind(local, fun s -> s.AudioBookItems.Length > 0)
+    
+    member this.SearchText
+        with get() = "nix"
+        and set(value) =
+            searchStringDebouncer 1000 (fun s ->
+                local.Dispatch <| SetSearchText s
+            ) value
+            
+            
         
     member this.LoadOnlineAudiobooks() = local.Dispatch LoadOnlineAudiobooks
     member this.SelectPreviousGroup(group:string) = local.Dispatch (SelectPreviousGroup group)
     member this.SelectAdditionalGroup(group:string) = local.Dispatch (AddSelectGroup group)
-    static member DesignVM = new BrowserViewModel([], [| AudioBookItemViewModel.DesignVM; AudioBookItemViewModel.DesignVM2 |])            
+    static member DesignVM =
+        new BrowserViewModel(
+            [],
+            [|
+                AudioBookItemViewModel(DemoData.designAudioBook)
+                AudioBookItemViewModel(DemoData.designAudioBook2)
+                AudioBookItemViewModel(DemoData.designAudioBook3)
+            |])            

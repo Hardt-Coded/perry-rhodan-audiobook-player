@@ -14,7 +14,9 @@ type MainViewModel(root:CompositionRoot) =
 
     interface IMainViewModel with
         member this.GotoPlayerPage audiobook startPlayer = this.GotoPlayerPage (audiobook :?> AudioBookItemViewModel) startPlayer
+        member this.OpenMiniplayer audiobook startPlayer = this.OpenMiniplayer (audiobook :?> AudioBookItemViewModel) startPlayer
         member this.GotoHomePage() = this.GotoHomePage()
+        member this.CurrentPlayerAudiobookViewModel = this.Bind(app, fun e -> e.MiniPlayerViewModel |> Option.map (fun vm -> vm.AudioBook))
     
     member this.SetMiniPlayerViewModel (playerViewModel:PlayerViewModel) = app.Dispatch <| SetMiniPlayerViewModel playerViewModel
     member this.MiniplayerControl =
@@ -65,13 +67,23 @@ type MainViewModel(root:CompositionRoot) =
                 let viewModel = new BrowserViewModel([])
                 view.DataContext <- viewModel
                 view
+
+            | View.SettingsPage ->
+                let view = SettingsView()
+                let viewModel = new SettingsViewModel()
+                view.DataContext <- viewModel
+                view
         )
         
     member this.IsLoading = this.Bind (app, _.IsLoading)
     
     member this.GotoHomePage() = app.Dispatch GotoHomePage   
     member this.GotoPlayerPage audiobook startPlaying = app.Dispatch <| SetView (View.PlayerPage (audiobook, startPlaying))   
-    member this.OpenLoginForm() = app.Dispatch OpenLoginView   
+    member this.OpenMiniplayer audiobook startPlaying =
+        app.Dispatch <| CloseMiniplayer   
+        app.Dispatch <| OpenMiniplayer (audiobook, startPlaying)   
+    member this.OpenLoginForm() = app.Dispatch OpenLoginView
+    member this.GotoOptionPage() = app.Dispatch GotoOptionPage
     member this.GotoBrowserPage() = app.Dispatch <| SetView View.BrowserPage   
        
         

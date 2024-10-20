@@ -24,7 +24,7 @@
         abstract member PlayPause : unit -> unit
         abstract member Stop : unit -> unit
         abstract member SeekTo : TimeSpan -> unit
-        abstract member SetPlaybackSpeed : float -> unit
+        abstract member SetPlaybackSpeed : float -> Task<unit>
         
     and AudioPlayerInformation  = {
         State: AudioPlayerState
