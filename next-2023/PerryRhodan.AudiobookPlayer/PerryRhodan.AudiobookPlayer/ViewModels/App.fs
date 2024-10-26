@@ -3,10 +3,17 @@
 open System.Threading.Tasks
 open Avalonia.Controls
 open CherylUI.Controls
+open Dependencies
 open Elmish
-open Microsoft.Maui.ApplicationModel
+open Microsoft.Extensions.DependencyInjection
+open PerryRhodan.AudiobookPlayer.Services
 open PerryRhodan.AudiobookPlayer.ViewModel
+open PerryRhodan.AudiobookPlayer.Views
 open ReactiveElmish.Avalonia
+open Services
+open PerryRhodan.AudiobookPlayer.Controls
+open System
+open Microsoft.Maui.ApplicationModel
 
 
 
@@ -14,13 +21,14 @@ open ReactiveElmish.Avalonia
 type Model = {
     View: View
     IsLoading: bool
-    MiniPlayerViewModel: PlayerViewModel option
+    PlayerViewModel: PlayerViewModel option
+    MiniPlayerControl: MiniPlayerView option
 }
 
 
 and [<RequireQualifiedAccess>] View =
     | HomePage
-    | PlayerPage of viewModel: AudioBookItemViewModel * startPlaying: bool
+    | PlayerPage of PlayerView
     | BrowserPage
     | SettingsPage
 
@@ -28,20 +36,28 @@ and [<RequireQualifiedAccess>] View =
 
 type Msg =
     | SetView of View
-    | GotoHomePage
+
+    | OpenPlayerPage of viewModel: AudioBookItemViewModel * startPlaying: bool
     | OpenLoginView
-    | GotoOptionPage
+
     | CloseMiniplayer
     | OpenMiniplayer of audiobook:AudioBookItemViewModel * startPlaying: bool
+
+    | SetPlayerViewModel of PlayerViewModel
+    | SetMiniPlayerControl of MiniPlayerView option
+
     | IsLoading of bool
-    | SetMiniPlayerViewModel of PlayerViewModel
+
 
 
 [<RequireQualifiedAccess>]
 type SideEffect =
     | None
     | InitApplication
+
     | OpenMiniplayer of audiobook:AudioBookItemViewModel * startPlaying:bool
+    | OpenPlayerPage of audiobook:AudioBookItemViewModel * startPlaying:bool
+
     | OpenLoginView
 
 
@@ -50,7 +66,8 @@ let init () =
     {
         View = View.HomePage
         IsLoading = false
-        MiniPlayerViewModel = None
+        PlayerViewModel = None
+        MiniPlayerControl = None
     },
     SideEffect.InitApplication
 
@@ -59,76 +76,110 @@ let update msg state =
     match msg with
     | SetView view ->
         { state with View = view }, SideEffect.None
+
+    | OpenPlayerPage(viewModel, startPlaying) ->
+        state, SideEffect.OpenPlayerPage (viewModel, startPlaying)
+
     | OpenMiniplayer (viewModel, startPlaying) ->
         state, SideEffect.OpenMiniplayer (viewModel, startPlaying)
+
     | CloseMiniplayer ->
-        { state with MiniPlayerViewModel = None }, SideEffect.None
-        
-    | GotoHomePage ->
-        { state with View = View.HomePage }, SideEffect.None
+        { state with PlayerViewModel = None }, SideEffect.None
+
     | OpenLoginView ->
         state, SideEffect.OpenLoginView
+
     | IsLoading isLoading ->
         { state with IsLoading = isLoading }, SideEffect.None
-    | SetMiniPlayerViewModel playerViewModel ->
+
+    | SetPlayerViewModel playerViewModel ->
         {
             state with
-                MiniPlayerViewModel = Some playerViewModel
+                PlayerViewModel = Some playerViewModel
         },
         SideEffect.None
-    | GotoOptionPage ->
-        { state with View = View.SettingsPage }, SideEffect.None
+
+    | SetMiniPlayerControl miniPlayerViewOption ->
+        {
+            state with
+                MiniPlayerControl = miniPlayerViewOption
+        },
+        SideEffect.None
+
 
 
 let runSideEffect sideEffect state dispatch =
     task {
-        match sideEffect with
-        | SideEffect.None -> return ()
-
-        | SideEffect.OpenLoginView ->
-            let control = PerryRhodan.AudiobookPlayer.Views.LoginView()
-            let vm = new LoginViewModel()
-            control.DataContext <- vm
-
-            InteractiveContainer.ShowDialog(control, true)
-
-        | SideEffect.InitApplication ->
-            // if the global audiobook store is busy display here a loading indicator
-            AudioBookStore.globalAudiobookStore.Observable.Subscribe(fun s ->
-                dispatch (Msg.IsLoading s.IsLoading)
-            )
-            |> ignore
-
-            do! Task.Delay 5000
-        
-            #if ANROID
-            let! a = Permissions.CheckStatusAsync<Permissions.PostNotifications>()
-
-            match a with
-            | PermissionStatus.Granted ->
-                Services.Notifications.showToasterMessage "Permission granted"
-            | _ ->
-                // Todo: check if user already saw this message
-                let! result =
-                    Services.Notifications.showQuestionDialog
-                        "Benachrichtigungen"
-                        "Benachrichtungen sind deaktiviert, damit wird der Downloadfortschritt nicht außerhalb der App angezeigt. In den Telefon-Einstellung zur App, können diese aktiviert werden."
-                        "Einstellungen"
-                        "Abbrechen"
-
-                if result then
-                    AppInfo.ShowSettingsUI()
-            #endif
-
-    
-        | SideEffect.OpenMiniplayer(audioBookItemViewModel, startPlaying) ->
-            let viewModel = PlayerViewModelStore.create audioBookItemViewModel startPlaying
-            dispatch <| SetMiniPlayerViewModel viewModel
+        if sideEffect = SideEffect.None then
             return ()
-            
-            
-        
-    
+        else
+            dispatch <| IsLoading true
+            do!
+                task {
+                    match sideEffect with
+                    | SideEffect.None ->
+                        return ()
+
+                    | SideEffect.OpenLoginView ->
+                        let control = LoginView()
+                        let vm = new LoginViewModel()
+                        control.DataContext <- vm
+                        InteractiveContainer.ShowDialog(control, true)
+
+                    | SideEffect.InitApplication ->
+                        // if the global audiobook store is busy display here a loading indicator
+                        AudioBookStore.globalAudiobookStore.Observable.Subscribe(fun s ->
+                            dispatch (Msg.IsLoading s.IsLoading)
+                        ) |> ignore
+
+
+                        let globalSettings = DependencyService.Get<GlobalSettingsService>()
+                        do! globalSettings.Init()
+
+                        // On first start ask for notification permission
+                        if OperatingSystem.IsAndroid() && globalSettings.IsFirstStart then
+                            let! a = Permissions.CheckStatusAsync<Permissions.PostNotifications>()
+                            match a with
+                            | PermissionStatus.Granted ->
+                                Services.Notifications.showToasterMessage "Permission granted"
+                            | _ ->
+                                // Todo: check if user already saw this message
+                                let! result =
+                                    Services.Notifications.showQuestionDialog
+                                        "Benachrichtigungen"
+                                        "Benachrichtungen sind deaktiviert, damit wird der Downloadfortschritt nicht außerhalb der App angezeigt. In den Telefon-Einstellung zur App, können diese aktiviert werden."
+                                        "Einstellungen"
+                                        "Abbrechen"
+
+                                if result then
+                                    AppInfo.ShowSettingsUI()
+
+
+                            globalSettings.IsFirstStart <- false
+
+
+
+                    | SideEffect.OpenMiniplayer (audioBookItemViewModel, startPlaying) ->
+                        let viewModel = PlayerViewModelStore.create audioBookItemViewModel startPlaying
+                        dispatch <| SetPlayerViewModel viewModel
+                        let miniPlayerView = MiniPlayerView()
+                        miniPlayerView.DataContext <- viewModel
+                        dispatch <| SetMiniPlayerControl (Some miniPlayerView)
+                        return ()
+
+                    | SideEffect.OpenPlayerPage (audioBookItemViewModel, startPlaying) ->
+                        let viewModel = PlayerViewModelStore.create audioBookItemViewModel startPlaying
+                        dispatch <| SetPlayerViewModel viewModel
+                        let playerView = PlayerView()
+                        playerView.DataContext <- viewModel
+                        dispatch <| SetView (View.PlayerPage playerView)
+                        return ()
+
+                }
+
+            dispatch <| IsLoading false
+
+
     }
 
 

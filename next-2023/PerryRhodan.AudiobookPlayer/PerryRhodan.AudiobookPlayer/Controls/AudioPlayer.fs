@@ -2,22 +2,23 @@
 
 
 
+open System.Threading
 open Dependencies
 open Domain
 open System
 open FSharp.Control
+open PerryRhodan.AudiobookPlayer.Services
 open PerryRhodan.AudiobookPlayer.Services.Interfaces
 open PerryRhodan.AudiobookPlayer.ViewModel
 open PerryRhodan.AudiobookPlayer.ViewModels
 
 
-[<RequireQualifiedAccess>]
 module PlayerElmish =
+
     [<RequireQualifiedAccess>]
     type AudioPlayerServiceState =
         | Stopped
         | Started
-
 
 
     type Mp3FileList = (string * TimeSpan) list
@@ -35,7 +36,7 @@ module PlayerElmish =
         TimeUntilSleep: TimeSpan option
         PlaybackSpeed: float
         IsBusy: bool
-        JumpDistance: int
+        SleepTimerState: SleepTimerState option
     } with
 
         member this.NumOfTracks = this.Mp3FileList.Length
@@ -53,14 +54,27 @@ module PlayerElmish =
             TimeUntilSleep = None
             PlaybackSpeed = 1.0
             IsBusy = false
-            JumpDistance = 30000
+            SleepTimerState = None
         }
+
+
+    and SleepTimerState = {
+        SleepTimerStartValue: TimeSpan
+        SleepTimerCurrentTime: TimeSpan
+    }
+
+
 
     type State = AudioPlayerInfo
 
 
     type Msg =
-        | InitAudioService of AudioBookItemViewModel * Mp3FileList
+        | StateControlMsg of StateControlMsg
+        | PlayerControlMsg of PlayerControlMsg
+        | SleepTimerMsg of SleepTimerMsg
+
+
+    and PlayerControlMsg =
         | Play
         | PlayExtern of filename: string * position: TimeSpan
         | Stop of resumeOnAudioFocus: bool
@@ -70,16 +84,21 @@ module PlayerElmish =
         | JumpForward
         | JumpBackwards
         | GotoPosition of pos: TimeSpan
+        | SetPlaybackSpeed of float
+        | QuitAudioPlayer
+
+    and StateControlMsg =
+        | InitAudioService of AudioBookItemViewModel * Mp3FileList
         | UpdatePlayingState of pos: TimeSpan * duration: TimeSpan * state: AudioPlayerState
         | UpdateInfoDataFromOutside of info: AudioPlayerInfo
-        | StartSleepTimer of TimeSpan option
-        | DecreaseSleepTimer
-        | SetPlaybackSpeed of float
-
         | SetBusy of bool
 
-        | QuitAudioPlayer
-        | SetJumpDistance of int
+    and SleepTimerMsg =
+        | SleepTimerTick
+        | SleepTimerStop
+        | SleepTimerStart of TimeSpan
+
+
 
 
     [<RequireQualifiedAccess>]
@@ -94,15 +113,21 @@ module PlayerElmish =
         | MoveToPreviousTrack
         | GotoPositionWithNewTrack
         | GotoPosition of position: TimeSpan
-        | StartSleepTimer of TimeSpan option
         | SetPlaybackSpeed of float
         | StopPlayingAndFinishAudioBook
 
         | GotUpdateInfoDataFromOutside
         | UpdateAudioBookViewModelPosition
 
+        | StartSleepTimer
+        | StopSleepTimer
+        | SleepTimeReachedEnd
+
         | QuitAudioPlayer
     // side effects are the same as the message itself, so we can use the same type
+
+
+
 
     let init () =
         AudioPlayerInfo.Empty, SideEffect.None
@@ -173,7 +198,8 @@ module PlayerElmish =
 
     let update msg state =
         match msg with
-        | InitAudioService(ab, mp3List) ->
+        //################ STATE CONTROL  ##################
+        | StateControlMsg (InitAudioService(ab, mp3List)) ->
             // get current filename, track and position from the audiobook
             let audioBookState = ab.AudioBook.State
 
@@ -211,7 +237,21 @@ module PlayerElmish =
                 },
                 SideEffect.None
 
-        | Play ->
+        | StateControlMsg(SetBusy b) ->
+            { state with IsBusy = b }, SideEffect.None
+
+        | StateControlMsg(UpdatePlayingState(pos, duration, apstate)) ->
+            {
+                state with
+                    Position = pos
+                    Duration = duration
+                    State = apstate
+            },
+            SideEffect.UpdateAudioBookViewModelPosition
+
+        //################ PLAYER CONTROL  ##################
+
+        | PlayerControlMsg Play ->
             if state.State = AudioPlayerState.Stopped then
                 if state.Filename = "" then
                     let filename, duration = state.Mp3FileList |> Helpers.getFileFromIndex 0
@@ -238,7 +278,7 @@ module PlayerElmish =
             else
                 state, SideEffect.None
 
-        | PlayExtern(filename, pos) ->
+        | PlayerControlMsg (PlayExtern(filename, pos)) ->
             // recalc pos and maybe file when pos below zero (for jumpback on press play
             let filename, pos = Helpers.recalcFileAndPos filename pos state.Mp3FileList
             let index = state.Mp3FileList |> Helpers.getIndexForFile filename
@@ -256,7 +296,7 @@ module PlayerElmish =
             },
             SideEffect.StartAudioPlayerExtern
 
-        | Stop resumeOnAudioFocus ->
+        | PlayerControlMsg(Stop resumeOnAudioFocus) ->
             {
                 state with
                     State = AudioPlayerState.Stopped
@@ -264,7 +304,7 @@ module PlayerElmish =
             },
             SideEffect.StopAudioPlayer
 
-        | TogglePlayPause ->
+        | PlayerControlMsg TogglePlayPause ->
             {
                 state with
                     State =
@@ -274,7 +314,7 @@ module PlayerElmish =
             },
             SideEffect.TogglePlayPause
 
-        | MoveToNextTrack ->
+        | PlayerControlMsg MoveToNextTrack ->
             if state.IsBusy then
                 state, SideEffect.None
             else
@@ -299,7 +339,7 @@ module PlayerElmish =
                     },
                     SideEffect.MoveToNextTrack |> Helpers.sideEffectOnlyWhenPlaying state
 
-        | MoveToPreviousTrack ->
+        | PlayerControlMsg MoveToPreviousTrack ->
             if state.IsBusy then
                 state, SideEffect.None
             else if state.Position > TimeSpan.FromMilliseconds 2000 then
@@ -321,9 +361,10 @@ module PlayerElmish =
                     },
                     SideEffect.MoveToPreviousTrack |> Helpers.sideEffectOnlyWhenPlaying state
 
-        | JumpForward ->
+        | PlayerControlMsg JumpForward ->
             // calculate, that a track can be ended, and a next one could start
-            let newPosition = state.Position + TimeSpan.FromMilliseconds state.JumpDistance
+            let jumpDistance = DependencyService.Get<GlobalSettingsService>().JumpDistance |> float
+            let newPosition = state.Position + TimeSpan.FromMilliseconds jumpDistance
 
             if newPosition > state.Duration then
                 let rest = newPosition - state.Duration
@@ -347,8 +388,9 @@ module PlayerElmish =
             else
                 { state with Position = newPosition }, SideEffect.GotoPosition newPosition
 
-        | JumpBackwards ->
-            let newPosition = state.Position - TimeSpan.FromMilliseconds state.JumpDistance
+        | PlayerControlMsg JumpBackwards ->
+            let jumpDistance = DependencyService.Get<GlobalSettingsService>().JumpDistance |> float
+            let newPosition = state.Position - TimeSpan.FromMilliseconds jumpDistance
 
             if newPosition < TimeSpan.Zero then
                 let newIndex = state.CurrentTrackNumber - 1
@@ -372,241 +414,211 @@ module PlayerElmish =
             else
                 { state with Position = newPosition }, SideEffect.GotoPosition newPosition
 
-        | GotoPosition pos ->
+        | PlayerControlMsg(GotoPosition pos) ->
             { state with Position = pos }, SideEffect.GotoPosition pos
 
-        | StartSleepTimer sleepTime ->
-            {
-                state with
-                    TimeUntilSleep = sleepTime
-            },
-            SideEffect.StartSleepTimer sleepTime
-
-        | DecreaseSleepTimer ->
-            let sleepTime =
-                state.TimeUntilSleep |> Option.map (_.Subtract(TimeSpan.FromSeconds(1.)))
-
-            if sleepTime |> Option.exists (fun t -> t <= TimeSpan.Zero) then
-                { state with TimeUntilSleep = None }, SideEffect.StopAudioPlayer
-            else
-                {
-                    state with
-                        TimeUntilSleep = sleepTime
-                },
-                SideEffect.None
-
-        | SetPlaybackSpeed value ->
+        | PlayerControlMsg(SetPlaybackSpeed value) ->
             if value < 0.1 || value > 6.0 then
                 state, SideEffect.None
             else
                 { state with PlaybackSpeed = value }, SideEffect.SetPlaybackSpeed value
 
-        | QuitAudioPlayer ->
+        | PlayerControlMsg QuitAudioPlayer ->
             AudioPlayerInfo.Empty, SideEffect.QuitAudioPlayer
 
-        | UpdateInfoDataFromOutside info -> info, SideEffect.GotUpdateInfoDataFromOutside
+        | StateControlMsg(UpdateInfoDataFromOutside info) ->
+            info, SideEffect.GotUpdateInfoDataFromOutside
 
-        | SetBusy b -> { state with IsBusy = b }, SideEffect.None
+        | SleepTimerMsg SleepTimerTick ->
+            state.SleepTimerState
+            |> Option.map (fun sleepTimerState ->
+                if sleepTimerState.SleepTimerCurrentTime <= TimeSpan.Zero then
+                    state, SideEffect.SleepTimeReachedEnd
+                else
+                    { state with SleepTimerState = Some { sleepTimerState with SleepTimerCurrentTime = sleepTimerState.SleepTimerCurrentTime - TimeSpan.FromSeconds 1.0 } }, SideEffect.None
+            )
+            |> Option.defaultValue (state, SideEffect.None)
 
-        | UpdatePlayingState(pos, duration, apstate) ->
-            {
-                state with
-                    Position = pos
-                    Duration = duration
-                    State = apstate
-            }, SideEffect.UpdateAudioBookViewModelPosition
+        | SleepTimerMsg SleepTimerStop ->
+            { state with SleepTimerState = None }, SideEffect.StopSleepTimer
 
-        | SetJumpDistance jd ->
-            { state with JumpDistance = jd }, SideEffect.None
+        | SleepTimerMsg (SleepTimerStart time) ->
+            { state
+              with SleepTimerState = {
+                SleepTimerStartValue = time
+                SleepTimerCurrentTime = time
+                } |> Some
+            }, SideEffect.StartSleepTimer
 
-        
 
 
     module SideEffects =
 
 
         let createSideEffectsProcessor (audioPlayer: IMediaPlayer) =
-            let mutable sleepTime: TimeSpan option = None
+            let mutable sleepTimer: Timer option = None
 
-
-            let sleepTimer: System.Timers.Timer = new System.Timers.Timer(1000.)
-            sleepTimer.Stop()
-
-            sleepTimer.Elapsed.Add(fun _ ->
-                sleepTime
-                |> Option.iter (fun t ->
-                    if t <= TimeSpan.Zero then
-                        sleepTimer.Stop()
-                        sleepTime <- None
-
-                        audioPlayer.Stop()
-                    else
-                        sleepTime <- Some(t.Subtract(TimeSpan.FromSeconds(1.)))
-                )
-            )
-
-            let disposables = System.Collections.Generic.List<IDisposable>()
-
-
-
-
-            fun (sideEffect: SideEffect) (state: State) (dispatch: Msg -> unit) ->
+            fun (sideEffect: SideEffect)
+                (state: State)
+                (dispatch: Msg -> unit) ->
                 task {
-                    
-
                     match sideEffect with
                     | SideEffect.None -> return ()
-
-                    | SideEffect.InitAudioPlayer ->
-                        let! jumpDistance = Services.SystemSettings.getJumpDistance()
-                        dispatch <| SetJumpDistance jumpDistance
-                        return ()
-                    
-                    | SideEffect.StartAudioPlayer ->
-                        dispatch <| SetBusy true
-
-                        state.AudioBook
-                        |> Option.iter (fun i -> i.UpdateCurrentListenFilename state.Filename)
-
-                        do! audioPlayer.Play state.Filename
-                        audioPlayer.SeekTo state.Position
-
-                        dispatch <| SetBusy false
-                        return ()
-
-                    | SideEffect.StartAudioPlayerExtern ->
-                        dispatch <| SetBusy true
-
-                        state.AudioBook
-                        |> Option.iter (fun i -> i.UpdateCurrentListenFilename state.Filename)
-
-                        do! audioPlayer.Play state.Filename
-                        audioPlayer.SeekTo state.Position
-
-                        dispatch <| SetBusy false
-                        return ()
-
-                    | SideEffect.StopAudioPlayer ->
-                        state.AudioBook
-                        |> Option.iter (fun i -> i.UpdateAudioBookPosition state.Position)
-
-                        audioPlayer.Stop()
-
-                        return ()
-
-                    | SideEffect.TogglePlayPause ->
-                        state.AudioBook
-                        |> Option.iter (fun i -> i.UpdateAudioBookPosition state.Position)
-
-                        audioPlayer.PlayPause()
-
-                        return ()
-
-                    | SideEffect.MoveToNextTrack ->
-                        dispatch <| SetBusy true
-
-                        state.AudioBook
-                        |> Option.iter (fun i -> i.UpdateCurrentListenFilename state.Filename)
-
-                        audioPlayer.Stop()
-                        do! audioPlayer.Play state.Filename
-
-                        dispatch <| SetBusy false
-                        return ()
-
-                    | SideEffect.MoveToPreviousTrack ->
-                        dispatch <| SetBusy true
-
-                        state.AudioBook
-                        |> Option.iter (fun i -> i.UpdateCurrentListenFilename state.Filename)
-
-                        audioPlayer.Stop()
-                        do! audioPlayer.Play state.Filename
-
-                        dispatch <| SetBusy false
-                        return ()
-
-                    | SideEffect.GotoPositionWithNewTrack ->
-                        state.AudioBook
-                        |> Option.iter (fun i -> i.UpdateCurrentListenFilename state.Filename)
-
-                        state.AudioBook
-                        |> Option.iter (fun i -> i.UpdateAudioBookPosition state.Position)
-
-                        do! audioPlayer.Play state.Filename
-                        audioPlayer.SeekTo state.Position
-
-                        return ()
-
-                    | SideEffect.GotoPosition position ->
-                        state.AudioBook |> Option.iter (fun i -> i.UpdateAudioBookPosition position)
-                        audioPlayer.SeekTo position
-
-                        return ()
-
-                    | SideEffect.StartSleepTimer timeSpanOption ->
-                        sleepTime <- timeSpanOption
-                        return ()
-
-                    | SideEffect.SetPlaybackSpeed f ->
-                        do! audioPlayer.SetPlaybackSpeed f
-
-                        return ()
-
-                    | SideEffect.StopPlayingAndFinishAudioBook ->
-                        audioPlayer.Stop()
-                        state.AudioBook |> Option.iter (_.MarkAsListend())
-
-                        return ()
-
-                    | SideEffect.QuitAudioPlayer ->
-                        audioPlayer.Stop()
-                        return ()
-
-                    | SideEffect.GotUpdateInfoDataFromOutside ->
-                        // open Playerpage
-                        match state.AudioBook with
-                        | Some audiobook ->
-                            DependencyService
-                                .Get<IMainViewModel>()
-                                .GotoPlayerPage
-                                audiobook
-                                false
-                        | None -> ()
-                        
+                    // normally all ops went into busy state, but this one shouldn
                     | SideEffect.UpdateAudioBookViewModelPosition ->
-                        
-                        state.AudioBook |> Option.iter (fun i ->
+                        state.AudioBook
+                        |> Option.iter (fun i ->
                             i.UpdateAudioBookPosition state.Position
-                            i.ToggleIsPlaying (state.State = AudioPlayerState.Playing)
+                            i.ToggleIsPlaying(state.State = AudioPlayerState.Playing)
                         )
+
                         return ()
+                    | SideEffect.StartSleepTimer ->
+                        sleepTimer |> Option.iter (_.Dispose())
+                        sleepTimer <- Some <| new Timer(
+                            fun _ ->
+                                dispatch <| SleepTimerMsg SleepTimerTick
+                            , null, TimeSpan.FromSeconds 1.0, TimeSpan.FromSeconds 1.0)
+                        return ()
+                    | _ ->
+
+                        dispatch <| StateControlMsg (SetBusy true)
+                        do!
+                            task {
+                                match sideEffect with
+                                | SideEffect.None -> return ()
+
+                                | SideEffect.InitAudioPlayer ->
+                                    return ()
+
+                                | SideEffect.StartAudioPlayer ->
+                                    state.AudioBook
+                                    |> Option.iter (fun i -> i.UpdateCurrentListenFilename state.Filename)
+
+                                    do! audioPlayer.Play state.Filename
+                                    audioPlayer.SeekTo state.Position
+                                    return ()
+
+                                | SideEffect.StartAudioPlayerExtern ->
+                                    state.AudioBook
+                                    |> Option.iter (fun i -> i.UpdateCurrentListenFilename state.Filename)
+
+                                    do! audioPlayer.Play state.Filename
+                                    audioPlayer.SeekTo state.Position
+                                    return ()
+
+                                | SideEffect.StopAudioPlayer ->
+                                    state.AudioBook
+                                    |> Option.iter (fun i -> i.UpdateAudioBookPosition state.Position)
+
+                                    audioPlayer.Stop state.ResumeOnAudioFocus
+
+                                    return ()
+
+                                | SideEffect.TogglePlayPause ->
+                                    state.AudioBook
+                                    |> Option.iter (fun i -> i.UpdateAudioBookPosition state.Position)
+
+                                    audioPlayer.PlayPause()
+                                    return ()
+
+                                | SideEffect.MoveToNextTrack ->
+                                    state.AudioBook
+                                    |> Option.iter (fun i -> i.UpdateCurrentListenFilename state.Filename)
+
+                                    audioPlayer.Stop state.ResumeOnAudioFocus
+                                    do! audioPlayer.Play state.Filename
+                                    return ()
+
+                                | SideEffect.MoveToPreviousTrack ->
+                                    state.AudioBook
+                                    |> Option.iter (fun i -> i.UpdateCurrentListenFilename state.Filename)
+
+                                    audioPlayer.Stop state.ResumeOnAudioFocus
+                                    do! audioPlayer.Play state.Filename
+                                    return ()
+
+                                | SideEffect.GotoPositionWithNewTrack ->
+                                    state.AudioBook
+                                    |> Option.iter (fun i -> i.UpdateCurrentListenFilename state.Filename)
+
+                                    state.AudioBook
+                                    |> Option.iter (fun i -> i.UpdateAudioBookPosition state.Position)
+
+                                    do! audioPlayer.Play state.Filename
+                                    audioPlayer.SeekTo state.Position
+                                    return ()
+
+                                | SideEffect.GotoPosition position ->
+                                    state.AudioBook |> Option.iter (fun i -> i.UpdateAudioBookPosition position)
+                                    audioPlayer.SeekTo position
+                                    return ()
 
 
 
+                                | SideEffect.SetPlaybackSpeed f ->
+                                    do! audioPlayer.SetPlaybackSpeed f
+                                    return ()
 
+                                | SideEffect.StopPlayingAndFinishAudioBook ->
+                                    audioPlayer.Stop false
+                                    state.AudioBook |> Option.iter (_.MarkAsListend())
+                                    return ()
+
+                                | SideEffect.QuitAudioPlayer ->
+                                    audioPlayer.Stop false
+                                    return ()
+
+                                | SideEffect.GotUpdateInfoDataFromOutside ->
+                                    // open Playerpage
+                                    match state.AudioBook with
+                                    | Some audiobook ->
+                                        DependencyService
+                                            .Get<IMainViewModel>()
+                                            .GotoPlayerPage
+                                            audiobook
+                                            false
+                                    | None -> ()
+
+                                | SideEffect.UpdateAudioBookViewModelPosition ->
+                                    // process earlier
+                                    return ()
+
+                                | SideEffect.StartSleepTimer ->
+                                    return ()
+
+                                | SideEffect.StopSleepTimer ->
+                                    sleepTimer |> Option.iter (_.Dispose())
+                                    return ()
+
+                                | SideEffect.SleepTimeReachedEnd ->
+                                    audioPlayer.Stop false
+                                    dispatch <| SleepTimerMsg SleepTimerStop
+                                    return ()
+                            }
+
+                        dispatch <| StateControlMsg (SetBusy false)
                 }
 
 
 type IAudioPlayer =
     inherit IAudioPlayerPause
     //abstract member SetMetaData: audiobook:AudioBook -> numberOfTracks:int -> curentTrack:int -> unit
-    abstract member Init : audioBook:AudioBookItemViewModel -> fileList:PlayerElmish.Mp3FileList -> unit
-    abstract member Play : unit -> unit
-    abstract member PlayExtern : file:string -> pos:TimeSpan -> unit
-    abstract member Pause : unit -> unit
-    abstract member PlayPause : unit -> unit
-    abstract member Stop : bool -> unit
-    abstract member SeekTo : TimeSpan -> unit
-    abstract member SetPlaybackSpeed : float -> unit
-    abstract member Next : unit -> unit
-    abstract member Previous : unit -> unit
-    abstract member JumpForward : unit -> unit
-    abstract member JumpBackwards : unit -> unit
-    abstract member StartSleepTimer : spleepTime:TimeSpan option -> unit
-    abstract member Duration : TimeSpan
-    abstract member CurrentPosition : TimeSpan
-    abstract member AudioPlayerInformation : PlayerElmish.AudioPlayerInfo
+    abstract member Init:
+        audioBook: AudioBookItemViewModel -> fileList: PlayerElmish.Mp3FileList -> unit
+
+    abstract member Play: unit -> unit
+    abstract member PlayExtern: file: string -> pos: TimeSpan -> unit
+    abstract member Pause: unit -> unit
+    abstract member PlayPause: unit -> unit
+    abstract member Stop: bool -> unit
+    abstract member SeekTo: TimeSpan -> unit
+    abstract member SetPlaybackSpeed: float -> unit
+    abstract member Next: unit -> unit
+    abstract member Previous: unit -> unit
+    abstract member JumpForward: unit -> unit
+    abstract member JumpBackwards: unit -> unit
+    abstract member StartSleepTimer: spleepTime: TimeSpan option -> unit
+    abstract member AudioPlayerInformation: PlayerElmish.AudioPlayerInfo
     // observable
-    abstract member AudioPlayerInfoChanged : IObservable<PlayerElmish.AudioPlayerInfo> 
-    
+    abstract member AudioPlayerInfoChanged: IObservable<PlayerElmish.AudioPlayerInfo>

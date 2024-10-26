@@ -192,8 +192,27 @@
             if input.Contains(str) then Some () else None
 
 
+    module ColorHelpers =
+        
+        open System
+        let invertHexColor (hex: string) =
+            let hex = hex.TrimStart('#') // Remove the '#' if it exists
+            if hex.Length <> 6 then failwith "Invalid HEX color."
 
-   
+            // Convert hex components to integers and invert each component
+            let r = 255 - Convert.ToInt32(hex.Substring(0, 2), 16)
+            let g = 255 - Convert.ToInt32(hex.Substring(2, 2), 16)
+            let b = 255 - Convert.ToInt32(hex.Substring(4, 2), 16)
+            // Format the inverted values back to hex with leading zeros if needed
+            $"#%02X{r}%02X{g}%02X{b}"
+            
+        let convertColorToHexString (color:Color) =
+            let r = color.R |> int
+            let g = color.G |> int
+            let b = color.B |> int
+            let a = color.A |> int
+            $"#{a:X2}{r:X2}{g:X2}{b:X2}"
+            
 
 
   

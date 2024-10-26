@@ -2,7 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="540" d:DesignHeight="104"
+             mc:Ignorable="d" d:DesignWidth="393" d:DesignHeight="104"
              xmlns:vm="clr-namespace:PerryRhodan.AudiobookPlayer.ViewModels"
              xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
              xmlns:asyncImageLoader="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
@@ -65,20 +65,28 @@
                         Kind="Download"
                         Foreground="{DynamicResource MaterialSecondaryMidBrush}"
                         IsVisible="{Binding !IsDownloaded}" />
-                    <!--<Interaction.Behaviors>
-                        <EventTriggerBehavior EventName="PointerPressed">
+                    <avalonia:MaterialIcon
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Bottom"
+                        Margin="0,0,8,2"
+                        Width="20"
+                        Height="20"
+                        Kind="CheckCircle"
+                        Foreground="Green"
+                        IsVisible="{Binding IsComplete}"/>
+                    <Interaction.Behaviors>
+                        <EventTriggerBehavior EventName="Tapped">
                             <InvokeCommandAction Command="{Binding OpenPlayer}" />
                         </EventTriggerBehavior>
-                    </Interaction.Behaviors>-->
+                    </Interaction.Behaviors>
                 </Grid>
             </Border>
-            <Grid Grid.Column="1" Margin="2,0,0,0">
+            <Grid Grid.Column="1" Margin="2,0,0,0" Background="Transparent">
                 <StackPanel Orientation="Vertical" Margin="3" VerticalAlignment="Center">
                     <TextBlock VerticalAlignment="Center" Grid.Column="0" Text="{Binding Title}" TextWrapping="Wrap" />
-                    <TextBlock VerticalAlignment="Center" Grid.Column="0" Text="{Binding ListendenProgress}" TextWrapping="Wrap" />
                 </StackPanel>
                 <Interaction.Behaviors>
-                    <EventTriggerBehavior EventName="PointerPressed">
+                    <EventTriggerBehavior EventName="Tapped">
                         <InvokeCommandAction Command="{Binding OpenPlayer}"  />
                     </EventTriggerBehavior>
                 </Interaction.Behaviors>

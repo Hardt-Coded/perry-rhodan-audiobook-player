@@ -8,7 +8,9 @@ open Avalonia.Controls
 open Avalonia.Controls.Primitives
 open Dependencies
 open Domain
+open PerryRhodan.AudiobookPlayer.Services
 open PerryRhodan.AudiobookPlayer.Services.AudioPlayer
+open PerryRhodan.AudiobookPlayer.Services.AudioPlayer.PlayerElmish
 open PerryRhodan.AudiobookPlayer.Services.Interfaces
 open PerryRhodan.AudiobookPlayer.ViewModel
 open ReactiveElmish
@@ -27,47 +29,52 @@ module PlayerPage =
         CurrentDuration: TimeSpan
         CurrentState: AudioPlayerState
         PlaybackSpeed: decimal
-        TimeUntilSleeps: TimeSpan option
+
 
         AudioPlayerBusy: bool
         HasPlayedBeforeDragSlider: bool
         SliderIsDragging: bool
         StartPlayingOnOpen: bool
         IsLoading: bool
+        SelectedSleepTime: TimeSpan option
+        TimeUntilSleeps: TimeSpan option
     }
 
 
+    let disposables = new System.Collections.Generic.List<IDisposable>()
+
     type Msg =
-        | Play
-        | PlayWithoutRewind
-        | Stop
-        | Next
-        | Previous
-        | JumpForward
-        | JumpBackwards
+        | PlayerControlMsg of PlayerControlMsg
+        | ButtonActionMsg of ButtonActionMsg
+
+        | RunOnlySideEffect of SideEffect
+
         | RestoreStateFormAudioService of PlayerElmish.AudioPlayerInfo
         | FileListLoaded of (string * TimeSpan) list
-
-        | OpenSleepTimerActionMenu
-        | OpenPlaybackSpeedActionMenu
-        | StartSleepTimer of TimeSpan option
-        | SetPlaybackSpeed of decimal
-        | UpdateSleepTimer of TimeSpan option
         | SetPlayerStateFromExtern of AudioPlayerState
         | UpdateTrackNumber of int
-
         | SetTrackPosition of TimeSpan
         | SetDragging of bool
         | UpdateScreenInformation of info: PlayerElmish.State
 
-        | ChangeBusyState of bool
+        | SetBusy of bool
 
-        | ClosePlayerPage
+    and PlayerControlMsg =
+        | Play
+        | PlayWithoutRewind
+        | Stop
 
-    [<RequireQualifiedAccess>]
-    type SideEffect =
+    and ButtonActionMsg =
+        | SetSleepTimer of TimeSpan option
+        | SetPlaybackSpeed of decimal
+
+
+
+    and [<RequireQualifiedAccess>]
+        SideEffect =
         | None
         | InitAudioPlayer
+
         | SliderDragStarted
 
         | StartAudioBookService of fileList: (string * TimeSpan) list
@@ -86,11 +93,9 @@ module PlayerPage =
 
         | UpdatePositionOnDatabase
 
-
-        | OpenSleepTimerActionMenu
-        | OpenPlaybackSpeedActionMenu
-
         | ClosePlayerPage
+
+
 
 
 
@@ -103,12 +108,13 @@ module PlayerPage =
         CurrentState = AudioPlayerState.Stopped
         AudioFileList = []
         IsLoading = false
-        TimeUntilSleeps = None
         AudioPlayerBusy = false
         HasPlayedBeforeDragSlider = false
         SliderIsDragging = false
         StartPlayingOnOpen = startPlaying
         PlaybackSpeed = 1.0m
+        SelectedSleepTime = None
+        TimeUntilSleeps = None
     }
 
 
@@ -122,11 +128,14 @@ module PlayerPage =
 
     let rec update msg state =
         match msg with
-        | Play ->
-            let model = state |> fixModelWhenCurrentTrackGreaterThanNumberOfTracks
+        | RunOnlySideEffect sideEffect ->
+            state, sideEffect
+
+        | PlayerControlMsg Play ->
+            let state = state |> fixModelWhenCurrentTrackGreaterThanNumberOfTracks
 
             {
-                model with
+                state with
                     CurrentState = AudioPlayerState.Playing
                     CurrentAudioFileIndex =
                         if state.CurrentAudioFileIndex < 0 then
@@ -136,7 +145,7 @@ module PlayerPage =
             },
             SideEffect.Play
 
-        | PlayWithoutRewind ->
+        | PlayerControlMsg PlayWithoutRewind ->
             let model = state |> fixModelWhenCurrentTrackGreaterThanNumberOfTracks
 
             {
@@ -145,15 +154,15 @@ module PlayerPage =
             },
             SideEffect.PlayWithoutRewind
 
-        | Stop -> state, SideEffect.Stop
+        | PlayerControlMsg Stop -> state, SideEffect.Stop
 
-        | Next -> state, SideEffect.Next
 
-        | Previous -> state, SideEffect.Previous
+        | ButtonActionMsg (SetSleepTimer sleepTime) ->
+            { state with SelectedSleepTime = sleepTime }, SideEffect.StartSleepTimer sleepTime
 
-        | JumpForward -> state, SideEffect.JumpForward
+        | ButtonActionMsg (SetPlaybackSpeed speed) ->
+            { state with PlaybackSpeed = speed }, SideEffect.SetPlaybackSpeed speed
 
-        | JumpBackwards -> state, SideEffect.JumpBackwards
 
 
         | RestoreStateFormAudioService info ->
@@ -213,25 +222,6 @@ module PlayerPage =
                     },
                     sideEffect
 
-
-
-        | OpenSleepTimerActionMenu ->
-            state, SideEffect.OpenSleepTimerActionMenu
-
-        | OpenPlaybackSpeedActionMenu ->
-            state, SideEffect.OpenPlaybackSpeedActionMenu
-
-        | StartSleepTimer sleepTime ->
-            state, SideEffect.StartSleepTimer sleepTime
-
-        | UpdateSleepTimer sleepTime ->
-            let newModel = {
-                state with
-                    TimeUntilSleeps = sleepTime
-            }
-
-            newModel, SideEffect.None
-
         | SetPlayerStateFromExtern exstate ->
             { state with CurrentState = exstate }, SideEffect.None
 
@@ -242,10 +232,7 @@ module PlayerPage =
             },
             SideEffect.None
 
-        | SetPlaybackSpeed speed ->
-            { state with PlaybackSpeed = speed }, SideEffect.SetPlaybackSpeed speed
-
-        | ChangeBusyState bstate ->
+        | SetBusy bstate ->
             { state with IsLoading = bstate }, SideEffect.None
 
         | SetDragging b ->
@@ -265,15 +252,27 @@ module PlayerPage =
             },
             sideEffect
 
-
         | SetTrackPosition pos ->
             { state with CurrentPosition = pos }, SideEffect.None
 
         | UpdateScreenInformation info ->
+            // always update the time until sleeps and audioplayer state
+            let state = {
+                state with
+                    TimeUntilSleeps =
+                        info.SleepTimerState
+                        |> Option.map (_.SleepTimerCurrentTime)
+                    SelectedSleepTime =
+                        // reset selected sleep time if the sleep timer has stopped
+                        info.SleepTimerState |> Option.bind (fun _ -> state.SelectedSleepTime)
+                    CurrentState = info.State
+
+            }
+
             if state.SliderIsDragging then
                 state, SideEffect.None
-            elif state.CurrentState = AudioPlayerState.Stopped then
-                { state with CurrentState = info.State }, SideEffect.None
+            //elif state.CurrentState = AudioPlayerState.Stopped then
+            //    { state with CurrentState = info.State }, SideEffect.None
             else
                 {
                     state with
@@ -286,8 +285,7 @@ module PlayerPage =
                 },
                 SideEffect.None
 
-        | ClosePlayerPage ->
-            state, SideEffect.ClosePlayerPage
+
 
 
     // repair model, if current track is greater than the actually count of files
@@ -309,32 +307,30 @@ module PlayerPage =
 
 
         let private rewindInSec state =
-            async {
-                match state.AudioBook.AudioBook.State.LastTimeListend with
-                | Some lastTimeListend ->
+            let globalSettings = DependencyService.Get<GlobalSettingsService>()
+            match state.AudioBook.AudioBook.State.LastTimeListend with
+            | Some lastTimeListend ->
 
-                    let minutesSinceLastListend =
-                        DateTime.UtcNow
-                            .Subtract(lastTimeListend)
-                            .TotalMinutes
+                let minutesSinceLastListend =
+                    DateTime.UtcNow
+                        .Subtract(lastTimeListend)
+                        .TotalMinutes
 
-                    let secondsSinceLastListend =
-                        DateTime.UtcNow
-                            .Subtract(lastTimeListend)
-                            .TotalSeconds
+                let secondsSinceLastListend =
+                    DateTime.UtcNow
+                        .Subtract(lastTimeListend)
+                        .TotalSeconds
 
-                    if (secondsSinceLastListend <= 30.0) then
-                        return 0
+                if (secondsSinceLastListend <= 30.0) then
+                    0
+                else
+                    let longTimeMinutes = globalSettings.LongPeriodBeginsAfterInMinutes
+
+                    if (minutesSinceLastListend >= longTimeMinutes) then
+                        globalSettings.RewindWhenStartAfterLongPeriodInSec
                     else
-                        let! longTimeMinutes =
-                            SystemSettings.getLongPeriodBeginsAfterInMinutes () |> Async.map float
-
-                        if (minutesSinceLastListend >= longTimeMinutes) then
-                            return! SystemSettings.getRewindWhenStartAfterLongPeriodInSec ()
-                        else
-                            return! SystemSettings.getRewindWhenStartAfterShortPeriodInSec ()
-                | _ -> return 0
-            }
+                        globalSettings.RewindWhenStartAfterShortPeriodInSec
+            | _ -> 0
 
 
         let private loadFiles (model: AudioBook) =
@@ -374,159 +370,179 @@ module PlayerPage =
             }
 
         let runSideEffects (sideEffect: SideEffect) (state: State) (dispatch: Msg -> unit) =
-
             task {
-                let audioPlayer = DependencyService.Get<IAudioPlayer>()
-
-                match sideEffect with
-                | SideEffect.None -> return ()
-
-                | SideEffect.InitAudioPlayer ->
-                    dispatch <| ChangeBusyState true
-
-                    // check if the global audio player is active and already an audiobook is loaded
-                    match audioPlayer.AudioPlayerInformation.AudioBook with
-                    // when the user tapped on the already active audiobook
-                    | Some audioBook when (audioBook.AudioBook.Id = state.AudioBook.AudioBook.Id) ->
-                        dispatch <| RestoreStateFormAudioService audioPlayer.AudioPlayerInformation
-
-                        if
-                            state.StartPlayingOnOpen
-                            && audioPlayer.AudioPlayerInformation.State = AudioPlayerState.Stopped
-                        then
-                            dispatch Play
-
-                    // the user tapped on a different audiobook
-                    | Some infoAudioBook ->
-                        let! files = state.AudioBook.AudioBook |> loadFiles
-
-                        match files with
-                        | None ->
-                            dispatch ClosePlayerPage
-                            ()
-                        | Some files ->
-                            dispatch <| FileListLoaded files
-                            // stop current Audioplayer, Disconnect Service then reconnect to the new audiobook
-                            audioPlayer.Stop false
-                            audioPlayer.Init state.AudioBook files
-
-                            if state.StartPlayingOnOpen then
-                                dispatch Play
-
-                    | _ ->
-                        // there is no current state in the store, so load the files and connect to the service
-                        let! files = state.AudioBook.AudioBook |> loadFiles
-
-                        match files with
-                        | None ->
-                            dispatch ClosePlayerPage
-                            ()
-                        | Some files ->
-                            audioPlayer.Init state.AudioBook files
-                            dispatch <| FileListLoaded files
-
-                            if state.StartPlayingOnOpen then
-                                dispatch Play
-
-
-                    dispatch <| ChangeBusyState false
+                if sideEffect = SideEffect.None then
                     return ()
+                 else
 
-                | SideEffect.Play ->
-                    match state.AudioFileList with
-                    | [] -> do! Notifications.showErrorMessage "Keine Dateien gefunden."
-                    | _ ->
-                        let file, _ = state.AudioFileList[state.CurrentAudioFileIndex]
-                        let currentPosition = state.CurrentPosition
-                        let! rewindInSec = rewindInSec state |> Async.map (TimeSpan.FromSeconds)
+                    let audioPlayer = DependencyService.Get<IAudioPlayer>()
+                    let globalSettings = DependencyService.Get<GlobalSettingsService>()
+                    dispatch <| SetBusy true
+                    do!
+                        task {
+                            match sideEffect with
+                            | SideEffect.None -> return ()
 
-                        let newPosition =
-                            let p = currentPosition - rewindInSec
+                            | SideEffect.InitAudioPlayer ->
+                                // check if the global audio player is active and already an audiobook is loaded
+                                match audioPlayer.AudioPlayerInformation.AudioBook with
+                                // when the user tapped on the already active audiobook
+                                | Some audioBook when (audioBook.AudioBook.Id = state.AudioBook.AudioBook.Id) ->
+                                    dispatch <| RestoreStateFormAudioService audioPlayer.AudioPlayerInformation
 
-                            if p < TimeSpan.Zero then
-                                TimeSpan.Zero
-                            else
-                                p
+                                    if
+                                        state.StartPlayingOnOpen
+                                        && audioPlayer.AudioPlayerInformation.State = AudioPlayerState.Stopped
+                                    then
+                                        dispatch <| PlayerControlMsg Play
 
-                        audioPlayer.PlayExtern file newPosition
-                        return ()
+                                // the user tapped on a different audiobook
+                                | Some infoAudioBook ->
+                                    let! files = state.AudioBook.AudioBook |> loadFiles
 
-                | SideEffect.PlayWithoutRewind ->
-                    match state.AudioFileList with
-                    | [] -> do! Notifications.showErrorMessage "Keine Dateien gefunden."
-                    | _ ->
-                        let file, _ = state.AudioFileList[state.CurrentAudioFileIndex]
-                        audioPlayer.PlayExtern file state.CurrentPosition
-                        return ()
+                                    match files with
+                                    | None ->
+                                        dispatch <| RunOnlySideEffect SideEffect.ClosePlayerPage
+                                        ()
+                                    | Some files ->
+                                        dispatch <| FileListLoaded files
 
-                | SideEffect.Stop ->
-                    audioPlayer.Stop false
-                    return ()
+                                        // remove all subscriptions
+                                        disposables |> Seq.iter (_.Dispose())
 
-                | SideEffect.Next ->
-                    audioPlayer.Next()
-                    return ()
+                                        audioPlayer.Stop false
+                                        audioPlayer.Init state.AudioBook files
 
-                | SideEffect.Previous ->
-                    audioPlayer.Previous()
-                    return ()
+                                        // set new info listener after init
+                                        disposables.Add
+                                            <| audioPlayer.AudioPlayerInfoChanged.Subscribe(fun info ->
+                                                dispatch <| UpdateScreenInformation info
+                                            )
 
-                | SideEffect.JumpForward ->
-                    audioPlayer.JumpForward()
-                    return ()
+                                        if state.StartPlayingOnOpen then
+                                            dispatch <| PlayerControlMsg Play
 
-                | SideEffect.JumpBackwards ->
-                    audioPlayer.JumpBackwards()
-                    return ()
+                                | _ ->
+                                    // there is no current state in the store, so load the files and connect to the service
+                                    let! files = state.AudioBook.AudioBook |> loadFiles
 
-                | SideEffect.StartAudioBookService fileList ->
-                    audioPlayer.Stop false
-                    audioPlayer.Init state.AudioBook fileList
-                    return ()
+                                    match files with
+                                    | None ->
+                                        dispatch <| RunOnlySideEffect SideEffect.ClosePlayerPage
+                                        ()
+                                    | Some files ->
+                                        // remove all subscriptions
+                                        disposables |> Seq.iter (_.Dispose())
+                                        
+                                        audioPlayer.Init state.AudioBook files
+                                        
+                                        // set new info listener after init
+                                        disposables.Add
+                                            <| audioPlayer.AudioPlayerInfoChanged.Subscribe(fun info ->
+                                                dispatch <| UpdateScreenInformation info
+                                            )
+                                            
+                                        dispatch <| FileListLoaded files
 
-                | SideEffect.UpdatePositionOnDatabase ->
-                    // Todo?
-                    return ()
+                                        if state.StartPlayingOnOpen then
+                                            dispatch <| PlayerControlMsg Play
 
-                | SideEffect.OpenSleepTimerActionMenu ->
-                    // Todo
-                    Notifications.showToasterMessage "Todo: OpenSleepTimerActionMenu"
-                    return ()
 
-                | SideEffect.OpenPlaybackSpeedActionMenu ->
-                    // Todo
-                    Notifications.showToasterMessage "Todo: OpenPlaybackSpeedActionMenu"
-                    return ()
+                                dispatch <| SetBusy false
+                                return ()
 
-                | SideEffect.StartSleepTimer sleepTime ->
-                    audioPlayer.StartSleepTimer sleepTime
-                    return ()
+                            | SideEffect.Play ->
+                                match state.AudioFileList with
+                                | [] -> do! Notifications.showErrorMessage "Keine Dateien gefunden."
+                                | _ ->
+                                    let file, _ = state.AudioFileList[state.CurrentAudioFileIndex]
+                                    let currentPosition = state.CurrentPosition
+                                    let rewindInSec = rewindInSec state |> TimeSpan.FromSeconds
 
-                | SideEffect.SetPlaybackSpeed speed ->
-                    audioPlayer.SetPlaybackSpeed(speed |> float)
+                                    let newPosition =
+                                        let p = currentPosition - rewindInSec
 
-                | SideEffect.SetAudioPositionAbsolute pos ->
-                    audioPlayer.SeekTo pos
-                    audioPlayer.Play()
-                    return ()
+                                        if p < TimeSpan.Zero then
+                                            TimeSpan.Zero
+                                        else
+                                            p
 
-                | SideEffect.ContinuePlayingAfterSlide pos ->
-                    audioPlayer.SeekTo pos
-                    dispatch <| PlayWithoutRewind
-                    return ()
+                                    audioPlayer.PlayExtern file newPosition
+                                    return ()
 
-                | SideEffect.SliderDragStarted ->
-                    audioPlayer.Stop false
-                    return ()
+                            | SideEffect.PlayWithoutRewind ->
+                                match state.AudioFileList with
+                                | [] -> do! Notifications.showErrorMessage "Keine Dateien gefunden."
+                                | _ ->
+                                    let file, _ = state.AudioFileList[state.CurrentAudioFileIndex]
+                                    audioPlayer.PlayExtern file state.CurrentPosition
+                                    return ()
 
-                | SideEffect.ClosePlayerPage ->
-                    audioPlayer.Stop false
+                            | SideEffect.Stop ->
+                                audioPlayer.Stop false
+                                return ()
 
-                    DependencyService
-                        .Get<IMainViewModel>()
-                        .GotoHomePage()
+                            | SideEffect.Next ->
+                                audioPlayer.Next()
+                                return ()
 
-                    return ()
+                            | SideEffect.Previous ->
+                                audioPlayer.Previous()
+                                return ()
+
+                            | SideEffect.JumpForward ->
+                                audioPlayer.JumpForward()
+                                return ()
+
+                            | SideEffect.JumpBackwards ->
+                                audioPlayer.JumpBackwards()
+                                return ()
+
+                            | SideEffect.StartAudioBookService fileList ->
+                                audioPlayer.Stop false
+                                audioPlayer.Init state.AudioBook fileList
+                                return ()
+
+                            | SideEffect.UpdatePositionOnDatabase ->
+                                // Todo?
+                                return ()
+
+                            | SideEffect.StartSleepTimer sleepTime ->
+                                audioPlayer.StartSleepTimer sleepTime
+                                return ()
+
+                            | SideEffect.SetPlaybackSpeed speed ->
+                                audioPlayer.SetPlaybackSpeed(speed |> float)
+                                globalSettings.PlaybackSpeed <- speed
+
+                            | SideEffect.SetAudioPositionAbsolute pos ->
+                                audioPlayer.SeekTo pos
+                                audioPlayer.Play()
+                                return ()
+
+                            | SideEffect.ContinuePlayingAfterSlide pos ->
+                                audioPlayer.SeekTo pos
+                                dispatch <| PlayerControlMsg PlayWithoutRewind
+                                return ()
+
+                            | SideEffect.SliderDragStarted ->
+                                audioPlayer.Stop false
+                                return ()
+
+                            | SideEffect.ClosePlayerPage ->
+                                audioPlayer.Stop false
+
+                                DependencyService
+                                    .Get<IMainViewModel>()
+                                    .GotoHomePage()
+
+                                return ()
+
+
+
+                        }
+
+                    dispatch <| SetBusy false
 
             }
 
@@ -579,7 +595,7 @@ open ReactiveElmish.Avalonia
 open Elmish.SideEffect
 
 
-type PlayerViewModel(audiobook: AudioBookItemViewModel, startPlaying, ?designView) as self =
+type PlayerViewModel(audiobook: AudioBookItemViewModel, startPlaying) as self =
     inherit ReactiveElmishViewModel()
 
     let init () =
@@ -589,17 +605,8 @@ type PlayerViewModel(audiobook: AudioBookItemViewModel, startPlaying, ?designVie
         Program.mkAvaloniaProgrammWithSideEffect init update SideEffects.runSideEffects
         |> Program.mkStore
 
-    let designView = defaultArg designView false
 
-    do
-        if not designView then
-            let audioPlayer = DependencyService.Get<IAudioPlayer>()
-
-            self.AddDisposable
-            <| audioPlayer.AudioPlayerInfoChanged.Subscribe(fun info ->
-                local.Dispatch(UpdateScreenInformation info)
-            )
-
+    member this.IsLoading = this.Bind(local, _.IsLoading)
 
     member this.AudioBook = this.Bind(local, _.AudioBook)
 
@@ -615,30 +622,31 @@ type PlayerViewModel(audiobook: AudioBookItemViewModel, startPlaying, ?designVie
     member this.CurrentTrackNumberString =
         this.Bind(local, (fun s -> $"Track: {s.CurrentAudioFileIndex + 1}"))
 
-    member this.CurrentAudioFile = this.Bind(local, _.CurrentAudioFile)
-    member this.CurrentAudioFileIndex = this.Bind(local, _.CurrentAudioFileIndex)
-    member this.CurrentPosition = this.Bind(local, _.CurrentPosition)
-
     member this.CurrentPositionMs
         with get () = this.Bind(local, _.CurrentPosition.TotalMilliseconds)
         and set v = local.Dispatch(SetTrackPosition(TimeSpan.FromMilliseconds v))
 
-    member this.CurrentDuration = this.Bind(local, _.CurrentDuration)
-    member this.CurrentDurationMs = this.Bind(local, _.CurrentDuration.TotalMilliseconds)
-    member this.CurrentState = this.Bind(local, _.CurrentState)
-    member this.AudioFileList = this.Bind(local, _.AudioFileList)
-    member this.IsLoading = this.Bind(local, _.IsLoading)
-    member this.TimeUntilSleeps = this.Bind(local, _.TimeUntilSleeps)
-    member this.AudioPlayerBusy = this.Bind(local, _.AudioPlayerBusy)
-    member this.HasPlayedBeforeDragSlider = this.Bind(local, _.HasPlayedBeforeDragSlider)
+    member this.CurrentDurationMs =
+        this.Bind(local, _.CurrentDuration.TotalMilliseconds)
+
+    member this.TimeUntilSleeps =
+        this.BindOnChanged(local, _.TimeUntilSleeps, fun x ->
+            x.TimeUntilSleeps
+            |> Option.map (fun time ->
+                let minutes, seconds = getMinutesAndSeconds time
+                $"{time.Minutes:``##0``}:{time.Seconds:``00``}"
+            )
+            |> Option.defaultValue ""
+        )
+
+    member this.SleepClockVisible =
+        this.BindOnChanged(local, _.SelectedSleepTime, fun x ->
+            x.SelectedSleepTime |> Option.isSome
+        )
 
     member this.SliderIsDragging
         with get () = this.Bind(local, _.SliderIsDragging)
         and set v = local.Dispatch(SetDragging v)
-
-    member this.PlaybackSpeed
-        with get () = this.Bind(local, _.PlaybackSpeed)
-        and set v = local.Dispatch(SetPlaybackSpeed v)
 
     member this.TotalPositionString =
         this.Bind(
@@ -654,8 +662,7 @@ type PlayerViewModel(audiobook: AudioBookItemViewModel, startPlaying, ?designVie
             fun s -> $"{s.CurrentPosition:``hh\:mm\:ss``}/{s.CurrentDuration:``hh\:mm\:ss``}"
         )
 
-
-    member this.SleeptimerValues =
+    member this.SleepTimerValues =
         [|
             (None, "Aus")
             (Some <| TimeSpan.FromMinutes 5, "5 Minuten")
@@ -667,45 +674,59 @@ type PlayerViewModel(audiobook: AudioBookItemViewModel, startPlaying, ?designVie
             (Some <| TimeSpan.FromMinutes 60, "60 Minuten")
             (Some <| TimeSpan.FromMinutes 90, "90 Minuten")
             (Some <| TimeSpan.FromMinutes 120, "120 Minuten")
+            (Some <| TimeSpan.FromMinutes 150, "150 Minuten")
+            (Some <| TimeSpan.FromMinutes 180, "180 Minuten")
+            (Some <| TimeSpan.FromMinutes 210, "210 Minuten")
+
         |]
 
-
     member this.SleepTimer
-        with get() = this.Bind(local, (fun s -> s.TimeUntilSleeps))
-        and set v = local.Dispatch(StartSleepTimer v)
+        with get() = this.Bind(local, _.SelectedSleepTime)
+        and set v = local.Dispatch  (ButtonActionMsg <| SetSleepTimer v)
+
+    member this.SleepTimerTextColor =
+        let ambientColor = this.AudioBook.AmbientColor |> Common.ColorHelpers.convertColorToHexString
+        let timerColor = Common.ColorHelpers.invertHexColor ambientColor
+        Avalonia.Media.Color.Parse timerColor
+
+
+    member this.PlaybackSpeeds =
+        [|
+            for i in 0.1m .. 0.1m .. 3.0m do
+                i, $"{i:``0.0x``}"
+        |]
+
+    member this.PlaybackSpeed
+        with get () = this.Bind (local, _.PlaybackSpeed)
+        and set v = local.Dispatch (ButtonActionMsg <| SetPlaybackSpeed v)
+
 
     member this.Play() =
-        local.Dispatch Play
+        local.Dispatch <| PlayerControlMsg Play
 
     member this.IsPlaying =
         this.Bind(local, (fun i -> i.CurrentState = AudioPlayerState.Playing))
 
     member this.PlayWithoutRewind() =
-        local.Dispatch PlayWithoutRewind
+        local.Dispatch <| PlayerControlMsg PlayWithoutRewind
 
     member this.Stop() =
-        local.Dispatch Stop
+        local.Dispatch <| PlayerControlMsg Stop
 
     member this.IsStopped =
         this.Bind(local, (fun i -> i.CurrentState = AudioPlayerState.Stopped))
 
     member this.Next() =
-        local.Dispatch Next
+        local.Dispatch <| RunOnlySideEffect SideEffect.Next
 
     member this.Previous() =
-        local.Dispatch Previous
+        local.Dispatch <| RunOnlySideEffect SideEffect.Previous
 
     member this.JumpForward() =
-        local.Dispatch JumpForward
+        local.Dispatch <| RunOnlySideEffect SideEffect.JumpForward
 
     member this.JumpBackwards() =
-        local.Dispatch JumpBackwards
-
-    member this.OpenSleepTimerActionMenu() =
-        local.Dispatch OpenSleepTimerActionMenu
-
-    member this.OpenPlaybackSpeedActionMenu() =
-        local.Dispatch OpenPlaybackSpeedActionMenu
+        local.Dispatch <| RunOnlySideEffect SideEffect.JumpBackwards
 
     member this.OnDraggingChanged b =
         local.Dispatch(SetDragging b)
@@ -715,7 +736,12 @@ type PlayerViewModel(audiobook: AudioBookItemViewModel, startPlaying, ?designVie
         mainViewModel.GotoPlayerPage audiobook false
 
 
-    static member DesignVM = new PlayerViewModel(AudioBookItemViewModel.DesignVM, false, true)
+
+
+    static member DesignVM =
+        let vm = new PlayerViewModel(AudioBookItemViewModel.DesignVM, false)
+        vm.SleepTimer <- Some <| TimeSpan.FromMinutes 10
+        vm
 
 
 
@@ -731,6 +757,7 @@ module PlayerViewModelStore =
 
             viewmodel
         | _ ->
+            viewmodel |> Option.iter (fun i -> (i :> IDisposable).Dispose())
             let vm = new PlayerViewModel(audiobook, startPlaying)
             viewmodel <- Some vm
             vm
