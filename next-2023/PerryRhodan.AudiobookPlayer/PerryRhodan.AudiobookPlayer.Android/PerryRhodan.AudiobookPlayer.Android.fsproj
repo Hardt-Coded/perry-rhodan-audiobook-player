@@ -12,18 +12,19 @@
     <AndroidResgenClass>Resource</AndroidResgenClass>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <AndroidPackageFormat>apk</AndroidPackageFormat>
+    <AndroidPackageFormat>aab</AndroidPackageFormat>
     <AndroidDexTool>r8</AndroidDexTool>
     <DebugSymbols>True</DebugSymbols>
     <EnableLLVM>False</EnableLLVM>
     <AndroidUseAapt2>True</AndroidUseAapt2>
     <RunAOTCompilation>false</RunAOTCompilation>
     <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
+    <AndroidCreatePackagePerAbi>False</AndroidCreatePackagePerAbi>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <OptimizationPreference>Speed</OptimizationPreference>
     <!--<PublishAot>true</PublishAot>-->
-    <AndroidPackageFormat>apk</AndroidPackageFormat>
+    <AndroidPackageFormat>aab</AndroidPackageFormat>
     <AndroidDexTool>r8</AndroidDexTool>
     <DebugSymbols>False</DebugSymbols>
     <EnableLLVM>False</EnableLLVM>
@@ -32,6 +33,8 @@
     <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
     <PublishTrimmed>false</PublishTrimmed>
     <TrimMode>partial</TrimMode>
+    <AndroidCreatePackagePerAbi>False</AndroidCreatePackagePerAbi>
+    <AndroidLinkTool>r8</AndroidLinkTool>
     <!-- <AndroidLinkTool>r8</AndroidLinkTool> -->
     <!--<AndroidEnableProfiledAot>True</AndroidEnableProfiledAot>-->
   </PropertyGroup>
@@ -74,12 +77,8 @@
 
 
   <Target Name="CopyFileToCustomDirectory" AfterTargets="AfterCompile">
-    <Copy
-            SourceFiles="$(SolutionDir)PerryRhodan.AudiobookPlayer\obj\$(Configuration)\net8.0\Avalonia\PerryRhodan.AudiobookPlayer.dll"
-            DestinationFolder="$(SolutionDir)PerryRhodan.AudiobookPlayer\obj\$(Configuration)\net8.0\" />
-    <Copy
-            SourceFiles="$(SolutionDir)PerryRhodan.AudiobookPlayer\obj\$(Configuration)\net8.0\Avalonia\PerryRhodan.AudiobookPlayer.dll"
-            DestinationFolder="$(SolutionDir)PerryRhodan.AudiobookPlayer\obj\$(Configuration)\net8.0\refint" />
+    <Copy SourceFiles="$(SolutionDir)PerryRhodan.AudiobookPlayer\obj\$(Configuration)\net8.0\Avalonia\PerryRhodan.AudiobookPlayer.dll" DestinationFolder="$(SolutionDir)PerryRhodan.AudiobookPlayer\obj\$(Configuration)\net8.0\" />
+    <Copy SourceFiles="$(SolutionDir)PerryRhodan.AudiobookPlayer\obj\$(Configuration)\net8.0\Avalonia\PerryRhodan.AudiobookPlayer.dll" DestinationFolder="$(SolutionDir)PerryRhodan.AudiobookPlayer\obj\$(Configuration)\net8.0\refint" />
   </Target> 
             
   
