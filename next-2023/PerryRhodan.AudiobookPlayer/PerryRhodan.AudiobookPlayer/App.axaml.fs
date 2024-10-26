@@ -21,20 +21,28 @@ type App() =
 
 
 
-    let appRoot = AppCompositionRoot()
-
-    let mainViewModel = new MainViewModel(appRoot)
-    let mainView = MainView()
 
 
 
-    let mainAccessViewService =
-        {
-            new IMainViewAccessService with
-                member this.GetMainViewModel() = mainView.DataContext :?> IMainViewModel
-        }
 
-    do
+    override this.Initialize() =
+            AvaloniaXamlLoader.Load(this)
+            let a = 1
+            // find resource
+            let values = this.Resources.Values
+            ()
+
+    override this.OnFrameworkInitializationCompleted() =
+        DependencyService.SetComplete()
+
+        let appRoot = AppCompositionRoot()
+        let mainViewModel = new MainViewModel(appRoot)
+        let mainView = MainView()
+        let mainAccessViewService =
+            {
+                new IMainViewAccessService with
+                    member this.GetMainViewModel() = mainView.DataContext :?> IMainViewModel
+            }
         mainView.DataContext <- mainViewModel
         // extend dependencies
         DependencyService.ServiceCollection
@@ -42,15 +50,6 @@ type App() =
             .AddSingleton<IMainViewModel>(mainViewModel)
         |> ignore
         DependencyService.SetComplete()
-
-
-
-    override this.Initialize() =
-            AvaloniaXamlLoader.Load(this)
-
-    override this.OnFrameworkInitializationCompleted() =
-        DependencyService.SetComplete()
-
 
         match this.ApplicationLifetime with
         | :? IClassicDesktopStyleApplicationLifetime as desktop ->

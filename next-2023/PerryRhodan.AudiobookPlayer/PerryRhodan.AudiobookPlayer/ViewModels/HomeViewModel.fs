@@ -1,5 +1,6 @@
 ﻿namespace PerryRhodan.AudiobookPlayer.ViewModels
 
+open System
 open System.Collections.ObjectModel
 open Domain
 open PerryRhodan.AudiobookPlayer.ViewModel
@@ -14,27 +15,32 @@ module HomePage =
     }
 
     type Msg =
-        //| LoadAudioBooks
+        | RunOnlySideEffect of SideEffect
         | AudioBooksLoaded of AudioBookItemViewModel array
         | SetBusy of bool
         | OnError of string
 
 
-    [<RequireQualifiedAccess>]
-    type SideEffect =
+    and [<RequireQualifiedAccess>]
+        SideEffect =
         | None
+        | Init
         | LoadAudioBooks
 
+
+    let disposables = new System.Collections.Generic.List<IDisposable>()
 
     let emptyModel = { Audiobooks = [||] ; LastTimeListenedAudioBook = None; IsLoading = true }
 
     let init () =
-        { emptyModel with IsLoading = true }, SideEffect.LoadAudioBooks
+        { emptyModel with IsLoading = true }, SideEffect.Init
 
 
     let update (msg:Msg) (state:State) =
         match msg with
-        //| LoadAudioBooks -> { state with IsLoading = true }, SideEffect.LoadAudioBooks
+        | RunOnlySideEffect sideEffect ->
+            state, sideEffect
+
         | AudioBooksLoaded audiobooks ->
             let lastListenAudioBook =
                 audiobooks
@@ -85,6 +91,13 @@ module HomePage =
                             | SideEffect.None ->
                                 return ()
 
+                            | SideEffect.Init ->
+                                // listen to global audiobook store
+                                disposables.Add
+                                    <| AudioBookStore.globalAudiobookStore.Observable.Subscribe(fun m ->
+                                        dispatch <| AudioBooksLoaded m.Audiobooks
+                                    )
+
                             | SideEffect.LoadAudioBooks ->
                                 try
                                     let audioBooks =
@@ -96,8 +109,10 @@ module HomePage =
                                 | ex ->
                                     dispatch <| OnError ex.Message
                                     return ()
+
+
                         }
-                        
+
                     dispatch <| SetBusy false
             }
 
@@ -115,6 +130,9 @@ type HomeViewModel() =
         Program.mkAvaloniaProgrammWithSideEffect init update SideEffects.runSideEffects
         |> Program.mkStore
 
+    do
+        let a = 1
+        ()
 
     member this.AudioBooks =
         this.Bind(local, fun s -> ObservableCollection(s.Audiobooks))
@@ -149,6 +167,8 @@ type HomeViewModel() =
         with get():int = 0
         and set(value:int) =
             ()
+            
+    member this.IsEmpty = this.Bind(local, fun i -> i.Audiobooks.Length = 0 && i.LastTimeListenedAudioBook.IsNone)
 
 
 

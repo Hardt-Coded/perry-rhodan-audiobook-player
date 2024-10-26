@@ -271,9 +271,7 @@ module PlayerPage =
 
             if state.SliderIsDragging then
                 state, SideEffect.None
-            //elif state.CurrentState = AudioPlayerState.Stopped then
-            //    { state with CurrentState = info.State }, SideEffect.None
-            else
+            elif state.CurrentState = AudioPlayerState.Playing then
                 {
                     state with
                         CurrentPosition = info.Position
@@ -284,6 +282,8 @@ module PlayerPage =
                         IsLoading = info.IsBusy
                 },
                 SideEffect.None
+            else
+                state, SideEffect.None
 
 
 
@@ -433,22 +433,23 @@ module PlayerPage =
                                     | Some files ->
                                         // remove all subscriptions
                                         disposables |> Seq.iter (_.Dispose())
-                                        
+
                                         audioPlayer.Init state.AudioBook files
-                                        
+
                                         // set new info listener after init
                                         disposables.Add
                                             <| audioPlayer.AudioPlayerInfoChanged.Subscribe(fun info ->
                                                 dispatch <| UpdateScreenInformation info
                                             )
-                                            
+
                                         dispatch <| FileListLoaded files
 
                                         if state.StartPlayingOnOpen then
                                             dispatch <| PlayerControlMsg Play
 
 
-                                dispatch <| SetBusy false
+                                dispatch <| ButtonActionMsg (SetPlaybackSpeed globalSettings.PlaybackSpeed)
+
                                 return ()
 
                             | SideEffect.Play ->
@@ -623,7 +624,8 @@ type PlayerViewModel(audiobook: AudioBookItemViewModel, startPlaying) as self =
         this.Bind(local, (fun s -> $"Track: {s.CurrentAudioFileIndex + 1}"))
 
     member this.CurrentPositionMs
-        with get () = this.Bind(local, _.CurrentPosition.TotalMilliseconds)
+        with get () =
+            this.BindOnChanged(local, _.CurrentPosition, fun i -> i.CurrentPosition.TotalMilliseconds)
         and set v = local.Dispatch(SetTrackPosition(TimeSpan.FromMilliseconds v))
 
     member this.CurrentDurationMs =
@@ -701,6 +703,16 @@ type PlayerViewModel(audiobook: AudioBookItemViewModel, startPlaying) as self =
         and set v = local.Dispatch (ButtonActionMsg <| SetPlaybackSpeed v)
 
 
+    member this.JumpDistance =
+        this.Bind(local, (fun i ->
+            let globalSettings = DependencyService.Get<GlobalSettingsService>()
+            if globalSettings <> Unchecked.defaultof<_> then
+                globalSettings.JumpDistance / 1000
+            else
+                30
+        ))
+
+
     member this.Play() =
         local.Dispatch <| PlayerControlMsg Play
 
@@ -736,7 +748,8 @@ type PlayerViewModel(audiobook: AudioBookItemViewModel, startPlaying) as self =
         mainViewModel.GotoPlayerPage audiobook false
 
 
-
+    member this.GoBackHome() =
+        DependencyService.Get<IMainViewModel>().GotoHomePage()
 
     static member DesignVM =
         let vm = new PlayerViewModel(AudioBookItemViewModel.DesignVM, false)

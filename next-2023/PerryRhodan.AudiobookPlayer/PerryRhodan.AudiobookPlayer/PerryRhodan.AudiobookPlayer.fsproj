@@ -58,7 +58,6 @@
     
     <Compile Include="ViewLocator.fs" />
     <Compile Include="App.axaml.fs" />
-    <Compile Include="Views\SpeedSelector.axaml.fs" />
   </ItemGroup>
 
   <ItemGroup>
