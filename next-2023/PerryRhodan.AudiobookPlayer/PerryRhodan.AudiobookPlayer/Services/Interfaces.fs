@@ -22,7 +22,7 @@
         abstract member Play : string -> Task<unit>
         abstract member Pause : unit -> unit
         abstract member PlayPause : unit -> unit
-        abstract member Stop : unit -> unit
+        abstract member Stop : resumeOnAudioFocus:bool -> unit
         abstract member SeekTo : TimeSpan -> unit
         abstract member SetPlaybackSpeed : float -> Task<unit>
         

@@ -1,5 +1,6 @@
 namespace PerryRhodan.AudiobookPlayer.Views
 
+open System.Diagnostics
 open Avalonia.Controls
 open Avalonia.Markup.Xaml
 open Services.Helpers
@@ -18,5 +19,11 @@ type MainView () as this =
 
     member private this.InitializeComponent() =
         AvaloniaXamlLoader.Load(this)
-        
 
+    override this.OnPropertyChanged(change) =
+        base.OnPropertyChanged(change)
+        if change.Property.Name = "Bounds" then
+            Trace.WriteLine($"Bounds changed to {this.Bounds.Width}x{this.Bounds.Height}")
+            ()
+        
+    

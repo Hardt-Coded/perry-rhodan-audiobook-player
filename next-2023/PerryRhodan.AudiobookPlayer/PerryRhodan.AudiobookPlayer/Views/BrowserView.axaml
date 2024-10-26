@@ -6,7 +6,7 @@
              xmlns:vm="clr-namespace:PerryRhodan.AudiobookPlayer.ViewModels"
              xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
-             mc:Ignorable="d" d:DesignWidth="520" d:DesignHeight="800"
+             mc:Ignorable="d" d:DesignWidth="393" d:DesignHeight="738"
              x:Class="PerryRhodan.AudiobookPlayer.Views.BrowserView"
              Background="Black"
              Design.DataContext="{Binding Source={x:Static vm:BrowserViewModel.DesignVM}}"

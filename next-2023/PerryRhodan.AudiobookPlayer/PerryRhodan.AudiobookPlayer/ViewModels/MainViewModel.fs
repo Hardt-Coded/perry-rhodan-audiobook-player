@@ -16,76 +16,66 @@ type MainViewModel(root:CompositionRoot) =
         member this.GotoPlayerPage audiobook startPlayer = this.GotoPlayerPage (audiobook :?> AudioBookItemViewModel) startPlayer
         member this.OpenMiniplayer audiobook startPlayer = this.OpenMiniplayer (audiobook :?> AudioBookItemViewModel) startPlayer
         member this.GotoHomePage() = this.GotoHomePage()
-        member this.CurrentPlayerAudiobookViewModel = this.Bind(app, fun e -> e.MiniPlayerViewModel |> Option.map (fun vm -> vm.AudioBook))
-    
-    member this.SetMiniPlayerViewModel (playerViewModel:PlayerViewModel) = app.Dispatch <| SetMiniPlayerViewModel playerViewModel
+        member this.CurrentPlayerAudiobookViewModel = this.Bind(app, fun e -> e.PlayerViewModel |> Option.map (fun vm -> vm.AudioBook))
+
+    member this.SetMiniPlayerViewModel (playerViewModel:PlayerViewModel) = app.Dispatch <| SetPlayerViewModel playerViewModel
+
     member this.MiniplayerControl =
-        this.BindOnChanged (app, _.MiniPlayerViewModel, fun e ->
-            match e.MiniPlayerViewModel with
-            | None ->
-                Unchecked.defaultof<MiniPlayerView>
-            | Some vm ->
-                let view = MiniPlayerView()
-                view.DataContext <- vm
-                view
+        this.BindOnChanged (app, _.MiniPlayerControl, fun e ->
+            e.MiniPlayerControl |> Option.defaultValue (Unchecked.defaultof<MiniPlayerView>)
         )
-        
+
     member this.MiniplayerIsVisible =
-        this.Bind (app,
+        this.BindOnChanged (app, (fun c -> (c.View, c.MiniPlayerControl)),
                 fun e ->
                     match e.View with
                     | View.PlayerPage _ -> false
-                    | _ -> e.MiniPlayerViewModel.IsSome
+                    | _ -> e.MiniPlayerControl.IsSome
         )
-        
-    member this.ContentView = 
-        this.BindOnChanged (app, _.View, fun m -> 
+
+    member this.ContentView =
+        this.BindOnChanged (app, _.View, fun m ->
             // reset Backbutton when change View
             // but not when the app is initializing
             // and the di container is not ready
             if DependencyService.IsComplete then
                 DependencyService.Get<INavigationService>().ResetBackbuttonPressed()
-            
+
             match m.View with
             | View.HomePage ->
                 root.GetView<HomeViewModel>()
-            
-            | View.PlayerPage (audiobook, startPlaying)  ->
-                try
-                    let view = PlayerView()
-                    let viewModel = PlayerViewModelStore.create audiobook startPlaying
-                    view.DataContext <- viewModel
-                    this.SetMiniPlayerViewModel viewModel
-                    view
-                with
-                | ex ->
-                    Services.Notifications.showErrorMessage ex.Message |> ignore
-                    reraise()
-                
+
             | View.BrowserPage ->
-                let view = BrowserView()
-                let viewModel = new BrowserViewModel([])
-                view.DataContext <- viewModel
-                view
+                root.GetView<BrowserViewModel>()
 
             | View.SettingsPage ->
-                let view = SettingsView()
-                let viewModel = new SettingsViewModel()
-                view.DataContext <- viewModel
-                view
+                root.GetView<SettingsViewModel>()
+
+            | View.PlayerPage playerView ->
+                playerView
+
         )
-        
+
     member this.IsLoading = this.Bind (app, _.IsLoading)
-    
-    member this.GotoHomePage() = app.Dispatch GotoHomePage   
-    member this.GotoPlayerPage audiobook startPlaying = app.Dispatch <| SetView (View.PlayerPage (audiobook, startPlaying))   
+
+    member this.GotoHomePage() =
+        app.Dispatch <| SetView View.HomePage
+
+    member this.GotoPlayerPage audiobook startPlaying =
+        if not app.Model.IsLoading then app.Dispatch <| OpenPlayerPage (audiobook, startPlaying)
+
     member this.OpenMiniplayer audiobook startPlaying =
-        app.Dispatch <| CloseMiniplayer   
-        app.Dispatch <| OpenMiniplayer (audiobook, startPlaying)   
-    member this.OpenLoginForm() = app.Dispatch OpenLoginView
-    member this.GotoOptionPage() = app.Dispatch GotoOptionPage
-    member this.GotoBrowserPage() = app.Dispatch <| SetView View.BrowserPage   
-       
-        
+        if not app.Model.IsLoading then app.Dispatch <| OpenMiniplayer (audiobook, startPlaying)
+
+    member this.OpenLoginForm() =
+        if not app.Model.IsLoading then app.Dispatch OpenLoginView
+
+    member this.GotoOptionPage() =
+        if not app.Model.IsLoading then app.Dispatch <| SetView View.SettingsPage
+
+    member this.GotoBrowserPage() =
+        if not app.Model.IsLoading then app.Dispatch <| SetView View.BrowserPage
+
+
     static member DesignVM = new MainViewModel(Design.stub)
-    
+

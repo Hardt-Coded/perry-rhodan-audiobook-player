@@ -33,7 +33,7 @@ module AudioBookStore =
             | AudiobooksLoaded of AudioBookItemViewModel array
             | DeleteAudiobookFromDatabase of AudioBook
             | RemoveAudiobookFromDevice of AudioBook
-            | IsLoading of bool
+            | IsBusy of bool
 
         [<RequireQualifiedAccess>]
         type SideEffect =
@@ -63,7 +63,7 @@ module AudioBookStore =
                 // let the view model do the work
                 state, SideEffect.RemoveAudiobookFromDevice audiobook
 
-            | IsLoading b ->
+            | IsBusy b ->
                 { state with IsLoading = b }, SideEffect.None
 
 
@@ -71,33 +71,40 @@ module AudioBookStore =
 
             let runSideEffects (sideEffect:SideEffect) (state:State) (dispatch:Msg -> unit) =
                 task {
-                    match sideEffect with
-                    | SideEffect.None ->
+                    if sideEffect = SideEffect.None then
                         return ()
+                    else
+                        dispatch <| IsBusy true
+                        do!
+                            task {
+                                match sideEffect with
+                                | SideEffect.None ->
+                                    return ()
 
-                    | SideEffect.LoadAudiobooks ->
-                        dispatch <| IsLoading true
-                        let! audiobooks = DataBase.loadAudioBooksStateFile()
-                        dispatch <| AudiobooksLoaded (audiobooks |> Array.map (fun i -> new AudioBookItemViewModel(i)))
-                        dispatch <| IsLoading false
-                        return ()
+                                | SideEffect.LoadAudiobooks ->
+                                    let! audiobooks = DataBase.loadAudioBooksStateFile()
+                                    dispatch <| AudiobooksLoaded (audiobooks |> Array.map (fun i -> new AudioBookItemViewModel(i)))
+                                    return ()
 
 
-                    | SideEffect.DeleteAudiobookFromDatabase audiobook ->
-                        Notifications.showToasterMessage $"TODO: Audiobook deleted from Database {audiobook.FullName}"
-                        return ()
+                                | SideEffect.DeleteAudiobookFromDatabase audiobook ->
+                                    Notifications.showToasterMessage $"TODO: Audiobook deleted from Database {audiobook.FullName}"
+                                    return ()
 
-                    | SideEffect.RemoveAudiobookFromDevice audiobook ->
-                        dispatch <| IsLoading true
-                        let! res = DataBase.removeAudiobook audiobook
-                        match res with
-                        | Ok _ ->
-                            // remove from the viewmodel (should already done by the action menu)
-                            Notifications.showToasterMessage $"Hörbuch {audiobook.FullName} vom Gerät entfernt"
-                        | Error e ->
-                            do! Notifications.showErrorMessage $"Error removing audiobook {audiobook.FullName} from database: {e}"
+                                | SideEffect.RemoveAudiobookFromDevice audiobook ->
+                                    let! res = DataBase.removeAudiobook audiobook
+                                    match res with
+                                    | Ok _ ->
+                                        // remove from the viewmodel (should already done by the action menu)
+                                        Notifications.showToasterMessage $"Hörbuch {audiobook.FullName} vom Gerät entfernt"
+                                        
+                                    | Error e ->
+                                        do! Notifications.showErrorMessage $"Error removing audiobook {audiobook.FullName} from database: {e}"
+                                    
+                                    return()
+                            }
 
-                        dispatch <| IsLoading false
+                        dispatch <| IsBusy false
                 }
 
 
@@ -117,6 +124,7 @@ module AudioBookItem =
         AudioFileInfos:AudioBookAudioFilesInfo option
         AmbientColor: string option
         IsPlaying: bool
+        IsBusy: bool
     }
 
     and DownloadState =
@@ -133,8 +141,7 @@ module AudioBookItem =
 
 
     type Msg =
-        | OpenAudioBookActionMenu
-        | CloseAudioBookActionMenu
+        | RunOnlySideEffect of SideEffect
 
         | StartDownload
         | RemoveDownloadFromQueue
@@ -143,10 +150,7 @@ module AudioBookItem =
         | UnmarkAudioBookAsListend
 
         | OpenAudioBookPlayer of startPlaying:bool
-        | OpenAudioBookDetail
-        | DeleteItemFromDb
 
-        | ShowMetaData
         | ToggleAmbientColor
 
         | UpdateDownloadProgress of current:int * total:int
@@ -156,27 +160,30 @@ module AudioBookItem =
         | UpdateCurrentAudioFileList of audioFiles:AudioBookAudioFilesInfo
         | SetAmbientColor of color:string
         | SendPauseCommandToAudioPlayer
-
+        
         | ToggleIsPlaying of pstate:bool
+        
+        | IsBusy of bool
 
 
-    [<RequireQualifiedAccess>]
-    type SideEffect =
+
+    and [<RequireQualifiedAccess>]
+        SideEffect =
         | None
         | Init
         | OpenAudioBookActionMenu
         | CloseAudioBookActionMenu
         | OpenAudioBookPlayer of startPlaying:bool
 
+        | DeleteItemFromDb
+        | ShowMetaData
+
         | StartDownload
         | DownloadCompleted
         | RemoveDownloadFromQueue
-        | OpenAudioBookDetail
         | RemoveAudioBookFromDevice
         | MarkAsUnlistend
         | MarkAsListend
-        | DeleteItemFromDb
-        | ShowMetaData
         | SendPauseCommandToAudioPlayer
 
 
@@ -200,22 +207,23 @@ module AudioBookItem =
                 | false, None       -> Unlistend
             AudioFileInfos = DataBase.getAudioBookFileInfoTimeout 100 audiobook.Id // Todo: unbedingt ändern!
             IsPlaying = false
+            IsBusy = false 
         }, SideEffect.Init
 
 
 
     let update msg state =
         match msg with
-        | OpenAudioBookActionMenu ->
-            state, SideEffect.OpenAudioBookActionMenu
+        | IsBusy b ->
+            { state with IsBusy =  b }, SideEffect.None
+            
+        | RunOnlySideEffect sideEffect ->
+            state, sideEffect
 
-        | CloseAudioBookActionMenu ->
-            state, SideEffect.CloseAudioBookActionMenu
-
-        | Msg.StartDownload ->
+        | StartDownload ->
             { state with DownloadState = Queued }, SideEffect.StartDownload
 
-        | Msg.RemoveDownloadFromQueue ->
+        | RemoveDownloadFromQueue ->
             match state.DownloadState with
             | Downloading _ ->
                 state, SideEffect.None
@@ -250,7 +258,11 @@ module AudioBookItem =
                 state, SideEffect.None
             | InProgress _
             | Unlistend ->
-                let newAudioBook = {state.Audiobook with State.Completed = true; }
+                let newAudioBook = {
+                    state.Audiobook with
+                        State.Completed = true
+                        State.CurrentPosition = None
+                }
                 let newModel = {state with Audiobook = newAudioBook; ListenState = Listend }
                 newModel, SideEffect.MarkAsListend
 
@@ -274,17 +286,8 @@ module AudioBookItem =
         | UpdateDownloadProgress (current, total) ->
             { state with DownloadState = Downloading (current, total) }, SideEffect.None
 
-        | Msg.OpenAudioBookPlayer startPlaying  ->
+        | OpenAudioBookPlayer startPlaying  ->
             state, SideEffect.OpenAudioBookPlayer startPlaying
-
-        | Msg.OpenAudioBookDetail ->
-            state, SideEffect.OpenAudioBookDetail
-
-        | DeleteItemFromDb ->
-            state, SideEffect.DeleteItemFromDb //Commands.deleteItemFromDb state
-
-        | ShowMetaData ->
-            state, SideEffect.ShowMetaData //Commands.showMetaDataCmd state
 
         | UpdateAudioBookPosition pos ->
             match state.Audiobook.State.CurrentPosition with
@@ -292,6 +295,7 @@ module AudioBookItem =
                 let position = { p with Position = pos }
                 { state with
                     Audiobook.State.CurrentPosition = Some position
+                    Audiobook.State.Completed = false // if you hear this audio book again, the complete flag is removed
                     ListenState = InProgress position
                     Audiobook.State.LastTimeListend = Some DateTime.Now
                 }, SideEffect.UpdateDatabase
@@ -305,6 +309,7 @@ module AudioBookItem =
                 let position = { p with Filename =  filename }
                 { state with
                     Audiobook.State.CurrentPosition = Some position
+                    Audiobook.State.Completed = false // if you hear this audio book again, the complete flag is removed
                     ListenState = InProgress position
                     Audiobook.State.LastTimeListend = Some DateTime.Now
                 }, SideEffect.UpdateDatabase
@@ -330,9 +335,10 @@ module AudioBookItem =
 
         | ToggleIsPlaying pstate ->
             { state with IsPlaying = pstate }, SideEffect.None
-            
+
         | SendPauseCommandToAudioPlayer ->
             { state with IsPlaying = false }, SideEffect.SendPauseCommandToAudioPlayer
+
 
 
 
@@ -489,108 +495,112 @@ module AudioBookItem =
             let navigationService = DependencyService.Get<INavigationService>()
             task {
                 try
-                    match sideEffect with
-                    | SideEffect.None ->
+                    if sideEffect = SideEffect.None then
                         return ()
+                    else
+                        dispatch <| IsBusy true
+                        do!
+                            task {
+                                match sideEffect with
+                                | SideEffect.None ->
+                                    return ()
 
-                    | SideEffect.Init ->
-                        match state.Audiobook.Picture with
-                        | Some picture ->
-                            let color = getAmbientColorFromPicture picture
-                            dispatch <| SetAmbientColor color
-                        | None ->
-                            ()
-                        return ()
+                                | SideEffect.Init ->
+                                    match state.Audiobook.Picture with
+                                    | Some picture ->
+                                        let color = getAmbientColorFromPicture picture
+                                        dispatch <| SetAmbientColor color
+                                    | None ->
+                                        ()
+                                    return ()
 
-                    | SideEffect.OpenAudioBookActionMenu ->
-                        let menuService = DependencyService.Get<IActionMenuService>()
-                        menuService.ShowAudiobookActionMenu state.ViewModel
+                                | SideEffect.OpenAudioBookActionMenu ->
+                                    let menuService = DependencyService.Get<IActionMenuService>()
+                                    menuService.ShowAudiobookActionMenu state.ViewModel
 
-                        navigationService.MemorizeBackbuttonCallback "PreviousToActionMenu"
-                        navigationService
-                            .RegisterBackbuttonPressed (fun _ ->
-                                InteractiveContainer.CloseDialog()
-                                navigationService.RestoreBackbuttonCallback "PreviousToActionMenu"
-                            )
-                        return ()
+                                    navigationService.MemorizeBackbuttonCallback "PreviousToActionMenu"
+                                    navigationService
+                                        .RegisterBackbuttonPressed (fun _ ->
+                                            InteractiveContainer.CloseDialog()
+                                            navigationService.RestoreBackbuttonCallback "PreviousToActionMenu"
+                                        )
+                                    return ()
 
-                    | SideEffect.CloseAudioBookActionMenu ->
-                        InteractiveContainer.CloseDialog()
-                        DependencyService.Get<INavigationService>().RestoreBackbuttonCallback "PreviousToActionMenu"
-                        return()
+                                | SideEffect.CloseAudioBookActionMenu ->
+                                    InteractiveContainer.CloseDialog()
+                                    DependencyService.Get<INavigationService>().RestoreBackbuttonCallback "PreviousToActionMenu"
+                                    return()
 
-                    | SideEffect.OpenAudioBookPlayer startPlaying ->
-                        let mainViewModel = DependencyService.Get<IMainViewModel>()
-                        match mainViewModel.CurrentPlayerAudiobookViewModel with
-                        | Some current when current.AudioBook.Id = state.ViewModel.AudioBook.Id ->
-                            return () // do nothing
-                        | _ ->
-                            mainViewModel.OpenMiniplayer state.ViewModel startPlaying    
-                            return()
+                                | SideEffect.OpenAudioBookPlayer startPlaying ->
+                                    let mainViewModel = DependencyService.Get<IMainViewModel>()
+                                    match mainViewModel.CurrentPlayerAudiobookViewModel with
+                                    | Some current when current.AudioBook.Id = state.ViewModel.AudioBook.Id ->
+                                        return () // do nothing
+                                    | _ ->
+                                        mainViewModel.OpenMiniplayer state.ViewModel startPlaying
+                                        return()
 
-                    | SideEffect.StartDownload ->
-                        do! downloadAudiobook state.ViewModel dispatch
-                        return()
+                                | SideEffect.StartDownload ->
+                                    do! downloadAudiobook state.ViewModel dispatch
+                                    return()
 
-                    | SideEffect.RemoveDownloadFromQueue ->
-                        removeDownloadFromQueue state.Audiobook
-                        Notifications.showToasterMessage "Download von Warteschlange entfernt"
-                        return()
+                                | SideEffect.RemoveDownloadFromQueue ->
+                                    removeDownloadFromQueue state.Audiobook
+                                    Notifications.showToasterMessage "Download von Warteschlange entfernt"
+                                    return()
 
-                    | SideEffect.OpenAudioBookDetail ->
-                        Notifications.showToasterMessage "TODO: Open Details"
-                        return()
+                                | SideEffect.RemoveAudioBookFromDevice ->
+                                    AudioBookStore.globalAudiobookStore.Dispatch <| AudioBookStore.AudioBookElmish.RemoveAudiobookFromDevice state.Audiobook
+                                    do! updateDatabase state.Audiobook
+                                    return()
 
-                    | SideEffect.RemoveAudioBookFromDevice ->
-                        AudioBookStore.globalAudiobookStore.Dispatch <| AudioBookStore.AudioBookElmish.RemoveAudiobookFromDevice state.Audiobook
-                        do! updateDatabase state.Audiobook
-                        return()
+                                | SideEffect.MarkAsUnlistend ->
+                                    do! updateDatabase state.Audiobook
 
-                    | SideEffect.MarkAsUnlistend ->
-                        do! updateDatabase state.Audiobook
+                                    return()
 
-                        return()
+                                | SideEffect.MarkAsListend ->
+                                    do! updateDatabase state.Audiobook
 
-                    | SideEffect.MarkAsListend ->
-                        do! updateDatabase state.Audiobook
+                                    return()
 
-                        return()
+                                | SideEffect.DeleteItemFromDb ->
+                                    return()
 
-                    | SideEffect.DeleteItemFromDb ->
-                        return()
+                                | SideEffect.ShowMetaData ->
+                                    do! Notifications.showMessage "Metadata" (state.Audiobook.ToString())
+                                    return()
 
-                    | SideEffect.ShowMetaData ->
-                        do! Notifications.showMessage "Metadata" (state.Audiobook.ToString())
-                        return()
+                                | SideEffect.UpdateDatabase ->
+                                    do! updateDatabase state.Audiobook
+                                    return ()
 
-                    | SideEffect.UpdateDatabase ->
-                        do! updateDatabase state.Audiobook
-                        return ()
+                                | SideEffect.DownloadCompleted ->
+                                    do! updateDatabase state.Audiobook
+                                    // refresh ambient color
+                                    match state.Audiobook.Picture with
+                                    | Some picture ->
+                                        let color = getAmbientColorFromPicture picture
+                                        dispatch <| SetAmbientColor color
+                                    | None ->
+                                        ()
 
-                    | SideEffect.DownloadCompleted ->
-                        do! updateDatabase state.Audiobook
-                        // refresh ambient color
-                        match state.Audiobook.Picture with
-                        | Some picture ->
-                            let color = getAmbientColorFromPicture picture
-                            dispatch <| SetAmbientColor color
-                        | None ->
-                            ()
-
-                    | SideEffect.SendPauseCommandToAudioPlayer ->
-                        DependencyService.Get<IAudioPlayerPause>().Pause()
-                        
-                                          
+                                | SideEffect.SendPauseCommandToAudioPlayer ->
+                                    DependencyService.Get<IAudioPlayerPause>().Pause()
+                            }
+                
+                        dispatch <| IsBusy true
+                
                 with
                 | ex ->
                     Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
+                    dispatch <| IsBusy true
                     raise ex
 
 
 
 
             }
-
 
 
 
@@ -770,8 +780,8 @@ type AudioBookItemViewModel(audiobook: AudioBook) as self =
         Color.Parse ac
         ))
 
-    member this.OpenDialog()                = local.Dispatch OpenAudioBookActionMenu
-    member this.CloseDialog()               = local.Dispatch CloseAudioBookActionMenu
+    member this.OpenDialog()                = local.Dispatch <| RunOnlySideEffect SideEffect.OpenAudioBookActionMenu
+    member this.CloseDialog()               = local.Dispatch <| RunOnlySideEffect SideEffect.CloseAudioBookActionMenu
     member this.StartDownload()             = local.Dispatch StartDownload
     member this.RemoveDownload()            = local.Dispatch RemoveDownloadFromQueue
     member this.RemoveAudiobookFromDevice() = local.Dispatch RemoveAudiobookFromDevice
@@ -779,16 +789,15 @@ type AudioBookItemViewModel(audiobook: AudioBook) as self =
     member this.MarkAsUnlistend()           = local.Dispatch UnmarkAudioBookAsListend
     member this.OpenPlayerAndPlay()         = local.Dispatch <| OpenAudioBookPlayer true
     member this.OpenPlayer()                = if this.IsDownloaded then local.Dispatch <| OpenAudioBookPlayer false
-    member this.OpenDetail()                = local.Dispatch OpenAudioBookDetail
-    member this.DeleteItemFromDb()          = local.Dispatch DeleteItemFromDb
-    member this.ShowMetaData()              = local.Dispatch ShowMetaData
+    member this.DeleteItemFromDb()          = local.Dispatch <| RunOnlySideEffect SideEffect.DeleteItemFromDb
+    member this.ShowMetaData()              = local.Dispatch <| RunOnlySideEffect SideEffect.ShowMetaData
     member this.UpdateAudioBookPosition pos = local.Dispatch (UpdateAudioBookPosition pos)
     member this.UpdateCurrentListenFilename filename = local.Dispatch (UpdateCurrentListenFilename filename)
     member this.ToggleAmbientColor()        = local.Dispatch (ToggleAmbientColor)
     member this.ToggleIsPlaying pstate      = local.Dispatch (ToggleIsPlaying pstate)
     member this.PauseAudiobook()            = local.Dispatch SendPauseCommandToAudioPlayer
-    
-    
+
+
     member this.StartDownloadVisible    = this.Bind(local, fun s -> s.DownloadState = NotDownloaded)
     member this.RemoveDownloadVisible   = this.Bind(local, fun s -> s.DownloadState = Queued)
     member this.RemoveAudiobookFromDeviceVisible = this.Bind(local, fun s -> s.DownloadState = Downloaded)
@@ -814,7 +823,7 @@ type AudioBookItemViewModel(audiobook: AudioBook) as self =
         | _ -> Unchecked.defaultof<Bitmap>
     )
 
-    member this.ListendenProgress = this.Bind(local, fun s ->
+    member this.ListendenProgress = this.BindOnChanged(local, _.ListenState, fun s ->
         match s.ListenState with
         | InProgress pos ->
             s
@@ -827,4 +836,3 @@ type AudioBookItemViewModel(audiobook: AudioBook) as self =
 
 
     static member DesignVM = new AudioBookItemViewModel(DemoData.designAudioBook)
-    

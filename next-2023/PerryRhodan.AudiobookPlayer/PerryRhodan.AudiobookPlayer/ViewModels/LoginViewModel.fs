@@ -29,7 +29,7 @@ module LoginPage =
         | ChangeUsername of string
         | ChangePassword of string
         | SetStoredCredentials of username:string * password:string * rememberLogin:bool
-        | ChangeBusyState of bool
+        | SetBusy of bool
         | CloseDialog
         | KeyboardStateChanged
 
@@ -76,7 +76,7 @@ module LoginPage =
         | SetStoredCredentials (u,p,r) ->
             {state with Username= u; Password = p; RememberLogin = r}, SideEffect.None
             
-        | ChangeBusyState busy -> 
+        | SetBusy busy -> 
             { state with IsLoading = busy}, SideEffect.None
             
         | CloseDialog ->
@@ -93,102 +93,111 @@ module LoginPage =
         
         let runSideEffects (sideEffect:SideEffect) (state:State) (dispatch:Msg -> unit) =
             task {
-                match sideEffect with
-                | SideEffect.None ->
+                if sideEffect = SideEffect.None then
                     return ()
-                    
-                | SideEffect.TryLogin ->
-                    dispatch <| ChangeBusyState true
-                    try
-                        let username = state.Username.Trim()
-                        let! cc = WebAccess.login username state.Password
-                        match cc with
-                        | Ok cc ->
-                            match cc with
-                            | None ->
-                                Notifications.showToasterMessage "Login fehlgeschlagen"
-                                dispatch LoginFailed
-                            | Some c ->
-                                dispatch <| LoginSucceeded c
-                        | Error e ->
-                            match e with
-                            | SessionExpired e ->
-                                do! Notifications.showErrorMessage e
-                                ()
-                            | Other e ->
-                                do! Notifications.showErrorMessage e
-                                ()
-                            | Exception e ->
-                                let ex = e.GetBaseException()
-                                let msg = ex.Message + "|" + ex.StackTrace
-                                do! Notifications.showErrorMessage msg
-                                ()
-                            | Network msg ->
-                                do! Notifications.showErrorMessage msg
-                                ()
+                else
+                    dispatch <| SetBusy true
+                    do!
+                        task {
+                            match sideEffect with
+                            | SideEffect.None ->
+                                return ()
                                 
-                            dispatch <| ChangeBusyState false
-                    with
-                    | ex ->
-                        do! Notifications.showErrorMessage ex.Message
-                        dispatch <| ChangeBusyState false
-                        return ()
-                   
-                | SideEffect.LoadStoredCredentials ->
-                        dispatch <| ChangeBusyState true
-                        let! res = SecureLoginStorage.loadLoginCredentials ()
-                        match res with
-                        | Error e -> 
-                            System.Diagnostics.Debug.WriteLine("Error loading cred: " + e)
-                            do! Notifications.showErrorMessage e
-                            dispatch <| ChangeBusyState false
-                            return ()
-                        | Ok (username,password,rl) ->
-                            match username,password with
-                            | Some usr, Some pw ->
-                                dispatch <| SetStoredCredentials (usr,pw,rl)
-                            | _, _ ->
-                                dispatch <| SetStoredCredentials ("","",rl)
+                            | SideEffect.TryLogin ->
+                                dispatch <| SetBusy true
+                                try
+                                    let username = state.Username.Trim()
+                                    let! cc = WebAccess.login username state.Password
+                                    match cc with
+                                    | Ok cc ->
+                                        match cc with
+                                        | None ->
+                                            Notifications.showToasterMessage "Login fehlgeschlagen"
+                                            dispatch LoginFailed
+                                        | Some c ->
+                                            dispatch <| LoginSucceeded c
+                                    | Error e ->
+                                        match e with
+                                        | SessionExpired e ->
+                                            do! Notifications.showErrorMessage e
+                                            ()
+                                        | Other e ->
+                                            do! Notifications.showErrorMessage e
+                                            ()
+                                        | Exception e ->
+                                            let ex = e.GetBaseException()
+                                            let msg = ex.Message + "|" + ex.StackTrace
+                                            do! Notifications.showErrorMessage msg
+                                            ()
+                                        | Network msg ->
+                                            do! Notifications.showErrorMessage msg
+                                            ()
+                                            
+                                        dispatch <| SetBusy false
+                                with
+                                | ex ->
+                                    do! Notifications.showErrorMessage ex.Message
+                                    dispatch <| SetBusy false
+                                    return ()
+                               
+                            | SideEffect.LoadStoredCredentials ->
+                                    dispatch <| SetBusy true
+                                    let! res = SecureLoginStorage.loadLoginCredentials ()
+                                    match res with
+                                    | Error e -> 
+                                        System.Diagnostics.Debug.WriteLine("Error loading cred: " + e)
+                                        do! Notifications.showErrorMessage e
+                                        dispatch <| SetBusy false
+                                        return ()
+                                    | Ok (username,password,rl) ->
+                                        match username,password with
+                                        | Some usr, Some pw ->
+                                            dispatch <| SetStoredCredentials (usr,pw,rl)
+                                        | _, _ ->
+                                            dispatch <| SetStoredCredentials ("","",rl)
+                                            
+                                    dispatch <| SetBusy false
+                                    
+                                            
+                            | SideEffect.LoginSuccessfullAfterMath (rememberLogin, cookie) ->
+                                dispatch <| SetBusy true
                                 
-                        dispatch <| ChangeBusyState false
-                        
-                                
-                | SideEffect.LoginSuccessfullAfterMath (rememberLogin, cookie) ->
-                    dispatch <| ChangeBusyState true
-                    
-                    if rememberLogin then
-                        let! res = SecureLoginStorage.saveLoginCredentials state.Username state.Password state.RememberLogin
-                        match res with
-                        | Error e ->
-                            let msg = $"Error storing cred: {e}"
-                            System.Diagnostics.Debug.WriteLine(msg)
-                            do! Notifications.showErrorMessage msg
-                        | Ok _ -> ()
-                        
-                    let! storeRes =  SecureLoginStorage.saveCookie cookie
-                    match storeRes with
-                    | Error e ->
-                        let msg = $"Error storing cookie: {e}"
-                        System.Diagnostics.Debug.WriteLine(msg)
-                        do! Notifications.showErrorMessage msg
-                    | Ok _ ->
-                        Notifications.showToasterMessage "Login erfolgreich"
-                        dispatch CloseDialog
-                        
-                    dispatch <| ChangeBusyState true
-                                                                                
+                                if rememberLogin then
+                                    let! res = SecureLoginStorage.saveLoginCredentials state.Username state.Password state.RememberLogin
+                                    match res with
+                                    | Error e ->
+                                        let msg = $"Error storing cred: {e}"
+                                        System.Diagnostics.Debug.WriteLine(msg)
+                                        do! Notifications.showErrorMessage msg
+                                    | Ok _ -> ()
+                                    
+                                let! storeRes =  SecureLoginStorage.saveCookie cookie
+                                match storeRes with
+                                | Error e ->
+                                    let msg = $"Error storing cookie: {e}"
+                                    System.Diagnostics.Debug.WriteLine(msg)
+                                    do! Notifications.showErrorMessage msg
+                                | Ok _ ->
+                                    Notifications.showToasterMessage "Login erfolgreich"
+                                    dispatch CloseDialog
+                                    
+                                dispatch <| SetBusy true
+                                                                                            
 
+                                    
+                                
+                            | SideEffect.ShowErrorMessage s ->
+                                do! Notifications.showErrorMessage s
+                                return ()
+                                
+                            | SideEffect.CloseDialog ->
+                                InteractiveContainer.CloseDialog()
+                                // Backbutton back to default
+                                DependencyService.Get<INavigationService>().ResetBackbuttonPressed()
+                                return ()
+                        }
                         
-                    
-                | SideEffect.ShowErrorMessage s ->
-                    do! Notifications.showErrorMessage s
-                    return ()
-                    
-                | SideEffect.CloseDialog ->
-                    InteractiveContainer.CloseDialog()
-                    // Backbutton back to default
-                    DependencyService.Get<INavigationService>().ResetBackbuttonPressed()
-                    return ()
+                    dispatch <| SetBusy false
             }
             
  

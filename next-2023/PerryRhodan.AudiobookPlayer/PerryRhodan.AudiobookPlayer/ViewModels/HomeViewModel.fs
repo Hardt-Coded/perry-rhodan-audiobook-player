@@ -16,7 +16,7 @@ module HomePage =
     type Msg =
         //| LoadAudioBooks
         | AudioBooksLoaded of AudioBookItemViewModel array
-        | ChangeBusyState of bool
+        | SetBusy of bool
         | OnError of string
 
 
@@ -61,7 +61,7 @@ module HomePage =
             }
             newState, SideEffect.None
 
-        | ChangeBusyState isBusy ->
+        | SetBusy isBusy ->
             { state with IsLoading = isBusy }, SideEffect.None
 
         | OnError error ->
@@ -75,22 +75,30 @@ module HomePage =
 
         let runSideEffects (sideEffect:SideEffect) (state:State) (dispatch:Msg -> unit) =
             task {
-                match sideEffect with
-                | SideEffect.None ->
+                if sideEffect = SideEffect.None then
                     return ()
+                else
+                    dispatch <| SetBusy true
+                    do!
+                        task {
+                            match sideEffect with
+                            | SideEffect.None ->
+                                return ()
 
-                | SideEffect.LoadAudioBooks ->
-                    try
-                        let audioBooks =
-                            AudioBookStore.globalAudiobookStore.Model.Audiobooks
+                            | SideEffect.LoadAudioBooks ->
+                                try
+                                    let audioBooks =
+                                        AudioBookStore.globalAudiobookStore.Model.Audiobooks
 
-                        dispatch <| AudioBooksLoaded audioBooks
-                        return ()
-                    with
-                    | ex ->
-                        dispatch <| OnError ex.Message
-                        return ()
-
+                                    dispatch <| AudioBooksLoaded audioBooks
+                                    return ()
+                                with
+                                | ex ->
+                                    dispatch <| OnError ex.Message
+                                    return ()
+                        }
+                        
+                    dispatch <| SetBusy false
             }
 
 

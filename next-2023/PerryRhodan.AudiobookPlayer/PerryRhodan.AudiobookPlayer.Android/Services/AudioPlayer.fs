@@ -7,11 +7,10 @@ open Android.Media
 open Android.OS
 open Android.Media.Session
 open System
-open System.Reactive.Subjects
 open Dependencies
 open Domain
 open Elmish.SideEffect
-open Microsoft.AppCenter
+open PerryRhodan.AudiobookPlayer.Services.AudioPlayer.PlayerElmish
 open PerryRhodan.AudiobookPlayer.ViewModels
 open ReactiveElmish.Avalonia
 open Microsoft.Extensions.DependencyInjection
@@ -38,6 +37,13 @@ module Helper =
         player.PrepareAsync()
         tcs.Task
 
+    type AudioFocusChangeListener(onAudioFocusChange: AudioFocus -> unit) =
+        inherit Java.Lang.Object()
+        interface AudioManager.IOnAudioFocusChangeListener with
+            member this.OnAudioFocusChange(focusChange: AudioFocus) =
+                onAudioFocusChange focusChange
+
+
 
 [<Service(Exported = true,
           Name = "perry.rhodan.audioplayer.mediaplayer",
@@ -58,6 +64,7 @@ type AudioPlayerService() as self =
     let player = new MediaPlayer()
     let binder = new AudioPlayerBinder(self)
     let mediaSessionCallback = new MediaSessionCallback()
+    let mutable audioManager :AudioManager option = None
     //let playerInfoSubject = new BehaviorSubject<AudioPlayerInformation>(AudioPlayerInformation.Empty)
     //let finishedTrackSubject = new Subject<unit>()
     let mutable mediaSession: MediaSession option = None
@@ -71,7 +78,7 @@ type AudioPlayerService() as self =
 
             let stateBuilder = new PlaybackState.Builder();
 
-            
+
 
             let stateAction =
                 match state.State with
@@ -133,12 +140,13 @@ type AudioPlayerService() as self =
         if player.IsPlaying then
             let duration = TimeSpan.FromMilliseconds(float player.Duration)
             let currentPosition = TimeSpan.FromMilliseconds(float player.CurrentPosition)
-            store.Dispatch <| PlayerElmish.Msg.UpdatePlayingState (currentPosition, duration, AudioPlayerState.Playing)
-            
+            store.Dispatch <| StateControlMsg (UpdatePlayingState (currentPosition, duration, AudioPlayerState.Playing))
+
+
     let updateAudioPlayerInformation () =
         match player.IsPlaying with
         | false ->
-            store.Dispatch <| PlayerElmish.Msg.UpdatePlayingState (store.Model.Position, store.Model.Duration, AudioPlayerState.Stopped)
+            store.Dispatch <| StateControlMsg (UpdatePlayingState (store.Model.Position, store.Model.Duration, AudioPlayerState.Stopped))
         | true ->
             sendCurrentPlayerState ()
 
@@ -165,12 +173,21 @@ type AudioPlayerService() as self =
 
             notificationManager |> Option.iter (_.CreateNotificationChannel(channel))
 
-        let selfInterface = self :> IAudioPlayer
         let style =
             (new Notification.MediaStyle())
 
-        
-        
+        let duration =
+            if player.IsPlaying then
+                player.Duration
+            else
+                state.Duration.TotalMilliseconds |> int
+
+        let currentPosition =
+            if player.IsPlaying then
+                player.CurrentPosition
+            else
+                state.Position.TotalMilliseconds |> int
+
         match state.AudioBook |> Option.map (_.AudioBook), mediaSession with
         | Some audioBook, Some mediaSession ->
             style.SetMediaSession(mediaSession.SessionToken) |> ignore
@@ -180,8 +197,7 @@ type AudioPlayerService() as self =
                 .SetContentText($"Track {state.CurrentTrackNumber + 1} of {state.NumOfTracks}")
                 .SetSmallIcon(Resource.Drawable.einsa_icon)
                 .SetVisibility(NotificationVisibility.Public)
-                .SetProgress(selfInterface.Duration.TotalSeconds |> int, selfInterface.CurrentPosition.TotalSeconds |> int, false)
-
+                .SetProgress(duration, currentPosition, false)
                 .Build()
 
         // do not show any notification
@@ -195,6 +211,52 @@ type AudioPlayerService() as self =
     let updateNotification (state:PlayerElmish.AudioPlayerInfo) =
         notificationManager
         |> Option.iter (_.Notify(notificationId, buildNotification state))
+
+
+    let audioFocusRequest =
+            (new AudioFocusRequestClass
+                .Builder(AudioFocus.Gain))
+                    .SetAudioAttributes(
+                        (new AudioAttributes.Builder())
+                            .SetUsage(AudioUsageKind.Media)
+                            .SetContentType(AudioContentType.Music)
+                            .Build()
+                        )
+                    .SetAcceptsDelayedFocusGain(true)
+                    .SetOnAudioFocusChangeListener(
+                            new Helper.AudioFocusChangeListener(
+                                onAudioFocusChange = fun focusChange ->
+                                    let audioPlayer = self :> IAudioPlayer
+                                    match focusChange with
+                                    | AudioFocus.LossTransientCanDuck ->
+                                        player.SetVolume(0.2f, 0.2f)
+                                    | AudioFocus.Gain ->
+                                        player.SetVolume(1.0f, 1.0f)
+                                        if audioPlayer.AudioPlayerInformation.State = AudioPlayerState.Stopped then
+                                            audioPlayer.Play()
+                                    | AudioFocus.GainTransient ->
+                                        player.SetVolume(1.0f, 1.0f)
+                                        if audioPlayer.AudioPlayerInformation.State = AudioPlayerState.Stopped then
+                                            audioPlayer.Play()
+                                    | AudioFocus.GainTransientExclusive ->
+                                        player.SetVolume(1.0f, 1.0f)
+                                        if audioPlayer.AudioPlayerInformation.State = AudioPlayerState.Stopped then
+                                            audioPlayer.Play()
+                                    | AudioFocus.GainTransientMayDuck ->
+                                        player.SetVolume(1.0f, 1.0f)
+                                        if audioPlayer.AudioPlayerInformation.State = AudioPlayerState.Stopped then
+                                            audioPlayer.Play()
+                                    | AudioFocus.Loss ->
+                                        audioPlayer.Stop true
+                                    | AudioFocus.LossTransient ->
+                                        audioPlayer.Stop true
+                                    | AudioFocus.None ->
+                                        ()
+                                    | _ ->
+                                        ()
+                            )
+                    )
+                    .Build()
 
 
     override this.OnBind(intent) =
@@ -225,7 +287,7 @@ type AudioPlayerService() as self =
                 updateNotification state
         )
         disposables.Add <| player.Completion.Subscribe (fun _ ->
-            store.Dispatch <| PlayerElmish.Msg.MoveToNextTrack
+            store.Dispatch <| PlayerControlMsg MoveToNextTrack
         )
 
         AudioPlayerService.ServiceIsRunningInForeground <- true
@@ -245,8 +307,8 @@ type AudioPlayerService() as self =
         let pm = PowerManager.FromContext(this)
         let wakeLock = pm.NewWakeLock(WakeLockFlags.Partial, "AudioPlayerService")
         wakeLock.Acquire()
-        
-        
+
+
         let audioPlayer = this :> IAudioPlayer
         match intent.Action with
         | "ACTION_PAUSE" ->
@@ -303,6 +365,7 @@ type AudioPlayerService() as self =
 
 
                 try
+
                     player.Reset()
                     player.SetDataSource(file)
                     let playbackParams =
@@ -310,11 +373,20 @@ type AudioPlayerService() as self =
                             .SetSpeed(currentPlaybackSpeed)
                             .SetPitch(1.0f)
                             .SetAudioFallbackMode(0)
-                        
+
                     player.PlaybackParams <- playbackParams
                     do! Helper.prepareMediaplayerAsync player
-                    player.Start()
-                    updateAudioPlayerInformation ()
+                    
+                    // ask audiomanager to give us audio focus
+                    audioManager |> Option.iter (fun a -> a.AbandonAudioFocusRequest(audioFocusRequest) |> ignore)
+                    audioManager
+                    |> Option.iter (fun a ->
+                        let audioFocus = a.RequestAudioFocus(audioFocusRequest)
+                        if audioFocus = AudioFocusRequest.Granted then
+                            player.Start()
+                            updateAudioPlayerInformation ()
+                    )
+                    
                 with
                 | ex ->
                      Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
@@ -345,9 +417,12 @@ type AudioPlayerService() as self =
                  Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
                  reraise()
 
-        member this.Stop() =
+        member this.Stop resumeOnAudioFocus =
             try
                 sendCurrentPlayerState () // send state right before pausing
+                if not resumeOnAudioFocus then
+                    audioManager |> Option.iter (fun a -> a.AbandonAudioFocusRequest(audioFocusRequest) |> ignore)
+
                 player.Stop ()
                 updateAudioPlayerInformation ()
             with
@@ -368,13 +443,14 @@ type AudioPlayerService() as self =
         member this.SetPlaybackSpeed(speed: float) =
             task {
                 try
+                    let wasPlaying = player.IsPlaying
                     currentPlaybackSpeed <- speed |> float32
                     let currentPos =
                         if player.IsPlaying then
                             player.CurrentPosition
                         else
                             store.Model.Position.TotalMilliseconds |> int
-                    
+
                     player.Stop()
                     player.Reset()
                     player.SetDataSource store.Model.Filename
@@ -386,76 +462,77 @@ type AudioPlayerService() as self =
                     player.PlaybackParams <- playbackParams
                     do! Helper.prepareMediaplayerAsync player
                     player.SeekTo currentPos
-                    player.Start()
+                    if wasPlaying then
+                        player.Start()
                     updateAudioPlayerInformation ()
                 with
                 | ex ->
                      Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
-                     raise ex    
+                     raise ex
             }
-            
+
     interface IAudioPlayerPause with
         member this.Pause() =
-            store.Dispatch <| PlayerElmish.Msg.Stop false
+            store.Dispatch <| PlayerControlMsg (Stop false)
 
     interface IAudioPlayer  with
 
         member this.Init audiobook fileList =
-            store.Dispatch <| PlayerElmish.Msg.InitAudioService (audiobook, fileList)
+            store.Dispatch <| StateControlMsg (InitAudioService (audiobook, fileList))
+            // add audio manager
+            audioManager <- Some (self.GetSystemService(Context.AudioService) :?> AudioManager)
 
         member this.Play () =
-            store.Dispatch <| PlayerElmish.Msg.Play
+            store.Dispatch <| PlayerControlMsg Play
 
         member this.PlayExtern file pos =
-            store.Dispatch <| PlayerElmish.Msg.PlayExtern (file, pos)
+            store.Dispatch <| PlayerControlMsg (PlayExtern (file, pos))
 
         member this.Pause() =
-            store.Dispatch <| PlayerElmish.Msg.Stop false
+            store.Dispatch <| PlayerControlMsg (Stop false)
 
-        member this.PlayPause() =
+        member this.PlayPause () =
             if player.IsPlaying then
-                store.Dispatch <| PlayerElmish.Msg.Stop false
+                store.Dispatch <| PlayerControlMsg (Stop false)
             else
-                store.Dispatch <| PlayerElmish.Msg.Play
+                store.Dispatch <| PlayerControlMsg Play
 
 
         member this.Stop resumeOnAudioFocus =
-            store.Dispatch <| PlayerElmish.Msg.Stop resumeOnAudioFocus
+            store.Dispatch <| PlayerControlMsg (Stop resumeOnAudioFocus)
 
-        member this.JumpBackwards() =
-            store.Dispatch <| PlayerElmish.Msg.JumpBackwards
+        member this.JumpBackwards () =
+            store.Dispatch <| PlayerControlMsg JumpBackwards
 
-        member this.JumpForward() =
-            store.Dispatch <| PlayerElmish.Msg.JumpForward
+        member this.JumpForward () =
+            store.Dispatch <| PlayerControlMsg JumpForward
 
-        member this.Next() =
-            store.Dispatch <| PlayerElmish.Msg.MoveToNextTrack
+        member this.Next () =
+            store.Dispatch <| PlayerControlMsg MoveToNextTrack
 
-        member this.Previous() =
-            store.Dispatch <| PlayerElmish.Msg.MoveToPreviousTrack
+        member this.Previous () =
+            store.Dispatch <| PlayerControlMsg MoveToPreviousTrack
 
-        member this.SeekTo(position: TimeSpan) =
-            store.Dispatch <| PlayerElmish.Msg.GotoPosition position
+        member this.SeekTo position =
+            store.Dispatch <| PlayerControlMsg (GotoPosition position)
 
-        member this.SetPlaybackSpeed(speed: float) =
-            store.Dispatch <| PlayerElmish.Msg.SetPlaybackSpeed speed
+        member this.SetPlaybackSpeed speed =
+            store.Dispatch <| PlayerControlMsg (SetPlaybackSpeed speed)
 
-        member this.StartSleepTimer(spleepTime) =
-            store.Dispatch <| PlayerElmish.Msg.StartSleepTimer spleepTime
+        member this.StartSleepTimer sleepTime =
+            match sleepTime with
+            | None ->
+                store.Dispatch <| SleepTimerMsg SleepTimerStop
+            | Some sleepTime ->
+                store.Dispatch <| SleepTimerMsg (SleepTimerStart sleepTime)
 
-        member this.Duration = player.Duration |> TimeSpan.FromMilliseconds
-
-        member this.CurrentPosition = player.CurrentPosition |> TimeSpan.FromMilliseconds
-
-        member this.AudioPlayerInformation = store.Model
+        member this.AudioPlayerInformation with get() = store.Model
         member this.AudioPlayerInfoChanged = store.Observable
 
-    
+
 
 and MediaSessionCallback() =
     inherit MediaSession.Callback()
-
-
 
     override this.OnPlay() =
         Helper.sendAction<AudioPlayerService> "ACTION_PLAY"
@@ -491,7 +568,8 @@ type NotificationActionReceiver() =
     inherit BroadcastReceiver()
     override this.OnReceive(context, intent) =
         match intent.Action with
-        | "ACTION_PAUSE" ->
+        | "ACTION_PAUSE"
+        | "ACTION_STOP"->
             Helper.sendAction<AudioPlayerService> "ACTION_PAUSE"
         | "ACTION_PLAY" ->
             Helper.sendAction<AudioPlayerService> "ACTION_PLAY"

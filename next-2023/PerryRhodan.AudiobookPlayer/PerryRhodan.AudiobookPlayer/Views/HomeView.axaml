@@ -7,7 +7,7 @@
              xmlns:speedSelector="clr-namespace:PerryRhodan.AudiobookPlayer.SpeedSelector"
              xmlns:valueSelector="clr-namespace:PerryRhodan.AudiobookPlayer.ValueSelector"
              xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
-             mc:Ignorable="d" d:DesignWidth="540" d:DesignHeight="1170"
+             mc:Ignorable="d" d:DesignWidth="393" d:DesignHeight="738"
              x:Class="PerryRhodan.AudiobookPlayer.Views.HomeView"
              Background="Black"
              Design.DataContext="{Binding Source={x:Static vm:HomeViewModel.DesignVM}}"
@@ -15,14 +15,18 @@
     <Grid RowDefinitions="Auto,Auto,*">
         <!-- Last Listened -->
         <Grid Grid.Row="0" IsVisible="{Binding HasLastListenedAudioBook}">
-            <views:AudioBookItemView DataContext="{Binding LastListendAudiobook}"/>
+            <TransitioningContentControl>
+                <TransitioningContentControl.PageTransition>
+                    <CrossFade Duration="00:00:00.500" />
+                </TransitioningContentControl.PageTransition>
+                <TransitioningContentControl.Content>
+                    <views:AudioBookItemView DataContext="{Binding LastListendAudiobook}"/>
+                </TransitioningContentControl.Content>
+            </TransitioningContentControl>
+            
         </Grid>
 
-		<valueSelector:ValueSelector Grid.Row="1" ItemList="{Binding SelectorValues}" Value="{Binding SelectorValue}">
-            <avalonia:MaterialIcon Kind="Headphones" />
-        </valueSelector:ValueSelector>
-
-        <!-- Audio Books -->
+		<!-- Audio Books -->
         <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Hidden">
             <ItemsControl Grid.Row="1" ItemsSource="{Binding AudioBooks}">
                 <ItemsControl.ItemTemplate>
@@ -35,8 +39,8 @@
 
 
         <!-- Loading -->
-        <Grid Grid.Row="0" Grid.RowSpan="2" IsVisible="{Binding IsLoading}">
-            <TextBlock Text="Loading..." HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <Grid Grid.Row="0" Grid.RowSpan="3" IsVisible="{Binding IsLoading}" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <ProgressBar Classes="circular" IsIndeterminate="True"  />
         </Grid>
     </Grid>
 </UserControl>

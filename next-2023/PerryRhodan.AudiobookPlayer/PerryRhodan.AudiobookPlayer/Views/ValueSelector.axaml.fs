@@ -8,6 +8,7 @@ open Avalonia.Data.Converters
 open Avalonia
 open Avalonia.Controls
 open Avalonia.Input
+open Avalonia.Layout
 open Avalonia.Markup.Xaml
 open Avalonia.Data
 open Avalonia.Interactivity
@@ -177,9 +178,13 @@ and ValueSelector() as self =
 
 
     let mutable _value = Unchecked.defaultof<obj>
+    let mutable _displayValue = ""
     let mutable _itemList:ICollection = [||]
 
-    do self.InitializeComponent()
+    do
+        self.InitializeComponent()
+        self.HorizontalContentAlignment <- HorizontalAlignment.Center // standard center
+        
 
     member private this.InitializeComponent() =
         AvaloniaXamlLoader.Load(this)
@@ -188,15 +193,20 @@ and ValueSelector() as self =
     member this.Value
         with get():obj = _value
         and set(value:obj) =
-            this.RaisePropertyChanged(ValueProperty,_value, value)
-            this.RaisePropertyChanged(DisplayValueProperty,"x", "y")
-            _value <- value
+            this.SetAndRaise(ValueProperty,&_value, value) |> ignore
+            // set possible DisplayValue
+            let displayValue =
+                this.ItemList |> convertCollectionToTupleArray
+                |> Array.tryFind (fun (key,_) -> key = this.Value)
+                |> Option.map snd
+                |> Option.defaultValue ""
+            this.SetAndRaise(DisplayValueProperty, &_displayValue, displayValue) |> ignore
 
-    member this.DisplayValue =
-        this.ItemList.Cast<obj>().ToArray()
-        |> Array.tryFind (fun x -> FSharpValue.GetTupleField(x, 0) = this.Value)
-        |> Option.map (fun x -> FSharpValue.GetTupleField(x, 1).ToString())
-        |> Option.defaultValue ""
+
+
+
+    member this.DisplayValue
+        with get() = _displayValue
 
     member this.SelectedIndex
         with get():int =
@@ -218,7 +228,15 @@ and ValueSelector() as self =
 
     member this.ItemList
         with get():ICollection = _itemList
-        and set(value:ICollection) = this.SetAndRaise<ICollection>(ItemListProperty, &_itemList, value) |> ignore
+        and set(value:ICollection) =
+            this.SetAndRaise<ICollection>(ItemListProperty, &_itemList, value) |> ignore
+            // set possible DisplayValue
+            let displayValue =
+                value |> convertCollectionToTupleArray
+                |> Array.tryFind (fun (key,_) -> key = this.Value)
+                |> Option.map snd
+                |> Option.defaultValue ""
+            this.SetAndRaise(DisplayValueProperty, &_displayValue, displayValue) |> ignore
 
 
 

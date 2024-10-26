@@ -6,6 +6,7 @@ open Dependencies
 open Microsoft.Maui.ApplicationModel
 open PerryRhodan.AudiobookPlayer.ViewModel
 open ReactiveElmish
+open Services
 open Services.DependencyServices
 
 type ActionMenuViewModel(audioBook: AudioBookItemViewModel) =
@@ -15,34 +16,37 @@ type ActionMenuViewModel(audioBook: AudioBookItemViewModel) =
     
     member this.StartDownload() =
         this.AudioBook.StartDownload()
+        DependencyService.Get<INavigationService>().RestoreBackbuttonCallback "PreviousToActionMenu"
         InteractiveContainer.CloseDialog()
         
     member this.RemoveDownload() =
         this.AudioBook.RemoveDownload()
-        InteractiveContainer.CloseDialog()
-    
-    member this.OpenDetail() =
-        this.AudioBook.OpenDetail()
+        DependencyService.Get<INavigationService>().RestoreBackbuttonCallback "PreviousToActionMenu"
         InteractiveContainer.CloseDialog()
     
     member this.MarkAsListend() =
         this.AudioBook.MarkAsListend()
+        DependencyService.Get<INavigationService>().RestoreBackbuttonCallback "PreviousToActionMenu"
         InteractiveContainer.CloseDialog()
     
     member this.MarkAsUnlistend() =
         this.AudioBook.MarkAsUnlistend()
+        DependencyService.Get<INavigationService>().RestoreBackbuttonCallback "PreviousToActionMenu"
         InteractiveContainer.CloseDialog()
     
     member this.RemoveAudiobookFromDevice() =
         this.AudioBook.RemoveAudiobookFromDevice()
+        DependencyService.Get<INavigationService>().RestoreBackbuttonCallback "PreviousToActionMenu"
         InteractiveContainer.CloseDialog()
     
     member this.OpenPlayer() =
         this.AudioBook.OpenPlayer()
+        DependencyService.Get<INavigationService>().RestoreBackbuttonCallback "PreviousToActionMenu"
         InteractiveContainer.CloseDialog()
     
     member this.ShowMetaData() =
         this.AudioBook.ShowMetaData()
+        DependencyService.Get<INavigationService>().RestoreBackbuttonCallback "PreviousToActionMenu"
         InteractiveContainer.CloseDialog()
         
     member this.ShowProductPage() =
@@ -52,15 +56,18 @@ type ActionMenuViewModel(audioBook: AudioBookItemViewModel) =
             let uri = Uri(Services.Consts.baseUrl + url)
             Browser.Default.OpenAsync(uri, BrowserLaunchMode.SystemPreferred) |> ignore
         )
+        DependencyService.Get<INavigationService>().RestoreBackbuttonCallback "PreviousToActionMenu"
         InteractiveContainer.CloseDialog()
         
         
         
     member this.ToggleAmbientColor() =
         this.AudioBook.ToggleAmbientColor()
+        DependencyService.Get<INavigationService>().RestoreBackbuttonCallback "PreviousToActionMenu"
         InteractiveContainer.CloseDialog()
         
     member this.CloseDialog() =
+        DependencyService.Get<INavigationService>().RestoreBackbuttonCallback "PreviousToActionMenu"
         InteractiveContainer.CloseDialog()
         
     

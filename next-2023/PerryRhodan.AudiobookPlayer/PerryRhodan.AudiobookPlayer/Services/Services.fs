@@ -27,18 +27,18 @@ open Dependencies
 module DependencyServices =
 
 
-    type IAndroidDownloadFolder = 
-        abstract member GetAndroidDownloadFolder:unit -> string 
+    type IAndroidDownloadFolder =
+        abstract member GetAndroidDownloadFolder:unit -> string
 
-    type INotificationService = 
+    type INotificationService =
         abstract ShowMessage : string->string -> unit
 
     type IDownloadService =
         abstract member StartDownload: unit -> unit
 
     type IAndroidHttpMessageHandlerService =
-        abstract member GetHttpMesageHandler: unit -> HttpMessageHandler 
-        abstract member GetCookieContainer: unit -> CookieContainer 
+        abstract member GetHttpMesageHandler: unit -> HttpMessageHandler
+        abstract member GetCookieContainer: unit -> CookieContainer
         abstract member SetAutoRedirect: bool -> unit
 
     type ICloseApplication =
@@ -46,11 +46,11 @@ module DependencyServices =
 
     type IScreenService =
         abstract member GetScreenSize: unit -> {| Width:int; Height:int; ScaledDensity: float |}
-        
+
     type INavigationService =
         // abstract property
         abstract BackbuttonPressedAction:(unit->unit) option with get
-        
+
         abstract member RegisterBackbuttonPressed: (unit -> unit) -> unit
         /// resets the back button callback to none
         abstract member ResetBackbuttonPressed: unit -> unit
@@ -66,11 +66,11 @@ module DependencyServices =
         interface INavigationService with
             member this.BackbuttonPressedAction
                 with get() = backbuttonPressedAction
-        
+
             member this.RegisterBackbuttonPressed(action) =
                 backbuttonPressedAction <- Some action
 
-            member this.ResetBackbuttonPressed() = 
+            member this.ResetBackbuttonPressed() =
                 backbuttonPressedAction <- None
 
             member this.MemorizeBackbuttonCallback(memoId) =
@@ -83,8 +83,8 @@ module DependencyServices =
                     let func = Func<string,(unit->unit),(unit->unit)>(fun _ _ -> action)
                     concurrentDict.AddOrUpdate(memoId, action, func) |> ignore
                     this.ResetBackbuttonPressed()
-                
-                
+
+
             member this.RestoreBackbuttonCallback(memoId) =
                 let this = this :> INavigationService
                 let gotAction, storedAction = concurrentDict.TryGetValue(memoId)
@@ -94,7 +94,7 @@ module DependencyServices =
                     this.ResetBackbuttonPressed()
 
 module Consts =
-    
+
 
     let isToInternalStorageMigrated () =
         File.Exists (Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),".migrated"))
@@ -104,12 +104,12 @@ module Consts =
         fun () ->
             match folders with
             | None ->
-                
+
                 let currentLocalBaseFolder =
-                    let storageFolder = 
+                    let storageFolder =
                         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)
 
-                    let baseFolder = 
+                    let baseFolder =
                         let bf = Path.Combine(storageFolder,"PerryRhodan.AudioBookPlayer")
                         if not (Directory.Exists(bf)) then
                             Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),"PerryRhodan.AudioBookPlayer")
@@ -127,9 +127,9 @@ module Consts =
                     | ex ->
                         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),"PerryRhodan.AudioBookPlayer")
 
-                let currentLocalDataFolder =  
+                let currentLocalDataFolder =
                     Path.Combine(currentLocalBaseFolder,"data")
-                    
+
 
                 let stateFileFolder = Path.Combine(currentLocalDataFolder,"states")
                 let audioBooksStateDataFile = Path.Combine(stateFileFolder,"audiobooks.db")
@@ -162,8 +162,8 @@ module Notifications =
     let showNotification title message =
         let ns = notificationService.Force()
         ns.ShowMessage title message
-        
-        
+
+
     let showToasterMessage message =
         Dispatcher.UIThread.Invoke<unit> (fun _ ->
             let control = Border(
@@ -174,17 +174,17 @@ module Notifications =
             )
             InteractiveContainer.ShowToast (control, 3)
         )
-        
-        
-        
+
+
+
     let showErrorMessage (msg:string) =
         Dispatcher.UIThread.InvokeAsync<unit> (fun _ ->
             task {
                 let! _ = DialogHost.Show(MessageBoxViewModel("Achtung!", msg))
                 ()
             }
-        )    
-            
+        )
+
     let showMessage title (msg:string) =
         Dispatcher.UIThread.InvokeAsync<unit> (fun _ ->
             task {
@@ -192,8 +192,8 @@ module Notifications =
                 ()
             }
         )
-        
-        
+
+
     let showQuestionDialog title message okButtonLabel cancelButtonLabel =
         Dispatcher.UIThread.InvokeAsync<bool> (fun _ ->
             task {
@@ -201,7 +201,7 @@ module Notifications =
                 return res = "OK"
             }
         )
-        
+
 
 
 module DataBase =
@@ -209,10 +209,10 @@ module DataBase =
     open Consts
     open LiteDB
     open LiteDB.FSharp
-    
-    
-    
-    
+
+
+
+
     let mapper = FSharpBsonMapper()
 
     type StorageMsg =
@@ -220,7 +220,7 @@ module DataBase =
         | InsertAudioBooks of AudioBook [] * AsyncReplyChannel<Result<unit,string>>
         | GetAudioBooks of AsyncReplyChannel<AudioBook[]>
         | RemoveAudiobookFromDatabase of AudioBook * AsyncReplyChannel<Result<unit,string>>
-        | DeleteDatabase 
+        | DeleteDatabase
 
         | GetAudioBookFileInfo of int * AsyncReplyChannel<AudioBookAudioFilesInfo option>
         | InsertAudioBookFileInfos of AudioBookAudioFilesInfo [] * AsyncReplyChannel<Result<unit,string>>
@@ -239,10 +239,10 @@ module DataBase =
     let private insertNewAudioBooksDb (audioBooksStateDataFile:string) (audioBooks:AudioBook[]) =
         try
             use db = new LiteDatabase(audioBooksStateDataFile, mapper)
-            let audioBooksCol = 
+            let audioBooksCol =
                 db.GetCollection<AudioBook>("audiobooks")
 
-            audioBooksCol.InsertBulk(audioBooks) |> ignore                    
+            audioBooksCol.InsertBulk(audioBooks) |> ignore
             Ok ()
         with
         | e -> Error e.Message
@@ -261,7 +261,7 @@ module DataBase =
         use db = new LiteDatabase(audioBooksStateDataFile, mapper)
         let audioBooks = db.GetCollection<AudioBook>("audiobooks")
 
-        let res = 
+        let res =
             audioBooks.Delete(fun x -> x.Id = audioBook.Id)
 
         if res > -1
@@ -279,11 +279,11 @@ module DataBase =
 
     let private loadAudioBooksFromDb (audioBooksStateDataFile:string) =
         initAppFolders ()
-                
+
         use db = new LiteDatabase(audioBooksStateDataFile, mapper)
-        let audioBooks = 
+        let audioBooks =
             db.GetCollection<AudioBook>("audiobooks")
-                .FindAll()                             
+                .FindAll()
                 |> Seq.toArray
                 |> Array.sortBy (_.FullName)
                 |> Array.Parallel.map (
@@ -305,51 +305,51 @@ module DataBase =
             FileName:string
             Duration:int
         }
-        
+
         type AudioBookAudioFilesInfoDb = {
             Id: int
             AudioFiles: AudioBookAudioFileDb list
         }
-                
+
         let private fromMsSpan (ts:int) =
             TimeSpan.FromMilliseconds ts
-            
+
         let private fromTimeSpan (ts:TimeSpan) =
             ts.TotalMilliseconds |> int
-            
+
         let private toDomain (info:AudioBookAudioFilesInfoDb) =
             {
                 AudioBookAudioFilesInfo.Id = info.Id
-                AudioFiles = 
+                AudioFiles =
                     info.AudioFiles
-                    |> List.map (fun f -> 
+                    |> List.map (fun f ->
                         {
                             AudioBookAudioFile.FileName = f.FileName
                             Duration = f.Duration |> fromMsSpan
                         }
                     )
             }
-            
+
         let private fromDomain (info:AudioBookAudioFilesInfo) =
             {
                 Id = info.Id
-                AudioFiles = 
+                AudioFiles =
                     info.AudioFiles
-                    |> List.map (fun f -> 
+                    |> List.map (fun f ->
                         {
                             FileName = f.FileName
                             Duration = f.Duration |> fromTimeSpan
                         }
                     )
             }
-        
+
         let loadAudioBookAudioFileInfosFromDb (audioBookAudioFileDb:string) =
             use db = new LiteDatabase(audioBookAudioFileDb, mapper)
-            let infos = 
+            let infos =
                 db.GetCollection<AudioBookAudioFilesInfoDb>("audiobookfileinfos")
-                    .FindAll()                             
+                    .FindAll()
                     |> Seq.toArray
-                    
+
 
             infos |> Array.Parallel.map toDomain
 
@@ -357,14 +357,14 @@ module DataBase =
         let addAudioFilesInfoToAudioBook (audioBookAudioFileDb:string) (audioFileInfos:AudioBookAudioFilesInfo []) =
             try
                 use db = new LiteDatabase(audioBookAudioFileDb, mapper)
-                let audioBooksCol = 
+                let audioBooksCol =
                     db.GetCollection<AudioBookAudioFilesInfoDb>("audiobookfileinfos")
 
                 let toInsert =
                     audioFileInfos
                     |> Array.Parallel.map fromDomain
-                
-                audioBooksCol.InsertBulk(toInsert) |> ignore                    
+
+                audioBooksCol.InsertBulk(toInsert) |> ignore
                 Ok ()
             with
             | e -> Error e.Message
@@ -373,7 +373,7 @@ module DataBase =
         let updateAudioBookFileInfo (audioBookAudioFileDb:string) (audioFileInfo:AudioBookAudioFilesInfo) =
             use db = new LiteDatabase(audioBookAudioFileDb, mapper)
             let audioBooks = db.GetCollection<AudioBookAudioFilesInfoDb>("audiobookfileinfos")
-            
+
             let audioFileInfo = audioFileInfo |> fromDomain
             if audioBooks.Update audioFileInfo then
                 (Ok ())
@@ -385,7 +385,7 @@ module DataBase =
             use db = new LiteDatabase(audioBookAudioFileDb, mapper)
             let audioBooks = db.GetCollection<AudioBookAudioFilesInfoDb>("audiobookfileinfos")
 
-            let res = 
+            let res =
                 audioBooks.Delete(fun x -> x.Id = audioFileInfo.Id)
 
             if  res > -1
@@ -399,8 +399,8 @@ module DataBase =
     }
 
     // lazy evaluation, to avoid try loading data without permission
-    let private storageProcessor = 
-        lazy 
+    let private storageProcessor =
+        lazy
         MailboxProcessor<StorageMsg>.Start(
             fun inbox ->
                 let mutable reloadedAfterFailedInsert = false
@@ -420,15 +420,15 @@ module DataBase =
 
                                 {
                                     AudioBooks = audioBooks
-                                    AudioBookAudioFilesInfos = audioFileInfos 
+                                    AudioBookAudioFilesInfos = audioFileInfos
                                 }
                             with
                             | ex ->
                                 Notifications.showErrorMessage ex.Message |> ignore
                                 reraise ()
 
-                        let initState = loadStateFromDb ()    
-                    
+                        let initState = loadStateFromDb ()
+
                         let rec loop (state:StorageState) =
                             async {
                                 let! msg = inbox.Receive()
@@ -445,7 +445,7 @@ module DataBase =
                                                 else
                                                     i
                                             )
-                                        
+
                                         replyChannel.Reply(Ok ())
                                         return! (loop { state with AudioBooks = newState })
                                     | Error e ->
@@ -458,7 +458,7 @@ module DataBase =
                                     | Ok _ ->
                                         let newState =
                                             state.AudioBooks |> Array.append audiobooks
-                                        
+
                                         replyChannel.Reply(Ok ())
                                         return! (loop { state with AudioBooks = newState })
                                     | Error e ->
@@ -483,7 +483,7 @@ module DataBase =
                                         let newState =
                                             state.AudioBooks |> Array.filter (fun i -> i.Id <> audiobook.Id)
 
-                                        
+
                                         replyChannel.Reply(Ok ())
                                         return! (loop { state with AudioBooks = newState })
                                     | Error e ->
@@ -504,7 +504,7 @@ module DataBase =
                                     return! loop state
 
                                 | InsertAudioBookFileInfos (infos,replyChannel) ->
-                                    
+
                                     // remove already saved
                                     let infos =
                                         infos
@@ -514,7 +514,7 @@ module DataBase =
                                     let newState =
                                         {
                                             state with
-                                                AudioBookAudioFilesInfos = 
+                                                AudioBookAudioFilesInfos =
                                                     state.AudioBookAudioFilesInfos
                                                     |> Array.append infos
                                         }
@@ -528,12 +528,12 @@ module DataBase =
                                         return! loop newState
 
 
-                                    
+
                                 | UpdateAudioBookFileInfo (info,replyChannel) ->
                                     let newState =
                                         {
                                             state with
-                                                AudioBookAudioFilesInfos = 
+                                                AudioBookAudioFilesInfos =
                                                     state.AudioBookAudioFilesInfos
                                                     |> Array.map (fun i ->
                                                         if info.Id = i.Id then
@@ -550,17 +550,17 @@ module DataBase =
                                         return! loop state
                                     | Ok _ ->
                                         return! loop newState
-                                    
+
                                 | DeleteAudioBookFileInfo (id,replyChannel) ->
                                     let newState =
                                         {
                                             state with
-                                                AudioBookAudioFilesInfos = 
+                                                AudioBookAudioFilesInfos =
                                                     state.AudioBookAudioFilesInfos
                                                     |> Array.filter (fun i -> i.Id <> id)
                                         }
 
-                                    let info = 
+                                    let info =
                                         state.AudioBookAudioFilesInfos
                                         |> Array.tryFind (fun i -> i.Id = id)
 
@@ -569,7 +569,7 @@ module DataBase =
                                         replyChannel.Reply(Ok())
                                         return! loop state
                                     | Some info ->
-                                        let res = AudioBookFiles.deleteAudioBookInfoFromDb folders.audioBookAudioFileInfoDb info 
+                                        let res = AudioBookFiles.deleteAudioBookInfoFromDb folders.audioBookAudioFileInfoDb info
                                         replyChannel.Reply(res)
                                         match res with
                                         | Error _ ->
@@ -577,7 +577,7 @@ module DataBase =
                                         | Ok _ ->
                                             return! loop newState
                             }
-                        
+
                         return! (loop initState)
 
                         let weschoulndenduphere = 0
@@ -587,39 +587,39 @@ module DataBase =
                         //storageProcessorErrorEvent.Trigger(ex)
                         failwith "machine down!"
                 }
-                
-                    
+
+
         )
 
 
-    
-    
+
+
     let loadAudioBooksStateFile () =
         storageProcessor.Force().PostAndAsyncReply(GetAudioBooks) |> Async.StartAsTask
-    
+
 
     let loadDownloadedAudioBooksStateFile () =
-        storageProcessor.Force().PostAndAsyncReply(GetAudioBooks)        
+        storageProcessor.Force().PostAndAsyncReply(GetAudioBooks)
         |> Async.map (fun res ->
             res |> Array.filter (_.State.Downloaded)
         )
         |> Async.StartAsTask
-        
+
 
     let insertNewAudioBooksInStateFile (audioBooks:AudioBook[]) =
-        let msg replyChannel = 
+        let msg replyChannel =
             InsertAudioBooks (audioBooks,replyChannel)
         storageProcessor.Force().PostAndAsyncReply(msg) |> Async.StartAsTask
 
 
     let updateAudioBookInStateFile (audioBook:AudioBook) =
-        let msg replyChannel = 
+        let msg replyChannel =
             UpdateAudioBook (audioBook,replyChannel)
         storageProcessor.Force().PostAndAsyncReply(msg) |> Async.StartAsTask
 
 
     let removeAudiobookFromDatabase audiobook =
-        let msg replyChannel = 
+        let msg replyChannel =
             RemoveAudiobookFromDatabase (audiobook,replyChannel)
         storageProcessor.Force().PostAndAsyncReply(msg) |> Async.StartAsTask
 
@@ -628,39 +628,39 @@ module DataBase =
         storageProcessor.Force().Post(DeleteDatabase)
 
 
-    
-        
+
+
 
 
     let getAudioBookFileInfo id =
-        let msg replyChannel = 
+        let msg replyChannel =
             GetAudioBookFileInfo (id,replyChannel)
         storageProcessor.Force().PostAndAsyncReply(msg) |> Async.StartAsTask
 
     let getAudioBookFileInfoTimeout timeout id =
-        let msg replyChannel = 
+        let msg replyChannel =
             GetAudioBookFileInfo (id,replyChannel)
         storageProcessor.Force().TryPostAndReply(msg,timeout)
         |> Option.bind (fun i -> i)
-        
+
     let insertAudioBookFileInfos infos =
-        let msg replyChannel = 
+        let msg replyChannel =
             InsertAudioBookFileInfos (infos,replyChannel)
         storageProcessor.Force().PostAndAsyncReply(msg)
 
     let updateAudioBookFileInfo info =
-        let msg replyChannel = 
+        let msg replyChannel =
             UpdateAudioBookFileInfo (info,replyChannel)
         storageProcessor.Force().PostAndAsyncReply(msg)
-    
+
     let deleteAudioBookFileInfo id =
-        let msg replyChannel = 
+        let msg replyChannel =
             DeleteAudioBookFileInfo (id,replyChannel)
         storageProcessor.Force().PostAndAsyncReply(msg)
 
 
 
-    let removeAudiobook audiobook = 
+    let removeAudiobook audiobook =
         task {
             try
                 match audiobook.State.DownloadedFolder with
@@ -672,18 +672,18 @@ module DataBase =
                     let! res = deleteAudioBookFileInfo audiobook.Id
                     return res
             with
-            | e -> 
+            | e ->
                 return Error e.Message
         }
 
-    
+
     let parseDownloadFolderForAlreadyDownloadedAudioBooks () =
         let folders = createCurrentFolders ()
 
         if (not (Directory.Exists(folders.audioBookDownloadFolderBase))) then
             [||]
         else
-            let directories = Directory.EnumerateDirectories(folders.audioBookDownloadFolderBase)    
+            let directories = Directory.EnumerateDirectories(folders.audioBookDownloadFolderBase)
             directories
             |> Seq.map (
                 fun lookupPath ->
@@ -693,8 +693,8 @@ module DataBase =
                     else
                         let picFiles = Directory.EnumerateFiles(lookupPath,"*.jpg")
                         let thumb = picFiles |> Seq.tryFind (fun f -> f = Path.Combine(lookupPath,audioBookName + ".thumb.jpg"))
-                        let pic = picFiles |> Seq.tryFind (fun f -> f = Path.Combine(lookupPath,audioBookName + ".jpg"))                    
-                        let audioPath = Path.Combine(lookupPath,"audio")                    
+                        let pic = picFiles |> Seq.tryFind (fun f -> f = Path.Combine(lookupPath,audioBookName + ".jpg"))
+                        let audioPath = Path.Combine(lookupPath,"audio")
                         let hasAudioBook =
                             if Directory.Exists(audioPath) then
                                 let audioFiles = Directory.EnumerateFiles(audioPath,"*.mp3")
@@ -703,19 +703,19 @@ module DataBase =
                                 (audioFiles |> Seq.length) > 0 && not hasCorruptDownloadingFlagFile
                             else false
                         let audioBookPath = if hasAudioBook then Some audioPath else None
-                        Some {| 
+                        Some {|
                             Name = audioBookName
                             Pic = pic
                             Thumb = thumb
                             HasAudioBook = hasAudioBook
-                            AudioBookPath = audioBookPath 
+                            AudioBookPath = audioBookPath
                         |}
             )
             |> Seq.choose id
             |> Seq.toArray
-            
-    
-    
+
+
+
     let getAudiobooksFromDownloadFolder audiobooks =
         let audioBooksOnDevice = parseDownloadFolderForAlreadyDownloadedAudioBooks ()
         let result =
@@ -729,19 +729,19 @@ module DataBase =
                     | None -> None
                     | Some audiobook ->
                         let newState = {
-                            audiobook.State with 
+                            audiobook.State with
                                 Downloaded = onDeviceItem.HasAudioBook
                                 DownloadedFolder=onDeviceItem.AudioBookPath
                         }
                         Some {
-                            audiobook with 
+                            audiobook with
                                 State = newState
                                 Picture = onDeviceItem.Pic
                                 Thumbnail = onDeviceItem.Thumb
                         }
             )
         result
-   
+
 
 
 module WebAccess =
@@ -751,9 +751,9 @@ module WebAccess =
     open System.Net.Sockets
     open Microsoft.AppCenter.Crashes
     open Microsoft.AppCenter.Analytics
-    
-    
-    let httpHandlerService = lazy DependencyService.Get<DependencyServices.IAndroidHttpMessageHandlerService>()    
+
+
+    let httpHandlerService = lazy DependencyService.Get<DependencyServices.IAndroidHttpMessageHandlerService>()
     let currentHttpClientHandler = lazy httpHandlerService.Force().GetHttpMesageHandler()
     let currentCookieContainer = lazy httpHandlerService.Force().GetCookieContainer()
     let httpClient = lazy (new HttpClient(currentHttpClientHandler.Force()))
@@ -780,14 +780,14 @@ module WebAccess =
                 | _ ->
                     return Error (Other Translations.current.InternalError)
         }
-        
-    
-    
+
+
+
     let login username password =
         task {
-            
+
             let! res =
-                fun () -> 
+                fun () ->
                     http {
                         POST $"{baseUrl}butler.php"
                         body
@@ -801,7 +801,7 @@ module WebAccess =
                     |> Request.sendTAsync
                 |> handleException
 
-            return 
+            return
                 res
                 |> Result.bind(
                     fun resp ->
@@ -810,38 +810,38 @@ module WebAccess =
                             |> Seq.filter (fun m -> m.Key = "Location")
                             |> Seq.tryHead
                         match location with
-                        | None -> 
+                        | None ->
                             Analytics.TrackEvent("no location on login response found")
                             Error (Other Translations.current.UnexpectedServerBehaviorError)
                         | Some v ->
-                            
+
                             let value = v.Value |> Seq.head
                             if value.Contains("98") then Ok None
-                            else if value.Contains("61") then 
-                                let cookies = 
+                            else if value.Contains("61") then
+                                let cookies =
                                     currentCookieContainer.Force().GetCookies(Uri(baseUrl))
-                                    |> Seq.cast<Cookie>                                    
+                                    |> Seq.cast<Cookie>
                                     |> Seq.map (fun cc -> (cc.Name,cc.Value))
                                     |> Map.ofSeq
                                 Ok (Some cookies)
-                            else Ok None                        
+                            else Ok None
                 )
-        
-                
+
+
         }
 
-    
-        
+
+
 
 
     let getDownloadPage (cc:Map<string,string>) =
-        task {       
+        task {
             let seqCC = cc |> Map.toSeq
 
             let! res =
                 fun () ->
                     task {
-                        let! resp = 
+                        let! resp =
                             http {
                                 GET $"{baseUrl}index.php?id=61"
                                 headers [
@@ -850,29 +850,29 @@ module WebAccess =
                                 config_transformHttpClient (useAndroidHttpClient true)
                             }
                             |> Request.sendTAsync
-                        
+
                         return! resp |> Response.toTextAsync
                     }
                 |> handleException
 
-            return res 
+            return res
                 |> Result.bind (
                     fun html ->
                         if html.Contains("<input name=\"username\"") then Error (SessionExpired Translations.current.SessionExpired)
                         else Ok html
                 )
         }
-    
-    
+
+
     let getAudiobooksOnline cookies =
         task {
-            initAppFolders ()        
-           
+            initAppFolders ()
+
             let! html = getDownloadPage cookies
             let audioBooks =
                 html
                 |> Result.map parseDownloadData
-    
+
             return audioBooks
         }
 
@@ -908,20 +908,20 @@ module WebAccess =
                             else
                                 Ok downloadUrl
                 )
-                
-            
+
+
         }
 
-    
-    
+
+
     module Downloader =
-        
+
         type UpdateProgress = {
             UpdateProgress:int * int -> unit
             FileSize:int
             CurrentProgress:int
         }
-            with 
+            with
                 static member create updateProgress filesize currentProgress =
                     {
                         UpdateProgress = updateProgress
@@ -936,7 +936,7 @@ module WebAccess =
                 seq {
                     let mutable copying = true
                     while copying do
-                        let bytesRead = src.Read(buffer,0,buffer.Length)    
+                        let bytesRead = src.Read(buffer,0,buffer.Length)
                         if bytesRead > 0 then
                             dst.Write(buffer, 0, bytesRead)
                             yield bytesRead
@@ -946,7 +946,7 @@ module WebAccess =
                 }
 
             dowloadStreamSeq
-            
+
 
 
 
@@ -958,7 +958,7 @@ module WebAccess =
                 File.Delete(extractFullPath)
 
             use streamWriter = File.Create(extractFullPath)
-            let progress = 
+            let progress =
                 copyStream zipStream streamWriter
                 |> Seq.map (fun bytesRead -> ((bytesRead |> float) * scale) |> int)
                 |> Seq.fold (fun state progress ->
@@ -969,18 +969,18 @@ module WebAccess =
                     newProgress
                 ) 0
             streamWriter.Close()
-            progress   
+            progress
 
 
         let private processPicFile (updateProgress:UpdateProgress) zipStream audioBookFolder (audiobook:AudioBook) (entry:ZipEntry) =
-            let scale = (entry.CompressedSize |> float) / (entry.Size |> float)            
+            let scale = (entry.CompressedSize |> float) / (entry.Size |> float)
             let imageFullName = Path.Combine(audioBookFolder,$"{audiobook.Id}.jpg")
 
             // try download picture if necessary
             let progress =
                 if not (File.Exists(imageFullName)) then
                     use streamWriter = File.Create(imageFullName)
-                    let progress = 
+                    let progress =
                         copyStream zipStream streamWriter
                         |> Seq.map (fun bytesRead -> ((bytesRead |> float) * scale) |> int)
                         |> Seq.fold (fun state progress ->
@@ -990,15 +990,15 @@ module WebAccess =
                             updateProgress.UpdateProgress ( displayProgress / (1024 * 1024), updateProgress.FileSize / (1024 * 1024))
                             newProgress
                         ) 0
-                        
-                    streamWriter.Close()                                        
+
+                    streamWriter.Close()
                     progress
                 else
                     entry.Size |> int
-            
-            
+
+
             let thumbFullName = Path.Combine(audioBookFolder,$"{audiobook.Id}.thumb.jpg")
-                    
+
             // try create thumb nail picture if necessary
             if not (File.Exists(thumbFullName)) then
 
@@ -1011,9 +1011,9 @@ module WebAccess =
                     use thumbImage = SKImage.FromBitmap(thumb)
                     use fileStream = new FileStream(thumbFullName,FileMode.Create)
                     thumbImage.Encode(SKEncodedImageFormat.Jpeg,90).SaveTo(fileStream)
-                  
+
                     fileStream.Close()
-        
+
             progress
 
 
@@ -1035,42 +1035,42 @@ module WebAccess =
 
                     let folders = createCurrentFolders ()
 
-                    if audiobook.State.Downloaded then 
+                    if audiobook.State.Downloaded then
                         return Error (Other "Audiobook already downloaded!")
                     else
-                        let audioBookFolder = Path.Combine(folders.audioBookDownloadFolderBase,$"{audiobook.Id}")        
+                        let audioBookFolder = Path.Combine(folders.audioBookDownloadFolderBase,$"{audiobook.Id}")
                         if not (Directory.Exists(audioBookFolder)) then
                             Directory.CreateDirectory(audioBookFolder) |> ignore
-                    
+
                         let noMediaFile = Path.Combine(audioBookFolder,".nomedia")
                         if File.Exists(noMediaFile) |> not then
                             do! File.WriteAllTextAsync(noMediaFile,"") |> Async.AwaitTask
 
                         match audiobook.DownloadUrl with
                         | None -> return Error (Other Translations.current.NoDownloadUrlFoundError)
-                        | Some abDownloadUrl ->    
+                        | Some abDownloadUrl ->
                             let! downloadUrl = (abDownloadUrl |> getDownloadUrl cookies)
                             match downloadUrl with
-                            | Error e -> 
+                            | Error e ->
                                 return Error e
 
-                            | Ok url -> 
+                            | Ok url ->
                                 try
-                                    
 
-                                    let! resp = 
-                                        http { 
-                                            GET url 
+
+                                    let! resp =
+                                        http {
+                                            GET url
                                             config_transformHttpClient (useAndroidHttpClient true)
                                         }
                                         |> Request.sendAsync
 
-                                    if (resp.statusCode <> HttpStatusCode.OK) then 
+                                    if (resp.statusCode <> HttpStatusCode.OK) then
                                         return Error (Other $"download statuscode {resp.statusCode}")
                                     else
-                                
+
                                         let unzipTargetFolder = Path.Combine(audioBookFolder,"audio")
-                                        
+
 
 
                                         if not (Directory.Exists(unzipTargetFolder)) then
@@ -1081,11 +1081,11 @@ module WebAccess =
                                         // create flag file, to determinate download was maybe interrupted!
                                         File.WriteAllText(downloadingFlagFile,"downloading")
 
-                                
-                                        let fileSize = 
+
+                                        let fileSize =
                                             (resp.content.Headers
                                             |> HttpHelpers.getFileSizeFromHttpHeadersOrDefaultValue 0)
-                                    
+
                                         let! responseStream = resp |> Response.toStreamAsync
                                         use zipStream = new ZipInputStream(responseStream)
 
@@ -1096,9 +1096,9 @@ module WebAccess =
                                                     match zipStream.GetNextEntry() with
                                                     | null ->
                                                         entryAvailable <- false
-                                                    | entry -> 
+                                                    | entry ->
                                                         yield entry
-                                            
+
                                             }
 
                                         let! gloablProgress =
@@ -1110,7 +1110,7 @@ module WebAccess =
                                                         let progress =
                                                             match entry with
                                                             | ZipHelpers.Mp3File ->
-                                                                entry |> processMp3File updateProgress zipStream unzipTargetFolder 
+                                                                entry |> processMp3File updateProgress zipStream unzipTargetFolder
                                                             | ZipHelpers.PicFile ->
                                                                 entry |> processPicFile updateProgress zipStream audioBookFolder audiobook
                                                             | _ ->
@@ -1121,18 +1121,18 @@ module WebAccess =
                                                         newProgress
                                                     ) 0
                                             }
-                                            
-                                
+
+
                                         zipStream.Close()
-                                        responseStream.Close()    
-                                        
+                                        responseStream.Close()
+
                                         updateProgress (fileSize / (1024 * 1024), fileSize / (1024 * 1024))
 
 
                                         let imageFullName = Path.Combine(audioBookFolder,$"{audiobook.Id}.jpg")
                                         let thumbFullName = Path.Combine(audioBookFolder,$"{audiobook.Id}.thumb.jpg")
 
-                                        let imageFileNames = 
+                                        let imageFileNames =
                                             if File.Exists(imageFullName) && File.Exists(thumbFullName) then
                                                 Some <| { Image = imageFullName; Thumbnail = thumbFullName }
                                             else None
@@ -1144,7 +1144,7 @@ module WebAccess =
                                             TargetFolder = unzipTargetFolder
                                             Images = imageFileNames
                                         }
-                                       
+
                                     with
                                     | :? WebException | :? SocketException ->
                                         return Error (Network Translations.current.NetworkError)
@@ -1173,8 +1173,8 @@ module WebAccess =
             | Some ps ->
                 let productPageUri = Uri(baseUrl + ps)
 
-                let! productPageRes = 
-                    fun () -> 
+                let! productPageRes =
+                    fun () ->
                         task {
                             let! res =
                                 http {
@@ -1182,14 +1182,14 @@ module WebAccess =
                                     config_transformHttpClient (useAndroidHttpClient true)
                                 }
                                 |> Request.sendTAsync
-                            if (res.statusCode <> HttpStatusCode.OK) then 
+                            if (res.statusCode <> HttpStatusCode.OK) then
                                 return ""
                             else
                                 return! res |> Response.toTextAsync
                         }
                     |> handleException
 
-                
+
                 return productPageRes
                     |> Result.bind (
                         fun productPage ->
@@ -1197,26 +1197,26 @@ module WebAccess =
                                 Error (Other Translations.current.ProductPageEmptyError)
                             else
                                 let desc = productPage |> parseProductPageForDescription
-                                let img = 
-                                    productPage 
+                                let img =
+                                    productPage
                                     |> parseProductPageForImage
                                     |> Option.map (fun i ->
                                         let uri = Uri(baseUrl + i)
                                         uri.AbsoluteUri
                                     )
-                                    
-                                    
+
+
                                 Ok (desc,img)
                     )
-                
-                
+
+
         }
 
 
 module SecureStorageHelper =
-    
+
     open Microsoft.Maui.Storage
-    
+
     let getSecuredValue key =
         task {
             if OperatingSystem.IsAndroid() then
@@ -1240,8 +1240,8 @@ module SecureStorageHelper =
             elif OperatingSystem.IsWindows() then
                 let _ = File.WriteAllTextAsync($"store-{key}.txt", value)
                 ()
-            
-            return ()            
+
+            return ()
         }
 
 
@@ -1263,7 +1263,7 @@ module SecureLoginStorage =
             with
             | e -> return (Error e.Message)
         }
-    
+
     let loadLoginCredentials () =
         task {
             try
@@ -1285,15 +1285,15 @@ module SecureLoginStorage =
             with
             | e -> return (Error e.Message)
         }
-        
-        
+
+
     let loadCookie () =
         task {
             try
                 let! cookie =
                     secCookieKey
                     |> getSecuredValue
-                return cookie |> Option.map (fun i -> JsonConvert.DeserializeObject<Map<string,string>>(i)) |> Ok 
+                return cookie |> Option.map (fun i -> JsonConvert.DeserializeObject<Map<string,string>>(i)) |> Ok
             with
             | e -> return (Error e.Message)
         }
@@ -1301,23 +1301,23 @@ module SecureLoginStorage =
 
 module Files =
 
-    
+
 
     let getMp3FileList folder =
         async {
-            let! files = 
-                async { 
+            let! files =
+                async {
                     try
                         return Directory.EnumerateFiles(folder, "*.mp3")
                     with
                     | _ -> return Seq.empty
                 }
-            
+
             let! res =
                 async {
                     return
-                        files 
-                        |> Seq.toList 
+                        files
+                        |> Seq.toList
                         |> List.map (
                             fun i ->
                                 use tfile = TagLib.File.Create(i)
@@ -1333,29 +1333,31 @@ module SystemSettings =
     open SecureStorageHelper
     open Common.StringHelpers
 
-    let defaultRewindWhenStartAfterShortPeriodInSec = 5
-    let defaultRewindWhenStartAfterLongPeriodInSec = 30
-    let defaultLongPeriodBeginsAfterInMinutes = 60
-    let defaultAudioJumpDistance = 30000
+    let private defaultRewindWhenStartAfterShortPeriodInSec = 5
+    let private defaultRewindWhenStartAfterLongPeriodInSec = 30
+    let private defaultLongPeriodBeginsAfterInMinutes = 60
+    let private defaultAudioJumpDistance = 30000
 
     let private keyRewindWhenStartAfterShortPeriodInSec = "PerryRhodanAudioBookRewindWhenStartAfterShortPeriodInSec"
     let private keykeyRewindWhenStartAfterLongPeriodInSec ="PerryRhodanAudioBookRewindWhenStartAfterLongPeriodInSec"
     let private keyLongPeriodBeginsAfterInMinutes ="PerryRhodanAudioBookLongPeriodBeginsAfterInMinutes"
     let private keyAudioJumpDistance = "PerryRhodanAudioBookAudioJumpDistance"
     let private keyDeveloperMode= "PerryRhodanAudioBookDeveloperModee"
+    let private keyIsFirstStart= "IsFirstStart"
+    let private keyPlaybackSpeed= "PlaybackSpeed"
 
     let getRewindWhenStartAfterShortPeriodInSec () =
-        keyRewindWhenStartAfterShortPeriodInSec 
+        keyRewindWhenStartAfterShortPeriodInSec
         |> getSecuredValue
         |> Async.AwaitTask
         |> Async.map (fun result ->
             result |> optToInt defaultRewindWhenStartAfterShortPeriodInSec
         )
-        
+
 
 
     let getRewindWhenStartAfterLongPeriodInSec () =
-        keykeyRewindWhenStartAfterLongPeriodInSec 
+        keykeyRewindWhenStartAfterLongPeriodInSec
         |> getSecuredValue
         |> Async.AwaitTask
         |> Async.map (fun result ->
@@ -1364,30 +1366,46 @@ module SystemSettings =
 
 
     let getLongPeriodBeginsAfterInMinutes () =
-        keyLongPeriodBeginsAfterInMinutes 
+        keyLongPeriodBeginsAfterInMinutes
         |> getSecuredValue
         |> Async.AwaitTask
         |> Async.map (fun result ->
             result |> optToInt defaultLongPeriodBeginsAfterInMinutes
         )
 
-    
+
     let getJumpDistance () =
-        keyAudioJumpDistance 
+        keyAudioJumpDistance
         |> getSecuredValue
         |> Async.AwaitTask
         |> Async.map (fun result ->
-            result |> optToInt defaultAudioJumpDistance
+            let distance = result |> optToInt defaultAudioJumpDistance
+            if distance < 1000 then 1000 else distance
         )
 
     let getDeveloperMode () =
-        keyDeveloperMode 
+        keyDeveloperMode
         |> getSecuredValue
         |> Async.AwaitTask
         |> Async.map (fun result ->
             result |> Option.map(fun v -> v = "true") |> Option.defaultValue false
         )
 
+    let getIsFirstStart () =
+        keyIsFirstStart
+        |> getSecuredValue
+        |> Async.AwaitTask
+        |> Async.map (fun result ->
+            result |> Option.map(fun v -> v = "true") |> Option.defaultValue true
+        )
+
+    let getPlaybackSpeed () =
+        keyPlaybackSpeed
+        |> getSecuredValue
+        |> Async.AwaitTask
+        |> Async.map (fun result ->
+            result |> Option.map(fun v -> Decimal.Parse(v)) |> Option.defaultValue 1.0m
+        )
 
     let setRewindWhenStartAfterShortPeriodInSec (value:int) =
         keyRewindWhenStartAfterShortPeriodInSec |> setSecuredValue (value.ToString())
@@ -1407,10 +1425,17 @@ module SystemSettings =
     let setDeveloperMode(value:bool) =
         keyDeveloperMode |> setSecuredValue (if value then "true" else "false")
 
- 
+    let setIsFirstStart(value:bool) =
+        keyIsFirstStart |> setSecuredValue (if value then "true" else "false")
+
+
+    let setPlaybackSpeed(value:decimal) =
+        keyPlaybackSpeed |> setSecuredValue (value.ToString())
+
+
 module SupportFeedback =
 
-    
+
     type Message = {
         Category:string
         Name:string
@@ -1419,7 +1444,7 @@ module SupportFeedback =
 
     let sendSupportFeedBack name category message =
         async {
-            
+
             let msg = {
                 Category = category
                 Message = message
@@ -1442,7 +1467,7 @@ module SupportFeedback =
 
 
 module DownloadService =
-    
+
     type DownloadState =
         | Open
         | Running of int * int
@@ -1450,7 +1475,7 @@ module DownloadService =
         | Failed of ComError
 
 
-    type DownloadInfo = 
+    type DownloadInfo =
         {
             State:DownloadState
             AudioBook:AudioBook
@@ -1491,7 +1516,7 @@ module DownloadService =
         | RemoveDownload of DownloadInfo
 
         | RegisterServiceListener of ServiceListener
-        
+
         | SignalError of DownloadInfo * ComError
         | SignalServiceCrashed of exn
         | SignalServiceShutDown
@@ -1507,7 +1532,7 @@ module DownloadService =
 
     type private HandlerState = {
         ServiceListener: ServiceListener option
-        Listeners: Listener list 
+        Listeners: Listener list
         ErrorEventListener: ErrorEventHandler option
         ShutdownEvent: ShutDownEventHandler option
     }
@@ -1516,7 +1541,7 @@ module DownloadService =
     let private downloadServiceCallback =
         lazy MailboxProcessor<Msg>.Start(
                  let downloadService = DependencyService.Get<DependencyServices.IDownloadService>()
-                 
+
                  fun inbox ->
                     let rec loop (state:HandlerState) =
                          async {
@@ -1551,7 +1576,7 @@ module DownloadService =
                                      | Some listener ->
                                          listener <| ServiceMessages.StartDownloads
                                          return! loop state
-                                         
+
 
                                  | AddDownload info ->
                                      match state.ServiceListener with
@@ -1606,7 +1631,7 @@ module DownloadService =
                                      else
                                         // replace listener
                                         return! loop { state with Listeners = state.Listeners |> List.map (fun (k,h) -> if k = key then (key,handler) else (k,h)) }
-                                        
+
                                  | RemoveInfoListener key ->
                                      let newState =
                                          { state with Listeners = state.Listeners |> List.filter (fun (k,_) -> k <> key) }
@@ -1614,24 +1639,24 @@ module DownloadService =
                                  | SendInfo info ->
                                      // send info only to listener with proper name
                                      let listenerName = $"AudioBook{info.AudioBook.Id}Listener"
-                                     do! 
-                                         state.Listeners 
+                                     do!
+                                         state.Listeners
                                          |> List.tryFind (fun (k,_) -> k = listenerName)
                                          |> Option.map (fun (_,handler) -> async { do! handler(info) })
                                          |> Option.defaultValue (async { return () })
 
                                      return! loop state
-                                     
+
                                  | GetState reply ->
                                      match state.ServiceListener with
                                      | None ->
                                          reply.Reply(None)
                                          return! loop state
-                                         
+
                                      | Some listener ->
                                          listener <| ServiceMessages.GetState reply
                                          return! loop state
-                                         
+
                              with
                              | ex ->
                                 Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
@@ -1641,7 +1666,7 @@ module DownloadService =
                         }
 
                     loop { Listeners = []; ShutdownEvent = None; ServiceListener = None; ErrorEventListener = None }
-                         
+
              )
 
 
@@ -1671,7 +1696,7 @@ module DownloadService =
 
 
     let signalError error =
-        downloadServiceCallback.Force().Post <| SignalError error 
+        downloadServiceCallback.Force().Post <| SignalError error
 
 
     let signalServiceCrashed ex =
@@ -1707,7 +1732,7 @@ module DownloadService =
 
 
     module External =
-        
+
 
         type Msg =
             | AddDownload of DownloadInfo
@@ -1720,18 +1745,18 @@ module DownloadService =
             | GetState of AsyncReplyChannel<DownloadServiceState>
 
 
-        let createExternalDownloadService 
+        let createExternalDownloadService
             startDownload
-            shutDownExternalService 
+            shutDownExternalService
             updateNotification =
-            
+
             MailboxProcessor<Msg>.Start(
                 fun inbox ->
                     let rec loop (state:DownloadServiceState) =
                         async {
                             try
                                 let! msg = inbox.Receive()
-                                    
+
                                 match msg with
                                 | StartDownload ->
                                     match state.CurrentDownload with
@@ -1741,8 +1766,8 @@ module DownloadService =
                                         inbox.Post StartDownload
                                         return! loop state
                                     | None ->
-                                        let openDownloads =  
-                                            state.Downloads 
+                                        let openDownloads =
+                                            state.Downloads
                                             |> List.filter (fun i -> i.State = Open)
 
                                         let download =
@@ -1755,8 +1780,8 @@ module DownloadService =
                                             if state.Downloads |> List.exists (fun i -> match i.State with | Failed (ComError.Network _) -> true | _ -> false) then
                                                 let newState =
                                                     { state with
-                                                        Downloads = 
-                                                            state.Downloads 
+                                                        Downloads =
+                                                            state.Downloads
                                                             |> List.map (fun i -> match i.State with | Failed (ComError.Network _) -> { i with State = Open } | _ -> i)
                                                     }
                                                 // wait a moment to try again
@@ -1769,16 +1794,16 @@ module DownloadService =
                                                 return! loop state
 
                                         | Some download ->
-                                            let download = 
-                                                { download 
-                                                    with 
+                                            let download =
+                                                { download
+                                                    with
                                                         State = DownloadState.Running (0,0)
                                                 }
 
-                                            let newState = 
-                                                { state with 
-                                                    CurrentDownload = Some download 
-                                                    Downloads = state.Downloads |> List.map (fun i -> if i.AudioBook.Id = download.AudioBook.Id then download else i) 
+                                            let newState =
+                                                { state with
+                                                    CurrentDownload = Some download
+                                                    Downloads = state.Downloads |> List.map (fun i -> if i.AudioBook.Id = download.AudioBook.Id then download else i)
                                                 }
 
                                             // start download, do not wait for the result, the loop mus continue
@@ -1791,21 +1816,21 @@ module DownloadService =
                                     | None ->
                                         return! loop state
                                     | Some download ->
-                                        let download = 
-                                            { download 
-                                                with 
+                                        let download =
+                                            { download
+                                                with
                                                     State = Failed error
                                             }
 
-                                        let newState = 
-                                            { state with 
-                                                CurrentDownload = None 
-                                                Downloads = state.Downloads |> List.map (fun i -> if i.AudioBook.Id = download.AudioBook.Id then download else i) 
+                                        let newState =
+                                            { state with
+                                                CurrentDownload = None
+                                                Downloads = state.Downloads |> List.map (fun i -> if i.AudioBook.Id = download.AudioBook.Id then download else i)
                                             }
 
 
                                         signalError (download, error)
-                                    
+
                                         return! loop newState
 
                                 | FinishedDownload (info,downloadResult) ->
@@ -1813,8 +1838,8 @@ module DownloadService =
                                     | None ->
                                         return! loop state
                                     | Some download ->
-                                        
-                                        
+
+
                                         // store file infos
                                         let! audioFileInformation =
                                             async {
@@ -1828,19 +1853,19 @@ module DownloadService =
                                                         AudioFiles = files |> List.sortBy (_.FileName)
                                                     }
                                                     let! _ = DataBase.insertAudioBookFileInfos [| fileInfo |]
-                                                    return Some fileInfo    
+                                                    return Some fileInfo
                                             }
-                                        
-                                        let download = 
-                                            { download 
-                                                with 
+
+                                        let download =
+                                            { download
+                                                with
                                                     State = Finished (downloadResult,audioFileInformation)
                                             }
 
-                                        let newState = 
-                                            { state with 
-                                                CurrentDownload = None 
-                                                Downloads = state.Downloads |> List.map (fun i -> if i.AudioBook.Id = download.AudioBook.Id then download else i) 
+                                        let newState =
+                                            { state with
+                                                CurrentDownload = None
+                                                Downloads = state.Downloads |> List.map (fun i -> if i.AudioBook.Id = download.AudioBook.Id then download else i)
                                             }
 
                                         // send info that the download is complete
@@ -1871,14 +1896,14 @@ module DownloadService =
                                         | Running _
                                         | Finished _ ->
                                             return! loop state
-                                        | Open 
+                                        | Open
                                         | Failed _ ->
                                             return! loop { state with Downloads = state.Downloads |> List.filter (fun i -> i.AudioBook.Id <> item.AudioBook.Id ) }
 
                                 | ShutDownService ->
                                     signalShutDownService ()
                                     shutDownExternalService ()
-                                    
+
                                     return! loop { Downloads = []; CurrentDownload = None }
 
                                 | GetState reply ->
@@ -1886,15 +1911,15 @@ module DownloadService =
                                     return! loop state
 
                                 | UpdateNotification (info,percent) ->
-                                    let openCount = 
-                                        state.Downloads |> List.filter (fun i -> match i.State with | Open | Failed _ -> true | _ -> false) |> List.length 
+                                    let openCount =
+                                        state.Downloads |> List.filter (fun i -> match i.State with | Open | Failed _ -> true | _ -> false) |> List.length
                                     let allCount = state.Downloads  |> List.length// |> List.filter (fun i -> match i.State with | Finished -> true | _ -> false)
 
                                     let stateText  =
                                         $"(noch %i{openCount + 1} von {allCount}) {info.AudioBook.FullName}"
 
                                     let stateTitle =
-                                        $"Lade runter... {percent} %%)" 
+                                        $"Lade runter... {percent} %%)"
 
                                     updateNotification stateTitle stateText
 
@@ -1913,7 +1938,7 @@ module DownloadService =
             match msg with
             | ServiceMessages.AddDownload download ->
                 downloadServiceMailbox.Post <| AddDownload download
-                    
+
             | ServiceMessages.RemoveDownload download ->
                 downloadServiceMailbox.Post <| RemoveDownload download
 
@@ -1929,10 +1954,10 @@ module DownloadService =
 
 
         let startDownload (inbox:MailboxProcessor<Msg>) (info:DownloadInfo) =
-                    
+
             let updateStateDownloadInfo newState (downloadInfo:DownloadInfo) =
                     {downloadInfo with State = newState}
-                    
+
 
             task {
 
@@ -1951,8 +1976,8 @@ module DownloadService =
                     inbox.Post (DownloadError <| ComError.SessionExpired "session expired")
                 | Ok (Some cc) ->
 
-                    let! res = 
-                        WebAccess.Downloader.downloadAudiobook 
+                    let! res =
+                        WebAccess.Downloader.downloadAudiobook
                             cc
                             updateProgress
                             info.AudioBook
@@ -1961,13 +1986,13 @@ module DownloadService =
                     | Error error ->
                         inbox.Post <| DownloadError error
                     | Ok result ->
-                        
-                        let newAb = 
-                            { info.AudioBook with 
+
+                        let newAb =
+                            { info.AudioBook with
                                 Thumbnail = result.Images |> Option.map (_.Thumbnail)
                                 Picture = result.Images |> Option.map (_.Image)
                                 State =
-                                    { info.AudioBook.State with 
+                                    { info.AudioBook.State with
                                         Downloaded = true
                                         DownloadedFolder = Some result.TargetFolder
                                     }
@@ -1986,7 +2011,7 @@ module DownloadService =
 
 
 module Helpers =
-    
+
     type InputPaneService() =
         // static member for IInputPane
         static member val InputPane:IInputPane = null with get, set

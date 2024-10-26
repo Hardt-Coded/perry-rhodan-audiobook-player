@@ -53,13 +53,6 @@
                     </StackPanel>
                 </Button>
                 
-                <Button Command="{Binding OpenDetail}" >
-                    <StackPanel Orientation="Horizontal">
-                        <avalonia:MaterialIcon Kind="Book" />
-                        <Label>Titeldetails ansehen</Label>
-                    </StackPanel>
-                </Button>
-                
                 <Button  IsVisible="{Binding AudioBook.MarkAsListendVisible}" 
                          Command="{Binding MarkAsListend}" >
                     <StackPanel Orientation="Horizontal">
@@ -84,7 +77,7 @@
                     </StackPanel>
                 </Button>
                 
-                <Button  IsVisible="{Binding AudioBook.OpenPlayerVisible}" 
+                <Button  IsVisible="{Binding AudioBook.IsPlayButtonVisible}" 
                          Command="{Binding OpenPlayer}" >
                     <StackPanel Orientation="Horizontal">
                         <avalonia:MaterialIcon Kind="PlayCircle" />
@@ -92,7 +85,7 @@
                     </StackPanel>
                 </Button>
                 
-                <Button Command="{Binding ShowMetaData}" >
+                <!--<Button Command="{Binding ShowMetaData}" >
                     <StackPanel Orientation="Horizontal">
                         <avalonia:MaterialIcon Kind="Database" />
                         <Label>Metadata</Label>
@@ -104,7 +97,7 @@
                         <avalonia:MaterialIcon Kind="Database" />
                         <Label>Random Ambient Color</Label>
                     </StackPanel>
-                </Button>
+                </Button>-->
                 
                 <Button Classes="accent" 
                         Command="{Binding CloseDialog}" >

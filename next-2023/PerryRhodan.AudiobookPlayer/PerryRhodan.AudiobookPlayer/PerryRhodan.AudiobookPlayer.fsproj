@@ -27,6 +27,7 @@
     <Compile Include="Domain\Translations.fs" />
     <Compile Include="Services\Services.fs" />
     <Compile Include="Services\Interfaces.fs" />
+    <Compile Include="Services\GlobalSettingsService.fs" />
    
     <Compile Include="Views\ActionMenuView.axaml.fs" />
     <Compile Include="Views\AudioBookItemView.axaml.fs" />

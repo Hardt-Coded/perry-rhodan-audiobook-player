@@ -4,6 +4,8 @@ open System
 open CherylUI.Controls
 open Dependencies
 open Global
+open Microsoft.Maui.ApplicationModel
+open PerryRhodan.AudiobookPlayer.Services
 open PerryRhodan.AudiobookPlayer.ViewModels.LoginPage
 open ReactiveElmish.Avalonia
 open ReactiveElmish
@@ -13,7 +15,7 @@ open Services.DependencyServices
 open Services.Helpers
 
 module SettingsPage =
-    
+
 
     type State = {
         DataProtectionStuff: bool
@@ -23,9 +25,11 @@ module SettingsPage =
         JumpDistance:int
         DeveloperModeSwitchCounter:int
         DeveloperMode:bool
+        FirstStart: bool
 
         ExternalAudioBookFileUrl: string
         ExternalAudioBookName: string
+        IsBusy: bool
     }
 
 
@@ -40,6 +44,7 @@ module SettingsPage =
 
         | SetDeveloperModeSwitchCounter of int
         | SetDeveloperMode of bool
+        | SetFirstStart of bool
         | DeleteDatabase
         | ImportDatabase
 
@@ -51,8 +56,10 @@ module SettingsPage =
         | KeyboardStateChanged
         | CloseDialog
         
-        
-        
+        | IsBusy of bool
+
+
+
     [<RequireQualifiedAccess>]
     type SideEffect =
         | None
@@ -63,7 +70,8 @@ module SettingsPage =
         | StoreRewindWhenStartAfterLongPeriodInSec
         | StoreLongPeriodBeginsAfterInMinutes
         | StoreDeveloperMode
-        
+        | StoreFirstStart
+
 
 
     let init () =
@@ -77,12 +85,16 @@ module SettingsPage =
             DeveloperModeSwitchCounter = 0
             ExternalAudioBookFileUrl = ""
             ExternalAudioBookName = ""
+            FirstStart = false
+            IsBusy = false 
         }, SideEffect.Init
 
 
 
     let rec update msg (state:State) =
         match msg with
+        | IsBusy b ->
+            { state with IsBusy = b }, SideEffect.None
         | ShowDataProtectionStuff ->
             state |> onShowDataProtectionStuffMsg
         | HideDataProtectionStuff ->
@@ -101,7 +113,6 @@ module SettingsPage =
         | SetDeveloperModeSwitchCounter value ->
             state |> onSetDeveloperSwitchCounter value
         | OpenFeedbackPage ->
-            // will be handled by the app.fs
             state, SideEffect.None
         | DeleteDatabase ->
             state, SideEffect.None
@@ -162,6 +173,8 @@ module SettingsPage =
             { state with ExternalAudioBookName = name },  SideEffect.None
         | KeyboardStateChanged ->
             state, SideEffect.None
+        | SetFirstStart b ->
+            { state with FirstStart = b }, SideEffect.StoreFirstStart
 
 
     and onSetDeveloperSwitchCounter value state  =
@@ -210,95 +223,134 @@ module SideEffects =
     open SettingsPage
 
     let runSideEffects (sideEffect:SideEffect) (state:State) (dispatch:Msg -> unit) =
+        let globalSettings = DependencyService.Get<GlobalSettingsService>()
         task {
-            match sideEffect with
-            | SideEffect.None ->
+            if sideEffect = SideEffect.None then
                 return ()
-                
-            | SideEffect.Init ->
-                let! rewindWhenStartAfterShortPeriodInSec =
-                    Services.SystemSettings.getRewindWhenStartAfterShortPeriodInSec()
-                let! rewindWhenStartAfterLongPeriodInSec =
-                    Services.SystemSettings.getRewindWhenStartAfterLongPeriodInSec()
-                let! longPeriodBeginsAfterInMinutes =
-                    Services.SystemSettings.getLongPeriodBeginsAfterInMinutes()
-                let! jumpDistance =
-                    Services.SystemSettings.getJumpDistance()
-                let! developerMode =
-                    Services.SystemSettings.getDeveloperMode()
+            else
+                dispatch <| IsBusy true
+                do!
+                    task {
+                        match sideEffect with
+                        | SideEffect.None ->
+                            return ()
+
+                        | SideEffect.Init ->
+
+
+                            dispatch (SetRewindWhenStartAfterShortPeriodInSecValue globalSettings.RewindWhenStartAfterShortPeriodInSec)
+                            dispatch (SetRewindWhenStartAfterLongPeriodInSecValue globalSettings.RewindWhenStartAfterLongPeriodInSec)
+                            dispatch (SetLongPeriodBeginsAfterInMinutesValue globalSettings.LongPeriodBeginsAfterInMinutes)
+                            dispatch (SetJumpDistanceValue (globalSettings.JumpDistance / 1000))
+                            //dispatch (SetDeveloperMode globalSettings.)
+                            dispatch (SetFirstStart globalSettings.IsFirstStart)
+
+
+                            return ()
+
+                        | SideEffect.CloseDialog ->
+                            InteractiveContainer.CloseDialog()
+                            return ()
+
+                        | SideEffect.StoreJumpDistance ->
+                            //do! Services.SystemSettings.setJumpDistance <| state.JumpDistance * 1000
+                            globalSettings.JumpDistance <- state.JumpDistance * 1000
+
+                            return ()
+
+                        | SideEffect.StoreRewindWhenStartAfterShortPeriodInSec ->
+                            //do! Services.SystemSettings.setRewindWhenStartAfterShortPeriodInSec state.RewindWhenStartAfterShortPeriodInSec
+                            globalSettings.RewindWhenStartAfterShortPeriodInSec <- state.RewindWhenStartAfterShortPeriodInSec
+                            return ()
+
+                        | SideEffect.StoreRewindWhenStartAfterLongPeriodInSec ->
+                            //do! Services.SystemSettings.setRewindWhenStartAfterLongPeriodInSec state.RewindWhenStartAfterLongPeriodInSec
+                            globalSettings.RewindWhenStartAfterLongPeriodInSec <- state.RewindWhenStartAfterLongPeriodInSec
+                            return ()
+
+                        | SideEffect.StoreLongPeriodBeginsAfterInMinutes ->
+                            //do! Services.SystemSettings.setLongPeriodBeginsAfterInMinutes state.LongPeriodBeginsAfterInMinutes
+                            globalSettings.LongPeriodBeginsAfterInMinutes <- state.LongPeriodBeginsAfterInMinutes
+                            return ()
+
+                        | SideEffect.StoreDeveloperMode ->
+                            //do! Services.SystemSettings.setDeveloperMode state.DeveloperMode
+                            return ()
+
+                        | SideEffect.StoreFirstStart ->
+                            //do! Services.SystemSettings.setIsFirstStart state.FirstStart
+                            globalSettings.IsFirstStart <- state.FirstStart
+                            return ()
+                    }
                     
-                dispatch (SetRewindWhenStartAfterShortPeriodInSecValue rewindWhenStartAfterShortPeriodInSec)
-                dispatch (SetRewindWhenStartAfterLongPeriodInSecValue rewindWhenStartAfterLongPeriodInSec)
-                dispatch (SetLongPeriodBeginsAfterInMinutesValue longPeriodBeginsAfterInMinutes)
-                dispatch (SetJumpDistanceValue (jumpDistance / 1000))
-                dispatch (SetDeveloperMode developerMode)
-                
-                return ()
-
-            | SideEffect.CloseDialog ->
-                InteractiveContainer.CloseDialog()
-                return ()
-
-            | SideEffect.StoreJumpDistance ->
-                do! Services.SystemSettings.setJumpDistance <| state.JumpDistance * 1000
-                return ()
-                
-            | SideEffect.StoreRewindWhenStartAfterShortPeriodInSec ->
-                do! Services.SystemSettings.setRewindWhenStartAfterShortPeriodInSec state.RewindWhenStartAfterShortPeriodInSec
-                return ()
-                
-            | SideEffect.StoreRewindWhenStartAfterLongPeriodInSec ->
-                do! Services.SystemSettings.setRewindWhenStartAfterLongPeriodInSec state.RewindWhenStartAfterLongPeriodInSec
-                return ()
-                
-            | SideEffect.StoreLongPeriodBeginsAfterInMinutes ->
-                do! Services.SystemSettings.setLongPeriodBeginsAfterInMinutes state.LongPeriodBeginsAfterInMinutes
-                return ()
-                
-            | SideEffect.StoreDeveloperMode ->
-                do! Services.SystemSettings.setDeveloperMode state.DeveloperMode
-                return ()
-                
+                dispatch <| IsBusy false
         }
-        
+
 
 
 open SettingsPage
 
 type SettingsViewModel() =
     inherit ReactiveElmishViewModel()
-    
-    
+
+
     let local =
         Program.mkAvaloniaProgrammWithSideEffect init update SideEffects.runSideEffects
         |> Program.mkStore
-        
-    
+
+
     // option members from state
     member this.DataProtectionStuff
         with get() = this.Bind(local, fun e -> e.DataProtectionStuff)
-        and set(value) = local.Dispatch (if value then ShowDataProtectionStuff else HideDataProtectionStuff)
-        
+        and set(value) = if this.IsInitialized then local.Dispatch (if value then ShowDataProtectionStuff else HideDataProtectionStuff)
+
     member this.RewindWhenStartAfterShortPeriodInSec
         with get() = this.Bind(local, fun e -> e.RewindWhenStartAfterShortPeriodInSec)
-        and set(value) = local.Dispatch (SetRewindWhenStartAfterShortPeriodInSecValue value)
-        
+        and set(value) = if this.IsInitialized then local.Dispatch (SetRewindWhenStartAfterShortPeriodInSecValue value)
+
     member this.RewindWhenStartAfterLongPeriodInSec
         with get() = this.Bind(local, fun e -> e.RewindWhenStartAfterLongPeriodInSec)
-        and set(value) = local.Dispatch (SetRewindWhenStartAfterLongPeriodInSecValue value)
-        
+        and set(value) = if this.IsInitialized then local.Dispatch (SetRewindWhenStartAfterLongPeriodInSecValue value)
+
     member this.LongPeriodBeginsAfterInMinutes
         with get() = this.Bind(local, fun e -> e.LongPeriodBeginsAfterInMinutes)
-        and set(value) = local.Dispatch (SetLongPeriodBeginsAfterInMinutesValue value)
-    
+        and set(value) = if this.IsInitialized then local.Dispatch (SetLongPeriodBeginsAfterInMinutesValue value)
+
     member this.JumpDistance
         with get() = this.Bind(local, fun e -> e.JumpDistance)
-        and set(value) = local.Dispatch (SetJumpDistanceValue value)
-        
+        and set(value) =
+            if this.IsInitialized then local.Dispatch (SetJumpDistanceValue value)
+
+    member val IsInitialized = false with get, set
+
+    member this.OnInitialized() =
+        this.IsInitialized <- true
+
+    member this.SecondsValues =
+        [|
+            for i in 0 .. 120 do
+                i, $"{i} Sekunden"
+        |]
+
+
+    member this.MinutesValues =
+        [|
+            for i in 0 .. 120 do
+                i, $"{i} Minuten"
+        |]
+
+    member this.ShowPrivacyPolicies() =
+        // open web browser url
+        let uri = Uri("https://www.hardt-solutions.com/PrivacyPolicies/EinsAMedienAudioBookPlayer.html")
+        Browser.Default.OpenAsync(uri, BrowserLaunchMode.SystemPreferred) |> ignore
+
+
+
+
     member this.DeveloperModeSwitchCounter = this.Bind(local, fun e -> e.DeveloperModeSwitchCounter)
     member this.DeveloperMode = this.Bind(local, fun e -> e.DeveloperMode)
-    
+
     static member DesignVM = new SettingsViewModel()
-    
-    
+
+
 

@@ -9,7 +9,7 @@
         x:Class="PerryRhodan.AudiobookPlayer.Views.MainWindow"
         Icon="/Assets/eins_a_launcher.png"
         Title="PerryRhodan.AudiobookPlayer"
-        Width="540" Height="1170"
+        Width="393" Height="778"
         Background="#202020">
         
           
