@@ -12,7 +12,7 @@
     <AndroidResgenClass>Resource</AndroidResgenClass>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <AndroidPackageFormat>aab</AndroidPackageFormat>
+    <AndroidPackageFormat>apk</AndroidPackageFormat>
     <AndroidDexTool>r8</AndroidDexTool>
     <DebugSymbols>True</DebugSymbols>
     <EnableLLVM>False</EnableLLVM>
