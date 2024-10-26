@@ -77,13 +77,14 @@ type ServiceConnection() =
 
 
 [<Activity(
-    Label = "PerryRhodan.AudiobookPlayer.Android",
+    Label = "Eins A Medien Audiobook Player",
     Theme = "@style/MyTheme.NoActionBar",
     //Theme = "@style/Theme.AppCompat.NoActionBar",
     Icon = "@drawable/eins_a_launcher",
     MainLauncher = true,
     LaunchMode = LaunchMode.SingleTop,
-    ConfigurationChanges = (ConfigChanges.Orientation ||| ConfigChanges.ScreenSize ||| ConfigChanges.UiMode))>]
+    ConfigurationChanges = (ConfigChanges.Orientation ||| ConfigChanges.ScreenSize ||| ConfigChanges.UiMode),
+    ScreenOrientation = ScreenOrientation.Portrait)>]
 type MainActivity() as self =
     inherit AvaloniaMainActivity<App>()
 
