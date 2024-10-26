@@ -596,7 +596,7 @@ open ReactiveElmish.Avalonia
 open Elmish.SideEffect
 
 
-type PlayerViewModel(audiobook: AudioBookItemViewModel, startPlaying) as self =
+type PlayerViewModel(audiobook: AudioBookItemViewModel, startPlaying) =
     inherit ReactiveElmishViewModel()
 
     let init () =
