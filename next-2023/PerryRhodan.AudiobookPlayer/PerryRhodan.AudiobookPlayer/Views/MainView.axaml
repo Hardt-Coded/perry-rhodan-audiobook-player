@@ -16,6 +16,7 @@
              Design.DataContext="{Binding Source={x:Static vm:MainViewModel.DesignVM}}"
              Background="#202020"
              x:DataType="vm:MainViewModel">
+    
     <UserControl.Styles>
         <Style Selector="avalonia|MaterialIcon.mainButton">
             <Setter Property="Width" Value="32" />
@@ -101,7 +102,7 @@
     <controls:InteractiveContainer HorizontalAlignment="Stretch">
     <Border Background="Black" IsEnabled="{Binding !IsLoading}">
         <Grid RowDefinitions="*, Auto, Auto"
-              ColumnDefinitions="*, *, *">
+              ColumnDefinitions="0.9*, *, 0.9*">
             
             <TransitioningContentControl Grid.ColumnSpan="4" Grid.Row="0" Content="{Binding ContentView}">
                 <TransitioningContentControl.PageTransition>
@@ -121,7 +122,8 @@
             <Button Grid.Row="2" 
                     Grid.Column="0" 
                     Theme="{StaticResource MaterialFlatButton}"
-                    Command="{Binding GotoHomePage}">
+                    Command="{Binding GotoHomePage}"
+                    Foreground="{Binding HomeButtonColor}">
                 <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
                     <avalonia:MaterialIcon Classes="mainButton" Kind="Home" />
                     <TextBlock>Start</TextBlock>
@@ -132,19 +134,21 @@
             <Button Grid.Row="2" 
                     Grid.Column="1" 
                     Theme="{StaticResource MaterialFlatButton}"
-                    Command="{Binding GotoBrowserPage}" >
+                    Command="{Binding GotoBrowserPage}" 
+                    Foreground="{Binding BrowserButtonColor}">
                 <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
                     <avalonia:MaterialIcon Kind="Globe" Classes="mainButton" />
-                    <TextBlock>Browse</TextBlock>
+                    <TextBlock>Meine Hörbücher</TextBlock>
                 </StackPanel>
             </Button>
             
             <Button Grid.Row="2" 
                     Grid.Column="2" 
                     Theme="{StaticResource MaterialFlatButton}"
-                    Command="{Binding GotoOptionPage}">
+                    Command="{Binding GotoOptionPage}"
+                    Foreground="{Binding SettingsButtonColor}">
                 <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                    <avalonia:MaterialIcon Classes="mainButton" Kind="Gear" />
+                    <avalonia:MaterialIcon Classes="mainButton" Kind="Gear"/>
                     <TextBlock>Einstellungen</TextBlock>
                 </StackPanel>
                 

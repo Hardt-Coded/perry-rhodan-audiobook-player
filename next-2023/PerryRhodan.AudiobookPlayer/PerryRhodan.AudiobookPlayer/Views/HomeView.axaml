@@ -4,7 +4,6 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:PerryRhodan.AudiobookPlayer.ViewModels"
              xmlns:views="clr-namespace:PerryRhodan.AudiobookPlayer.Views"
-             xmlns:speedSelector="clr-namespace:PerryRhodan.AudiobookPlayer.SpeedSelector"
              xmlns:valueSelector="clr-namespace:PerryRhodan.AudiobookPlayer.ValueSelector"
              xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              mc:Ignorable="d" d:DesignWidth="393" d:DesignHeight="738"
@@ -26,6 +25,15 @@
             
         </Grid>
 
+        <!-- Empty -->
+        <TextBlock Grid.Row="0" Grid.RowSpan="3" VerticalAlignment="Center" 
+                   HorizontalAlignment="Center"
+                   TextAlignment="Center"
+                   Text="Sie haben noch keine Hörbücher runtergeladen. Stöbern sie doch ein wenig in Ihrem Bestand."
+                   TextWrapping="Wrap"
+                   FontSize="20"
+                   Margin="10"
+                   IsVisible="{Binding IsEmpty}"/>
 		<!-- Audio Books -->
         <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Hidden">
             <ItemsControl Grid.Row="1" ItemsSource="{Binding AudioBooks}">

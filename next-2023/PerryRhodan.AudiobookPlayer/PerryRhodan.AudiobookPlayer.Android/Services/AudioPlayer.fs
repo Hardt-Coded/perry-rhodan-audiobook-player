@@ -17,6 +17,7 @@ open Microsoft.Extensions.DependencyInjection
 open PerryRhodan.AudiobookPlayer.Services.AudioPlayer
 open PerryRhodan.AudiobookPlayer.Services.Interfaces
 open _Microsoft.Android.Resource.Designer
+open PerryRhodan.AudiobookPlayer.Services
 
 
 module Helper =
@@ -44,6 +45,49 @@ module Helper =
                 onAudioFocusChange focusChange
 
 
+    // title, album, trackNumber, numTracks, duration, albumArt, displayIcon, art
+    type MediaSessionData = {
+        Title: string
+        Album: string
+        TrackNumber: int64
+        NumTracks: int64
+        Duration: int64
+    }
+
+    let getMediaSessionData (mediaSession:MediaSession) =
+        mediaSession.Controller.Metadata
+        |> Option.ofObj
+        |> Option.map (fun metadata ->
+            let title = metadata.GetString(MediaMetadata.MetadataKeyDisplayTitle)
+            let album = metadata.GetString(MediaMetadata.MetadataKeyAlbum)
+            let trackNumber = metadata.GetLong(MediaMetadata.MetadataKeyTrackNumber)
+            let numTracks = metadata.GetLong(MediaMetadata.MetadataKeyNumTracks)
+            let duration = metadata.GetLong(MediaMetadata.MetadataKeyDuration)
+            {
+                Title = title
+                Album = album
+                TrackNumber = trackNumber
+                NumTracks = numTracks
+                Duration = duration
+            }
+        )
+
+
+
+    let mapAudioPlayerInfoToMediaSessionData audioPlayerInfo =
+        audioPlayerInfo.AudioBook
+        |> Option.map (fun i ->
+            {
+                Title = i.AudioBook.FullName
+                Album = i.AudioBook.FullName
+                TrackNumber = audioPlayerInfo.CurrentTrackNumber + 1 |> int64
+                NumTracks = audioPlayerInfo.Mp3FileList.Length |> int64
+                Duration = audioPlayerInfo.Duration.TotalMilliseconds |> int64
+            }
+        )
+
+
+
 
 [<Service(Exported = true,
           Name = "perry.rhodan.audioplayer.mediaplayer",
@@ -58,8 +102,6 @@ type AudioPlayerService() as self =
             (PlayerElmish.SideEffects.createSideEffectsProcessor self)
         |> Program.mkStore
 
-
-
     let notificationId = 47112024
     let player = new MediaPlayer()
     let binder = new AudioPlayerBinder(self)
@@ -72,66 +114,72 @@ type AudioPlayerService() as self =
     let mutable currentPlaybackSpeed = 1.0f
     let disposables = System.Collections.Generic.List<IDisposable>()
 
-    let createMediaSession (state:PlayerElmish.AudioPlayerInfo) =
-        match mediaSession, state.AudioBook |> Option.map (_.AudioBook) with
-        | Some mediaSession, Some audioBook ->
+    let createMediaSession (state:AudioPlayerInfo) =
 
-            let stateBuilder = new PlaybackState.Builder();
+        match mediaSession, Helper.mapAudioPlayerInfoToMediaSessionData state with
+        | Some mediaSession, Some newMediaSessionData ->
+
+            let setMediaSessionState mediasession =
+                let stateBuilder = new PlaybackState.Builder();
+                let stateAction =
+                    match state.State with
+                    | AudioPlayerState.Playing ->
+                        PlaybackState.ActionPlayPause |||
+                        PlaybackState.ActionPause |||
+                        PlaybackState.ActionSkipToNext |||
+                        PlaybackState.ActionSkipToPrevious |||
+                        PlaybackState.ActionRewind |||
+                        PlaybackState.ActionFastForward |||
+                        PlaybackState.ActionSeekTo
+                    | AudioPlayerState.Stopped ->
+                        PlaybackState.ActionPlayPause |||
+                        PlaybackState.ActionPlay |||
+                        PlaybackState.ActionSkipToNext |||
+                        PlaybackState.ActionSkipToPrevious |||
+                        PlaybackState.ActionSeekTo
+                stateBuilder.SetActions(stateAction) |> ignore
+                stateBuilder.SetState(
+                    (if state.State = AudioPlayerState.Stopped then PlaybackStateCode.Stopped else PlaybackStateCode.Playing),
+                    state.Position.TotalMilliseconds |> int64,
+                    currentPlaybackSpeed) |> ignore
+                mediaSession.SetPlaybackState(stateBuilder.Build())
 
 
+            let oldMediaSessionData = Helper.getMediaSessionData mediaSession
+            if Some newMediaSessionData = oldMediaSessionData then
+                setMediaSessionState mediaSession
+            else
+                setMediaSessionState mediaSession
 
-            let stateAction =
-                match state.State with
-                | AudioPlayerState.Playing ->
-                    PlaybackState.ActionPlayPause |||
-                    PlaybackState.ActionPause |||
-                    PlaybackState.ActionSkipToNext |||
-                    PlaybackState.ActionSkipToPrevious |||
-                    PlaybackState.ActionRewind |||
-                    PlaybackState.ActionFastForward |||
-                    PlaybackState.ActionSeekTo
-                | AudioPlayerState.Stopped ->
-                    PlaybackState.ActionPlayPause |||
-                    PlaybackState.ActionPlay |||
-                    PlaybackState.ActionSkipToNext |||
-                    PlaybackState.ActionSkipToPrevious |||
-                    PlaybackState.ActionSeekTo
+                let picture =
+                    state.AudioBook
+                    |> Option.bind (_.AudioBook.Picture)
+                    |> Option.defaultValue "@drawable/AudioBookPlaceholder_Dark.png"
+                    |> Android.Graphics.BitmapFactory.DecodeFile
 
+                let thumbnail =
+                    state.AudioBook
+                    |> Option.bind (_.AudioBook.Thumbnail)
+                    |> Option.defaultValue "@drawable/AudioBookPlaceholder_Dark.png"
+                    |> Android.Graphics.BitmapFactory.DecodeFile
 
-            stateBuilder.SetActions(stateAction) |> ignore
-            stateBuilder.SetState(
-                (if state.State = AudioPlayerState.Stopped then PlaybackStateCode.Stopped else PlaybackStateCode.Playing),
-                state.Position.TotalMilliseconds |> int64,
-                currentPlaybackSpeed) |> ignore
+                let albumPic = picture
+                let thumbPic = thumbnail
 
-            mediaSession.SetPlaybackState(stateBuilder.Build());
+                let mediaMetaData =
+                    (new MediaMetadata.Builder())
+                        .PutBitmap(MediaMetadata.MetadataKeyAlbumArt,albumPic)
+                        .PutBitmap(MediaMetadata.MetadataKeyDisplayIcon,thumbPic)
+                        .PutString(MediaMetadata.MetadataKeyDisplayTitle, newMediaSessionData.Title)
+                        .PutString(MediaMetadata.MetadataKeyTitle, newMediaSessionData.Title)
+                        .PutBitmap(MediaMetadata.MetadataKeyArt, albumPic)
+                        .PutLong(MediaMetadata.MetadataKeyDuration, newMediaSessionData.Duration)
+                        .PutString(MediaMetadata.MetadataKeyAlbum, newMediaSessionData.Album)
+                        .PutLong(MediaMetadata.MetadataKeyTrackNumber, newMediaSessionData.TrackNumber)
+                        .PutLong(MediaMetadata.MetadataKeyNumTracks, newMediaSessionData.NumTracks)
+                        .Build();
 
-            let albumPicFile =
-                audioBook.Picture
-                |> Option.defaultValue "@drawable/AudioBookPlaceholder_Dark.png"
-
-            let albumPic = Android.Graphics.BitmapFactory.DecodeFile(albumPicFile)
-
-            let thumbPicFile =
-                audioBook.Thumbnail
-                |> Option.defaultValue "@drawable/AudioBookPlaceholder_Dark.png"
-
-            let thumbPic = Android.Graphics.BitmapFactory.DecodeFile(thumbPicFile)
-
-            let mediaMetaData =
-                (new MediaMetadata.Builder())
-                    .PutBitmap(MediaMetadata.MetadataKeyAlbumArt,albumPic)
-                    .PutBitmap(MediaMetadata.MetadataKeyDisplayIcon,thumbPic)
-                    .PutString(MediaMetadata.MetadataKeyDisplayTitle,audioBook.FullName)
-                    .PutString(MediaMetadata.MetadataKeyTitle,audioBook.FullName)
-                    .PutBitmap(MediaMetadata.MetadataKeyArt, albumPic)
-                    .PutLong(MediaMetadata.MetadataKeyDuration, state.Duration.TotalMilliseconds |> int64)
-                    .PutString(MediaMetadata.MetadataKeyAlbum,audioBook.FullName)
-                    .PutLong(MediaMetadata.MetadataKeyTrackNumber, state.CurrentTrackNumber + 1 |> int64)
-                    .PutLong(MediaMetadata.MetadataKeyNumTracks, state.Mp3FileList.Length |> int64)
-                    .Build();
-
-            mediaSession.SetMetadata(mediaMetaData)
+                mediaSession.SetMetadata(mediaMetaData)
 
         | _ -> ()
 
@@ -366,6 +414,9 @@ type AudioPlayerService() as self =
 
                 try
 
+                    let globalSettings = DependencyService.Get<GlobalSettingsService>()
+                    currentPlaybackSpeed <- globalSettings.PlaybackSpeed |> float32
+
                     player.Reset()
                     player.SetDataSource(file)
                     let playbackParams =
@@ -376,7 +427,7 @@ type AudioPlayerService() as self =
 
                     player.PlaybackParams <- playbackParams
                     do! Helper.prepareMediaplayerAsync player
-                    
+
                     // ask audiomanager to give us audio focus
                     audioManager |> Option.iter (fun a -> a.AbandonAudioFocusRequest(audioFocusRequest) |> ignore)
                     audioManager
@@ -386,7 +437,7 @@ type AudioPlayerService() as self =
                             player.Start()
                             updateAudioPlayerInformation ()
                     )
-                    
+
                 with
                 | ex ->
                      Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)

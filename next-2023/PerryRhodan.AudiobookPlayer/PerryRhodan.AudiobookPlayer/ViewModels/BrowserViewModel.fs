@@ -1,5 +1,6 @@
 ﻿namespace PerryRhodan.AudiobookPlayer.ViewModels
 
+open System
 open System.Collections.ObjectModel
 open System.Threading.Tasks
 open CherylUI.Controls
@@ -7,6 +8,7 @@ open Common
 open Dependencies
 open Domain
 open PerryRhodan.AudiobookPlayer.ViewModel
+open PerryRhodan.AudiobookPlayer.ViewModel.AudioBookItem
 open Services
 open Services.DependencyServices
 
@@ -25,6 +27,7 @@ module BrowserPage =
 
 
     type Msg =
+        | RunOnlySideEffect of SideEffect
         | LoadOnlineAudiobooks
         | AudioBookItemsChanged of AudioBookItemViewModel []
         | SelectPreviousGroup of string
@@ -37,9 +40,11 @@ module BrowserPage =
         | SetSearchResult of AudioBookItemViewModel []
 
 
-    [<RequireQualifiedAccess>]
-    type SideEffect =
+
+    and [<RequireQualifiedAccess>]
+        SideEffect =
         | None
+        | Init
         | LoadCurrentAudioBooks
         | LoadOnlineAudioBooks
         | OpenLoginPage
@@ -47,7 +52,7 @@ module BrowserPage =
         | OnSelectedGroupChanged
         | StartSearch
 
-
+    let disposables = new System.Collections.Generic.List<IDisposable>()
 
     let filter selectedGroups (audioBookItems:AudioBookItemViewModel []) =
 
@@ -98,11 +103,14 @@ module BrowserPage =
             SearchText = ""
         }
 
-        newModel, if initAudioBooks = [||] then SideEffect.LoadCurrentAudioBooks else SideEffect.None
+        newModel, if initAudioBooks = [||] then SideEffect.Init else SideEffect.None
 
 
     let update msg (state:State) =
         match msg with
+        | RunOnlySideEffect sideEffect ->
+            state, sideEffect
+
         | LoadOnlineAudiobooks ->
             state, SideEffect.LoadOnlineAudioBooks
 
@@ -452,6 +460,8 @@ module BrowserPage =
                         AudioBookStore.globalAudiobookStore.Model.Audiobooks
                 dispatch <| AudioBookItemsChanged audioBooks
 
+
+
             task {
                 if sideEffect = SideEffect.None then
                     return ()
@@ -462,6 +472,14 @@ module BrowserPage =
                             match sideEffect with
                             | SideEffect.None ->
                                 return ()
+
+                            | SideEffect.Init ->
+                                // listen to global audiobook store
+                                disposables.Add
+                                    <| AudioBookStore.globalAudiobookStore.Observable.Subscribe(fun m ->
+                                        dispatch <| AudioBookItemsChanged m.Audiobooks
+                                    )
+
                             | SideEffect.LoadCurrentAudioBooks ->
                                 loadCurrentAudiobooks ()
                                 return ()
@@ -485,11 +503,12 @@ module BrowserPage =
                             | SideEffect.OnSelectedGroupChanged ->
                                 loadCurrentAudiobooks ()
                                 let navService = DependencyService.Get<INavigationService>()
-                                match state.SelectedGroups with
+                                let selectedGroups = state.SelectedGroups
+                                match selectedGroups with
                                 | [] ->
                                     navService.ResetBackbuttonPressed()
                                 | _ ->
-                                    navService.RegisterBackbuttonPressed (fun () -> dispatch (RemoveLastSelectGroup (List.last state.SelectedGroups)))
+                                    navService.RegisterBackbuttonPressed (fun () -> dispatch (RemoveLastSelectGroup (List.last selectedGroups)))
 
                                 return ()
 
@@ -504,7 +523,7 @@ module BrowserPage =
 
                                     dispatch <| Msg.SetSearchResult filteredAudioBooks
                         }
-                        
+
                     dispatch <| SetBusy false
             }
 
@@ -583,6 +602,9 @@ type BrowserViewModel(?audiobookItems) =
 
     let searchStringDebouncer = Extensions.debounce<string>
 
+    new () =
+        new BrowserViewModel([||])
+
     member this.AudioBooks =
         this.Bind(local, fun s -> ObservableCollection(s.AudioBookItems))
 
@@ -591,20 +613,57 @@ type BrowserViewModel(?audiobookItems) =
     member this.SelectedGroups:string list = this.Bind(local, _.SelectedGroups)
     member this.GroupItems = this.Bind(local, fun s -> ObservableCollection(match s.SelectedGroupItems with | GroupList grp -> grp | _ -> [||]))
     member this.IsLoading:bool = this.Bind(local, _.IsLoading)
-    member this.HasAudioBooks = this.Bind(local, fun s -> s.AudioBookItems.Length > 0)
-
+    
+    member this.BackButtonVisible = this.Bind(local, fun s -> s.SelectedGroups.Length > 0)
+    member this.AudioBookItemsVisible = this.Bind(local, fun s -> s.AudioBookItems.Length > 0)
+    member this.CategoryItemsVisible =
+        this.Bind(local, fun s ->
+            match s.SelectedGroupItems with
+            | GroupList _ -> true
+            | _ -> false
+        
+        )
+    
+    member this.IsEmpty = this.Bind(local, fun s -> s.AudioBookItems.Length = 0 && s.AvailableGroups.Length = 0)
+    
     member this.SearchText
         with get() = "nix"
         and set(value) =
             searchStringDebouncer 1000 (fun s ->
+                // protect against null
+                let s = if s = null then "" else s
                 local.Dispatch <| SetSearchText s
             ) value
 
 
-
+    
+    
+    member this.OnInitialized() = local.Dispatch <| RunOnlySideEffect SideEffect.LoadCurrentAudioBooks
     member this.LoadOnlineAudiobooks() = local.Dispatch LoadOnlineAudiobooks
     member this.SelectPreviousGroup(group:string) = local.Dispatch (SelectPreviousGroup group)
     member this.SelectAdditionalGroup(group:string) = local.Dispatch (AddSelectGroup group)
+    member this.RemoveLastSelectedGroup () =
+        match this.SelectedGroups with
+        | [] ->
+            ()
+        | _ ->
+            local.Dispatch <| RemoveLastSelectGroup (local.Model.SelectedGroups |> List.last)
+
+    member this.OnLoaded() =
+        // always set backbutton, when enter this page
+        let navService = DependencyService.Get<INavigationService>()
+        if navService <> Unchecked.defaultof<_> then // because of design time
+            let selectedGroups = local.Model.SelectedGroups
+            match selectedGroups with
+            | [] ->
+                navService.ResetBackbuttonPressed()
+            | _ ->
+                navService.RegisterBackbuttonPressed (fun () -> local.Dispatch (RemoveLastSelectGroup (List.last selectedGroups)))
+
+    member this.GoBackHome() =
+        DependencyService.Get<IMainViewModel>().GotoHomePage()
+    
+    
     static member DesignVM =
         new BrowserViewModel(
             [|

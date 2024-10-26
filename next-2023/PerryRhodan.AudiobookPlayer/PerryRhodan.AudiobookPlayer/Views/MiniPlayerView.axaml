@@ -85,8 +85,21 @@
             </Border>
             <!-- controls -->
             <StackPanel Grid.Column="2" Orientation="Horizontal">
-                <Button Command="{Binding JumpBackwards}" IsEnabled="{Binding !IsLoading}">
-                    <avalonia:MaterialIcon Kind="Rewind30" />
+                <Button Grid.Row="3" Grid.Column="1" Command="{Binding JumpBackwards}" IsEnabled="{Binding !IsLoading}">
+                    <Grid>
+                        <TextBlock Text="{Binding JumpDistance}"  
+                                   HorizontalAlignment="Center" 
+                                   VerticalAlignment="Center"
+                                   FontSize="8"
+                                   Margin="0,2,0,0"/>
+                        <avalonia:MaterialIcon Kind="Replay">
+                            <avalonia:MaterialIcon.RenderTransform>
+                                <TransformGroup>
+                                    <RotateTransform Angle="-90" />
+                                </TransformGroup>
+                            </avalonia:MaterialIcon.RenderTransform>
+                        </avalonia:MaterialIcon>
+                    </Grid>
                 </Button>
                 <Button Command="{Binding Play}" IsVisible="{Binding IsStopped}"
                         IsEnabled="{Binding !IsLoading}">
@@ -96,8 +109,23 @@
                         IsEnabled="{Binding !IsLoading}">
                     <avalonia:MaterialIcon Kind="PauseCircle" />
                 </Button>
-                <Button Command="{Binding JumpForward}" IsEnabled="{Binding !IsLoading}">
-                    <avalonia:MaterialIcon Kind="FastForward30" />
+                <Button Grid.Row="3" Grid.Column="3" Command="{Binding JumpForward}" IsEnabled="{Binding !IsLoading}">
+                    <Grid>
+                        <TextBlock Text="{Binding JumpDistance}"  
+                                   HorizontalAlignment="Center" 
+                                   VerticalAlignment="Center"
+                                   FontSize="8"
+                                   Margin="-3,2,0,0"/>
+                        <avalonia:MaterialIcon Kind="Replay">
+                            <avalonia:MaterialIcon.RenderTransform>
+                                <TransformGroup>
+                                    <ScaleTransform ScaleX="-1" />
+                                    <RotateTransform Angle="90" />
+                                </TransformGroup>
+                            </avalonia:MaterialIcon.RenderTransform>
+                        </avalonia:MaterialIcon>
+                    
+                    </Grid>
                 </Button>
             </StackPanel>
         </Grid>

@@ -1,5 +1,6 @@
 ﻿namespace PerryRhodan.AudiobookPlayer.ViewModels
 
+open Avalonia.Media
 open Dependencies
 open PerryRhodan.AudiobookPlayer
 open PerryRhodan.AudiobookPlayer.ViewModel
@@ -41,18 +42,24 @@ type MainViewModel(root:CompositionRoot) =
             if DependencyService.IsComplete then
                 DependencyService.Get<INavigationService>().ResetBackbuttonPressed()
 
-            match m.View with
-            | View.HomePage ->
-                root.GetView<HomeViewModel>()
+            try
+                match m.View with
+                | View.HomePage ->
+                    let view = root.GetView<HomeViewModel>()
+                    view
 
-            | View.BrowserPage ->
-                root.GetView<BrowserViewModel>()
+                | View.BrowserPage ->
+                    root.GetView<BrowserViewModel>()
 
-            | View.SettingsPage ->
-                root.GetView<SettingsViewModel>()
+                | View.SettingsPage ->
+                    root.GetView<SettingsViewModel>()
 
-            | View.PlayerPage playerView ->
-                playerView
+                | View.PlayerPage playerView ->
+                    playerView
+            with
+            | ex ->
+                let e = ex
+                reraise()
 
         )
 
@@ -75,6 +82,15 @@ type MainViewModel(root:CompositionRoot) =
 
     member this.GotoBrowserPage() =
         if not app.Model.IsLoading then app.Dispatch <| SetView View.BrowserPage
+
+    member this.HomeButtonColor =
+        this.Bind (app, fun e ->  SolidColorBrush(if e.View = View.HomePage then  Colors.WhiteSmoke else Colors.DarkGray))
+
+    member this.BrowserButtonColor =
+        this.Bind (app, fun e -> SolidColorBrush(if e.View = View.BrowserPage then Colors.WhiteSmoke else Colors.DarkGray))
+
+    member this.SettingsButtonColor =
+        this.Bind (app, fun e -> SolidColorBrush(if e.View = View.SettingsPage then Colors.WhiteSmoke else Colors.DarkGray))
 
 
     static member DesignVM = new MainViewModel(Design.stub)

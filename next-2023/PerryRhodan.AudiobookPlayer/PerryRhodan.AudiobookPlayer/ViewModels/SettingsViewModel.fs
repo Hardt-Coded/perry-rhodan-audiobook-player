@@ -321,6 +321,11 @@ type SettingsViewModel() =
         and set(value) =
             if this.IsInitialized then local.Dispatch (SetJumpDistanceValue value)
 
+    member this.FirstStart
+        with get() = this.Bind(local, fun e -> e.FirstStart)
+        and set(value) =
+            if this.IsInitialized then local.Dispatch (SetFirstStart value)
+
     member val IsInitialized = false with get, set
 
     member this.OnInitialized() =
@@ -338,13 +343,20 @@ type SettingsViewModel() =
             for i in 0 .. 120 do
                 i, $"{i} Minuten"
         |]
+        
+    member this.YesNorValues =
+        [|
+            false, "Nein"
+            true, "Ja"
+        |]
 
     member this.ShowPrivacyPolicies() =
         // open web browser url
         let uri = Uri("https://www.hardt-solutions.com/PrivacyPolicies/EinsAMedienAudioBookPlayer.html")
         Browser.Default.OpenAsync(uri, BrowserLaunchMode.SystemPreferred) |> ignore
 
-
+    member this.GoBackHome() =
+        DependencyService.Get<IMainViewModel>().GotoHomePage()
 
 
     member this.DeveloperModeSwitchCounter = this.Bind(local, fun e -> e.DeveloperModeSwitchCounter)

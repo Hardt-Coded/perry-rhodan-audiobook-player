@@ -13,7 +13,8 @@
              mc:Ignorable="d" d:DesignWidth="393" d:DesignHeight="738"
              x:Class="PerryRhodan.AudiobookPlayer.Views.SettingsView"
              Design.DataContext="{Binding Source={x:Static vm:SettingsViewModel.DesignVM}}"
-             x:DataType="vm:SettingsViewModel">
+             x:DataType="vm:SettingsViewModel"
+             Background="Black">
     <Interaction.Behaviors>
         <EventTriggerBehavior EventName="Initialized">
             <InvokeCommandAction Command="{Binding OnInitialized}"  />
@@ -26,7 +27,7 @@
 
         <Style Selector="Button">
             <Setter Property="Theme" Value="{StaticResource MaterialFlatButton}" />
-
+            
         </Style>
         <Style Selector="StackPanel">
             <Setter Property="Margin" Value="0,3,0,0" />
@@ -45,9 +46,11 @@
 
 
     <Grid RowDefinitions="Auto,Auto,Auto, Auto">
-        <Button Grid.Row="0" Theme="{StaticResource MaterialFlatButton}" HorizontalAlignment="Left">
+        <Button Grid.Row="0" Theme="{StaticResource MaterialFlatButton}" HorizontalAlignment="Left"
+                Command="{Binding GoBackHome}">
             <StackPanel Orientation="Horizontal">
                 <avalonia:MaterialIcon Kind="ArrowLeftCircle" Width="24" Height="24" Margin="-10,0,10,0" />
+                <TextBlock FontSize="24">Einstellungen</TextBlock>
             </StackPanel>
         </Button>
         <Grid Grid.Row="2" Margin="10">
@@ -59,7 +62,6 @@
                                                  ItemList="{Binding SecondsValues}"
                                                  HorizontalContentAlignment="Left"/>
                 </Grid>
-                <cherylUi:HorizontalSeparator />
                 <Grid ColumnDefinitions="*,120">
 
                     <TextBlock Grid.Column="0" Text="Sprung nach langer Pause" />
@@ -68,7 +70,6 @@
                                                  ItemList="{Binding SecondsValues}"
                                                  HorizontalContentAlignment="Left"/>
                 </Grid>
-                <cherylUi:HorizontalSeparator />
                 <Grid ColumnDefinitions="*,120">
                     <TextBlock Grid.Column="0" Text="Lange Pause ist" />
                     <valueSelector:ValueSelector Grid.Column="1"
@@ -76,12 +77,19 @@
                                                  ItemList="{Binding MinutesValues}"
                                                  HorizontalContentAlignment="Left" />
                 </Grid>
-                <cherylUi:HorizontalSeparator />
                 <Grid ColumnDefinitions="*,120">
                     <TextBlock Grid.Column="0" Text="Sprungweite" />
                     <valueSelector:ValueSelector Grid.Column="1"
                                                  Value="{Binding JumpDistance}"
                                                  ItemList="{Binding SecondsValues}"
+                                                 HorizontalContentAlignment="Left"/>
+
+                </Grid>
+                <Grid ColumnDefinitions="*,120">
+                    <TextBlock Grid.Column="0" Text="Verhalten wie beim ersten Start" />
+                    <valueSelector:ValueSelector Grid.Column="1"
+                                                 Value="{Binding FirstStart}"
+                                                 ItemList="{Binding YesNorValues}"
                                                  HorizontalContentAlignment="Left"/>
 
                 </Grid>
