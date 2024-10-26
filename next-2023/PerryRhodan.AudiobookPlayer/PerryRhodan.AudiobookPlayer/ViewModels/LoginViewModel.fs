@@ -17,12 +17,12 @@ module LoginPage =
         Username:string
         Password:string
         LoginFailed:bool
-        RememberLogin:bool 
+        RememberLogin:bool
         IsLoading:bool
     }
 
-    type Msg = 
-        | TryLogin 
+    type Msg =
+        | TryLogin
         | LoginFailed
         | LoginSucceeded of Map<string,string>
         | ChangeRememberLogin of bool
@@ -33,8 +33,8 @@ module LoginPage =
         | CloseDialog
         | KeyboardStateChanged
 
-        
-    
+
+
     [<RequireQualifiedAccess>]
     type SideEffect =
         | None
@@ -51,46 +51,46 @@ module LoginPage =
 
     let update msg (state:State) =
         match msg with
-        | TryLogin ->            
+        | TryLogin ->
             match state.Username,state.Password with
             | "", "" ->
                 state, SideEffect.ShowErrorMessage Translations.current.MissingLoginCredentials
             | _, _ ->
                 state, SideEffect.TryLogin
-                
+
         | LoginSucceeded cc ->
             state, SideEffect.LoginSuccessfullAfterMath (state.RememberLogin, cc)
-        
+
         | LoginFailed ->
             {state with LoginFailed = true}, SideEffect.None
-            
+
         | ChangeRememberLogin b ->
             {state with RememberLogin = b}, SideEffect.None
-            
+
         | ChangeUsername u ->
             {state with Username = u}, SideEffect.None
-            
+
         | ChangePassword p ->
             {state with Password = p}, SideEffect.None
-            
+
         | SetStoredCredentials (u,p,r) ->
             {state with Username= u; Password = p; RememberLogin = r}, SideEffect.None
-            
-        | SetBusy busy -> 
+
+        | SetBusy busy ->
             { state with IsLoading = busy}, SideEffect.None
-            
+
         | CloseDialog ->
             state, SideEffect.CloseDialog
-            
+
         | KeyboardStateChanged ->
             state, SideEffect.None
-            
-    
+
+
 
     module SideEffects =
         open Common
-        
-        
+
+
         let runSideEffects (sideEffect:SideEffect) (state:State) (dispatch:Msg -> unit) =
             task {
                 if sideEffect = SideEffect.None then
@@ -102,9 +102,8 @@ module LoginPage =
                             match sideEffect with
                             | SideEffect.None ->
                                 return ()
-                                
+
                             | SideEffect.TryLogin ->
-                                dispatch <| SetBusy true
                                 try
                                     let username = state.Username.Trim()
                                     let! cc = WebAccess.login username state.Password
@@ -132,19 +131,19 @@ module LoginPage =
                                         | Network msg ->
                                             do! Notifications.showErrorMessage msg
                                             ()
-                                            
+
                                         dispatch <| SetBusy false
                                 with
                                 | ex ->
                                     do! Notifications.showErrorMessage ex.Message
                                     dispatch <| SetBusy false
                                     return ()
-                               
+
                             | SideEffect.LoadStoredCredentials ->
                                     dispatch <| SetBusy true
                                     let! res = SecureLoginStorage.loadLoginCredentials ()
                                     match res with
-                                    | Error e -> 
+                                    | Error e ->
                                         System.Diagnostics.Debug.WriteLine("Error loading cred: " + e)
                                         do! Notifications.showErrorMessage e
                                         dispatch <| SetBusy false
@@ -155,13 +154,13 @@ module LoginPage =
                                             dispatch <| SetStoredCredentials (usr,pw,rl)
                                         | _, _ ->
                                             dispatch <| SetStoredCredentials ("","",rl)
-                                            
+
                                     dispatch <| SetBusy false
-                                    
-                                            
+
+
                             | SideEffect.LoginSuccessfullAfterMath (rememberLogin, cookie) ->
                                 dispatch <| SetBusy true
-                                
+
                                 if rememberLogin then
                                     let! res = SecureLoginStorage.saveLoginCredentials state.Username state.Password state.RememberLogin
                                     match res with
@@ -170,7 +169,7 @@ module LoginPage =
                                         System.Diagnostics.Debug.WriteLine(msg)
                                         do! Notifications.showErrorMessage msg
                                     | Ok _ -> ()
-                                    
+
                                 let! storeRes =  SecureLoginStorage.saveCookie cookie
                                 match storeRes with
                                 | Error e ->
@@ -180,63 +179,67 @@ module LoginPage =
                                 | Ok _ ->
                                     Notifications.showToasterMessage "Login erfolgreich"
                                     dispatch CloseDialog
-                                    
-                                dispatch <| SetBusy true
-                                                                                            
 
-                                    
-                                
+                                dispatch <| SetBusy true
+
+
+
+
                             | SideEffect.ShowErrorMessage s ->
                                 do! Notifications.showErrorMessage s
                                 return ()
-                                
+
                             | SideEffect.CloseDialog ->
                                 InteractiveContainer.CloseDialog()
                                 // Backbutton back to default
                                 DependencyService.Get<INavigationService>().ResetBackbuttonPressed()
                                 return ()
                         }
-                        
+
                     dispatch <| SetBusy false
             }
-            
- 
- 
+
+
+
 open LoginPage
 
 type LoginViewModel(?designView) =
     inherit ReactiveElmishViewModel()
-    
+
     let local =
         Program.mkAvaloniaProgrammWithSideEffect init update SideEffects.runSideEffects
         |> Program.mkStore
-        
-    let designView = defaultArg designView false    
+
+    let designView = defaultArg designView false
     do
         if OperatingSystem.IsAndroid() && not designView then
             base.Subscribe(InputPaneService.InputPane.StateChanged, fun _ -> local.Dispatch KeyboardStateChanged)
             let notificationService = DependencyService.Get<INavigationService>()
             notificationService.RegisterBackbuttonPressed (fun () -> local.Dispatch CloseDialog)
             ()
-    
+
+
+    new() =
+        new LoginViewModel(false)
+
     interface ILoginViewModel
-            
-    member this.Username 
+
+    member this.Username
         with get() = this.Bind(local, _.Username)
         and set v = local.Dispatch (ChangeUsername v)
     member this.Password
         with get() = this.Bind(local, _.Password)
         and set v = local.Dispatch (ChangePassword v)
-        
+
     member this.RememberLogin
         with get() = this.Bind(local, _.RememberLogin)
         and set v = local.Dispatch (ChangeRememberLogin v)
-    
+
     member this.IsLoading = this.Bind(local, _.IsLoading)
-        
+
     member this.TryLogin() = local.Dispatch TryLogin
     member this.Cancel() = local.Dispatch CloseDialog
-    
+
     /// return the screen size for the login form dialog
     member this.DialogWidth = this.Bind(local, fun _ ->
         let screenService = DependencyService.Get<IScreenService>()
