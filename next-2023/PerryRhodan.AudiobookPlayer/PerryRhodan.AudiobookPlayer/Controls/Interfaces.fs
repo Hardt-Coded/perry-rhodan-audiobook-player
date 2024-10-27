@@ -19,6 +19,7 @@ type IActionMenuService =
 type IMainViewModel =
     abstract member GotoPlayerPage:viewModel:IAudioBookItemViewModel->startPlaying:bool->unit
     abstract member OpenMiniplayer:viewModel:IAudioBookItemViewModel->startPlaying:bool->unit
+    abstract member CloseMiniplayer:unit->unit
     abstract member GotoHomePage:unit->unit
     abstract member CurrentPlayerAudiobookViewModel:IAudioBookItemViewModel option
 
