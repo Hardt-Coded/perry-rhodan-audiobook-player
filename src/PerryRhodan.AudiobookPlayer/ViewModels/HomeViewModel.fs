@@ -25,7 +25,6 @@ module HomePage =
         SideEffect =
         | None
         | Init
-        | LoadAudioBooks
 
 
     let disposables = new System.Collections.Generic.List<IDisposable>()
@@ -92,13 +91,6 @@ module HomePage =
                                 return ()
 
                             | SideEffect.Init ->
-                                // listen to global audiobook store
-                                disposables.Add
-                                    <| AudioBookStore.globalAudiobookStore.Observable.Subscribe(fun m ->
-                                        dispatch <| AudioBooksLoaded m.Audiobooks
-                                    )
-
-                            | SideEffect.LoadAudioBooks ->
                                 try
                                     let audioBooks =
                                         AudioBookStore.globalAudiobookStore.Model.Audiobooks

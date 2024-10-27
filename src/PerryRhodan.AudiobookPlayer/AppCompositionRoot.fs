@@ -18,7 +18,7 @@ type AppCompositionRoot() =
 
     override this.RegisterViews() =
         Map [
-            VM.Key<HomeViewModel>(), View.Singleton<HomeView>()
+            VM.Key<HomeViewModel>(), View.Transient<HomeView>()
             VM.Key<BrowserViewModel>(), View.Singleton<BrowserView>()
             VM.Key<SettingsViewModel>(), View.Singleton<SettingsView>()
         ]
