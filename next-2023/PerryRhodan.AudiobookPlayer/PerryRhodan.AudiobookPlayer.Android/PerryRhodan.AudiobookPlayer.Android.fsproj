@@ -34,9 +34,6 @@
     <PublishTrimmed>false</PublishTrimmed>
     <TrimMode>partial</TrimMode>
     <AndroidCreatePackagePerAbi>False</AndroidCreatePackagePerAbi>
-    <AndroidLinkTool>r8</AndroidLinkTool>
-    <!-- <AndroidLinkTool>r8</AndroidLinkTool> -->
-    <!--<AndroidEnableProfiledAot>True</AndroidEnableProfiledAot>-->
   </PropertyGroup>
 
   <ItemGroup>

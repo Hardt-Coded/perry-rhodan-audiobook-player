@@ -1,5 +1,6 @@
 ﻿namespace rec PerryRhodan.AudiobookPlayer.ViewModel
 
+open Avalonia.Controls
 open Avalonia.Media
 open Avalonia.Media.Imaging
 open Avalonia.Threading
@@ -15,6 +16,7 @@ open Services
 open System
 open AudioBookItem
 open Services.DependencyServices
+open SkiaSharp
 
 
 
@@ -33,6 +35,7 @@ module AudioBookStore =
             | AudiobooksLoaded of AudioBookItemViewModel array
             | DeleteAudiobookFromDatabase of AudioBook
             | RemoveAudiobookFromDevice of AudioBook
+            | AudioBookChanged // only trigger for the reactive subscriptions on this store
             | IsBusy of bool
 
         [<RequireQualifiedAccess>]
@@ -49,6 +52,9 @@ module AudioBookStore =
 
         let update (msg:Msg) (state:State) =
             match msg with
+            | AudioBookChanged ->
+                state, SideEffect.None
+                
             | AudiobooksLoaded audiobooks ->
                 { state with Audiobooks = audiobooks }, SideEffect.None
 
@@ -451,7 +457,7 @@ module AudioBookItem =
                 if bitmap = null then
                     "#ff483d8b"
                 else
-                    let bitmap = bitmap.Resize(SkiaSharp.SKImageInfo(5,5), SkiaSharp.SKFilterQuality.Low)
+                    let bitmap = bitmap.Resize(SkiaSharp.SKImageInfo(5,5, SKColorType.Rgb888x), SkiaSharp.SKFilterQuality.High)
 
                     let getHue (x,_,_) = x
 
@@ -565,6 +571,8 @@ module AudioBookItem =
                                     return()
 
                                 | SideEffect.DeleteItemFromDb ->
+                                    // update the audio file list, to trigger update of other views
+                                    AudioBookStore.globalAudiobookStore.Dispatch <| AudioBookStore.AudioBookElmish.DeleteAudiobookFromDatabase state.Audiobook
                                     return()
 
                                 | SideEffect.ShowMetaData ->
@@ -584,6 +592,8 @@ module AudioBookItem =
                                         dispatch <| SetAmbientColor color
                                     | None ->
                                         ()
+                                    // update the audio file list, to trigger update of other views
+                                    AudioBookStore.globalAudiobookStore.Dispatch <| AudioBookStore.AudioBookElmish.AudioBookChanged
 
                                 | SideEffect.SendPauseCommandToAudioPlayer ->
                                     DependencyService.Get<IAudioPlayerPause>().Pause()
@@ -759,6 +769,8 @@ type AudioBookItemViewModel(audiobook: AudioBook) as self =
         Program.mkAvaloniaProgrammWithSideEffect init update SideEffects.runSideEffects
         |> Program.mkStore
 
+    
+    
     interface IAudioBookItemViewModel with
         member this.SetUploadDownloadState newState = local.Dispatch (UpdateDownloadProgress newState)
         member this.SetDownloadCompleted result     = local.Dispatch (DownloadCompleted result)
@@ -778,6 +790,13 @@ type AudioBookItemViewModel(audiobook: AudioBook) as self =
     member this.AmbientColor    = this.BindOnChanged(local, _.AmbientColor, (fun i ->
         let ac = i.AmbientColor |> Option.defaultValue "#ff483d8b"
         Color.Parse ac
+        ))
+    
+    member this.IconColor      = this.BindOnChanged(local, _.AmbientColor, (fun i ->
+        i.AmbientColor
+        |> Option.map ColorHelpers.invertHexColor
+        |> Option.defaultValue "#ffffff"
+        |> SolidColorBrush.Parse
         ))
 
     member this.OpenDialog()                = local.Dispatch <| RunOnlySideEffect SideEffect.OpenAudioBookActionMenu
