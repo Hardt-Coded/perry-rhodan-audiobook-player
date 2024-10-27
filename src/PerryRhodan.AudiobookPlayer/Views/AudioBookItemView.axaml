@@ -45,14 +45,16 @@
         </Border.Background>
         <Grid ColumnDefinitions="100,*,44,44"
               RowDefinitions="*,Auto">
+            
+            
 
             <Border CornerRadius="15" Margin="0,3,0,0" Padding="1" ClipToBounds="True">
                 <Grid Grid.Column="0" Margin="0">
-
+                    
                     <asyncImageLoader:AdvancedImage Source="{Binding Thumbnail}">
                         
                     </asyncImageLoader:AdvancedImage>
-
+                   
                     <Image Source="{Binding LoadingPie}" />
                     <!--<Image Source="{Binding ProgressPie}" Width="20" Height="20" HorizontalAlignment="Left"
                            VerticalAlignment="Bottom" Margin="10,0,0,5" />-->
@@ -65,6 +67,7 @@
                         Kind="Download"
                         Foreground="{Binding IconColor}"
                         IsVisible="{Binding !IsDownloaded}" />
+                    
                     <avalonia:MaterialIcon
                         HorizontalAlignment="Left"
                         VerticalAlignment="Bottom"

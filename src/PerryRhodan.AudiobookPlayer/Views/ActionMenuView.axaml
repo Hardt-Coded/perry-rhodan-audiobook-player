@@ -57,7 +57,7 @@
                          Command="{Binding MarkAsListend}" >
                     <StackPanel Orientation="Horizontal">
                         <avalonia:MaterialIcon Kind="Book" />
-                        <Label>Hörbuch als gelesen markieren"</Label>
+                        <Label>Hörbuch als gelesen markieren</Label>
                     </StackPanel>
                 </Button>
                 

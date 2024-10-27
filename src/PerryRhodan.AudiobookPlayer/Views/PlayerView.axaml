@@ -45,14 +45,14 @@
 
         <asyncImageLoader:AdvancedImage Margin="40,5,40,10" Grid.Row="1" Source="{Binding Picture}" />
         <Grid Grid.Row="1" RowDefinitions="Auto" ColumnDefinitions="Auto" HorizontalAlignment="Center"
-              VerticalAlignment="Center" IsVisible="{Binding SleepClockVisible}">
-            <!--<glassMorphism:GlassCard BorderThickness="0">
+              VerticalAlignment="Center" IsVisible="{Binding !SleepClockVisible}">
+            <glassMorphism:GlassCard BorderThickness="0">
                 <TextBlock VerticalAlignment="Center"
                            Text="{Binding TimeUntilSleeps}"
                            FontSize="50"
                            HorizontalAlignment="Center"
                            Foreground="WhiteSmoke" />    
-            </glassMorphism:GlassCard>-->
+            </glassMorphism:GlassCard>
         </Grid>
 
 

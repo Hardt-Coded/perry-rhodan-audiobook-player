@@ -22,8 +22,8 @@
         <Grid>
             <StackPanel Margin="10">
                 <TextBlock Classes="headline4" Text="Login" HorizontalAlignment="Center" />
-                <TextBox p1:TextFieldAssist.Label="E-Mail" Text="{Binding Username}" Watermark="E-Mail eingeben" />
-                <TextBox p1:TextFieldAssist.Label="Passwort" Text="{Binding Password}" Watermark="Passwort eingeben" PasswordChar="*" />
+                <TextBox p1:TextFieldAssist.Label="E-Mail" Text="{Binding Username}" Watermark="E-Mail eingeben" TextInputOptions.ContentType="Email"/>
+                <TextBox p1:TextFieldAssist.Label="Passwort" Text="{Binding Password}" Watermark="Passwort eingeben" PasswordChar="*"  TextInputOptions.ContentType="Password" />
                 <ToggleSwitch Margin="0,5,0,5" Content="Login merken" IsChecked="{Binding RememberLogin}"
                               HorizontalAlignment="Center" />
                 <Button Margin="0,5,0,5" Content="Login" Command="{Binding TryLogin}" />

@@ -457,7 +457,7 @@ module AudioBookItem =
                 if bitmap = null then
                     "#ff483d8b"
                 else
-                    let bitmap = bitmap.Resize(SkiaSharp.SKImageInfo(5,5, SKColorType.Rgb888x), SkiaSharp.SKFilterQuality.High)
+                    let bitmap = bitmap.Resize(SkiaSharp.SKImageInfo(5,5, SKColorType.Rgb888x), SKSamplingOptions(SKFilterMode.Nearest))
 
                     let getHue (x,_,_) = x
 
@@ -681,15 +681,18 @@ module private Draw =
             canvas.Restore()
 
         use textPaint = new SKPaint()
-        textPaint.TextSize <- 75.0f
         textPaint.Color <- SKColor.Parse("FFFFFF")
         textPaint.BlendMode <- SKBlendMode.Plus
         textPaint.IsAntialias <- false
-        textPaint.TextAlign <- SKTextAlign.Center
-
+        
+        use font = new SKFont()
+        font.Size <- 75.0f
+        
         let text = $"{((factor * 100.0) |> int)} %%"
-        let y = ((height  / 2) |> f32) + (textPaint.TextSize / 2.0f) - 15.0f
-        canvas.DrawText(text, (width / 2) |> f32,y , textPaint)
+        let y = ((height  / 2) |> f32) + (font.Size / 2.0f) - 15.0f
+        
+        
+        canvas.DrawText(text, (width / 2) |> f32, y ,SKTextAlign.Center, font, textPaint)
 
         canvas.ResetMatrix()
 

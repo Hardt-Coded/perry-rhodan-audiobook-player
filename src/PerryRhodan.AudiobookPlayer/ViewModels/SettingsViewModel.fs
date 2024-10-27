@@ -7,6 +7,7 @@ open Global
 open Microsoft.Maui.ApplicationModel
 open PerryRhodan.AudiobookPlayer.Services
 open PerryRhodan.AudiobookPlayer.ViewModels.LoginPage
+open PerryRhodan.AudiobookPlayer.Views
 open ReactiveElmish.Avalonia
 open ReactiveElmish
 open Elmish.SideEffect
@@ -298,6 +299,12 @@ type SettingsViewModel() =
         Program.mkAvaloniaProgrammWithSideEffect init update SideEffects.runSideEffects
         |> Program.mkStore
 
+    
+    let feedBackView =
+        let view = FeedbackView()
+        view.DataContext <- new FeedbackViewModel()
+        view
+    
 
     // option members from state
     member this.DataProtectionStuff
@@ -355,6 +362,10 @@ type SettingsViewModel() =
         let uri = Uri("https://www.hardt-solutions.com/PrivacyPolicies/EinsAMedienAudioBookPlayer.html")
         Browser.Default.OpenAsync(uri, BrowserLaunchMode.SystemPreferred) |> ignore
 
+    
+    member this.ShowFeedbackPage() =
+        InteractiveContainer.ShowDialog feedBackView
+    
     member this.GoBackHome() =
         DependencyService.Get<IMainViewModel>().GotoHomePage()
 
