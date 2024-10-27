@@ -558,6 +558,7 @@ module AudioBookItem =
                                 | SideEffect.RemoveAudioBookFromDevice ->
                                     AudioBookStore.globalAudiobookStore.Dispatch <| AudioBookStore.AudioBookElmish.RemoveAudiobookFromDevice state.Audiobook
                                     do! updateDatabase state.Audiobook
+                                    DependencyService.Get<IMainViewModel>().CloseMiniplayer()
                                     return()
 
                                 | SideEffect.MarkAsUnlistend ->
