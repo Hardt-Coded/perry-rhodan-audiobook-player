@@ -20,13 +20,11 @@
             <InvokeCommandAction Command="{Binding OnInitialized}"  />
         </EventTriggerBehavior>
     </Interaction.Behaviors>
-    <UserControl.Resources>
-        <SolidColorBrush x:Key="DialogBackground" Color="Green" />
-    </UserControl.Resources>
     <UserControl.Styles>
 
         <Style Selector="Button">
-            <Setter Property="Theme" Value="{StaticResource MaterialFlatButton}" />
+            <Setter Property="Theme" Value="{StaticResource MaterialOutlineButton}" />
+            <Setter Property="Margin" Value="5,5,5,5" />
             
         </Style>
         <Style Selector="StackPanel">
@@ -98,6 +96,7 @@
         <Grid Grid.Row="3">
             <StackPanel>
                 <Button Command="{Binding ShowPrivacyPolicies}">Zeige Datenschutzerklärung</Button>
+                <Button Command="{Binding ShowFeedbackPage}">Sende Supportanfrage oder Feedback</Button>
             </StackPanel>
         </Grid>
     </Grid>

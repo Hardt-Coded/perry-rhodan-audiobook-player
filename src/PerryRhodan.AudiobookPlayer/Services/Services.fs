@@ -1004,7 +1004,7 @@ module WebAccess =
 
                 //use thumbInputStream = File.OpenRead()
                 use orig = SKBitmap.Decode(imageFullName)
-                use thumb = orig.Resize(SKImageInfo(200, 200),SKFilterQuality.Medium)
+                use thumb = orig.Resize(SKImageInfo(200, 200), SKSamplingOptions(SKFilterMode.Linear, SKMipmapMode.Linear))
                 if isNull thumb then
                     ()
                 else
@@ -1435,7 +1435,9 @@ module SystemSettings =
 
 module SupportFeedback =
 
-
+    
+    
+    
     type Message = {
         Category:string
         Name:string
@@ -1443,26 +1445,34 @@ module SupportFeedback =
     }
 
     let sendSupportFeedBack name category message =
-        async {
-
+        task {
             let msg = {
                 Category = category
                 Message = message
                 Name = name
             }
-            let json = JsonConvert.SerializeObject(msg)
-            //let body = HttpRequestBody.TextRequest json
+            let jsonStr = JsonConvert.SerializeObject(msg)
+            // use FsHttp to send the message
+            
             try
-               (* let! response = Http.AsyncRequest(url=Global.supportMessageApi,httpMethod="POST", body=body,headers=[Accept HttpContentTypes.Json;ContentType HttpContentTypes.Json])
-                if response.StatusCode <> 202 then
+                let! res =
+                    http {
+                        POST Global.supportMessageApi
+                        body
+                        json jsonStr
+                        config_transformHttpClient (WebAccess.useAndroidHttpClient false)
+                    }
+                    |> Request.sendTAsync
+                    
+                    
+                if res.statusCode <> HttpStatusCode.Accepted then
                     return Error "Fehler beim Senden der Nachricht. Probieren Sie es noch einmal."
-                else*)
-                return Ok ()
+                else
+                    return Ok ()
             with
             | ex ->
                 Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
-                return Error "Fehlerbeim Senden der Nachricht. Probieren Sie es noch einmal."
-
+                return Error "Fehler beim Senden der Nachricht. Probieren Sie es noch einmal."
         }
 
 
