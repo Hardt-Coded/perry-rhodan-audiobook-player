@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionName="2.0.0-beta" package="hits.rhodan.audiobooks.dev" android:installLocation="auto" android:versionCode="49990">
+	<uses-permission android:name="android.permission.INTERNET" />
+	<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+	<uses-permission android:name="android.permission.WAKE_LOCK" />
+	<uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+	<uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+	<uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+	<uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+	<application android:label="Eins A Medien Audiobook Player" android:icon="@drawable/eins_a_launcher" android:requestLegacyExternalStorage="true" android:allowBackup="true" android:fullBackupContent="@xml/backup_rules">
+		<!--android:dataExtractionRules="@xml/backup_rules_31"-->
+		<!--<service android:name="Perry.Rhodan.AudioService"
+				 android:stopWithTask="true"
+				 android:foregroundServiceType="mediaPlayback">
+
+		</service>-->
+	</application>
+	<queries>
+		<intent>
+			<action android:name="android.intent.action.VIEW" />
+			<data android:scheme="http"/>
+		</intent>
+		<intent>
+			<action android:name="android.intent.action.VIEW" />
+			<data android:scheme="https"/>
+		</intent>
+	</queries>
+</manifest>
