@@ -521,6 +521,10 @@ type AudioPlayerService() as self =
                      Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
                      raise ex
             }
+            
+        member this.UpdateNotifcation() =
+            mediaSession |> Option.iter (fun m -> m.Release())
+            mediaSession <- None
 
     interface IAudioPlayerPause with
         member this.Pause() =
@@ -533,6 +537,10 @@ type AudioPlayerService() as self =
             // add audio manager
             audioManager <- Some (self.GetSystemService(Context.AudioService) :?> AudioManager)
 
+        member this.DisableAudioPlayer() =
+            store.Dispatch <| StateControlMsg (DisableAudioService)
+            
+        
         member this.Play () =
             store.Dispatch <| PlayerControlMsg Play
 

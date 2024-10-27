@@ -60,7 +60,6 @@
     <Compile Include="Services\Common.fs" />
     <Compile Include="Services\NotificationService.fs" />
     <Compile Include="Services\DownloadService.fs" />
-    <Compile Include="Services\AudioPlayerOld.fs" />
     <Compile Include="Services\AudioPlayer.fs" />
     <Compile Include="Activities.fs" />
   </ItemGroup>

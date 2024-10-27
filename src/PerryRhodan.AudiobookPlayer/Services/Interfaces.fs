@@ -25,6 +25,7 @@
         abstract member Stop : resumeOnAudioFocus:bool -> unit
         abstract member SeekTo : TimeSpan -> unit
         abstract member SetPlaybackSpeed : float -> Task<unit>
+        abstract member UpdateNotifcation : unit -> unit
         
     and AudioPlayerInformation  = {
         State: AudioPlayerState
