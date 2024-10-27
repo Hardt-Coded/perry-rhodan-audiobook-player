@@ -84,7 +84,7 @@ let update msg state =
         state, SideEffect.OpenMiniplayer (viewModel, startPlaying)
 
     | CloseMiniplayer ->
-        { state with PlayerViewModel = None }, SideEffect.None
+        { state with PlayerViewModel = None; MiniPlayerControl = None }, SideEffect.None
 
     | OpenLoginView ->
         state, SideEffect.OpenLoginView

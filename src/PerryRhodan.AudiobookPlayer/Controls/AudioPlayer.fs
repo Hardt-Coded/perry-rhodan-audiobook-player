@@ -89,6 +89,7 @@ module PlayerElmish =
 
     and StateControlMsg =
         | InitAudioService of AudioBookItemViewModel * Mp3FileList
+        | DisableAudioService
         | UpdatePlayingState of pos: TimeSpan * duration: TimeSpan * state: AudioPlayerState
         | UpdateInfoDataFromOutside of info: AudioPlayerInfo
         | SetBusy of bool
@@ -105,6 +106,7 @@ module PlayerElmish =
     type SideEffect =
         | None
         | InitAudioPlayer
+        | DisableAudioService
         | StartAudioPlayer
         | StartAudioPlayerExtern
         | StopAudioPlayer
@@ -237,6 +239,9 @@ module PlayerElmish =
                 },
                 SideEffect.None
 
+        | StateControlMsg DisableAudioService  ->
+            AudioPlayerInfo.Empty, SideEffect.DisableAudioService
+        
         | StateControlMsg(SetBusy b) ->
             { state with IsBusy = b }, SideEffect.None
 
@@ -455,7 +460,7 @@ module PlayerElmish =
     module SideEffects =
 
 
-        let createSideEffectsProcessor (audioPlayer: IMediaPlayer) =
+        let createSideEffectsProcessor (mediaPlayer: IMediaPlayer) =
             let mutable sleepTimer: Timer option = None
 
             fun (sideEffect: SideEffect)
@@ -490,28 +495,32 @@ module PlayerElmish =
 
                                 | SideEffect.InitAudioPlayer ->
                                     return ()
+                                    
+                                | SideEffect.DisableAudioService ->
+                                    mediaPlayer.UpdateNotifcation()
+                                    return ()
 
                                 | SideEffect.StartAudioPlayer ->
                                     state.AudioBook
                                     |> Option.iter (fun i -> i.UpdateCurrentListenFilename state.Filename)
 
-                                    do! audioPlayer.Play state.Filename
-                                    audioPlayer.SeekTo state.Position
+                                    do! mediaPlayer.Play state.Filename
+                                    mediaPlayer.SeekTo state.Position
                                     return ()
 
                                 | SideEffect.StartAudioPlayerExtern ->
                                     state.AudioBook
                                     |> Option.iter (fun i -> i.UpdateCurrentListenFilename state.Filename)
 
-                                    do! audioPlayer.Play state.Filename
-                                    audioPlayer.SeekTo state.Position
+                                    do! mediaPlayer.Play state.Filename
+                                    mediaPlayer.SeekTo state.Position
                                     return ()
 
                                 | SideEffect.StopAudioPlayer ->
                                     state.AudioBook
                                     |> Option.iter (fun i -> i.UpdateAudioBookPosition state.Position)
 
-                                    audioPlayer.Stop state.ResumeOnAudioFocus
+                                    mediaPlayer.Stop state.ResumeOnAudioFocus
 
                                     return ()
 
@@ -519,23 +528,23 @@ module PlayerElmish =
                                     state.AudioBook
                                     |> Option.iter (fun i -> i.UpdateAudioBookPosition state.Position)
 
-                                    audioPlayer.PlayPause()
+                                    mediaPlayer.PlayPause()
                                     return ()
 
                                 | SideEffect.MoveToNextTrack ->
                                     state.AudioBook
                                     |> Option.iter (fun i -> i.UpdateCurrentListenFilename state.Filename)
 
-                                    audioPlayer.Stop state.ResumeOnAudioFocus
-                                    do! audioPlayer.Play state.Filename
+                                    mediaPlayer.Stop state.ResumeOnAudioFocus
+                                    do! mediaPlayer.Play state.Filename
                                     return ()
 
                                 | SideEffect.MoveToPreviousTrack ->
                                     state.AudioBook
                                     |> Option.iter (fun i -> i.UpdateCurrentListenFilename state.Filename)
 
-                                    audioPlayer.Stop state.ResumeOnAudioFocus
-                                    do! audioPlayer.Play state.Filename
+                                    mediaPlayer.Stop state.ResumeOnAudioFocus
+                                    do! mediaPlayer.Play state.Filename
                                     return ()
 
                                 | SideEffect.GotoPositionWithNewTrack ->
@@ -545,28 +554,28 @@ module PlayerElmish =
                                     state.AudioBook
                                     |> Option.iter (fun i -> i.UpdateAudioBookPosition state.Position)
 
-                                    do! audioPlayer.Play state.Filename
-                                    audioPlayer.SeekTo state.Position
+                                    do! mediaPlayer.Play state.Filename
+                                    mediaPlayer.SeekTo state.Position
                                     return ()
 
                                 | SideEffect.GotoPosition position ->
                                     state.AudioBook |> Option.iter (fun i -> i.UpdateAudioBookPosition position)
-                                    audioPlayer.SeekTo position
+                                    mediaPlayer.SeekTo position
                                     return ()
 
 
 
                                 | SideEffect.SetPlaybackSpeed f ->
-                                    do! audioPlayer.SetPlaybackSpeed f
+                                    do! mediaPlayer.SetPlaybackSpeed f
                                     return ()
 
                                 | SideEffect.StopPlayingAndFinishAudioBook ->
-                                    audioPlayer.Stop false
+                                    mediaPlayer.Stop false
                                     state.AudioBook |> Option.iter (_.MarkAsListend())
                                     return ()
 
                                 | SideEffect.QuitAudioPlayer ->
-                                    audioPlayer.Stop false
+                                    mediaPlayer.Stop false
                                     return ()
 
                                 | SideEffect.GotUpdateInfoDataFromOutside ->
@@ -592,7 +601,7 @@ module PlayerElmish =
                                     return ()
 
                                 | SideEffect.SleepTimeReachedEnd ->
-                                    audioPlayer.Stop false
+                                    mediaPlayer.Stop false
                                     dispatch <| SleepTimerMsg SleepTimerStop
                                     return ()
                             }
@@ -606,6 +615,7 @@ type IAudioPlayer =
     //abstract member SetMetaData: audiobook:AudioBook -> numberOfTracks:int -> curentTrack:int -> unit
     abstract member Init:
         audioBook: AudioBookItemViewModel -> fileList: PlayerElmish.Mp3FileList -> unit
+    abstract member DisableAudioPlayer: unit -> unit
 
     abstract member Play: unit -> unit
     abstract member PlayExtern: file: string -> pos: TimeSpan -> unit
