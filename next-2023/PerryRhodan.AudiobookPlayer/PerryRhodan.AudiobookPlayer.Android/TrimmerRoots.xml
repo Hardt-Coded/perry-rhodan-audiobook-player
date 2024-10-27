@@ -1,5 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
-<linker>
-    <assembly fullname="Avalonia" preserve="all"/>
-    <assembly fullname="Avalonia.Skia" />
-</linker>
