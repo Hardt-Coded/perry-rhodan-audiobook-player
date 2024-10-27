@@ -1,0 +1,40 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+             xmlns:p1="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             xmlns:vm="clr-namespace:PerryRhodan.AudiobookPlayer.ViewModels"
+             xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="PerryRhodan.AudiobookPlayer.Views.LoginView"
+             Design.DataContext="{Binding Source={x:Static vm:LoginViewModel.DesignVM}}"
+             x:DataType="vm:LoginViewModel"
+             Width="{Binding DialogWidth}">
+    <UserControl.Styles>
+        <Style Selector="TextBox">
+            <Setter Property="Margin" Value="0,5,0,5" />
+            <Setter Property="UseFloatingWatermark" Value="True" />
+        </Style>
+    </UserControl.Styles>
+
+    <controls:Card VerticalAlignment="Top" CornerRadius="20">
+        <Grid>
+            <StackPanel Margin="10">
+                <TextBlock Classes="headline4" Text="Login" HorizontalAlignment="Center" />
+                <TextBox p1:TextFieldAssist.Label="E-Mail" Text="{Binding Username}" Watermark="E-Mail eingeben" />
+                <TextBox p1:TextFieldAssist.Label="Passwort" Text="{Binding Password}" Watermark="Passwort eingeben" PasswordChar="*" />
+                <ToggleSwitch Margin="0,5,0,5" Content="Login merken" IsChecked="{Binding RememberLogin}"
+                              HorizontalAlignment="Center" />
+                <Button Margin="0,5,0,5" Content="Login" Command="{Binding TryLogin}" />
+                <Button Margin="0,2,0,0" Theme="{StaticResource MaterialFlatButton}" Content="Cancel"
+                        Command="{Binding Cancel}" />
+                <Grid Height="{Binding InputPaneHeight}" />
+            </StackPanel>
+            <Grid IsVisible="{Binding IsLoading}">
+                <ProgressBar Classes="circular" IsIndeterminate="True" />
+            </Grid>
+        </Grid>
+    </controls:Card>
+
+</UserControl>

@@ -1,0 +1,328 @@
+﻿/// https://github.com/Zaid-Ajaj/LiteDB.FSharp/blob/master/LiteDB.FSharp/Json.fs
+namespace LiteDB.FSharp
+
+open LiteDB
+open System
+open System.Collections.Generic
+open Newtonsoft.Json
+
+[<AutoOpen>]
+module ReflectionAdapters =
+    open System.Reflection
+
+    type Type with
+        member this.IsValueType = this.GetTypeInfo().IsValueType
+        member this.IsGenericType = this.GetTypeInfo().IsGenericType
+        member this.GetMethod(name) = this.GetTypeInfo().GetMethod(name)
+        member this.GetGenericArguments() = this.GetTypeInfo().GetGenericArguments()
+        member this.MakeGenericType(args) = this.GetTypeInfo().MakeGenericType(args)
+        member this.GetCustomAttributes(inherits : bool) : obj[] =
+            downcast box(CustomAttributeExtensions.GetCustomAttributes(this.GetTypeInfo(), inherits) |> Seq.toArray)
+
+open FSharp.Reflection
+open System.Collections.Concurrent
+
+type Kind =
+    | Other = 0
+    | Option = 1
+    | Tuple = 2
+    | Union = 3
+    | DateTime = 6
+    | MapOrDictWithNonStringKey = 7
+    | Long = 8
+    | BigInt = 9
+    | Guid = 10
+    | Decimal = 11
+    | Binary = 12
+    | ObjectId = 13
+    | Double = 14
+
+/// Helper for serializing map/dict with non-primitive, non-string keys such as unions and records.
+/// Performs additional serialization/deserialization of the key object and uses the resulting JSON
+/// representation of the key object as the string key in the serialized map/dict.
+type MapSerializer<'k,'v when 'k : comparison>() =
+    static member Deserialize(t:Type, reader:JsonReader, serializer:JsonSerializer) =
+        let dictionary =
+            serializer.Deserialize<Dictionary<string,'v>>(reader)
+                |> Seq.fold (fun (dict:Dictionary<'k,'v>) kvp ->
+                    use tempReader = new System.IO.StringReader(kvp.Key)
+                    let key = serializer.Deserialize(tempReader, typeof<'k>) :?> 'k
+                    dict.Add(key, kvp.Value)
+                    dict
+                    ) (Dictionary<'k,'v>())
+        if t.IsGenericType && t.GetGenericTypeDefinition() = typedefof<Map<_,_>>
+        then dictionary |> Seq.map (|KeyValue|) |> Map.ofSeq :> obj
+        elif t.IsGenericType && t.GetGenericTypeDefinition() = typedefof<Dictionary<_,_>>
+        then dictionary :> obj
+        else failwith "MapSerializer input type wasn't a Map or a Dictionary"
+    static member Serialize(value: obj, writer:JsonWriter, serializer:JsonSerializer) =
+        let kvpSeq =
+            match value with
+            | :? Map<'k,'v> as mapObj -> mapObj |> Map.toSeq
+            | :? Dictionary<'k,'v> as dictObj -> dictObj |> Seq.map (|KeyValue|)
+            | _ -> failwith "MapSerializer input value wasn't a Map or a Dictionary"
+        writer.WriteStartObject()
+        use tempWriter = new System.IO.StringWriter()
+        kvpSeq
+            |> Seq.iter (fun (k,v) ->
+                let key =
+                    tempWriter.GetStringBuilder().Clear() |> ignore
+                    serializer.Serialize(tempWriter, k)
+                    tempWriter.ToString()
+                writer.WritePropertyName(key)
+                serializer.Serialize(writer, v) )
+        writer.WriteEndObject()
+
+module private Cache =
+
+    let jsonConverterTypes = ConcurrentDictionary<Type,Kind>()
+    let serializationBinderTypes = ConcurrentDictionary<string,Type>()
+    let inheritedConverterTypes = ConcurrentDictionary<string,HashSet<Type>>()
+    let inheritedTypeQuickAccessor = ConcurrentDictionary<string * list<string>,Type>()
+
+open Cache
+open Newtonsoft.Json.Linq
+open System.Globalization
+
+/// Converts F# options, tuples and unions to a format understandable
+/// A derivative of Fable's JsonConverter. Code adapted from Lev Gorodinski's original.
+/// See https://goo.gl/F6YiQk
+type FSharpJsonConverter() =
+    inherit JsonConverter()
+    let advance(reader: JsonReader) =
+        reader.Read() |> ignore
+
+    let readElements(reader: JsonReader, itemTypes: Type[], serializer: JsonSerializer) =
+        let rec read index acc =
+            match reader.TokenType with
+            | JsonToken.EndArray -> acc
+            | _ ->
+                let value = serializer.Deserialize(reader, itemTypes[index])
+                advance reader
+                read (index + 1) (acc @ [value])
+        advance reader
+        read 0 List.empty
+
+    let getUci t name =
+        FSharpType.GetUnionCases(t)
+        |> Array.find (fun uci -> uci.Name = name)
+
+    let isRegisteredParentType (tp: Type) =
+        inheritedConverterTypes.ContainsKey(tp.FullName)
+
+    override x.CanConvert(t) =
+        let kind =
+            jsonConverterTypes.GetOrAdd(t, fun t ->
+                if t.FullName = "System.DateTime"
+                then Kind.DateTime
+                elif t.FullName = "System.Guid"
+                then Kind.Guid
+                elif t.Name = "FSharpOption`1"
+                then Kind.Option
+                elif t.FullName = "System.Int64"
+                then Kind.Long
+                elif t.FullName = "System.Double"
+                then Kind.Double
+                elif t = typeof<ObjectId>
+                then Kind.ObjectId
+                elif t.FullName = "System.Numerics.BigInteger"
+                then Kind.BigInt
+                elif t = typeof<byte[]> 
+                then Kind.Binary
+                elif FSharpType.IsTuple t
+                then Kind.Tuple
+                elif (FSharpType.IsUnion t && t.Name <> "FSharpList`1")
+                then Kind.Union
+                elif t.IsGenericType
+                    && (t.GetGenericTypeDefinition() = typedefof<Map<_,_>> || t.GetGenericTypeDefinition() = typedefof<Dictionary<_,_>>)
+                    && t.GetGenericArguments().[0] <> typeof<string>
+                then
+                    Kind.MapOrDictWithNonStringKey
+                else Kind.Other)
+        
+        match kind with 
+        | Kind.Other -> isRegisteredParentType t
+        | _ -> true       
+
+    override x.WriteJson(writer, value, serializer) =
+        if isNull value
+        then serializer.Serialize(writer, value)
+        else
+            let t = value.GetType()
+            match jsonConverterTypes.TryGetValue(t) with
+            | false, _ ->
+                serializer.Serialize(writer, value)
+            | true, Kind.Long ->
+                let numberLong = JObject()
+                let value = $"%+i{value :?> int64}"
+                numberLong.Add(JProperty("$numberLong", value))
+                numberLong.WriteTo(writer)
+            | true, Kind.Double ->
+                let value = (value :?> double).ToString("R")
+                writer.WriteValue(value)
+            | true, Kind.Guid ->
+                let guidObject = JObject()
+                let guidValue = (value :?> Guid).ToString()
+                guidObject.Add(JProperty("$guid", guidValue))
+                guidObject.WriteTo(writer)
+            | true, Kind.ObjectId ->
+                let objectId = value |> unbox<ObjectId>
+                let oid = JObject()
+                oid.Add(JProperty("$oid", objectId.ToString()))
+                oid.WriteTo(writer)
+            | true, Kind.DateTime ->
+                let dt = value :?> DateTime
+                let universalTime = if dt.Kind = DateTimeKind.Local then dt.ToUniversalTime() else dt
+                let dateTime = JObject()
+                dateTime.Add(JProperty("$date", universalTime.ToString("O", CultureInfo.InvariantCulture)))
+                dateTime.WriteTo(writer)
+            | true, Kind.Binary ->
+                let bytes = value |> unbox<byte[]>
+                let base64 = Convert.ToBase64String(bytes)
+                let binaryBsonField = JObject()
+                binaryBsonField.Add(JProperty("$binary", base64))
+                binaryBsonField.WriteTo(writer)
+            | true, Kind.Decimal ->
+                let value = (value :?> decimal).ToString()
+                let numberDecimal = JObject()
+                numberDecimal.Add(JProperty("$numberDecimal", value))
+                numberDecimal.WriteTo(writer)
+            | true, Kind.Option ->
+                let _,fields = FSharpValue.GetUnionFields(value, t)
+                serializer.Serialize(writer, fields[0])
+            | true, Kind.Tuple ->
+                let values = FSharpValue.GetTupleFields(value)
+                serializer.Serialize(writer, values)
+            | true, Kind.Union ->
+                let uci, fields = FSharpValue.GetUnionFields(value, t)
+                if fields.Length = 0
+                then serializer.Serialize(writer, uci.Name)
+                else
+                    writer.WriteStartObject()
+                    writer.WritePropertyName(uci.Name)
+                    if fields.Length = 1
+                    then serializer.Serialize(writer, fields[0])
+                    else serializer.Serialize(writer, fields)
+                    writer.WriteEndObject()
+            | true, Kind.MapOrDictWithNonStringKey ->
+                let mapTypes = t.GetGenericArguments()
+                let mapSerializer = typedefof<MapSerializer<_,_>>.MakeGenericType mapTypes
+                let mapSerializeMethod = mapSerializer.GetMethod("Serialize")
+                mapSerializeMethod.Invoke(null, [| value; writer; serializer |]) |> ignore
+            | true, _ ->                
+                serializer.Serialize(writer, value)
+
+    override x.ReadJson(reader, t, existingValue, serializer) =
+        match jsonConverterTypes.TryGetValue(t) with
+        | false, _ ->
+            serializer.Deserialize(reader, t)
+        | true, Kind.Guid ->
+            let jsonObject = JObject.Load(reader)
+            let value = jsonObject["$guid"].Value<string>()
+            upcast Guid.Parse(value)
+        | true, Kind.ObjectId ->
+            let jsonObject = JObject.Load(reader)
+            let value = jsonObject["$oid"].Value<string>()
+            upcast ObjectId(value)
+        | true, Kind.Decimal ->
+            let jsonObject = JObject.Load(reader)
+            let value = jsonObject["$numberDecimal"].Value<string>()
+            upcast Decimal.Parse(value)
+        | true, Kind.Binary ->
+            let jsonObject =  JObject.Load(reader)
+            let base64 = jsonObject["$binary"].Value<string>()
+            let bytes = Convert.FromBase64String(base64)
+            upcast bytes
+        | true, Kind.Long ->
+            let jsonObject = JObject.Load(reader)
+            let value = jsonObject["$numberLong"].Value<string>()
+            upcast Int64.Parse(value)
+        | true, Kind.Double ->
+            let value = serializer.Deserialize(reader, typeof<string>) :?> string
+            upcast Double.Parse(value)
+        | true, Kind.DateTime ->
+            let jsonObject = JObject.Load(reader)
+            let dateValue = jsonObject["$date"].Value<string>()
+            upcast DateTime.Parse(dateValue, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind)
+        | true, Kind.Option ->
+            let innerType = t.GetGenericArguments().[0]
+            let innerType =
+                if innerType.IsValueType
+                then typedefof<Nullable<_>>.MakeGenericType([|innerType|])
+                else innerType
+            
+            let value = 
+                match reader.TokenType with 
+                | JsonToken.StartObject ->
+                    let jObject = JObject.Load(reader)
+                    let path = jObject.First.Path
+                    if path.StartsWith("$") then
+                        let value = jObject.GetValue(path)
+                        value.ToObject(innerType,serializer)
+                    else
+                        jObject.ToObject(innerType,serializer)
+                | _ -> serializer.Deserialize(reader,innerType)              
+
+            let cases = FSharpType.GetUnionCases(t)
+            if isNull value
+            then FSharpValue.MakeUnion(cases[0], [||])
+            else FSharpValue.MakeUnion(cases[1], [|value|])
+        | true, Kind.Tuple ->
+            match reader.TokenType with
+            | JsonToken.StartArray ->
+                let values = readElements(reader, FSharpType.GetTupleElements(t), serializer)
+                FSharpValue.MakeTuple(values |> List.toArray, t)
+            | _ -> failwith "invalid token"
+        | true, Kind.Union ->
+            match reader.TokenType with
+            | JsonToken.String ->
+                let name = serializer.Deserialize(reader, typeof<string>) :?> string
+                FSharpValue.MakeUnion(getUci t name, [||])
+            | JsonToken.StartObject ->
+                advance reader
+                let name = reader.Value :?> string
+                let uci = getUci t name
+                advance reader
+                let itemTypes = uci.GetFields() |> Array.map (_.PropertyType)
+                if itemTypes.Length > 1
+                then
+                    let values = readElements(reader, itemTypes, serializer)
+                    advance reader
+                    FSharpValue.MakeUnion(uci, List.toArray values)
+                else
+                    let value = serializer.Deserialize(reader, itemTypes[0])
+                    advance reader
+                    FSharpValue.MakeUnion(uci, [|value|])
+            | JsonToken.Null -> null // for { "union": null }
+            | _ -> failwith "invalid token"
+        | true, Kind.MapOrDictWithNonStringKey ->
+            let mapTypes = t.GetGenericArguments()
+            let mapSerializer = typedefof<MapSerializer<_,_>>.MakeGenericType mapTypes
+            let mapDeserializeMethod = mapSerializer.GetMethod("Deserialize")
+            mapDeserializeMethod.Invoke(null, [| t; reader; serializer |])
+        | true, Kind.Other when isRegisteredParentType t ->  
+            let inheritedTypes = inheritedConverterTypes[t.FullName]
+            let jObject = JObject.Load(reader)
+            let jsonFields = jObject.Properties() |> Seq.map (_.Name) |> List.ofSeq
+            let inheritedType = inheritedTypeQuickAccessor.GetOrAdd((t.FullName,jsonFields),fun (_,jsonFields) ->
+                let findType (jsonFields: seq<string>) =
+                    inheritedTypes |> Seq.maxBy (fun tp ->
+                        let fields = 
+                            let properties = tp.GetProperties() |> Array.filter(fun prop -> prop.CanWrite) |> Array.map (fun prop -> prop.Name)
+                            if properties.Length > 0 then properties
+                            else
+                                tp.GetFields() |> Array.map (fun fd -> fd.Name)
+                        let fieldsLength = Seq.length fields
+                        (jsonFields |> Seq.filter(fun jsonField ->
+                            Seq.contains jsonField fields
+                        )
+                        |> Seq.length),-fieldsLength
+                    )            
+                findType jsonFields
+            )
+            // printfn "found inherited type %s with jsonFields %A" inheritedType.FullName jsonFields
+            jObject.ToObject(inheritedType,serializer)
+
+        | true, _ ->
+            serializer.Deserialize(reader, t)
+
