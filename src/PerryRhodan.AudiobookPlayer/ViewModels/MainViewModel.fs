@@ -16,6 +16,7 @@ type MainViewModel(root:CompositionRoot) =
     interface IMainViewModel with
         member this.GotoPlayerPage audiobook startPlayer = this.GotoPlayerPage (audiobook :?> AudioBookItemViewModel) startPlayer
         member this.OpenMiniplayer audiobook startPlayer = this.OpenMiniplayer (audiobook :?> AudioBookItemViewModel) startPlayer
+        member this.CloseMiniplayer() = app.Dispatch CloseMiniplayer
         member this.GotoHomePage() = this.GotoHomePage()
         member this.CurrentPlayerAudiobookViewModel = this.Bind(app, fun e -> e.PlayerViewModel |> Option.map (fun vm -> vm.AudioBook))
 
