@@ -364,7 +364,7 @@ type SettingsViewModel() =
 
     
     member this.ShowFeedbackPage() =
-        InteractiveContainer.ShowDialog feedBackView
+        InteractiveContainer.ShowDialog(feedBackView, true)
     
     member this.GoBackHome() =
         DependencyService.Get<IMainViewModel>().GotoHomePage()

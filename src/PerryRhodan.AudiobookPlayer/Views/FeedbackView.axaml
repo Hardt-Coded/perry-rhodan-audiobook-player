@@ -3,18 +3,28 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:PerryRhodan.AudiobookPlayer.ViewModels"
+             xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
              mc:Ignorable="d" d:DesignWidth="393" d:DesignHeight="500"
              x:Class="PerryRhodan.AudiobookPlayer.Views.FeedbackView"
              Background="Black"
              Design.DataContext="{Binding Source={x:Static vm:FeedbackViewModel.DesignVM}}"
-             x:DataType="vm:FeedbackViewModel">
+             x:DataType="vm:FeedbackViewModel"
+             Width="{Binding DialogWidth}">
     <!-- 2 input fields for feedback, email and message -->
-    <StackPanel Margin="10">
-        <TextBlock Classes="headline4" Text="Feedback" HorizontalAlignment="Center" />
-        <TextBox x:Name="Email" Watermark="E-Mail eingeben" TextInputOptions.ContentType="Email"/>
-        <TextBox x:Name="Message" Watermark="Nachricht eingeben" MinLines="5" MaxLines="25"/>
-        <Button Margin="0,5,0,5" Content="Senden" Command="{Binding SendFeedback}" />
-        <Button Margin="0,2,0,0" Theme="{StaticResource MaterialFlatButton}" Content="Abbrechen" Command="{Binding Cancel}" />
-        <Grid Height="{Binding InputPaneHeight}" />
-    </StackPanel>
+    <controls:Card VerticalAlignment="Top" CornerRadius="20">
+        <Grid>
+            <StackPanel Margin="10">
+                <TextBlock Classes="headline4" Text="Feedback" HorizontalAlignment="Center" />
+                <TextBox x:Name="Email" Watermark="E-Mail eingeben" TextInputOptions.ContentType="Email" />
+                <TextBox x:Name="Message" Watermark="Nachricht eingeben" MinLines="5" MaxLines="25" />
+                <Button Margin="0,5,0,5" Content="Senden" Command="{Binding SendFeedback}" />
+                <Button Margin="0,2,0,0" Theme="{StaticResource MaterialFlatButton}" Content="Abbrechen"
+                        Command="{Binding Cancel}" />
+                <Grid Height="{Binding InputPaneHeight}" />
+            </StackPanel>
+            <Grid IsVisible="{Binding IsBusy}">
+                <ProgressBar Classes="circular" IsIndeterminate="True" />
+            </Grid>
+        </Grid>
+    </controls:Card>
 </UserControl>

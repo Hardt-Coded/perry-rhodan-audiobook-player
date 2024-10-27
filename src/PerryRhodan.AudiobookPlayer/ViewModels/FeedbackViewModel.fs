@@ -60,6 +60,9 @@ module FeedbackPage =
                     
                     match res with
                     | Ok _ ->
+                        // empty form
+                        dispatch <| ChangeEMail ""
+                        dispatch <| ChangeMessage ""
                         dispatch <| RunSideEffects SideEffect.CloseDialog
                         return ()
                         
