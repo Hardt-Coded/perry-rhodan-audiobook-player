@@ -138,12 +138,12 @@ let runSideEffect sideEffect state dispatch =
 
                         // On first start ask for notification permission
                         if OperatingSystem.IsAndroid() && globalSettings.IsFirstStart then
-                            let! a = Permissions.CheckStatusAsync<Permissions.PostNotifications>()
+                            let! a = Permissions.RequestAsync<Permissions.PostNotifications>()
                             match a with
                             | PermissionStatus.Granted ->
                                 Services.Notifications.showToasterMessage "Permission granted"
                             | _ ->
-                                // Todo: check if user already saw this message
+                                (*// Todo: check if user already saw this message
                                 let! result =
                                     Services.Notifications.showQuestionDialog
                                         "Benachrichtigungen"
@@ -152,7 +152,7 @@ let runSideEffect sideEffect state dispatch =
                                         "Abbrechen"
 
                                 if result then
-                                    AppInfo.ShowSettingsUI()
+                                    AppInfo.ShowSettingsUI()*)
 
 
                             globalSettings.IsFirstStart <- false

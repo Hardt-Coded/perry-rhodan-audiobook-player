@@ -51,8 +51,7 @@ module PlayerPage =
 
         | RestoreStateFormAudioService of PlayerElmish.AudioPlayerInfo
         | FileListLoaded of (string * TimeSpan) list
-        | SetPlayerStateFromExtern of AudioPlayerState
-        | UpdateTrackNumber of int
+
         | SetTrackPosition of TimeSpan
         | SetDragging of bool
         | UpdateScreenInformation of info: PlayerElmish.State
@@ -136,7 +135,7 @@ module PlayerPage =
 
             {
                 state with
-                    CurrentState = AudioPlayerState.Playing
+                    //CurrentState = AudioPlayerState.Playing
                     CurrentAudioFileIndex =
                         if state.CurrentAudioFileIndex < 0 then
                             0
@@ -146,13 +145,8 @@ module PlayerPage =
             SideEffect.Play
 
         | PlayerControlMsg PlayWithoutRewind ->
-            let model = state |> fixModelWhenCurrentTrackGreaterThanNumberOfTracks
-
-            {
-                model with
-                    CurrentState = AudioPlayerState.Playing
-            },
-            SideEffect.PlayWithoutRewind
+            let state = state |> fixModelWhenCurrentTrackGreaterThanNumberOfTracks
+            state, SideEffect.PlayWithoutRewind
 
         | PlayerControlMsg Stop -> state, SideEffect.Stop
 
@@ -171,7 +165,7 @@ module PlayerPage =
                 |> Option.map (fun ab -> {
                     state with
                         CurrentAudioFile = info.Filename
-                        CurrentAudioFileIndex = info.CurrentTrackNumber - 1
+                        CurrentAudioFileIndex = info.CurrentFileIndex
                         CurrentDuration = info.Duration
                         CurrentPosition = info.Position
                         AudioFileList = info.Mp3FileList
@@ -222,15 +216,6 @@ module PlayerPage =
                     },
                     sideEffect
 
-        | SetPlayerStateFromExtern exstate ->
-            { state with CurrentState = exstate }, SideEffect.None
-
-        | UpdateTrackNumber num ->
-            {
-                state with
-                    CurrentAudioFileIndex = num - 1
-            },
-            SideEffect.None
 
         | SetBusy bstate ->
             { state with IsLoading = bstate }, SideEffect.None
@@ -242,6 +227,8 @@ module PlayerPage =
                     SideEffect.SliderDragStarted
                 elif state.SliderIsDragging && b = false && state.HasPlayedBeforeDragSlider then
                     SideEffect.ContinuePlayingAfterSlide state.CurrentPosition
+                elif state.SliderIsDragging && b = false then
+                    SideEffect.SetAudioPositionAbsolute state.CurrentPosition
                 else
                     SideEffect.None
 
@@ -271,19 +258,19 @@ module PlayerPage =
 
             if state.SliderIsDragging then
                 state, SideEffect.None
-            elif state.CurrentState = AudioPlayerState.Playing then
+            else
                 {
                     state with
                         CurrentPosition = info.Position
                         CurrentDuration = info.Duration
                         CurrentState = info.State
                         CurrentAudioFile = info.Filename
-                        CurrentAudioFileIndex = info.CurrentTrackNumber
+                        CurrentAudioFileIndex = info.CurrentFileIndex
                         IsLoading = info.IsBusy
                 },
                 SideEffect.None
-            else
-                state, SideEffect.None
+            //else
+            //    state, SideEffect.None
 
 
 
@@ -407,17 +394,18 @@ module PlayerPage =
                                     | Some files ->
                                         dispatch <| FileListLoaded files
 
-                                        // remove all subscriptions
                                         disposables |> Seq.iter (_.Dispose())
+                                        disposables.Add
+                                            <| audioPlayer.AudioPlayerInfoChanged.Subscribe(fun info ->
+                                                //if info.State = AudioPlayerState.Playing then
+                                                    dispatch <| UpdateScreenInformation info
+                                            )
 
                                         audioPlayer.Stop false
                                         audioPlayer.Init state.AudioBook files
 
                                         // set new info listener after init
-                                        disposables.Add
-                                            <| audioPlayer.AudioPlayerInfoChanged.Subscribe(fun info ->
-                                                dispatch <| UpdateScreenInformation info
-                                            )
+
 
                                         if state.StartPlayingOnOpen then
                                             dispatch <| PlayerControlMsg Play
@@ -433,14 +421,14 @@ module PlayerPage =
                                     | Some files ->
                                         // remove all subscriptions
                                         disposables |> Seq.iter (_.Dispose())
-
-                                        audioPlayer.Init state.AudioBook files
-
                                         // set new info listener after init
                                         disposables.Add
                                             <| audioPlayer.AudioPlayerInfoChanged.Subscribe(fun info ->
-                                                dispatch <| UpdateScreenInformation info
+                                                //if info.State = AudioPlayerState.Playing then
+                                                    dispatch <| UpdateScreenInformation info
                                             )
+
+                                        audioPlayer.Init state.AudioBook files
 
                                         dispatch <| FileListLoaded files
 
@@ -469,6 +457,7 @@ module PlayerPage =
                                             p
 
                                     audioPlayer.PlayExtern file newPosition
+
                                     return ()
 
                             | SideEffect.PlayWithoutRewind ->
@@ -477,6 +466,7 @@ module PlayerPage =
                                 | _ ->
                                     let file, _ = state.AudioFileList[state.CurrentAudioFileIndex]
                                     audioPlayer.PlayExtern file state.CurrentPosition
+
                                     return ()
 
                             | SideEffect.Stop ->
@@ -518,7 +508,6 @@ module PlayerPage =
 
                             | SideEffect.SetAudioPositionAbsolute pos ->
                                 audioPlayer.SeekTo pos
-                                audioPlayer.Play()
                                 return ()
 
                             | SideEffect.ContinuePlayingAfterSlide pos ->
@@ -612,8 +601,9 @@ type PlayerViewModel(audiobook: AudioBookItemViewModel, startPlaying) =
     member this.AudioBook = this.Bind(local, _.AudioBook)
 
     member this.Picture =
-        this.Bind(
+        this.BindOnChanged(
             local,
+            _.AudioBook.AudioBook.Picture,
             fun s ->
                 s.AudioBook.AudioBook.Picture
                 |> Option.defaultValue
@@ -621,7 +611,7 @@ type PlayerViewModel(audiobook: AudioBookItemViewModel, startPlaying) =
         )
 
     member this.CurrentTrackNumberString =
-        this.Bind(local, (fun s -> $"Track: {s.CurrentAudioFileIndex + 1}"))
+        this.BindOnChanged(local, _.CurrentAudioFileIndex, (fun s -> $"Track: {s.CurrentAudioFileIndex + 1}"))
 
     member this.CurrentPositionMs
         with get () =
@@ -629,7 +619,7 @@ type PlayerViewModel(audiobook: AudioBookItemViewModel, startPlaying) =
         and set v = local.Dispatch(SetTrackPosition(TimeSpan.FromMilliseconds v))
 
     member this.CurrentDurationMs =
-        this.Bind(local, _.CurrentDuration.TotalMilliseconds)
+        this.BindOnChanged(local, _.CurrentDuration.TotalMilliseconds, _.CurrentDuration.TotalMilliseconds)
 
     member this.TimeUntilSleeps =
         this.BindOnChanged(local, _.TimeUntilSleeps, fun x ->
@@ -647,20 +637,22 @@ type PlayerViewModel(audiobook: AudioBookItemViewModel, startPlaying) =
         )
 
     member this.SliderIsDragging
-        with get () = this.Bind(local, _.SliderIsDragging)
+        with get () = this.BindOnChanged(local, _.SliderIsDragging, _.SliderIsDragging)
         and set v = local.Dispatch(SetDragging v)
 
     member this.TotalPositionString =
-        this.Bind(
+        this.BindOnChanged(
             local,
+            _.CurrentPosition,
             fun s ->
                 let pos = getPositionAudioBookTotal s
                 $"Gesamt: {pos.CurrentPos:``hh\:mm\:ss``} / {pos.Total:``hh\:mm\:ss``}"
         )
 
     member this.PositionString =
-        this.Bind(
+        this.BindOnChanged(
             local,
+            _.CurrentPosition,
             fun s -> $"{s.CurrentPosition:``hh\:mm\:ss``}/{s.CurrentDuration:``hh\:mm\:ss``}"
         )
 
@@ -683,7 +675,7 @@ type PlayerViewModel(audiobook: AudioBookItemViewModel, startPlaying) =
         |]
 
     member this.SleepTimer
-        with get() = this.Bind(local, _.SelectedSleepTime)
+        with get() = this.BindOnChanged(local, _.SelectedSleepTime, _.SelectedSleepTime)
         and set v = local.Dispatch  (ButtonActionMsg <| SetSleepTimer v)
 
     member this.SleepTimerTextColor =
@@ -699,7 +691,7 @@ type PlayerViewModel(audiobook: AudioBookItemViewModel, startPlaying) =
         |]
 
     member this.PlaybackSpeed
-        with get () = this.Bind (local, _.PlaybackSpeed)
+        with get () = this.BindOnChanged (local, _.PlaybackSpeed, _.PlaybackSpeed)
         and set v = local.Dispatch (ButtonActionMsg <| SetPlaybackSpeed v)
 
 
@@ -717,7 +709,7 @@ type PlayerViewModel(audiobook: AudioBookItemViewModel, startPlaying) =
         local.Dispatch <| PlayerControlMsg Play
 
     member this.IsPlaying =
-        this.Bind(local, (fun i -> i.CurrentState = AudioPlayerState.Playing))
+        this.BindOnChanged(local, _.CurrentState, (fun i -> i.CurrentState = AudioPlayerState.Playing))
 
     member this.PlayWithoutRewind() =
         local.Dispatch <| PlayerControlMsg PlayWithoutRewind
@@ -726,7 +718,7 @@ type PlayerViewModel(audiobook: AudioBookItemViewModel, startPlaying) =
         local.Dispatch <| PlayerControlMsg Stop
 
     member this.IsStopped =
-        this.Bind(local, (fun i -> i.CurrentState = AudioPlayerState.Stopped))
+        this.BindOnChanged(local, _.CurrentState, (fun i -> i.CurrentState = AudioPlayerState.Stopped))
 
     member this.Next() =
         local.Dispatch <| RunOnlySideEffect SideEffect.Next

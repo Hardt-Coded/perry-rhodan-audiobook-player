@@ -54,7 +54,7 @@ module AudioBookStore =
             match msg with
             | AudioBookChanged ->
                 state, SideEffect.None
-                
+
             | AudiobooksLoaded audiobooks ->
                 { state with Audiobooks = audiobooks }, SideEffect.None
 
@@ -103,10 +103,10 @@ module AudioBookStore =
                                     | Ok _ ->
                                         // remove from the viewmodel (should already done by the action menu)
                                         Notifications.showToasterMessage $"Hörbuch {audiobook.FullName} vom Gerät entfernt"
-                                        
+
                                     | Error e ->
                                         do! Notifications.showErrorMessage $"Error removing audiobook {audiobook.FullName} from database: {e}"
-                                    
+
                                     return()
                             }
 
@@ -166,9 +166,9 @@ module AudioBookItem =
         | UpdateCurrentAudioFileList of audioFiles:AudioBookAudioFilesInfo
         | SetAmbientColor of color:string
         | SendPauseCommandToAudioPlayer
-        
+
         | ToggleIsPlaying of pstate:bool
-        
+
         | IsBusy of bool
 
 
@@ -213,7 +213,7 @@ module AudioBookItem =
                 | false, None       -> Unlistend
             AudioFileInfos = DataBase.getAudioBookFileInfoTimeout 100 audiobook.Id // Todo: unbedingt ändern!
             IsPlaying = false
-            IsBusy = false 
+            IsBusy = false
         }, SideEffect.Init
 
 
@@ -222,7 +222,7 @@ module AudioBookItem =
         match msg with
         | IsBusy b ->
             { state with IsBusy =  b }, SideEffect.None
-            
+
         | RunOnlySideEffect sideEffect ->
             state, sideEffect
 
@@ -599,9 +599,9 @@ module AudioBookItem =
                                 | SideEffect.SendPauseCommandToAudioPlayer ->
                                     DependencyService.Get<IAudioPlayerPause>().Pause()
                             }
-                
+
                         dispatch <| IsBusy true
-                
+
                 with
                 | ex ->
                     Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
@@ -684,14 +684,14 @@ module private Draw =
         textPaint.Color <- SKColor.Parse("FFFFFF")
         textPaint.BlendMode <- SKBlendMode.Plus
         textPaint.IsAntialias <- false
-        
+
         use font = new SKFont()
         font.Size <- 75.0f
-        
+
         let text = $"{((factor * 100.0) |> int)} %%"
         let y = ((height  / 2) |> f32) + (font.Size / 2.0f) - 15.0f
-        
-        
+
+
         canvas.DrawText(text, (width / 2) |> f32, y ,SKTextAlign.Center, font, textPaint)
 
         canvas.ResetMatrix()
@@ -773,29 +773,29 @@ type AudioBookItemViewModel(audiobook: AudioBook) as self =
         Program.mkAvaloniaProgrammWithSideEffect init update SideEffects.runSideEffects
         |> Program.mkStore
 
-    
-    
+
+
     interface IAudioBookItemViewModel with
         member this.SetUploadDownloadState newState = local.Dispatch (UpdateDownloadProgress newState)
         member this.SetDownloadCompleted result     = local.Dispatch (DownloadCompleted result)
         member this.AudioBook                       = this.AudioBook
         member this.SetAudioFileList audioFiles     = local.Dispatch (UpdateCurrentAudioFileList audioFiles)
 
-    member this.AudioBook       = this.Bind(local, _.Audiobook)
-    member this.DownloadState   = this.Bind(local, _.DownloadState)
-    member this.IsDownloaded    = this.Bind(local, fun s -> s.DownloadState = Downloaded)
-    member this.IsQueued        = this.Bind(local, fun s -> s.DownloadState = Queued)
-    member this.IsDownloading   = this.Bind(local, fun s -> match s.DownloadState with | Downloading _ -> true | _ -> false)
-    member this.IsNotDownloaded = this.Bind(local, fun s -> s.DownloadState = NotDownloaded)
-    member this.IsComplete      = this.Bind(local, fun s -> s.ListenState = Listend)
-    member this.IsPlaying       = this.Bind(local, _.IsPlaying)
-    member this.IsPlayButtonVisible = this.Bind(local, fun s ->  s.DownloadState = Downloaded && not s.IsPlaying)
-    member this.ListenState     = this.Bind(local, _.ListenState)
+    member this.AudioBook       = this.BindOnChanged(local, _.Audiobook, _.Audiobook)
+    member this.DownloadState   = this.BindOnChanged(local,_.DownloadState, _.DownloadState)
+    member this.IsDownloaded    = this.BindOnChanged(local,_.DownloadState, fun s -> s.DownloadState = Downloaded)
+    member this.IsQueued        = this.BindOnChanged(local,_.DownloadState, fun s -> s.DownloadState = Queued)
+    member this.IsDownloading   = this.BindOnChanged(local,_.DownloadState, fun s -> match s.DownloadState with | Downloading _ -> true | _ -> false)
+    member this.IsNotDownloaded = this.BindOnChanged(local,_.DownloadState, fun s -> s.DownloadState = NotDownloaded)
+    member this.IsComplete      = this.BindOnChanged(local,_.ListenState, fun s -> s.ListenState = Listend)
+    member this.IsPlaying       = this.BindOnChanged(local,_.IsPlaying, _.IsPlaying)
+    member this.IsPlayButtonVisible = this.BindOnChanged(local,_.DownloadState, fun s ->  s.DownloadState = Downloaded && not s.IsPlaying)
+    member this.ListenState     = this.BindOnChanged(local, _.ListenState, _.ListenState)
     member this.AmbientColor    = this.BindOnChanged(local, _.AmbientColor, (fun i ->
         let ac = i.AmbientColor |> Option.defaultValue "#ff483d8b"
         Color.Parse ac
         ))
-    
+
     member this.IconColor      = this.BindOnChanged(local, _.AmbientColor, (fun i ->
         i.AmbientColor
         |> Option.map ColorHelpers.invertHexColor

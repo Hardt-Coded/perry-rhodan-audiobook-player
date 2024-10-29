@@ -80,7 +80,7 @@ module Helper =
             {
                 Title = i.AudioBook.FullName
                 Album = i.AudioBook.FullName
-                TrackNumber = audioPlayerInfo.CurrentTrackNumber + 1 |> int64
+                TrackNumber = audioPlayerInfo.CurrentFileIndex + 1 |> int64
                 NumTracks = audioPlayerInfo.Mp3FileList.Length |> int64
                 Duration = audioPlayerInfo.Duration.TotalMilliseconds |> int64
             }
@@ -242,7 +242,7 @@ type AudioPlayerService() as self =
             (new Notification.Builder(self, channelId))
                 .SetStyle(style)
                 .SetContentTitle(audioBook.FullName)
-                .SetContentText($"Track {state.CurrentTrackNumber + 1} of {state.NumOfTracks}")
+                .SetContentText($"Track {state.CurrentFileIndex + 1} of {state.NumOfTracks}")
                 .SetSmallIcon(Resource.Drawable.einsa_icon)
                 .SetVisibility(NotificationVisibility.Public)
                 .SetProgress(duration, currentPosition, false)
@@ -334,7 +334,11 @@ type AudioPlayerService() as self =
             if state.IsBusy |> not then
                 updateNotification state
         )
-        disposables.Add <| player.Completion.Subscribe (fun _ ->
+
+        
+
+        disposables.Add <| player.Completion.Subscribe (fun m ->
+            
             store.Dispatch <| PlayerControlMsg MoveToNextTrack
         )
 
@@ -542,48 +546,50 @@ type AudioPlayerService() as self =
             
         
         member this.Play () =
-            store.Dispatch <| PlayerControlMsg Play
+            if not store.Model.IsBusy then store.Dispatch <| PlayerControlMsg Play
 
         member this.PlayExtern file pos =
-            store.Dispatch <| PlayerControlMsg (PlayExtern (file, pos))
+            if not store.Model.IsBusy then store.Dispatch <| PlayerControlMsg (PlayExtern (file, pos))
 
         member this.Pause() =
-            store.Dispatch <| PlayerControlMsg (Stop false)
+            if not store.Model.IsBusy then store.Dispatch <| PlayerControlMsg (Stop false)
 
         member this.PlayPause () =
-            if player.IsPlaying then
-                store.Dispatch <| PlayerControlMsg (Stop false)
-            else
-                store.Dispatch <| PlayerControlMsg Play
+            if not store.Model.IsBusy then 
+                if player.IsPlaying then
+                    store.Dispatch <| PlayerControlMsg (Stop false)
+                else
+                    store.Dispatch <| PlayerControlMsg Play
 
 
         member this.Stop resumeOnAudioFocus =
-            store.Dispatch <| PlayerControlMsg (Stop resumeOnAudioFocus)
+            if not store.Model.IsBusy then store.Dispatch <| PlayerControlMsg (Stop resumeOnAudioFocus)
 
         member this.JumpBackwards () =
-            store.Dispatch <| PlayerControlMsg JumpBackwards
+            if not store.Model.IsBusy then store.Dispatch <| PlayerControlMsg JumpBackwards
 
         member this.JumpForward () =
-            store.Dispatch <| PlayerControlMsg JumpForward
+            if not store.Model.IsBusy then store.Dispatch <| PlayerControlMsg JumpForward
 
         member this.Next () =
-            store.Dispatch <| PlayerControlMsg MoveToNextTrack
+            if not store.Model.IsBusy then store.Dispatch <| PlayerControlMsg MoveToNextTrack
 
         member this.Previous () =
-            store.Dispatch <| PlayerControlMsg MoveToPreviousTrack
+            if not store.Model.IsBusy then store.Dispatch <| PlayerControlMsg MoveToPreviousTrack
 
         member this.SeekTo position =
-            store.Dispatch <| PlayerControlMsg (GotoPosition position)
+            if not store.Model.IsBusy then store.Dispatch <| PlayerControlMsg (GotoPosition position)
 
         member this.SetPlaybackSpeed speed =
-            store.Dispatch <| PlayerControlMsg (SetPlaybackSpeed speed)
+            if not store.Model.IsBusy then store.Dispatch <| PlayerControlMsg (SetPlaybackSpeed speed)
 
         member this.StartSleepTimer sleepTime =
-            match sleepTime with
-            | None ->
-                store.Dispatch <| SleepTimerMsg SleepTimerStop
-            | Some sleepTime ->
-                store.Dispatch <| SleepTimerMsg (SleepTimerStart sleepTime)
+            if not store.Model.IsBusy then 
+                match sleepTime with
+                | None ->
+                    store.Dispatch <| SleepTimerMsg SleepTimerStop
+                | Some sleepTime ->
+                    store.Dispatch <| SleepTimerMsg (SleepTimerStart sleepTime)
 
         member this.AudioPlayerInformation with get() = store.Model
         member this.AudioPlayerInfoChanged = store.Observable
