@@ -2,9 +2,6 @@
 
 open System
 open System.Linq
-open System.Globalization
-open Avalonia.Controls.Templates
-open Avalonia.Data.Converters
 open Avalonia
 open Avalonia.Controls
 open Avalonia.Input
@@ -14,7 +11,6 @@ open Avalonia.Data
 open Avalonia.Interactivity
 open CherylUI.Controls
 open Microsoft.FSharp.Reflection
-open PerryRhodan.AudiobookPlayer.Views
 open System.Collections
 
 

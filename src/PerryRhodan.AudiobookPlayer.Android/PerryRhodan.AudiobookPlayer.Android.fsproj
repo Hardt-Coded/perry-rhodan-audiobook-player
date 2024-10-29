@@ -5,7 +5,7 @@
     <SupportedOSPlatformVersion>21</SupportedOSPlatformVersion>
     <ApplicationId>hits.rhodan.audiobooks.dev</ApplicationId>
     <ApplicationVersion>49990</ApplicationVersion>
-    <ApplicationDisplayVersion>2.0.0-beta</ApplicationDisplayVersion>
+    <ApplicationDisplayVersion>2.0.0-beta5</ApplicationDisplayVersion>
     <AndroidPackageFormat>apk</AndroidPackageFormat>
 
     <AndroidResgenFile>Resources\Resource.designer.cs</AndroidResgenFile>
@@ -17,8 +17,8 @@
     <DebugSymbols>True</DebugSymbols>
     <EnableLLVM>False</EnableLLVM>
     <AndroidUseAapt2>True</AndroidUseAapt2>
-    <RunAOTCompilation>false</RunAOTCompilation>
-    <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
+    <RunAOTCompilation>False</RunAOTCompilation>
+    <AndroidEnableProfiledAot>False</AndroidEnableProfiledAot>
     <AndroidCreatePackagePerAbi>False</AndroidCreatePackagePerAbi>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -29,9 +29,9 @@
     <DebugSymbols>False</DebugSymbols>
     <EnableLLVM>False</EnableLLVM>
     <AndroidUseAapt2>True</AndroidUseAapt2>
-    <RunAOTCompilation>false</RunAOTCompilation>
-    <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
-    <PublishTrimmed>false</PublishTrimmed>
+    <RunAOTCompilation>False</RunAOTCompilation>
+    <AndroidEnableProfiledAot>False</AndroidEnableProfiledAot>
+    <PublishTrimmed>False</PublishTrimmed>
     <TrimMode>partial</TrimMode>
     <AndroidCreatePackagePerAbi>False</AndroidCreatePackagePerAbi>
   </PropertyGroup>
@@ -75,12 +75,12 @@
   <Target Name="CopyFileToCustomDirectory" AfterTargets="AfterCompile">
     <Copy SourceFiles="$(SolutionDir)PerryRhodan.AudiobookPlayer\obj\$(Configuration)\net8.0\Avalonia\PerryRhodan.AudiobookPlayer.dll" DestinationFolder="$(SolutionDir)PerryRhodan.AudiobookPlayer\obj\$(Configuration)\net8.0\" />
     <Copy SourceFiles="$(SolutionDir)PerryRhodan.AudiobookPlayer\obj\$(Configuration)\net8.0\Avalonia\PerryRhodan.AudiobookPlayer.dll" DestinationFolder="$(SolutionDir)PerryRhodan.AudiobookPlayer\obj\$(Configuration)\net8.0\refint" />
-  </Target> 
-            
-  
-  
-  
-  
+  </Target>
+
+
+
+
+
 <!--    <ItemGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
         <None Include="..\PerryRhodan.AudiobookPlayer\obj\Avalonia\*.dll">
         <Link>%(Filename)%(Extension)</Link>

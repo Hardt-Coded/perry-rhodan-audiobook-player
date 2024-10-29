@@ -160,7 +160,7 @@ module BrowserPage =
                     task {
                         match synchedAb with
                         | [||] ->
-                            do! Notifications.showMessage Translations.current.NoNewAudioBooksSinceLastRefresh " ¯\_(ツ)_/¯"
+                            do! Notifications.showMessage "Neue Hörbücher" $"{Translations.current.NoNewAudioBooksSinceLastRefresh} ¯\_(ツ)_/¯"
                         | _ ->
                             let message = synchedAb |> Array.map (_.AudioBook.FullName) |> String.concat "\r\n"
                             do! Notifications.showMessage Translations.current.NewAudioBooksSinceLastRefresh message
@@ -437,16 +437,21 @@ module BrowserPage =
                                 do! Notifications.showErrorMessage msg
                     }
 
-                do!
-                    checkLoginSession ()
-                    |> loadAudioBooksFromCloud
-                    |> loadAudioBooksFromDevice state.AudioBookItems
-                    |> processLoadedAudioBookFromDevice
-                    |> determinateNewAddedAudioBooks state.AudioBookItems
-                    |> processNewAddedAudioBooks
-                    |> repairAudiobookMetadataIfNeeded
-                    |> fixDownloadFolders
-                    |> processResult
+                try
+                    do!
+                        checkLoginSession ()
+                        |> loadAudioBooksFromCloud
+                        |> loadAudioBooksFromDevice AudioBookStore.globalAudiobookStore.Model.Audiobooks
+                        |> processLoadedAudioBookFromDevice
+                        |> determinateNewAddedAudioBooks AudioBookStore.globalAudiobookStore.Model.Audiobooks
+                        |> processNewAddedAudioBooks
+                        |> repairAudiobookMetadataIfNeeded
+                        |> fixDownloadFolders
+                        |> processResult
+                with
+                | ex ->
+                    do! Notifications.showErrorMessage ex.Message
+
 
 
                 dispatch <| SetBusy false
@@ -613,7 +618,7 @@ type BrowserViewModel(?audiobookItems) =
     member this.SelectedGroups:string list = this.Bind(local, _.SelectedGroups)
     member this.GroupItems = this.Bind(local, fun s -> ObservableCollection(match s.SelectedGroupItems with | GroupList grp -> grp | _ -> [||]))
     member this.IsLoading:bool = this.Bind(local, _.IsLoading)
-    
+
     member this.BackButtonVisible = this.Bind(local, fun s -> s.SelectedGroups.Length > 0)
     member this.AudioBookItemsVisible = this.Bind(local, fun s -> s.AudioBookItems.Length > 0)
     member this.CategoryItemsVisible =
@@ -621,11 +626,11 @@ type BrowserViewModel(?audiobookItems) =
             match s.SelectedGroupItems with
             | GroupList _ -> true
             | _ -> false
-        
+
         )
-    
+
     member this.IsEmpty = this.Bind(local, fun s -> s.AudioBookItems.Length = 0 && s.AvailableGroups.Length = 0)
-    
+
     member this.SearchText
         with get() = "nix"
         and set(value) =
@@ -636,8 +641,8 @@ type BrowserViewModel(?audiobookItems) =
             ) value
 
 
-    
-    
+
+
     member this.OnInitialized() = local.Dispatch <| RunOnlySideEffect SideEffect.LoadCurrentAudioBooks
     member this.LoadOnlineAudiobooks() = local.Dispatch LoadOnlineAudiobooks
     member this.SelectPreviousGroup(group:string) = local.Dispatch (SelectPreviousGroup group)
@@ -662,8 +667,8 @@ type BrowserViewModel(?audiobookItems) =
 
     member this.GoBackHome() =
         DependencyService.Get<IMainViewModel>().GotoHomePage()
-    
-    
+
+
     static member DesignVM =
         new BrowserViewModel(
             [|

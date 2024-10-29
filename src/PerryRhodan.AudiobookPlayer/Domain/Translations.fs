@@ -1,10 +1,10 @@
 ﻿module Translations
-    
+
     open System.Globalization
 
 
-    type Translation = 
-        { Error:string 
+    type Translation =
+        { Error:string
           Close:string
           Cancel:string
           Yes:string
@@ -67,7 +67,7 @@
           HideDataProtection:string
 
           HideLastListendWhenOnlyOneAudioBookOnDevice:string
-          
+
           TabBarStartLabel:string
           TabBarBrowserLabel:string
           TabBarOptionsLabel:string
@@ -92,7 +92,7 @@
 
 
         static member English =
-            {   Error = "Error" 
+            {   Error = "Error"
                 Close = "Close"
                 Cancel="Cancel"
                 Yes="Yes"
@@ -177,9 +177,9 @@
                 SelectPlaybackSpeed="Select Playback Speed"
             }
 
-    
+
         static member German =
-            {   Error = "Fehler" 
+            {   Error = "Fehler"
                 Close = "Schließen"
                 Yes="Ja"
                 No="Nein"
@@ -269,9 +269,7 @@
 
 
     let current =
-        match CultureInfo.CurrentUICulture.TwoLetterISOLanguageName with
-        | "de" | "DE" | "De" -> Translation.German
-        | _ -> Translation.English
-        
-        
+        Translation.German
+
+
 

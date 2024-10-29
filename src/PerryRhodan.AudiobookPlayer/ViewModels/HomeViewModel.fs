@@ -127,19 +127,19 @@ type HomeViewModel() =
         ()
 
     member this.AudioBooks =
-        this.Bind(local, fun s -> ObservableCollection(s.Audiobooks))
+        this.BindList(local, fun s -> ObservableCollection(s.Audiobooks))
 
     member this.LastListendAudiobook =
-        this.Bind(local, fun i -> i.LastTimeListenedAudioBook |> Option.defaultValue AudioBookItemViewModel.DesignVM)
+        this.BindOnChanged(local, _.LastTimeListenedAudioBook, fun i -> i.LastTimeListenedAudioBook |> Option.defaultValue AudioBookItemViewModel.DesignVM)
 
     member this.LastTimeListenedAudioBook =
-        this.Bind(local, _.LastTimeListenedAudioBook)
+        this.BindOnChanged(local, _.LastTimeListenedAudioBook, _.LastTimeListenedAudioBook)
 
     member this.HasLastListenedAudioBook =
-        this.Bind(local, _.LastTimeListenedAudioBook.IsSome)
+        this.BindOnChanged(local, _.LastTimeListenedAudioBook.IsSome, _.LastTimeListenedAudioBook.IsSome)
 
     member this.IsLoading =
-        this.Bind(local, _.IsLoading)
+        this.BindOnChanged(local, _.IsLoading, _.IsLoading)
 
     member this.SelectorValues =
         [|

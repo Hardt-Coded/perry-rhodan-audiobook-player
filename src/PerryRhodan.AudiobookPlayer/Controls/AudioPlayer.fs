@@ -27,7 +27,7 @@ module PlayerElmish =
         Filename: string
         Position: TimeSpan
         Duration: TimeSpan
-        CurrentTrackNumber: int // starts with zero
+        CurrentFileIndex: int // starts with zero
         State: AudioPlayerState
         AudioBook: AudioBookItemViewModel option
         Mp3FileList: Mp3FileList
@@ -45,7 +45,7 @@ module PlayerElmish =
             Filename = ""
             Position = TimeSpan.Zero
             Duration = TimeSpan.Zero
-            CurrentTrackNumber = 0
+            CurrentFileIndex = 0
             State = AudioPlayerState.Stopped
             AudioBook = None
             Mp3FileList = []
@@ -217,7 +217,7 @@ module PlayerElmish =
                         PlaybackDelayed = false
                         Position = posInfo.Position
                         Duration = duration
-                        CurrentTrackNumber = index
+                        CurrentFileIndex = index
                         Mp3FileList = mp3List
                         AudioBook = Some ab
                 },
@@ -233,7 +233,7 @@ module PlayerElmish =
                         PlaybackDelayed = false
                         Position = TimeSpan.Zero
                         Duration = duration
-                        CurrentTrackNumber = 0
+                        CurrentFileIndex = 0
                         Mp3FileList = mp3List
                         AudioBook = Some ab
                 },
@@ -241,7 +241,7 @@ module PlayerElmish =
 
         | StateControlMsg DisableAudioService  ->
             AudioPlayerInfo.Empty, SideEffect.DisableAudioService
-        
+
         | StateControlMsg(SetBusy b) ->
             { state with IsBusy = b }, SideEffect.None
 
@@ -268,7 +268,7 @@ module PlayerElmish =
                             PlaybackDelayed = false
                             Position = TimeSpan.Zero
                             Duration = duration
-                            CurrentTrackNumber = 0
+                            CurrentFileIndex = 0
                             State = AudioPlayerState.Playing
                     },
                     SideEffect.StartAudioPlayer
@@ -296,7 +296,7 @@ module PlayerElmish =
                     PlaybackDelayed = false
                     Position = pos
                     Duration = duration
-                    CurrentTrackNumber = index
+                    CurrentFileIndex = index
                     State = AudioPlayerState.Playing
             },
             SideEffect.StartAudioPlayerExtern
@@ -323,7 +323,7 @@ module PlayerElmish =
             if state.IsBusy then
                 state, SideEffect.None
             else
-                let newIndex = state.CurrentTrackNumber + 1
+                let newIndex = state.CurrentFileIndex + 1
 
                 if state.Mp3FileList.Length < newIndex + 1 then
                     {
@@ -334,12 +334,12 @@ module PlayerElmish =
                     SideEffect.StopPlayingAndFinishAudioBook
                 else
                     let newFileName, duration =
-                        state.Mp3FileList |> Helpers.getFileFromIndex (state.CurrentTrackNumber + 1)
+                        state.Mp3FileList |> Helpers.getFileFromIndex (newIndex)
 
                     {
                         state with
                             Filename = newFileName
-                            CurrentTrackNumber = state.CurrentTrackNumber + 1
+                            CurrentFileIndex = newIndex
                             Duration = duration
                     },
                     SideEffect.MoveToNextTrack |> Helpers.sideEffectOnlyWhenPlaying state
@@ -350,7 +350,7 @@ module PlayerElmish =
             else if state.Position > TimeSpan.FromMilliseconds 2000 then
                 { state with Position = TimeSpan.Zero }, SideEffect.GotoPosition TimeSpan.Zero
             else
-                let newIndex = state.CurrentTrackNumber - 1
+                let newIndex = state.CurrentFileIndex - 1
 
                 if newIndex < 0 then
                     { state with Position = TimeSpan.Zero }, SideEffect.GotoPosition TimeSpan.Zero
@@ -361,7 +361,7 @@ module PlayerElmish =
                     {
                         state with
                             Filename = newFileName
-                            CurrentTrackNumber = newIndex
+                            CurrentFileIndex = newIndex
                             Duration = duration
                     },
                     SideEffect.MoveToPreviousTrack |> Helpers.sideEffectOnlyWhenPlaying state
@@ -373,7 +373,7 @@ module PlayerElmish =
 
             if newPosition > state.Duration then
                 let rest = newPosition - state.Duration
-                let newIndex = state.CurrentTrackNumber + 1
+                let newIndex = state.CurrentFileIndex + 1
 
                 if state.Mp3FileList.Length < newIndex + 1 then
                     { state with Position = state.Duration },
@@ -385,7 +385,7 @@ module PlayerElmish =
                     {
                         state with
                             Filename = newFileName
-                            CurrentTrackNumber = newIndex
+                            CurrentFileIndex = newIndex
                             Duration = duration
                             Position = rest
                     },
@@ -398,7 +398,7 @@ module PlayerElmish =
             let newPosition = state.Position - TimeSpan.FromMilliseconds jumpDistance
 
             if newPosition < TimeSpan.Zero then
-                let newIndex = state.CurrentTrackNumber - 1
+                let newIndex = state.CurrentFileIndex - 1
 
                 if newIndex < 0 then
                     { state with Position = TimeSpan.Zero }, SideEffect.GotoPosition TimeSpan.Zero
@@ -411,7 +411,7 @@ module PlayerElmish =
                     {
                         state with
                             Filename = newFileName
-                            CurrentTrackNumber = newIndex
+                            CurrentFileIndex = newIndex
                             Duration = duration
                             Position = newPosition
                     },
@@ -494,8 +494,9 @@ module PlayerElmish =
                                 | SideEffect.None -> return ()
 
                                 | SideEffect.InitAudioPlayer ->
+
                                     return ()
-                                    
+
                                 | SideEffect.DisableAudioService ->
                                     mediaPlayer.UpdateNotifcation()
                                     return ()
@@ -553,14 +554,16 @@ module PlayerElmish =
 
                                     state.AudioBook
                                     |> Option.iter (fun i -> i.UpdateAudioBookPosition state.Position)
+                                    if state.State = AudioPlayerState.Playing then
+                                        do! mediaPlayer.Play state.Filename
+                                        mediaPlayer.SeekTo state.Position
 
-                                    do! mediaPlayer.Play state.Filename
-                                    mediaPlayer.SeekTo state.Position
                                     return ()
 
                                 | SideEffect.GotoPosition position ->
                                     state.AudioBook |> Option.iter (fun i -> i.UpdateAudioBookPosition position)
-                                    mediaPlayer.SeekTo position
+                                    if state.State = AudioPlayerState.Playing then
+                                        mediaPlayer.SeekTo position
                                     return ()
 
 
