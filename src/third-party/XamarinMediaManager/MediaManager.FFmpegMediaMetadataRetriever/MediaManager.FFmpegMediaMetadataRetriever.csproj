@@ -1,0 +1,37 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net7.0-android33.0</TargetFrameworks>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <AssemblyName>MediaManager.FFmpegMediaMetadataRetriever</AssemblyName>
+    <RootNamespace>MediaManager.FFmpegMediaMetadataRetriever</RootNamespace>
+    <PackageId>Plugin.MediaManager.FFmpegMediaMetadataRetriever</PackageId>
+    <Description>Cross platform .NET plugin to play and control Audio and Video</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Platforms\**\*.cs" />
+    <None Include="Platforms\**\*.cs" />
+    <None Include="Resources\*.cs" />
+    <Compile Remove="Resources\*.cs" />
+    <None Include="readme.txt" pack="true" PackagePath="." />
+  </ItemGroup>
+
+  <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
+    <None Remove="Platforms\Android\**\*.cs" />
+    <None Remove="Platforms\Xamarin\**\*.cs" />
+    <Compile Include="Platforms\Android\**\*.cs" />
+    <Compile Include="Platforms\Xamarin\**\*.cs" />
+    <AndroidResource Include="Resources\**\*.xml" SubType="Designer" Generator="MSBuild:UpdateAndroidResources" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Xam.Plugins.Android.FFmpegMediaMetadataRetriever" Version="1.0.14" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\MediaManager\MediaManager.csproj" />
+  </ItemGroup>
+  
+</Project>
