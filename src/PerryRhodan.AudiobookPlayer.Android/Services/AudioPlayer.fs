@@ -1,5 +1,6 @@
 ﻿namespace PerryRhodan.AudiobookPlayer.Android
 
+(*
 open System.Threading.Tasks
 open Android.App
 open Android.Content
@@ -655,3 +656,4 @@ type AudioPlayerServiceController() =
             if AudioPlayerService.ServiceIsRunningInForeground then
                 let intent = new Intent(Application.Context, typeof<AudioPlayerService>)
                 Application.Context.StopService(intent) |> ignore
+                *)

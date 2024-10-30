@@ -20,10 +20,10 @@
 
     type IMediaPlayer =
         abstract member Play : string -> Task<unit>
-        abstract member Pause : unit -> unit
-        abstract member PlayPause : unit -> unit
-        abstract member Stop : resumeOnAudioFocus:bool -> unit
-        abstract member SeekTo : TimeSpan -> unit
+        abstract member Pause : unit -> Task<unit>
+        abstract member PlayPause : unit -> Task<unit>
+        abstract member Stop : resumeOnAudioFocus:bool -> Task<unit>
+        abstract member SeekTo : TimeSpan -> Task<unit>
         abstract member SetPlaybackSpeed : float -> Task<unit>
         abstract member UpdateNotifcation : unit -> unit
 

@@ -21,6 +21,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "PerryRhodan.AudiobookPlayer
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "third-party", "third-party", "{3CF64A1B-5B86-4574-A6A9-2369902661FC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediaManager", "third-party\XamarinMediaManager\MediaManager\MediaManager.csproj", "{F4E002DA-EEA7-493E-888B-14EF84D43C20}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +57,10 @@ Global
 		{57121491-8F5A-4B5D-B327-2F8E6EB90255}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{57121491-8F5A-4B5D-B327-2F8E6EB90255}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{57121491-8F5A-4B5D-B327-2F8E6EB90255}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F4E002DA-EEA7-493E-888B-14EF84D43C20}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F4E002DA-EEA7-493E-888B-14EF84D43C20}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F4E002DA-EEA7-493E-888B-14EF84D43C20}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F4E002DA-EEA7-493E-888B-14EF84D43C20}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -63,5 +69,6 @@ Global
 		SolutionGuid = {FA975F72-10BF-449E-AF8E-03F927A4CBCB}
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{F4E002DA-EEA7-493E-888B-14EF84D43C20} = {3CF64A1B-5B86-4574-A6A9-2369902661FC}
 	EndGlobalSection
 EndGlobal
