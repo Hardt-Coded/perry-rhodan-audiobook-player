@@ -1,0 +1,92 @@
+﻿<Project>
+  <PropertyGroup>
+    <Copyright>Copyright (c) Baseflow</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/Baseflow/XamarinMediaManager</PackageProjectUrl>
+    <Authors>Martijn van Dijk</Authors>
+    <Owners>Martijn van Dijk</Owners>
+    <PackageTags>xamarin, android, plugin, MediaManager, media, audio, video</PackageTags>
+    <PackageReleaseNotes>https://github.com/Baseflow/XamarinMediaManager/releases</PackageReleaseNotes>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageReadmeFile>readme.md</PackageReadmeFile>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <MinClientVersion>2.14</MinClientVersion>
+
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <RepositoryUrl>https://github.com/Baseflow/XamarinMediaManager</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <Product>$(AssemblyName) ($(TargetFramework))</Product>
+    <Version>1.2.2</Version>
+
+    <!--<Nullable>enable</Nullable>-->
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>11.0</LangVersion>
+    <NoWarn>$(NoWarn);1591;1701;1702;1705;VSX1000;CS0109;CS0108;CS0618;CS0114;NU1603</NoWarn>
+    <Platform>AnyCPU</Platform>
+
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <AnalysisMode>AllEnabledByDefault</AnalysisMode>
+
+    <IsTestProject>$(MSBuildProjectName.Contains('UnitTest'))</IsTestProject>
+    <IsLibraryProject>$(MSBuildProjectName.Contains('MediaManager'))</IsLibraryProject>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <PublishReadyToRun Condition=" '$(PublishReadyToRun)' == '' and '$(OutputType)' == '' or '$(OutputType)' == 'Library' ">false</PublishReadyToRun>
+    <!--<SymbolPackageFormat>snupkg</SymbolPackageFormat>-->
+    <IncludeSymbols>true</IncludeSymbols>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+
+    <DesignTimeBuild>false</DesignTimeBuild>
+    <DebugType>portable</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <GeneratePackageOnBuild Condition=" '$(IsTestProject)' != 'true'">true</GeneratePackageOnBuild>
+    <PackageOutputPath>$(SolutionDir)\artifacts</PackageOutputPath>
+    <PackageIcon>icon.png</PackageIcon>
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(IsLibraryProject)' == 'true'">
+    <None Include="$(MSBuildThisFileDirectory)\LICENSE" Pack="true" PackagePath="\" />
+    <None Include="$(MSBuildThisFileDirectory)\icon.png" Pack="true" PackagePath="\" />
+    <None Include="$(MSBuildThisFileDirectory)\readme.md" Pack="true" PackagePath="\"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Roslynator.Analyzers" Version="4.2.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="AsyncFixer" Version="1.6.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="IDisposableAnalyzers" Version="4.0.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="PropertyChangedAnalyzers" Version="4.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="ReflectionAnalyzers" Version="0.3.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Meziantou.Analyzer" Version="2.0.19">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+</Project>
