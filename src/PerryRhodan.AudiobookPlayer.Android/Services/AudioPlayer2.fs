@@ -100,131 +100,9 @@ type AudioPlayerService2() as self =
         Program.mkAvaloniaProgrammWithSideEffect
             PlayerElmish.init
             PlayerElmish.update
-            (PlayerElmish.SideEffects.createSideEffectsProcessor self)
+            (PlayerElmish.SideEffects.createSideEffectsProcessor ())
         |> Program.mkStore
 
-    do
-        CrossMediaManager.Current.PositionChanged.Subscribe(fun e ->
-            let state =
-                match CrossMediaManager.Current.State with
-                | MediaPlayerState.Playing -> AudioPlayerState.Playing
-                | _ -> AudioPlayerState.Stopped
-                
-            store.Dispatch <| StateControlMsg (UpdatePlayingState (e.Position, CrossMediaManager.Current.Duration, state))
-        ) |> ignore
-        
-        CrossMediaManager.Current.StateChanged.Subscribe(fun e ->
-            let state =
-                match e.State with
-                | MediaPlayerState.Playing -> AudioPlayerState.Playing
-                | _ -> AudioPlayerState.Stopped
-                
-            store.Dispatch <| StateControlMsg (UpdatePlayingState (CrossMediaManager.Current.Position, CrossMediaManager.Current.Duration, state))
-        ) |> ignore
-        
-        
-        
-        CrossMediaManager.Current.MediaItemFinished.Subscribe(fun e ->
-            store.Dispatch <| PlayerControlMsg MoveToNextTrack
-        ) |> ignore
-    
-    interface IMediaPlayer with
-
-        member this.Play(file: string) =
-            task {
-                try
-                    match store.Model.AudioBook with
-                    | Some audioBook ->
-                        let mediaItem = MediaItem()
-                        mediaItem.MediaUri <- $"file://{file}"
-                        mediaItem.MediaType <- MediaType.Audio
-                        mediaItem.Album <- audioBook.AudioBook.FullName
-                        mediaItem.Title <- audioBook.AudioBook.FullName
-                        
-                        mediaItem.DisplayTitle <- audioBook.AudioBook.FullName
-                        let bitmap = audioBook.AudioBook.Picture |> Option.map (fun p -> BitmapFactory.DecodeFile p) |> Option.defaultValue null
-                        let thumb = audioBook.AudioBook.Thumbnail |> Option.map (fun p -> BitmapFactory.DecodeFile p) |> Option.defaultValue null
-                        mediaItem.Image <- bitmap
-                        mediaItem.AlbumImage <- bitmap
-                        
-                        mediaItem.DisplaySubtitle <- $"Track {store.Model.CurrentFileIndex + 1} of {store.Model.Mp3FileList.Length}"
-                        mediaItem.NumTracks <- store.Model.Mp3FileList.Length
-                        mediaItem.TrackNumber <- store.Model.CurrentFileIndex + 1
-                        CrossMediaManager.Current.Notification.Enabled <- true
-                        CrossMediaManager.Current.Notification.ShowNavigationControls   <- true
-                        CrossMediaManager.Current.Notification.ShowPlayPauseControls    <- true
-                        let! _ = CrossMediaManager.Current.Play (mediaItem, store.Model.Position)
-                        return ()
-                    | _ ->
-                        return ()
-                with
-                | ex ->
-                     Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
-                     raise ex
-            }
-
-
-        member this.Pause() =
-                task {
-                    try
-                        let! _ = CrossMediaManager.Current.Pause()
-                        return ()
-                    with
-                    | ex ->
-                         Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
-                         raise ex
-                 }
-
-        member this.PlayPause() =
-            task {
-                try
-                    if CrossMediaManager.Current.State = MediaPlayerState.Playing then
-                        let! _ = CrossMediaManager.Current.Pause()
-                        return ()
-                    else
-                        let! _ = CrossMediaManager.Current.Play()
-                        return ()
-                with
-                | ex ->
-                     Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
-                     raise ex
-                 }
-
-        member this.Stop resumeOnAudioFocus =
-            task {
-                try
-                    let! _ = CrossMediaManager.Current.Stop()
-                    return ()
-                with
-                | ex ->
-                     Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
-                     raise ex
-            }
-
-        member this.SeekTo(position: TimeSpan) =
-            task {
-                try
-                    let! _ = CrossMediaManager.Current.SeekTo position
-                    return ()
-                with
-                | ex ->
-                     Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
-                     raise ex
-            }
-
-        member this.SetPlaybackSpeed(speed: float) =
-            task {
-                try
-                    CrossMediaManager.Current.Speed <- speed |> float32
-                    return ()
-                with
-                | ex ->
-                     Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
-                     raise ex
-            }
-            
-        member this.UpdateNotifcation() =
-            ()
 
     interface IAudioPlayerPause with
         member this.Pause() =
@@ -237,8 +115,8 @@ type AudioPlayerService2() as self =
 
         member this.DisableAudioPlayer() =
             store.Dispatch <| StateControlMsg (DisableAudioService)
-            
-        
+
+
         member this.Play () =
             if not store.Model.IsBusy then store.Dispatch <| PlayerControlMsg Play
 
@@ -249,7 +127,7 @@ type AudioPlayerService2() as self =
             if not store.Model.IsBusy then store.Dispatch <| PlayerControlMsg (Stop false)
 
         member this.PlayPause () =
-            if not store.Model.IsBusy then 
+            if not store.Model.IsBusy then
                 if store.Model.State = AudioPlayerState.Playing then
                     store.Dispatch <| PlayerControlMsg (Stop false)
                 else
@@ -278,7 +156,7 @@ type AudioPlayerService2() as self =
             if not store.Model.IsBusy then store.Dispatch <| PlayerControlMsg (SetPlaybackSpeed speed)
 
         member this.StartSleepTimer sleepTime =
-            if not store.Model.IsBusy then 
+            if not store.Model.IsBusy then
                 match sleepTime with
                 | None ->
                     store.Dispatch <| SleepTimerMsg SleepTimerStop

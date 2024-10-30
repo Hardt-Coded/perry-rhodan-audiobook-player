@@ -36,6 +36,9 @@ namespace MediaManager
 
         void Init();
 
+
+
+        void PrepareController();
         /// <summary>
         /// Plays a media item
         /// </summary>

@@ -47,7 +47,7 @@ namespace MediaManager
 
         private static IMediaManager CreateMediaManager()
         {
-#if NET7
+#if NET8_0_OR_GREATER && !ANDROID && !IOS && !MACCATALYST && !UWP && !TIZEN && !WPF
             return null;
 #else
 #pragma warning disable IDE0022 // Use expression body for methods

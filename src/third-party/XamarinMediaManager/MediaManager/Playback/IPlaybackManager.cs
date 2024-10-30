@@ -116,6 +116,8 @@ namespace MediaManager.Playback
         /// <returns></returns>
         Task<bool> PlayQueueItem(int index);
 
+        Task<bool> PlayQueueItem(int index, TimeSpan startAt);
+
         /// <summary>
         /// Seeks forward a fixed amount of seconds of the current MediaItem
         /// </summary>
