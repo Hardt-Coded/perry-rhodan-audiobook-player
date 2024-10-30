@@ -11,6 +11,7 @@ open Avalonia.ReactiveUI
 open Avalonia.Android
 open Avalonia.Vulkan
 open Dependencies
+open MediaManager
 open Microsoft.AppCenter.Analytics
 open Microsoft.AppCenter
 open Microsoft.AppCenter.Crashes.Android
@@ -92,7 +93,7 @@ type MainActivity() as self =
     let mutable isBound = false
 
 
-    let bindToService() =
+    (*let bindToService() =
         let serviceConnection =
             match serviceConnection with
             | Some sc ->
@@ -117,13 +118,14 @@ type MainActivity() as self =
 
 
         let intent = new Intent(self, typeof<AudioPlayerService>)
-        self.BindService(intent, serviceConnection, Bind.AutoCreate) |> ignore
+        self.BindService(intent, serviceConnection, Bind.AutoCreate) |> ignore*)
 
 
 
 
 
     override _.CustomizeAppBuilder(builder) =
+
 
         // register services
         DependencyService.ServiceCollection
@@ -134,12 +136,13 @@ type MainActivity() as self =
             .AddSingleton<INavigationService, NavigationService>()
             .AddSingleton<IDownloadService, DownloadServiceImplementation.DependencyService.DownloadService>()
             .AddSingleton<INotificationService, NotificationService.NotificationService>()
-            .AddSingleton<IAudioPlayerServiceController, AudioPlayerServiceController>()
+            //.AddSingleton<IAudioPlayerServiceController, AudioPlayerServiceController>()
             .AddTransient<ILoginViewModel, LoginViewModel>()
             .AddSingleton<IActionMenuService, ActionMenuService>()
             .AddSingleton<GlobalSettingsService>(GlobalSettingsService())
             |> ignore
 
+        // convert function to C# Func
 
         base.CustomizeAppBuilder(builder)
             .UseAndroid()
@@ -164,14 +167,21 @@ type MainActivity() as self =
         (*// set complete to build service provider here, to avoid that the dependencies,
         // which are registered in app.xaml.fs are also included in the service provider
         DependencyService.SetComplete()*)
+        CrossMediaManager.Current.Init(this)
+        let audioService = AudioPlayerService2()
+        DependencyService.ServiceCollection
+            .AddSingleton<IMediaPlayer>(audioService)
+            .AddSingleton<IAudioPlayer>(audioService)
+        |> ignore
 
+        DependencyService.SetComplete()
 
         Microsoft.Maui.ApplicationModel.Platform.Init(this, savedInstanceState)
 
         // start audioplayer foreground service
-        let intent = new Intent(Application.Context, typeof<AudioPlayerService>)
+        (*let intent = new Intent(Application.Context, typeof<AudioPlayerService>)
         Application.Context.StartService(intent) |> ignore
-        bindToService()
+        bindToService()*)
         AppCompatDelegate.DefaultNightMode <- AppCompatDelegate.ModeNightYes
 
     override _.OnDestroy() =
@@ -197,7 +207,8 @@ type MainActivity() as self =
             |> Async.AwaitTask
             |> Async.map (fun result ->
                 if result then
-                    DependencyService.Get<IAudioPlayerServiceController>().StopService()
+                    //DependencyService.Get<IAudioPlayerServiceController>().StopService()
+                    CrossMediaManager.Current.Dispose()
                     this.FinishAffinity()
 
             )

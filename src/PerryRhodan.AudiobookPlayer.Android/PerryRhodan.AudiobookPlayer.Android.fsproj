@@ -61,11 +61,13 @@
     <Compile Include="Services\NotificationService.fs" />
     <Compile Include="Services\DownloadService.fs" />
     <Compile Include="Services\AudioPlayer.fs" />
+    <Compile Include="Services\AudioPlayer2.fs" />
     <Compile Include="Activities.fs" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\PerryRhodan.AudiobookPlayer\PerryRhodan.AudiobookPlayer.fsproj" />
+    <ProjectReference Include="..\third-party\XamarinMediaManager\MediaManager\MediaManager.csproj" />
   </ItemGroup>
 
   <!-- copy file to ..\PerryRhodan.AudiobookPlayer\obj\ -->
