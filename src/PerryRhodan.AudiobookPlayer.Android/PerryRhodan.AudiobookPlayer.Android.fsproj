@@ -67,7 +67,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\PerryRhodan.AudiobookPlayer\PerryRhodan.AudiobookPlayer.fsproj" />
-    <ProjectReference Include="..\third-party\XamarinMediaManager\MediaManager\MediaManager.csproj" />
   </ItemGroup>
 
   <!-- copy file to ..\PerryRhodan.AudiobookPlayer\obj\ -->

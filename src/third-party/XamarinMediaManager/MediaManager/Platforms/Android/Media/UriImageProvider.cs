@@ -13,11 +13,26 @@ namespace MediaManager.Platforms.Android.Media
             {
                 if (!string.IsNullOrEmpty(mediaItem.ImageUri))
                 {
-                    mediaItem.Image = image = await GetBitmapFromUrl(mediaItem.ImageUri).ConfigureAwait(false);
+                    if (mediaItem.ImageUri.StartsWith("/"))
+                    {
+                        mediaItem.Image = image = await GetBitmapFromFile(mediaItem.ImageUri).ConfigureAwait(false);
+                    } else
+                    {
+                        mediaItem.Image = image = await GetBitmapFromUrl(mediaItem.ImageUri).ConfigureAwait(false);
+                    }
+
+
                 }
                 if (image == null && !string.IsNullOrEmpty(mediaItem.AlbumImageUri))
                 {
-                    mediaItem.AlbumImage = image = await GetBitmapFromUrl(mediaItem.AlbumImageUri).ConfigureAwait(false);
+                    if (mediaItem.AlbumImageUri.StartsWith("/"))
+                    {
+                        mediaItem.AlbumImage = image = await GetBitmapFromFile(mediaItem.AlbumImageUri).ConfigureAwait(false);
+                    } else
+                    {
+                        mediaItem.AlbumImage = image = await GetBitmapFromUrl(mediaItem.AlbumImageUri).ConfigureAwait(false);
+                    }
+
                 }
             }
             catch (Exception ex)
@@ -31,6 +46,11 @@ namespace MediaManager.Platforms.Android.Media
         {
             var url = new Java.Net.URL(uri);
             return await Task.Run(() => BitmapFactory.DecodeStreamAsync(url.OpenStream())).ConfigureAwait(false);
+        }
+
+        private async Task<Bitmap> GetBitmapFromFile(string file)
+        {
+            return await Task.Run(() => BitmapFactory.DecodeFile(file)).ConfigureAwait(false);
         }
     }
 }

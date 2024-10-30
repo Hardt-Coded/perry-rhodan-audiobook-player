@@ -114,11 +114,13 @@ namespace MediaManager
         {
             EnsureInit();
             InitTimer();
+            
         }
 
         public async Task EnsureInit()
         {
             IsInitialized = await MediaBrowserManager.Init();
+
 
             if (!IsInitialized)
                 throw new Exception("Cannot Initialize MediaManager");
@@ -231,10 +233,15 @@ namespace MediaManager
             }
         }
 
+
+        public override void PrepareController()
+        {
+            MediaController.GetTransportControls().Prepare();
+        }
+
         public override async Task PlayAsCurrent(IMediaItem mediaItem)
         {
             await EnsureInit();
-            MediaController.GetTransportControls().Prepare();
         }
 
         public override async Task Pause()
@@ -246,16 +253,13 @@ namespace MediaManager
         public override async Task Play()
         {
             await EnsureInit();
-
-            if (this.IsStopped())
-                MediaController.GetTransportControls().Prepare();
-
             MediaController.GetTransportControls().Play();
         }
 
         public override async Task<bool> PlayNext()
         {
             await EnsureInit();
+
 
             // If we repeat just the single media item, we do that first
             if (RepeatMode == RepeatMode.One)
@@ -298,7 +302,6 @@ namespace MediaManager
                 return false;
 
             Queue.CurrentIndex = Queue.IndexOf(mediaItem);
-
             MediaController.GetTransportControls().SkipToQueueItem(Queue.IndexOf(mediaItem));
             return true;
         }
@@ -312,8 +315,25 @@ namespace MediaManager
                 return false;
 
             Queue.CurrentIndex = index;
-
             MediaController.GetTransportControls().SkipToQueueItem(index);
+            MediaController.GetTransportControls().Play();
+            return true;
+        }
+
+        public override async Task<bool> PlayQueueItem(int index, TimeSpan startAt)
+        {
+            await EnsureInit();
+
+            var mediaItem = Queue.ElementAtOrDefault(index);
+            if (mediaItem == null)
+                return false;
+
+            Queue.CurrentIndex = index;
+
+            MediaController.GetTransportControls().PrepareFromMediaId(mediaItem.Id, null);
+            MediaController.GetTransportControls().SkipToQueueItem(index);
+            MediaController.GetTransportControls().SeekTo((long)startAt.TotalMilliseconds);
+            MediaController.GetTransportControls().Play();
             return true;
         }
 
@@ -326,7 +346,6 @@ namespace MediaManager
         public override async Task Stop()
         {
             await EnsureInit();
-
             MediaController.GetTransportControls().Stop();
 
             if (Notification is MediaManager.Platforms.Android.Notifications.NotificationManager notificationManager)

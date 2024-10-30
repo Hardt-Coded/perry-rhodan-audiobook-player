@@ -392,23 +392,7 @@ module PlayerPage =
                                         dispatch <| RunOnlySideEffect SideEffect.ClosePlayerPage
                                         ()
                                     | Some files ->
-                                        dispatch <| FileListLoaded files
-
-                                        disposables |> Seq.iter (_.Dispose())
-                                        disposables.Add
-                                            <| audioPlayer.AudioPlayerInfoChanged.Subscribe(fun info ->
-                                                //if info.State = AudioPlayerState.Playing then
-                                                    dispatch <| UpdateScreenInformation info
-                                            )
-
-                                        audioPlayer.Stop false
-                                        audioPlayer.Init state.AudioBook files
-
-                                        // set new info listener after init
-
-
-                                        if state.StartPlayingOnOpen then
-                                            dispatch <| PlayerControlMsg Play
+                                        dispatch <| FileListLoaded files // initialized the audioplayer with the new files
 
                                 | _ ->
                                     // there is no current state in the store, so load the files and connect to the service
@@ -419,18 +403,7 @@ module PlayerPage =
                                         dispatch <| RunOnlySideEffect SideEffect.ClosePlayerPage
                                         ()
                                     | Some files ->
-                                        // remove all subscriptions
-                                        disposables |> Seq.iter (_.Dispose())
-                                        // set new info listener after init
-                                        disposables.Add
-                                            <| audioPlayer.AudioPlayerInfoChanged.Subscribe(fun info ->
-                                                //if info.State = AudioPlayerState.Playing then
-                                                    dispatch <| UpdateScreenInformation info
-                                            )
-
-                                        audioPlayer.Init state.AudioBook files
-
-                                        dispatch <| FileListLoaded files
+                                        dispatch <| FileListLoaded files // initialized the audioplayer with the new files
 
                                         if state.StartPlayingOnOpen then
                                             dispatch <| PlayerControlMsg Play
@@ -492,6 +465,17 @@ module PlayerPage =
                             | SideEffect.StartAudioBookService fileList ->
                                 audioPlayer.Stop false
                                 audioPlayer.Init state.AudioBook fileList
+
+                                disposables |> Seq.iter (_.Dispose())
+                                disposables.Add
+                                    <| audioPlayer.AudioPlayerInfoChanged.Subscribe(fun info ->
+                                        //if info.State = AudioPlayerState.Playing then
+                                            dispatch <| UpdateScreenInformation info
+                                    )
+
+                                if state.StartPlayingOnOpen then
+                                    dispatch <| PlayerControlMsg Play
+
                                 return ()
 
                             | SideEffect.UpdatePositionOnDatabase ->

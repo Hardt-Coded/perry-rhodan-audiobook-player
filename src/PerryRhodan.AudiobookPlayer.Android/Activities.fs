@@ -25,6 +25,8 @@ open Services
 open Services.DependencyServices
 open Xamarin.Android.Net
 open PerryRhodan.AudiobookPlayer.Controls
+open Android.Graphics
+open Avalonia.Xaml.Interactivity
 
 
 
@@ -89,43 +91,16 @@ type ServiceConnection() =
 type MainActivity() as self =
     inherit AvaloniaMainActivity<App>()
 
-    let mutable serviceConnection: ServiceConnection option = None
-    let mutable isBound = false
-
-
-    (*let bindToService() =
-        let serviceConnection =
-            match serviceConnection with
-            | Some sc ->
-                sc
-            | None ->
-                let sc = new ServiceConnection()
-                serviceConnection <- Some sc
-                sc.ServiceConnected.Subscribe(fun args ->
-                    match args.Binder with
-                    | :? AudioPlayerBinder as binder ->
-                        // make dependency injection aware of this instance of the service
-                        let service = binder.GetService()
-                        DependencyService.ServiceCollection.AddSingleton<IAudioPlayer>(service) |> ignore
-                        DependencyService.ServiceCollection.AddSingleton<IAudioPlayerPause>(service) |> ignore
-                        DependencyService.ServiceCollection.AddSingleton<IMediaPlayer>(service) |> ignore
-                        DependencyService.SetComplete()
-
-                        isBound <- true
-                    | _ -> ()
-                ) |> ignore
-                sc
-
-
-        let intent = new Intent(self, typeof<AudioPlayerService>)
-        self.BindService(intent, serviceConnection, Bind.AutoCreate) |> ignore*)
-
-
-
-
 
     override _.CustomizeAppBuilder(builder) =
 
+
+        let bitmapConverter = {
+            new IBitmapConverter with
+                member this.GetBitmap path =
+                    let bitmap = BitmapFactory.DecodeFile(path)
+                    bitmap :> obj
+        }
 
         // register services
         DependencyService.ServiceCollection
@@ -140,6 +115,7 @@ type MainActivity() as self =
             .AddTransient<ILoginViewModel, LoginViewModel>()
             .AddSingleton<IActionMenuService, ActionMenuService>()
             .AddSingleton<GlobalSettingsService>(GlobalSettingsService())
+            .AddSingleton<IBitmapConverter>(bitmapConverter)
             |> ignore
 
         // convert function to C# Func
@@ -170,7 +146,6 @@ type MainActivity() as self =
         CrossMediaManager.Current.Init(this)
         let audioService = AudioPlayerService2()
         DependencyService.ServiceCollection
-            .AddSingleton<IMediaPlayer>(audioService)
             .AddSingleton<IAudioPlayer>(audioService)
         |> ignore
 
@@ -178,20 +153,16 @@ type MainActivity() as self =
 
         Microsoft.Maui.ApplicationModel.Platform.Init(this, savedInstanceState)
 
-        // start audioplayer foreground service
-        (*let intent = new Intent(Application.Context, typeof<AudioPlayerService>)
-        Application.Context.StartService(intent) |> ignore
-        bindToService()*)
         AppCompatDelegate.DefaultNightMode <- AppCompatDelegate.ModeNightYes
+
+        AppDomain.CurrentDomain.UnhandledException.Subscribe(fun args ->
+            let ex = args.ExceptionObject :?> Exception
+            Microsoft.AppCenter.Crashes.Crashes.TrackError(ex)
+        ) |> ignore
+
 
     override _.OnDestroy() =
         base.OnDestroy()
-        match serviceConnection with
-        | Some sc when isBound ->
-            self.UnbindService sc
-            isBound <- false
-            serviceConnection <- None
-        | _ -> ()
 
     override this.OnStop() =
         base.OnStop()

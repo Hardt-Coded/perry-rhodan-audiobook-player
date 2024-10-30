@@ -83,6 +83,12 @@ namespace MediaManager
             InitTimer();
         }
 
+        public virtual void PrepareController()
+        {
+            
+            // nix
+        }
+
         public virtual void InitTimer()
         {
             if (Timer?.Enabled == true)
@@ -376,6 +382,18 @@ namespace MediaManager
 
             Queue.CurrentIndex = index;
             await MediaPlayer.Play(mediaItem);
+            return true;
+        }
+
+        public virtual async Task<bool> PlayQueueItem(int index, TimeSpan startAt) {
+
+            var mediaItem = Queue.ElementAtOrDefault(index);
+            if (mediaItem == null)
+                return false;
+
+            Queue.CurrentIndex = index;
+            await MediaPlayer.Play(mediaItem);
+            await MediaPlayer.SeekTo(startAt);
             return true;
         }
 

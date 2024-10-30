@@ -97,6 +97,10 @@
     <PackageReference Include="taglib-sharp-netstandard2.0" Version="2.1.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\third-party\XamarinMediaManager\MediaManager\MediaManager.csproj" />
+  </ItemGroup>
+
   
   
   <!-- set variables for the build -->
