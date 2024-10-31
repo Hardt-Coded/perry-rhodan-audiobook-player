@@ -69,6 +69,9 @@ type MainViewModel(root:CompositionRoot) =
     member this.GotoHomePage() =
         app.Dispatch <| SetView View.HomePage
 
+    member this.OpenCurrentPlayerPage () =
+        if not app.Model.IsLoading then app.Dispatch <| OpenCurrentPlayerPage
+    
     member this.GotoPlayerPage audiobook startPlaying =
         if not app.Model.IsLoading then app.Dispatch <| OpenPlayerPage (audiobook, startPlaying)
 
@@ -92,6 +95,9 @@ type MainViewModel(root:CompositionRoot) =
 
     member this.SettingsButtonColor =
         this.Bind (app, fun e -> SolidColorBrush(if e.View = View.SettingsPage then Colors.WhiteSmoke else Colors.DarkGray))
+        
+    member this.PlayerAvailable =
+        this.Bind (app, fun e -> e.PlayerViewModel.IsSome)
 
 
     static member DesignVM = new MainViewModel(Design.stub)

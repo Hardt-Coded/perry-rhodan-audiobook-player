@@ -120,10 +120,20 @@ type MainActivity() as self =
 
         // convert function to C# Func
 
+        // let androidOptions = AndroidPlatformOptions()
+        // // Todo: do not forget Fallback 
+        // let renderModes = [ AndroidRenderingMode.Vulkan ] |> System.Collections.Generic.List
+        // androidOptions.RenderingMode <- renderModes.AsReadOnly()
+        //
+        // let vulkanOptions = VulkanOptions()
+        // vulkanOptions.VulkanInstanceCreationOptions <- VulkanInstanceCreationOptions()
+        
         base.CustomizeAppBuilder(builder)
+            // .With(androidOptions)
+            // .With(vulkanOptions)
             .UseAndroid()
             .WithInterFont()
-            //.UseSkia()
+
             .UseReactiveUI()
 
 

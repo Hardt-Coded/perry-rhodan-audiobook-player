@@ -1,12 +1,15 @@
 ﻿namespace Elmish.SideEffect
 
 open ReactiveElmish.Avalonia
+open Elmish
 
 
 [<RequireQualifiedAccess>]
 module Program =
 
     let mkAvaloniaProgrammWithSideEffect init update runSideEffect =
+
+
 
         let runSideEffect sideEffect state =
             [

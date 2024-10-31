@@ -38,6 +38,7 @@ type Msg =
     | SetView of View
 
     | OpenPlayerPage of viewModel: AudioBookItemViewModel * startPlaying: bool
+    | OpenCurrentPlayerPage
     | OpenLoginView
 
     | CloseMiniplayer
@@ -57,6 +58,7 @@ type SideEffect =
 
     | OpenMiniplayer of audiobook:AudioBookItemViewModel * startPlaying:bool
     | OpenPlayerPage of audiobook:AudioBookItemViewModel * startPlaying:bool
+    | OpenCurrentPlayerPage
 
     | OpenLoginView
 
@@ -79,6 +81,9 @@ let update msg state =
 
     | OpenPlayerPage(viewModel, startPlaying) ->
         state, SideEffect.OpenPlayerPage (viewModel, startPlaying)
+        
+    | OpenCurrentPlayerPage ->
+        state, SideEffect.OpenCurrentPlayerPage
 
     | OpenMiniplayer (viewModel, startPlaying) ->
         state, SideEffect.OpenMiniplayer (viewModel, startPlaying)
@@ -171,10 +176,26 @@ let runSideEffect sideEffect state dispatch =
                         let viewModel = PlayerViewModelStore.create audioBookItemViewModel startPlaying
                         dispatch <| SetPlayerViewModel viewModel
                         let playerView = PlayerView()
+                        let position = viewModel.CurrentPositionMs
                         playerView.DataContext <- viewModel
+                        // after assignment of the viewmodel to the player page, the position is set to zero.
+                        // therefore we have to set the position again
+                        viewModel.CurrentPositionMs <- position
                         dispatch <| SetView (View.PlayerPage playerView)
                         return ()
-
+                        
+                    | SideEffect.OpenCurrentPlayerPage  ->
+                        match state.PlayerViewModel with
+                        | None -> return ()
+                        | Some viewModel ->
+                            let playerView = PlayerView()
+                            let position = viewModel.CurrentPositionMs
+                            playerView.DataContext <- viewModel
+                            // after assignment of the viewmodel to the player page, the position is set to zero.
+                            // therefore we have to set the position again
+                            viewModel.CurrentPositionMs <- position
+                            dispatch <| SetView (View.PlayerPage playerView)
+                            return ()
                 }
 
             dispatch <| IsLoading false

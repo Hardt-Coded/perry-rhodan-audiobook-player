@@ -101,6 +101,11 @@ type AudioPlayerService2() as self =
             PlayerElmish.init
             PlayerElmish.update
             (PlayerElmish.SideEffects.createSideEffectsProcessor ())
+        #if DEBUG
+        |> Elmish.Program.withTrace(fun msg state subIds ->
+            System.Diagnostics.Trace.WriteLine($"Player: \r\n Msg: \r\n {msg} \r\n State: \r\n {({ state with Mp3FileList = [] })}")
+        )
+        #endif
         |> Program.mkStore
 
 
@@ -111,7 +116,14 @@ type AudioPlayerService2() as self =
     interface IAudioPlayer  with
 
         member this.Init audiobook fileList =
+            let tcs = TaskCompletionSource<unit>()
+            let rec subscription:IDisposable = store.Observable.Subscribe(fun _ ->
+                if store.Model.IsInitialized then
+                    tcs.SetResult()
+                    subscription.Dispose()
+            )
             store.Dispatch <| StateControlMsg (InitAudioService (audiobook, fileList))
+            tcs.Task
 
         member this.DisableAudioPlayer() =
             store.Dispatch <| StateControlMsg (DisableAudioService)
@@ -138,10 +150,10 @@ type AudioPlayerService2() as self =
             if not store.Model.IsBusy then store.Dispatch <| PlayerControlMsg (Stop resumeOnAudioFocus)
 
         member this.JumpBackwards () =
-            if not store.Model.IsBusy then store.Dispatch <| PlayerControlMsg JumpBackwards
+            if not store.Model.IsBusy then store.Dispatch <|  RunSideEffect SideEffect.JumpBackwards
 
         member this.JumpForward () =
-            if not store.Model.IsBusy then store.Dispatch <| PlayerControlMsg JumpForward
+            if not store.Model.IsBusy then store.Dispatch <| RunSideEffect SideEffect.JumpForward
 
         member this.Next () =
             if not store.Model.IsBusy then store.Dispatch <| PlayerControlMsg MoveToNextTrack

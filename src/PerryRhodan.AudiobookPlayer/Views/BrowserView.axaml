@@ -17,16 +17,8 @@
         </EventTriggerBehavior>
     </Interaction.Behaviors>
     <Grid RowDefinitions="Auto,Auto,Auto,*">
-        <Button Grid.Row="0" 
-                Theme="{StaticResource MaterialFlatButton}" 
-                HorizontalAlignment="Left"
-                Command="{Binding GoBackHome}">
-            <StackPanel Orientation="Horizontal">
-                <avalonia:MaterialIcon Kind="ArrowLeftCircle" Width="24" Height="24" Margin="0,0,10,0" />
-                <TextBlock FontSize="24">Bestand durchstöbern</TextBlock>
-            </StackPanel>
-        </Button>
-
+        <TextBlock Grid.Row="0" FontSize="24" HorizontalAlignment="Center">Bestand durchstöbern</TextBlock>
+        
         <!-- Update -->
         <Grid Grid.Row="1" Margin="5,5,5,25">
             <!-- Search Bar -->

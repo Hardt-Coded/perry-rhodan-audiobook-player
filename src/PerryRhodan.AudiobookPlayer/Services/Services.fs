@@ -1435,9 +1435,9 @@ module SystemSettings =
 
 module SupportFeedback =
 
-    
-    
-    
+
+
+
     type Message = {
         Category:string
         Name:string
@@ -1453,7 +1453,7 @@ module SupportFeedback =
             }
             let jsonStr = JsonConvert.SerializeObject(msg)
             // use FsHttp to send the message
-            
+
             try
                 let! res =
                     http {
@@ -1463,8 +1463,8 @@ module SupportFeedback =
                         config_transformHttpClient (WebAccess.useAndroidHttpClient false)
                     }
                     |> Request.sendTAsync
-                    
-                    
+
+
                 if res.statusCode <> HttpStatusCode.Accepted then
                     return Error "Fehler beim Senden der Nachricht. Probieren Sie es noch einmal."
                 else
