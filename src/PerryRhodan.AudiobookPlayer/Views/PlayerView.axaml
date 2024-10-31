@@ -36,26 +36,27 @@
                 <GradientStop Color="Black" Offset="0.25" />
             </LinearGradientBrush>
         </Grid.Background>
-        <Button Grid.Row="0" 
-                Theme="{StaticResource MaterialFlatButton}" 
-                HorizontalAlignment="Left"
-                Command="{Binding GoBackHome}">
-            <StackPanel Orientation="Horizontal">
-                <avalonia:MaterialIcon Kind="ArrowLeftCircle" Width="24" Height="24" Margin="-10,0,10,0" />
-            </StackPanel>
-        </Button>
         <!-- cover -->
 
-        <asyncImageLoader:AdvancedImage Margin="40,5,40,10" Grid.Row="1" Source="{Binding Picture}" />
-        <Grid Grid.Row="1" RowDefinitions="Auto" ColumnDefinitions="Auto" HorizontalAlignment="Center"
+        <asyncImageLoader:AdvancedImage Margin="40,5,40,10" Grid.Row="1" Source="{Binding Picture}"></asyncImageLoader:AdvancedImage>
+        <Grid Grid.Row="1" RowDefinitions="60" ColumnDefinitions="170" HorizontalAlignment="Center"
               VerticalAlignment="Center" IsVisible="{Binding SleepClockVisible}">
-                <glassMorphism:GlassCard BorderThickness="0" CornerRadius="10">
+                <Border BorderThickness="0" 
+                        CornerRadius="20" 
+                        Effect="blur(20)" 
+                        Opacity="0.3" 
+                        Background="Black" 
+                        HorizontalAlignment="Stretch">
+                        <glassMorphism:CherylBackground />
+                </Border>
+                <Border BorderThickness="1" CornerRadius="10">
                     <TextBlock VerticalAlignment="Center"
-                               Text="{Binding TimeUntilSleeps}"
+                               Text="000:00"
+                               Opacity="0.9" 
                                FontSize="50"
                                HorizontalAlignment="Center"
                                Foreground="WhiteSmoke" />    
-                </glassMorphism:GlassCard>
+                </Border>
         </Grid>
 
 

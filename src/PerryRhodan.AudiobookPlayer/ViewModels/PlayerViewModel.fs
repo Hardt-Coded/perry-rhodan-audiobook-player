@@ -113,7 +113,7 @@ module PlayerPage =
         StartPlayingOnOpen = startPlaying
         PlaybackSpeed = 1.0m
         SelectedSleepTime = None
-        TimeUntilSleeps = None
+        TimeUntilSleeps = Some <| TimeSpan.FromMinutes 130.0
     }
 
 

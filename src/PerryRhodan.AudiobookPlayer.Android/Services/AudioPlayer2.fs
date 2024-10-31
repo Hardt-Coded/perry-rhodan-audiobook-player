@@ -94,7 +94,7 @@ module Helper =
 
 
 
-type AudioPlayerService2() as self =
+type AudioPlayerService2() =
 
     let store =
         Program.mkAvaloniaProgrammWithSideEffect

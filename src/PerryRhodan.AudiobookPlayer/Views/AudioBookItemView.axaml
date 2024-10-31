@@ -45,29 +45,35 @@
         </Border.Background>
         <Grid ColumnDefinitions="100,*,44,44"
               RowDefinitions="*,Auto">
-            
-            
+
 
             <Border CornerRadius="15" Margin="0,3,0,0" Padding="1" ClipToBounds="True">
                 <Grid Grid.Column="0" Margin="0">
-                    
+
                     <asyncImageLoader:AdvancedImage Source="{Binding Thumbnail}">
-                        
+
                     </asyncImageLoader:AdvancedImage>
-                   
+
+                    <Grid RowDefinitions="*" ColumnDefinitions="*"  HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,5,0">
+                        <Canvas Width="30" Height="30" Margin="2,2, 2,0"
+                                IsVisible="{Binding !IsDownloaded}">
+                            <Path Fill="#303030" StrokeThickness="1" Data="M 30,30 L 0,30 L 30,0 Z" />
+                        </Canvas>
+                    </Grid>
+
                     <Image Source="{Binding LoadingPie}" />
                     <!--<Image Source="{Binding ProgressPie}" Width="20" Height="20" HorizontalAlignment="Left"
                            VerticalAlignment="Bottom" Margin="10,0,0,5" />-->
                     <avalonia:MaterialIcon
                         HorizontalAlignment="Right"
                         VerticalAlignment="Bottom"
-                        Margin="0,0,8,2"
+                        Margin="0,0,4,0"
                         Width="20"
                         Height="20"
                         Kind="Download"
-                        Foreground="{Binding IconColor}"
+                        Foreground="{Binding AmbientColor}"
                         IsVisible="{Binding !IsDownloaded}" />
-                    
+
                     <avalonia:MaterialIcon
                         HorizontalAlignment="Left"
                         VerticalAlignment="Bottom"
@@ -76,7 +82,7 @@
                         Height="20"
                         Kind="CheckCircle"
                         Foreground="Green"
-                        IsVisible="{Binding IsComplete}"/>
+                        IsVisible="{Binding IsComplete}" />
                     <Interaction.Behaviors>
                         <EventTriggerBehavior EventName="Tapped">
                             <InvokeCommandAction Command="{Binding OpenPlayer}" />
@@ -90,24 +96,24 @@
                 </StackPanel>
                 <Interaction.Behaviors>
                     <EventTriggerBehavior EventName="Tapped">
-                        <InvokeCommandAction Command="{Binding OpenPlayer}"  />
+                        <InvokeCommandAction Command="{Binding OpenPlayer}" />
                     </EventTriggerBehavior>
                 </Interaction.Behaviors>
             </Grid>
             <Grid Grid.Column="2">
-                <Button Command="{Binding OpenPlayerAndPlay}" 
+                <Button Command="{Binding OpenPlayerAndPlay}"
                         IsVisible="{Binding IsPlayButtonVisible}">
                     <avalonia:MaterialIcon Kind="PlayCircle" />
                 </Button>
-                <Button Command="{Binding PauseAudiobook}" 
+                <Button Command="{Binding PauseAudiobook}"
                         IsVisible="{Binding IsPlaying}">
                     <avalonia:MaterialIcon Kind="PauseCircle" />
                 </Button>
-                <Button Command="{Binding StartDownload}" 
+                <Button Command="{Binding StartDownload}"
                         IsVisible="{Binding IsNotDownloaded}">
                     <avalonia:MaterialIcon Kind="DownloadCircle" />
                 </Button>
-                <Button Command="{Binding RemoveDownload}" 
+                <Button Command="{Binding RemoveDownload}"
                         IsVisible="{Binding IsQueued}">
                     <avalonia:MaterialIcon Kind="SelectionEllipseRemove" />
                 </Button>
@@ -121,7 +127,8 @@
                 </Button>
             </Grid>
             <Grid Grid.Row="1" Grid.ColumnSpan="4">
-                <ProgressBar Foreground="Yellow" Background="Transparent" Value="{Binding ListendenProgress}" Margin="3,0,3,0"/>
+                <ProgressBar Foreground="Yellow" Background="Transparent" Value="{Binding ListendenProgress}"
+                             Margin="3,0,3,0" />
             </Grid>
 
         </Grid>

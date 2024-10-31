@@ -30,7 +30,7 @@
     <EnableLLVM>False</EnableLLVM>
     <AndroidUseAapt2>True</AndroidUseAapt2>
     <RunAOTCompilation>False</RunAOTCompilation>
-    <AndroidEnableProfiledAot>False</AndroidEnableProfiledAot>
+    <AndroidEnableProfiledAot>True</AndroidEnableProfiledAot>
     <PublishTrimmed>False</PublishTrimmed>
     <TrimMode>partial</TrimMode>
     <AndroidCreatePackagePerAbi>False</AndroidCreatePackagePerAbi>
@@ -43,9 +43,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia.Android" Version="11.2.0-rc2" />
+    <PackageReference Include="Avalonia.Android" Version="11.2.0" />
     <PackageReference Include="Xamarin.AndroidX.Core.SplashScreen" Version="1.0.1.12" />
     <PackageReference Update="Microsoft.Maui.Essentials" Version="8.0.91" />
+    <PackageReference Update="Microsoft.NET.Runtime.MonoAOTCompiler.Task" Version="8.0.10"  />
   </ItemGroup>
   <ItemGroup>
     <TrimmerRootDescriptor Include="TrimmerRoots.xml" />
@@ -68,6 +69,7 @@
   <ItemGroup>
     <ProjectReference Include="..\PerryRhodan.AudiobookPlayer\PerryRhodan.AudiobookPlayer.fsproj" />
   </ItemGroup>
+
 
   <!-- copy file to ..\PerryRhodan.AudiobookPlayer\obj\ -->
 
