@@ -3,6 +3,7 @@
 
 
 open System.Threading
+open System.Threading.Tasks
 open Dependencies
 open Domain
 open System
@@ -29,6 +30,7 @@ module PlayerElmish =
     type Mp3FileList = (string * TimeSpan) list
 
     type AudioPlayerInfo = {
+        IsInitialized: bool
         Filename: string
         Position: TimeSpan
         Duration: TimeSpan
@@ -39,7 +41,7 @@ module PlayerElmish =
         PlaybackDelayed: bool
         ResumeOnAudioFocus: bool
         TimeUntilSleep: TimeSpan option
-        PlaybackSpeed: float
+        PlaybackSpeed: decimal
         IsBusy: bool
         SleepTimerState: SleepTimerState option
     } with
@@ -47,6 +49,7 @@ module PlayerElmish =
         member this.NumOfTracks = this.Mp3FileList.Length
 
         static member Empty = {
+            IsInitialized = false
             Filename = ""
             Position = TimeSpan.Zero
             Duration = TimeSpan.Zero
@@ -57,7 +60,7 @@ module PlayerElmish =
             PlaybackDelayed = false
             ResumeOnAudioFocus = false
             TimeUntilSleep = None
-            PlaybackSpeed = 1.0
+            PlaybackSpeed = 1.0m
             IsBusy = false
             SleepTimerState = None
         }
@@ -77,6 +80,7 @@ module PlayerElmish =
         | StateControlMsg of StateControlMsg
         | PlayerControlMsg of PlayerControlMsg
         | SleepTimerMsg of SleepTimerMsg
+        | RunSideEffect of SideEffect
 
 
     and PlayerControlMsg =
@@ -89,11 +93,12 @@ module PlayerElmish =
         | JumpForward
         | JumpBackwards
         | GotoPosition of pos: TimeSpan
-        | SetPlaybackSpeed of float
+        | SetPlaybackSpeed of decimal
         | QuitAudioPlayer
 
     and StateControlMsg =
         | InitAudioService of AudioBookItemViewModel * Mp3FileList
+        | InitComplete
         | DisableAudioService
         | UpdateInfoDataFromOutside of info: AudioPlayerInfo
         | SetBusy of bool
@@ -109,8 +114,9 @@ module PlayerElmish =
 
 
 
-    [<RequireQualifiedAccess>]
-    type SideEffect =
+
+    and [<RequireQualifiedAccess>]
+        SideEffect =
         | None
         | InitAudioPlayer
         | DisableAudioService
@@ -120,9 +126,11 @@ module PlayerElmish =
         | TogglePlayPause
         | MoveToNextTrack
         | MoveToPreviousTrack
+        | JumpForward
+        | JumpBackwards
         | GotoPositionWithNewTrack
         | GotoPosition of position: TimeSpan
-        | SetPlaybackSpeed of float
+        | SetPlaybackSpeed of decimal
         | StopPlayingAndFinishAudioBook
 
         | GotUpdateInfoDataFromOutside
@@ -207,6 +215,9 @@ module PlayerElmish =
 
     let update msg state =
         match msg with
+        | RunSideEffect sideEffect ->
+            state, sideEffect
+
         //################ STATE CONTROL  ##################
         | StateControlMsg (InitAudioService(ab, mp3List)) ->
             // get current filename, track and position from the audiobook
@@ -244,7 +255,11 @@ module PlayerElmish =
                         Mp3FileList = mp3List
                         AudioBook = Some ab
                 },
-                SideEffect.None
+                SideEffect.InitAudioPlayer
+
+        | StateControlMsg InitComplete ->
+            { state with IsInitialized = true }, SideEffect.None
+
 
         | StateControlMsg DisableAudioService  ->
             AudioPlayerInfo.Empty, SideEffect.DisableAudioService
@@ -256,21 +271,18 @@ module PlayerElmish =
             info, SideEffect.None
 
         | StateControlMsg (UpdatePosition pos) ->
-            { state with Position = if state.IsBusy then state.Position else pos }, SideEffect.UpdateAudioBookViewModelPosition
+            { state with Position = pos }, SideEffect.UpdateAudioBookViewModelPosition
 
         | StateControlMsg (UpdateAudioPlayerState astate) ->
-            { state with State = if state.IsBusy then state.State else astate }, SideEffect.None
+            { state with State = astate }, SideEffect.None
 
         | StateControlMsg (UpdateCurrentMediaItem mediaItem) ->
-            if state.IsBusy then
-                state, SideEffect.None
-            else
-                {
-                    state with
-                        Filename = mediaItem.Id
-                        CurrentFileIndex = mediaItem.TrackNumber - 1
-                        Duration = mediaItem.Duration
-                }, SideEffect.None
+            {
+                state with
+                    Filename = mediaItem.Id
+                    CurrentFileIndex = mediaItem.TrackNumber - 1
+                    Duration = mediaItem.Duration
+            }, SideEffect.None
 
 
         //################ PLAYER CONTROL  ##################
@@ -442,7 +454,7 @@ module PlayerElmish =
             { state with Position = pos }, SideEffect.GotoPosition pos
 
         | PlayerControlMsg (SetPlaybackSpeed value) ->
-            if value < 0.1 || value > 6.0 then
+            if value < 0.1m || value > 6.0m then
                 state, SideEffect.None
             else
                 { state with PlaybackSpeed = value }, SideEffect.SetPlaybackSpeed value
@@ -477,30 +489,11 @@ module PlayerElmish =
 
     module SideEffects =
 
-        let createMediaItem filename (audioBook: AudioBookItemViewModel) numTracks tracknumber duration =
-            let mediaItem = MediaItem()
-            mediaItem.MediaUri <- $"file://{filename}"
-            mediaItem.MediaType <- MediaType.Audio
-            mediaItem.Album <- audioBook.AudioBook.FullName
-            mediaItem.Title <- $"Track {tracknumber} of {numTracks}"
-            mediaItem.Id <- filename
-
-            mediaItem.DisplayTitle <- audioBook.AudioBook.FullName
-
-            mediaItem.ImageUri <- audioBook.AudioBook.Thumbnail |> Option.defaultValue Unchecked.defaultof<_>
-            mediaItem.AlbumImageUri <- audioBook.AudioBook.Thumbnail |> Option.defaultValue Unchecked.defaultof<_>
-
-            mediaItem.DisplaySubtitle <- $"Track {tracknumber} of {numTracks}"
-            mediaItem.NumTracks <- numTracks
-            mediaItem.TrackNumber <- tracknumber
-            mediaItem.Duration <- duration
-            mediaItem
-
-
         let createSideEffectsProcessor () =
             let mutable sleepTimer: Timer option = None
-            let mutable currentMediaItem: MediaItem list = []
+            let mutable currentMediaItem: IMediaItem array = [||]
             let disposables = new System.Collections.Generic.List<IDisposable>()
+            let globalSettings = DependencyService.Get<GlobalSettingsService>()
             fun (sideEffect: SideEffect)
                 (state: State)
                 (dispatch: Msg -> unit) ->
@@ -536,27 +529,41 @@ module PlayerElmish =
                                     return ()
 
                                 | SideEffect.InitAudioPlayer ->
+                                    CrossMediaManager.Current.Init()
                                     do! CrossMediaManager.Current.Stop()
                                     CrossMediaManager.Current.Notification.Enabled <- true
                                     CrossMediaManager.Current.Queue.Clear()
-                                    let mediaItems =
+
+                                    let! mediaItems =
                                         match state.AudioBook with
                                         | Some audiobook ->
-                                            state.Mp3FileList
-                                            |> List.indexed
-                                            |> List.map (fun (i,(filename, duration)) ->
-                                                createMediaItem filename state.AudioBook.Value state.Mp3FileList.Length (i + 1) duration
-                                            )
-                                        | None -> []
-                                    mediaItems |> List.iter (fun item -> CrossMediaManager.Current.Queue.Add item)
+                                            try
+                                                state.Mp3FileList
+                                                |> List.map (fun (filename, _) ->
+                                                    CrossMediaManager.Current.Extractor.CreateMediaItem($"file://{filename}")
+                                                )
+                                                |> Task.WhenAll
+                                            with
+                                            | ex ->
+                                                Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
+                                                Task.FromResult [||]
+                                        | None -> Task.FromResult [||]
+
+
+                                    mediaItems |> Array.iter (fun item -> CrossMediaManager.Current.Queue.Add item)
                                     currentMediaItem <- mediaItems
 
-
-
                                     disposables |> Seq.iter (fun i -> i.Dispose())
+
+                                    // use debouncer to avoid jumping around, because the prepare function of the
+                                    // mediaplayer messes up the positions and mediaitems
+                                    let positionDebouncer =
+                                        Common.Extensions.debounce<TimeSpan> 750 (fun pos ->
+                                            dispatch <| StateControlMsg (UpdatePosition pos)
+                                        )
                                     disposables.Add
                                         <| CrossMediaManager.Current.PositionChanged.Subscribe(fun pos ->
-                                            dispatch <| StateControlMsg (UpdatePosition pos.Position)
+                                            positionDebouncer pos.Position
                                         )
 
                                     disposables.Add
@@ -565,142 +572,168 @@ module PlayerElmish =
                                             ()
                                         )
 
+                                    let mediaItemDebouncer =
+                                         Common.Extensions.debounce<IMediaItem> 750 (fun mediaItem ->
+                                            dispatch <| StateControlMsg (UpdateCurrentMediaItem mediaItem)
+                                        )
                                     disposables.Add
                                         <| CrossMediaManager.Current.MediaItemChanged.Subscribe(fun e ->
-                                            dispatch <| StateControlMsg (UpdateCurrentMediaItem e.MediaItem)
+                                             mediaItemDebouncer e.MediaItem
+                                        )
+
+
+                                    let stateDebouncer =
+                                        Common.Extensions.debounce<AudioPlayerState> 750 (fun state ->
+                                            dispatch <| StateControlMsg (UpdateAudioPlayerState state)
                                         )
 
                                     disposables.Add
                                         <| CrossMediaManager.Current.StateChanged.Subscribe(fun e ->
                                             match e.State with
-                                            | MediaPlayerState.Playing -> Some AudioPlayerState.Playing
-                                            | MediaPlayerState.Paused -> Some AudioPlayerState.Stopped
-                                            | MediaPlayerState.Stopped -> Some AudioPlayerState.Stopped
-                                            | _ -> None
-                                            |> Option.iter (fun i -> dispatch <| StateControlMsg (UpdateAudioPlayerState i))
+                                            | MediaPlayerState.Playing -> Some AudioPlayerState.Playing, false
+                                            | MediaPlayerState.Paused -> Some AudioPlayerState.Stopped, false
+                                            | MediaPlayerState.Stopped -> Some AudioPlayerState.Stopped, false
+                                            | MediaPlayerState.Loading -> None, true
+                                            | MediaPlayerState.Buffering -> None, true
+                                            | MediaPlayerState.Failed -> None, false
+                                            | _ -> None, false
+                                            |> fun (abstate, isBusy) ->
+                                                #if DEBUG
+                                                System.Diagnostics.Trace.WriteLine $"MediaPlayerStateTrigggered: {state} Translated To: {abstate}/{isBusy}"
+                                                #endif
+
+                                                dispatch <| StateControlMsg (SetBusy isBusy)
+                                                abstate |> Option.iter stateDebouncer
                                         )
 
 
-                                    CrossMediaManager.Current.Speed <- state.PlaybackSpeed |> float32
+                                    dispatch <| PlayerControlMsg (SetPlaybackSpeed globalSettings.PlaybackSpeed)
+                                    dispatch <| StateControlMsg InitComplete
+
                                     return ()
 
                                 | SideEffect.DisableAudioService ->
-                                    CrossMediaManager.Current.Notification.Enabled <- false
-                                    disposables |> Seq.iter (fun i -> i.Dispose())
-                                    disposables.Clear()
-                                    return ()
+                                     CrossMediaManager.Current.Notification.Enabled <- false
+                                     disposables |> Seq.iter (fun i -> i.Dispose())
+                                     disposables.Clear()
+                                     return ()
 
                                 | SideEffect.StartAudioPlayer ->
-                                    state.AudioBook
-                                    |> Option.iter (fun i -> i.UpdateCurrentListenFilename state.Filename)
-
-                                    let! _ =  CrossMediaManager.Current.PlayQueueItem(state.CurrentFileIndex)
-                                    do! CrossMediaManager.Current.SeekTo state.Position
-                                    return ()
+                                     state.AudioBook
+                                     |> Option.iter (fun i -> i.UpdateCurrentListenFilename state.Filename)
+                                     let! _ =  CrossMediaManager.Current.PlayQueueItem(state.CurrentFileIndex, state.Position)
+                                     return ()
 
                                 | SideEffect.StartAudioPlayerExtern ->
-                                    state.AudioBook
-                                    |> Option.iter (fun i -> i.UpdateCurrentListenFilename state.Filename)
-                                    let queue = CrossMediaManager.Current.Queue
-                                    let currentMediaItems = queue |> Seq.toList
-                                    let mediaItem = CrossMediaManager.Current.Queue.Current
-
-                                    let! _ =  CrossMediaManager.Current.PlayQueueItem(state.CurrentFileIndex, state.Position)
-                                    //do! CrossMediaManager.Current.SeekTo state.Position
-                                    return ()
+                                     state.AudioBook
+                                     |> Option.iter (fun i -> i.UpdateCurrentListenFilename state.Filename)
+                                     let! _ =  CrossMediaManager.Current.PlayQueueItem(state.CurrentFileIndex, state.Position)
+                                     return ()
 
 
                                 | SideEffect.StopAudioPlayer ->
-                                    state.AudioBook
-                                    |> Option.iter (fun i -> i.UpdateAudioBookPosition state.Position)
+                                     state.AudioBook
+                                     |> Option.iter (fun i -> i.UpdateAudioBookPosition state.Position)
 
-                                    do! CrossMediaManager.Current.Pause()
+                                     do! CrossMediaManager.Current.Pause()
 
-                                    return ()
+                                     return ()
 
                                 | SideEffect.TogglePlayPause ->
-                                    state.AudioBook
-                                    |> Option.iter (fun i -> i.UpdateAudioBookPosition state.Position)
-                                    do! CrossMediaManager.Current.PlayPause()
-                                    return ()
+                                     state.AudioBook
+                                     |> Option.iter (fun i -> i.UpdateAudioBookPosition state.Position)
+                                     do! CrossMediaManager.Current.PlayPause()
+                                     return ()
 
                                 | SideEffect.MoveToNextTrack ->
-                                    state.AudioBook
-                                    |> Option.iter (fun i -> i.UpdateCurrentListenFilename state.Filename)
-
-                                    let! _ =  CrossMediaManager.Current.PlayQueueItem(state.CurrentFileIndex)
-                                    //do! CrossMediaManager.Current.SeekTo state.Position
-                                    return ()
+                                     state.AudioBook
+                                     |> Option.iter (fun i -> i.UpdateCurrentListenFilename state.Filename)
+                                     let! _ = CrossMediaManager.Current.PlayNext()
+                                     return ()
 
                                 | SideEffect.MoveToPreviousTrack ->
-                                    state.AudioBook
-                                    |> Option.iter (fun i -> i.UpdateCurrentListenFilename state.Filename)
+                                     state.AudioBook
+                                     |> Option.iter (fun i -> i.UpdateCurrentListenFilename state.Filename)
+                                     let! _ = CrossMediaManager.Current.PlayPrevious()
+                                     return ()
 
-                                    let! _ =  CrossMediaManager.Current.PlayQueueItem(state.CurrentFileIndex)
-                                    //do! CrossMediaManager.Current.SeekTo state.Position
-                                    return ()
+                                | SideEffect.JumpForward ->
+                                     state.AudioBook
+                                     |> Option.iter (fun i -> i.UpdateCurrentListenFilename state.Filename)
+                                     let jumpDistance = globalSettings.JumpDistance |> TimeSpan.FromMilliseconds
+                                     if jumpDistance <> CrossMediaManager.Current.StepSizeForward then
+                                         CrossMediaManager.Current.StepSizeForward <- jumpDistance
+                                     let! _ = CrossMediaManager.Current.StepForward()
+                                     return ()
+
+                                | SideEffect.JumpBackwards ->
+                                     state.AudioBook
+                                     |> Option.iter (fun i -> i.UpdateCurrentListenFilename state.Filename)
+                                     let jumpDistance = globalSettings.JumpDistance |> TimeSpan.FromMilliseconds
+                                     if jumpDistance <> CrossMediaManager.Current.StepSizeBackward then
+                                         CrossMediaManager.Current.StepSizeBackward <- jumpDistance
+
+                                     let! _ = CrossMediaManager.Current.StepBackward()
+                                     return ()
 
                                 | SideEffect.GotoPositionWithNewTrack ->
-                                    state.AudioBook
-                                    |> Option.iter (fun i -> i.UpdateCurrentListenFilename state.Filename)
+                                     state.AudioBook
+                                     |> Option.iter (fun i -> i.UpdateCurrentListenFilename state.Filename)
 
-                                    state.AudioBook
-                                    |> Option.iter (fun i -> i.UpdateAudioBookPosition state.Position)
-                                    if state.State = AudioPlayerState.Playing then
-                                        let! _ =  CrossMediaManager.Current.PlayQueueItem(state.CurrentFileIndex)
-                                        do! CrossMediaManager.Current.SeekTo state.Position
-                                        ()
+                                     state.AudioBook
+                                     |> Option.iter (fun i -> i.UpdateAudioBookPosition state.Position)
+                                     if state.State = AudioPlayerState.Playing then
+                                         let! _ =  CrossMediaManager.Current.PlayQueueItem(state.CurrentFileIndex)
+                                         do! CrossMediaManager.Current.SeekTo state.Position
+                                         ()
 
-                                    return ()
+                                     return ()
 
                                 | SideEffect.GotoPosition position ->
-                                    state.AudioBook |> Option.iter (fun i -> i.UpdateAudioBookPosition position)
-                                    if state.State = AudioPlayerState.Playing then
-                                        do! CrossMediaManager.Current.SeekTo position
-                                        ()
-                                    return ()
-
-
+                                     state.AudioBook |> Option.iter (fun i -> i.UpdateAudioBookPosition position)
+                                     do! CrossMediaManager.Current.SeekTo position
+                                     ()
+                                     return ()
 
                                 | SideEffect.SetPlaybackSpeed f ->
-                                    CrossMediaManager.Current.Speed <- f |> float32
-                                    return ()
+                                     CrossMediaManager.Current.Speed <- f |> float32
+                                     return ()
 
                                 | SideEffect.StopPlayingAndFinishAudioBook ->
-                                    do! CrossMediaManager.Current.Pause()
-                                    state.AudioBook |> Option.iter (_.MarkAsListend())
-                                    return ()
+                                     do! CrossMediaManager.Current.Pause()
+                                     state.AudioBook |> Option.iter (_.MarkAsListend())
+                                     return ()
 
                                 | SideEffect.QuitAudioPlayer ->
-                                    do! CrossMediaManager.Current.Pause()
-                                    return ()
+                                     do! CrossMediaManager.Current.Pause()
+                                     return ()
 
                                 | SideEffect.GotUpdateInfoDataFromOutside ->
-                                    // open Playerpage
-                                    match state.AudioBook with
-                                    | Some audiobook ->
-                                        DependencyService
-                                            .Get<IMainViewModel>()
-                                            .GotoPlayerPage
-                                            audiobook
-                                            false
-                                    | None -> ()
+                                     // open Playerpage
+                                     match state.AudioBook with
+                                     | Some audiobook ->
+                                         DependencyService
+                                             .Get<IMainViewModel>()
+                                             .GotoPlayerPage
+                                             audiobook
+                                             false
+                                     | None -> ()
 
                                 | SideEffect.UpdateAudioBookViewModelPosition ->
-                                    // process earlier
-                                    return ()
+                                     // process earlier
+                                     return ()
 
                                 | SideEffect.StartSleepTimer ->
-                                    return ()
+                                     return ()
 
                                 | SideEffect.StopSleepTimer ->
-                                    sleepTimer |> Option.iter (_.Dispose())
-                                    return ()
+                                     sleepTimer |> Option.iter (_.Dispose())
+                                     return ()
 
                                 | SideEffect.SleepTimeReachedEnd ->
-                                    do! CrossMediaManager.Current.Pause()
-                                    dispatch <| SleepTimerMsg SleepTimerStop
-                                    return ()
+                                     do! CrossMediaManager.Current.Pause()
+                                     dispatch <| SleepTimerMsg SleepTimerStop
+                                     return ()
                             }
 
                         dispatch <| StateControlMsg (SetBusy false)
@@ -711,7 +744,7 @@ type IAudioPlayer =
     inherit IAudioPlayerPause
     //abstract member SetMetaData: audiobook:AudioBook -> numberOfTracks:int -> curentTrack:int -> unit
     abstract member Init:
-        audioBook: AudioBookItemViewModel -> fileList: PlayerElmish.Mp3FileList -> unit
+        audioBook: AudioBookItemViewModel -> fileList: PlayerElmish.Mp3FileList -> Task<unit>
     abstract member DisableAudioPlayer: unit -> unit
 
     abstract member Play: unit -> unit
@@ -720,7 +753,7 @@ type IAudioPlayer =
     abstract member PlayPause: unit -> unit
     abstract member Stop: bool -> unit
     abstract member SeekTo: TimeSpan -> unit
-    abstract member SetPlaybackSpeed: float -> unit
+    abstract member SetPlaybackSpeed: decimal -> unit
     abstract member Next: unit -> unit
     abstract member Previous: unit -> unit
     abstract member JumpForward: unit -> unit

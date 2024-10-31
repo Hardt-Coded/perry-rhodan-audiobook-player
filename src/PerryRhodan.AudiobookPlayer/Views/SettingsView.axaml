@@ -44,13 +44,9 @@
 
 
     <Grid RowDefinitions="Auto,Auto,Auto, Auto">
-        <Button Grid.Row="0" Theme="{StaticResource MaterialFlatButton}" HorizontalAlignment="Left"
-                Command="{Binding GoBackHome}">
-            <StackPanel Orientation="Horizontal">
-                <avalonia:MaterialIcon Kind="ArrowLeftCircle" Width="24" Height="24" Margin="-10,0,10,0" />
-                <TextBlock FontSize="24">Einstellungen</TextBlock>
-            </StackPanel>
-        </Button>
+        
+        <TextBlock Grid.Row="0" FontSize="24" HorizontalAlignment="Center">Einstellungen</TextBlock>
+        
         <Grid Grid.Row="2" Margin="10">
             <StackPanel>
                 <Grid ColumnDefinitions="*,120">

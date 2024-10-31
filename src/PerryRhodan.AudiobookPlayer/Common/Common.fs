@@ -46,7 +46,11 @@
                 let key = fn.GetType()
                  // Cancel previous debouncer
                 match memoizations.TryGetValue(key) with
-                | true, cts -> cts.Cancel()
+                | true, cts ->
+                    #if DEBUG
+                    System.Diagnostics.Trace.WriteLine($"Debouncer: {key} debounced!")
+                    #endif
+                    cts.Cancel()
                 | _ -> ()
                  // Create a new cancellation token and memoize it
                 let cts = new CancellationTokenSource()

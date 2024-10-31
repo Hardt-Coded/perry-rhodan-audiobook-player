@@ -325,35 +325,41 @@ module PlayerPage =
                 match model.State.DownloadedFolder with
                 | None -> return None
                 | Some folder ->
-                    let! audioFileInfo = DataBase.getAudioBookFileInfo model.Id
+                    try
+                        let! audioFileInfo = DataBase.getAudioBookFileInfo model.Id
 
-                    match audioFileInfo with
-                    | None ->
-                        try
-                            let files =
-                                Directory.EnumerateFiles(folder, "*.mp3")
-                                |> Seq.toArray
-                                |> Array.Parallel.map (fun i ->
-                                    use tfile = TagLib.File.Create(i)
-                                    (i, tfile.Properties.Duration)
-                                )
-                                |> Array.sortBy (fun (f, _) -> f)
-                                |> Array.toList
+                        match audioFileInfo with
+                        | None ->
+                            try
+                                let files =
+                                    Directory.EnumerateFiles(folder, "*.mp3")
+                                    |> Seq.toArray
+                                    |> Array.Parallel.map (fun i ->
+                                        use tfile = TagLib.File.Create(i)
+                                        (i, tfile.Properties.Duration)
+                                    )
+                                    |> Array.sortBy (fun (f, _) -> f)
+                                    |> Array.toList
 
-                            return files |> Some
-                        with ex ->
-                            do!
-                                Notifications.showErrorMessage
-                                    "Konnte Hörbuch Dateien nicht finden."
+                                return files |> Some
+                            with ex ->
+                                do!
+                                    Notifications.showErrorMessage
+                                        "Konnte Hörbuch Dateien nicht finden."
 
-                            Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
-                            return None
+                                Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
+                                return None
 
-                    | Some audioFileInfo ->
-                        return
-                            audioFileInfo.AudioFiles
-                            |> List.map (fun i -> (i.FileName, i.Duration))
-                            |> Some
+                        | Some audioFileInfo ->
+                            return
+                                audioFileInfo.AudioFiles
+                                |> List.map (fun i -> (i.FileName, i.Duration))
+                                |> Some
+                    with
+                    | ex ->
+                        Microsoft.AppCenter.Crashes.Crashes.TrackError(ex)
+                        return raise ex
+
             }
 
         let runSideEffects (sideEffect: SideEffect) (state: State) (dispatch: Msg -> unit) =
@@ -405,8 +411,6 @@ module PlayerPage =
                                     | Some files ->
                                         dispatch <| FileListLoaded files // initialized the audioplayer with the new files
 
-                                        if state.StartPlayingOnOpen then
-                                            dispatch <| PlayerControlMsg Play
 
 
                                 dispatch <| ButtonActionMsg (SetPlaybackSpeed globalSettings.PlaybackSpeed)
@@ -464,7 +468,7 @@ module PlayerPage =
 
                             | SideEffect.StartAudioBookService fileList ->
                                 audioPlayer.Stop false
-                                audioPlayer.Init state.AudioBook fileList
+                                do! audioPlayer.Init state.AudioBook fileList
 
                                 disposables |> Seq.iter (_.Dispose())
                                 disposables.Add
@@ -472,6 +476,9 @@ module PlayerPage =
                                         //if info.State = AudioPlayerState.Playing then
                                             dispatch <| UpdateScreenInformation info
                                     )
+
+                                // update the screen information
+                                dispatch <| UpdateScreenInformation audioPlayer.AudioPlayerInformation
 
                                 if state.StartPlayingOnOpen then
                                     dispatch <| PlayerControlMsg Play
@@ -487,7 +494,7 @@ module PlayerPage =
                                 return ()
 
                             | SideEffect.SetPlaybackSpeed speed ->
-                                audioPlayer.SetPlaybackSpeed(speed |> float)
+                                audioPlayer.SetPlaybackSpeed speed
                                 globalSettings.PlaybackSpeed <- speed
 
                             | SideEffect.SetAudioPositionAbsolute pos ->
@@ -577,6 +584,13 @@ type PlayerViewModel(audiobook: AudioBookItemViewModel, startPlaying) =
 
     let local =
         Program.mkAvaloniaProgrammWithSideEffect init update SideEffects.runSideEffects
+        #if DEBUG2
+        |> Elmish.Program.withTrace(fun msg state subIds ->
+            System.Diagnostics.Trace.WriteLine($"PlayerViewModel: Msg: {msg}")
+            System.Diagnostics.Trace.WriteLine($"PlayerViewModel: State: {( { state with AudioFileList = [] })}")
+            if subIds <> [] then System.Diagnostics.Trace.WriteLine($"PlayerViewModel: SubIds: {subIds}")
+        )
+        #endif
         |> Program.mkStore
 
 
@@ -599,7 +613,7 @@ type PlayerViewModel(audiobook: AudioBookItemViewModel, startPlaying) =
 
     member this.CurrentPositionMs
         with get () =
-            this.BindOnChanged(local, _.CurrentPosition, fun i -> i.CurrentPosition.TotalMilliseconds)
+            this.Bind(local, fun i -> i.CurrentPosition.TotalMilliseconds)
         and set v = local.Dispatch(SetTrackPosition(TimeSpan.FromMilliseconds v))
 
     member this.CurrentDurationMs =
