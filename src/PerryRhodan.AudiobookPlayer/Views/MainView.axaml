@@ -75,8 +75,8 @@
 
         <controls:InteractiveContainer Name="DialogContainer" HorizontalAlignment="Stretch">
             <Border Background="Black" IsEnabled="{Binding !IsLoading}">
-                <Grid RowDefinitions="*, Auto, Auto"
-                      ColumnDefinitions="*" IsEnabled="{Binding ElementName=DialogContainer, Path=!IsDialogOpen}">
+                <Grid RowDefinitions="*, Auto, Auto" 
+                      IsEnabled="{Binding ElementName=DialogContainer, Path=!IsDialogOpen}">
 
                     <TransitioningContentControl Grid.Row="0" Content="{Binding ContentView}">
                         <TransitioningContentControl.PageTransition>
@@ -94,7 +94,8 @@
                     </TransitioningContentControl>
 
                     <!-- Bottom Navigation -->
-                    <Grid ColumnDefinitions="0.8*, 0.7*, 1.0*, 0.9*" Grid.Row="2">
+                    <Grid ColumnDefinitions="0.8*, 0.7*, 1.0*, 0.9*" Grid.Row="2"
+                          Margin="0,0,0,5">
                         <Button Grid.Row="0"
                                 Grid.Column="0"
                                 Margin="0,0,0,0"
@@ -116,7 +117,7 @@
                                 IsVisible="{Binding PlayerAvailable}"
                                 Theme="{StaticResource MaterialFlatButton}"
                                 Command="{Binding OpenCurrentPlayerPage}"
-                                Foreground="{Binding BrowserButtonColor}">
+                                Foreground="{Binding PlayerButtonColor}">
                             <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
                                 <avalonia:MaterialIcon Kind="PlayCircle" Classes="mainButton" />
                                 <TextBlock>Player</TextBlock>

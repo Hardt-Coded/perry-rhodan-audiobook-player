@@ -27,6 +27,9 @@
             <Setter Property="Width" Value="32" />
             <Setter Property="Height" Value="32" />
         </Style>
+        <Style Selector="Button:disabled /template/ Border#PART_RootBorder">
+            <Setter Property="Opacity" Value="1.0" />
+        </Style>
     </UserControl.Styles>
     <Border CornerRadius="10" Margin="5" ClipToBounds="True" BorderThickness="1">
         <Border.BorderBrush>
@@ -92,9 +95,10 @@
                         <TextBlock Text="{Binding JumpDistance}"  
                                    HorizontalAlignment="Center" 
                                    VerticalAlignment="Center"
-                                   FontSize="8"
-                                   Margin="0,2,0,0"/>
-                        <avalonia:MaterialIcon Kind="Replay">
+                                   FontSize="9"
+                                   Width="10"
+                                   Margin="4,1,0,0"/>
+                        <avalonia:MaterialIcon Kind="Replay" Width="40" Height="40">
                             <avalonia:MaterialIcon.RenderTransform>
                                 <TransformGroup>
                                     <RotateTransform Angle="-90" />
@@ -103,6 +107,7 @@
                         </avalonia:MaterialIcon>
                     </Grid>
                 </Button>
+                <Grid>
                 <Button Command="{Binding Play}" IsVisible="{Binding IsStopped}"
                         IsEnabled="{Binding !IsLoading}">
                     <avalonia:MaterialIcon Kind="PlayCircle" />
@@ -111,14 +116,18 @@
                         IsEnabled="{Binding !IsLoading}">
                     <avalonia:MaterialIcon Kind="PauseCircle" />
                 </Button>
-                <Button Grid.Row="3" Grid.Column="3" Command="{Binding JumpForward}" IsEnabled="{Binding !IsLoading}">
+                <ProgressBar Classes="circular" IsIndeterminate="True" Height="40" Width="40"
+                             IsVisible="{Binding IsLoading}" />
+                </Grid>
+                <Button Command="{Binding JumpForward}" IsEnabled="{Binding !IsLoading}" Margin="0,0,3,0">
                     <Grid>
                         <TextBlock Text="{Binding JumpDistance}"  
                                    HorizontalAlignment="Center" 
                                    VerticalAlignment="Center"
-                                   FontSize="8"
-                                   Margin="-3,2,0,0"/>
-                        <avalonia:MaterialIcon Kind="Replay">
+                                   FontSize="9"
+                                   Width="10"
+                                   Margin="-5,2,0,0"/>
+                        <avalonia:MaterialIcon Kind="Replay" Width="40" Height="40">
                             <avalonia:MaterialIcon.RenderTransform>
                                 <TransformGroup>
                                     <ScaleTransform ScaleX="-1" />

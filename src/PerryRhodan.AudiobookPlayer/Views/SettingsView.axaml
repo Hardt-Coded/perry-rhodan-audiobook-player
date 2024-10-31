@@ -43,11 +43,11 @@
     </UserControl.Styles>
 
 
-    <Grid RowDefinitions="Auto,Auto,Auto, Auto">
+    <Grid RowDefinitions="Auto,Auto,Auto, *">
         
         <TextBlock Grid.Row="0" FontSize="24" HorizontalAlignment="Center">Einstellungen</TextBlock>
         
-        <Grid Grid.Row="2" Margin="10">
+        <Grid Grid.Row="1" Margin="10">
             <StackPanel>
                 <Grid ColumnDefinitions="*,120">
                     <TextBlock Grid.Column="0" Text="Sprung nach kurzer Pause"/>
@@ -89,10 +89,17 @@
                 </Grid>
             </StackPanel>
         </Grid>
-        <Grid Grid.Row="3">
+        <Grid Grid.Row="2">
             <StackPanel>
                 <Button Command="{Binding ShowPrivacyPolicies}">Zeige Datenschutzerklärung</Button>
                 <Button Command="{Binding ShowFeedbackPage}">Sende Supportanfrage oder Feedback</Button>
+                <Button Command="{Binding SendMail}">Sende E-Mail</Button>
+            </StackPanel>
+        </Grid>
+        <Grid Grid.Row="3">
+            <StackPanel Orientation="Vertical" VerticalAlignment="Bottom">
+                <TextBlock Text="{Binding Version}" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
+                <TextBlock Text="{Binding Build}" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
             </StackPanel>
         </Grid>
     </Grid>
