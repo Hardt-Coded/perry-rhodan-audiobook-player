@@ -140,6 +140,11 @@ let runSideEffect sideEffect state dispatch =
 
                         let globalSettings = DependencyService.Get<GlobalSettingsService>()
                         do! globalSettings.Init()
+                        
+                        if globalSettings.IsFirstStart then
+                            do! Notifications.showMessage
+                                    "Willkommen!"
+                                    "Hallo und Willkommen zum Eins A Medien Audioplayer im neuen Gewand. Ich habe den Player neugeschrieben. Ich bitte um Entschuldigung, es handelt sich derzeit um eine Beta-Version. Bei Problemen, meldet euch einfach wie bekannt unter 'info@hardt-solutions.de' Oder über die Feedbackseite. \r\n Viel Spass!"
 
                         // On first start ask for notification permission
                         if OperatingSystem.IsAndroid() && globalSettings.IsFirstStart then
@@ -151,10 +156,7 @@ let runSideEffect sideEffect state dispatch =
                                 ()
 
 
-                        if globalSettings.IsFirstStart then
-                            do! Notifications.showMessage
-                                    "Willkommen!"
-                                    "Hallo und Willkommen zum Eins A Medien Audioplayer im neuen Gewand. Ich habe den Player neugeschrieben. Ich bitte um Entschuldigung, es handelt sich derzeit um eine Beta-Version. Bei Problemen, meldet euch einfach wie bekannt unter 'info@hardt-solutions.de' Oder über die Feedbackseite. \r\n Viel Spass!"
+                        
 
 
                         globalSettings.IsFirstStart <- false

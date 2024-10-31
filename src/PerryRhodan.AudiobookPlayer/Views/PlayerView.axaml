@@ -51,7 +51,7 @@
                 </Border>
                 <Border BorderThickness="1" CornerRadius="10">
                     <TextBlock VerticalAlignment="Center"
-                               Text="000:00"
+                               Text="{Binding TimeUntilSleeps}"
                                Opacity="0.9" 
                                FontSize="50"
                                HorizontalAlignment="Center"
