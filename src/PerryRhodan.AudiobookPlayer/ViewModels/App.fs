@@ -81,7 +81,7 @@ let update msg state =
 
     | OpenPlayerPage(viewModel, startPlaying) ->
         state, SideEffect.OpenPlayerPage (viewModel, startPlaying)
-        
+
     | OpenCurrentPlayerPage ->
         state, SideEffect.OpenCurrentPlayerPage
 
@@ -148,19 +148,16 @@ let runSideEffect sideEffect state dispatch =
                             | PermissionStatus.Granted ->
                                 Services.Notifications.showToasterMessage "Permission granted"
                             | _ ->
-                                (*// Todo: check if user already saw this message
-                                let! result =
-                                    Services.Notifications.showQuestionDialog
-                                        "Benachrichtigungen"
-                                        "Benachrichtungen sind deaktiviert, damit wird der Downloadfortschritt nicht außerhalb der App angezeigt. In den Telefon-Einstellung zur App, können diese aktiviert werden."
-                                        "Einstellungen"
-                                        "Abbrechen"
-
-                                if result then
-                                    AppInfo.ShowSettingsUI()*)
+                                ()
 
 
-                            globalSettings.IsFirstStart <- false
+                        if globalSettings.IsFirstStart then
+                            do! Notifications.showMessage
+                                    "Willkommen!"
+                                    "Hallo und Willkommen zum Eins A Medien Audioplayer im neuen Gewand. Ich habe den Player neugeschrieben. Ich bitte um Entschuldigung, es handelt sich derzeit um eine Beta-Version. Bei Problemen, meldet euch einfach wie bekannt unter 'info@hardt-solutions.de' Oder über die Feedbackseite. \r\n Viel Spass!"
+
+
+                        globalSettings.IsFirstStart <- false
 
 
 
@@ -183,7 +180,7 @@ let runSideEffect sideEffect state dispatch =
                         viewModel.CurrentPositionMs <- position
                         dispatch <| SetView (View.PlayerPage playerView)
                         return ()
-                        
+
                     | SideEffect.OpenCurrentPlayerPage  ->
                         match state.PlayerViewModel with
                         | None -> return ()

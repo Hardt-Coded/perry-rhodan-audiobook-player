@@ -101,6 +101,15 @@ type MainActivity() as self =
                     let bitmap = BitmapFactory.DecodeFile(path)
                     bitmap :> obj
         }
+        
+        let packageInfo = self.PackageManager.GetPackageInfo(self.PackageName, PackageInfoFlags.MetaData)
+        let packageInformation = {
+            new IPackageInformation with
+                member this.GetVersion() =
+                    packageInfo.VersionName
+                member this.GetBuild() =
+                    packageInfo.VersionCode.ToString()
+        }
 
         // register services
         DependencyService.ServiceCollection
@@ -116,6 +125,7 @@ type MainActivity() as self =
             .AddSingleton<IActionMenuService, ActionMenuService>()
             .AddSingleton<GlobalSettingsService>(GlobalSettingsService())
             .AddSingleton<IBitmapConverter>(bitmapConverter)
+            .AddSingleton<IPackageInformation>(packageInformation)
             |> ignore
 
         // convert function to C# Func

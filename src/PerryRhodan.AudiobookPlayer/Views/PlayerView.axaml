@@ -25,6 +25,9 @@
             <Setter Property="Width" Value="40" />
             <Setter Property="Height" Value="40" />
         </Style>
+        <Style Selector="Button:disabled /template/ Border#PART_RootBorder">
+            <Setter Property="Opacity" Value="1.0" />
+        </Style>
     </UserControl.Styles>
     <Grid RowDefinitions="Auto,*,*">
         <Grid.Background>
@@ -86,17 +89,37 @@
                                Foreground="#c0c0c0" />
 
 
-            <Button Grid.Row="3" Grid.Column="0" Command="{Binding Previous}" IsEnabled="{Binding !IsLoading}">
+            <valueSelector:ValueSelector Grid.Row="2" Grid.Column="1"
+                                         Value="{Binding PlaybackSpeed}"
+                                         ItemList="{Binding PlaybackSpeeds}"
+                                         IsEnabled="{Binding !IsLoading}">
+                <avalonia:MaterialIcon Kind="Speedometer" />
+            </valueSelector:ValueSelector>
+
+
+            <valueSelector:ValueSelector Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="3"
+                                         Value="{Binding SleepTimer}"
+                                         ItemList="{Binding SleepTimerValues}"
+                                         IsEnabled="{Binding !IsLoading}">
+                <avalonia:MaterialIcon Kind="Clock" />
+            </valueSelector:ValueSelector>
+            
+            
+            <Button Grid.Row="3" Grid.Column="0" 
+                    Command="{Binding Previous}" 
+                    IsEnabled="{Binding !IsLoading}">
                 <avalonia:MaterialIcon Kind="PreviousTitle" />
             </Button>
-            <Button Grid.Row="3" Grid.Column="1" Command="{Binding JumpBackwards}" IsEnabled="{Binding !IsLoading}">
+            <Button Grid.Row="3" Grid.Column="1" 
+                    Command="{Binding JumpBackwards}" 
+                    IsEnabled="{Binding !IsLoading}">
                 <Grid>
                     <TextBlock Text="{Binding JumpDistance}"  
                                HorizontalAlignment="Center" 
                                VerticalAlignment="Center"
                                FontSize="12"
-                               Margin="1,2,0,0"/>
-                    <avalonia:MaterialIcon Kind="Replay">
+                               Margin="7,2,0,0"/>
+                    <avalonia:MaterialIcon Kind="Replay" Width="60" Height="60">
                         <avalonia:MaterialIcon.RenderTransform>
                             <TransformGroup>
                                 <RotateTransform Angle="-90" />
@@ -121,9 +144,9 @@
                     <TextBlock Text="{Binding JumpDistance}"  
                                HorizontalAlignment="Center" 
                                VerticalAlignment="Center"
-                               FontSize="12"
-                               Margin="-1,2,0,0"/>
-                    <avalonia:MaterialIcon Kind="Replay">
+                               FontSize="13"
+                               Margin="-6,2,0,0"/>
+                    <avalonia:MaterialIcon Kind="Replay" Width="60" Height="60">
                         <avalonia:MaterialIcon.RenderTransform>
                             <TransformGroup>
                                 <ScaleTransform ScaleX="-1" />
@@ -141,20 +164,7 @@
             </Button>
 
 
-            <valueSelector:ValueSelector Grid.Row="2" Grid.Column="1"
-                                         Value="{Binding PlaybackSpeed}"
-                                         ItemList="{Binding PlaybackSpeeds}"
-                                         IsEnabled="{Binding !IsLoading}">
-                <avalonia:MaterialIcon Kind="Speedometer" />
-            </valueSelector:ValueSelector>
-
-
-            <valueSelector:ValueSelector Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="3"
-                                         Value="{Binding SleepTimer}"
-                                         ItemList="{Binding SleepTimerValues}"
-                                         IsEnabled="{Binding !IsLoading}">
-                <avalonia:MaterialIcon Kind="Clock" />
-            </valueSelector:ValueSelector>
+            
 
         </Grid>
     </Grid>

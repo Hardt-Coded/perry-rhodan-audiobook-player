@@ -368,6 +368,17 @@ type SettingsViewModel() =
     
     member this.GoBackHome() =
         DependencyService.Get<IMainViewModel>().GotoHomePage()
+        
+    member this.Version =
+        $"Version: {DependencyService.Get<IPackageInformation>().GetVersion()}"
+        
+    member this.Build =
+        $"Build: {DependencyService.Get<IPackageInformation>().GetBuild()}"
+        
+    member this.SendMail() =
+        Launcher.OpenAsync(new Uri("mailto:info@hardt-solutions.de?subject=Eins A Medien Audioplayer"))
+        
+        
 
 
     member this.DeveloperModeSwitchCounter = this.Bind(local, fun e -> e.DeveloperModeSwitchCounter)

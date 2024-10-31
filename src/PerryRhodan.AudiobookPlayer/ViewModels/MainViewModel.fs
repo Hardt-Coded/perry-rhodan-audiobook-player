@@ -88,16 +88,19 @@ type MainViewModel(root:CompositionRoot) =
         if not app.Model.IsLoading then app.Dispatch <| SetView View.BrowserPage
 
     member this.HomeButtonColor =
-        this.Bind (app, fun e ->  SolidColorBrush(if e.View = View.HomePage then  Colors.WhiteSmoke else Colors.DarkGray))
+        this.BindOnChanged (app, _.View, fun e ->  SolidColorBrush(match e.View with | View.HomePage ->  Colors.WhiteSmoke | _ -> Colors.DarkGray))
 
     member this.BrowserButtonColor =
-        this.Bind (app, fun e -> SolidColorBrush(if e.View = View.BrowserPage then Colors.WhiteSmoke else Colors.DarkGray))
+        this.BindOnChanged (app, _.View, fun e -> SolidColorBrush(match e.View with | View.BrowserPage -> Colors.WhiteSmoke | _ -> Colors.DarkGray))
 
     member this.SettingsButtonColor =
-        this.Bind (app, fun e -> SolidColorBrush(if e.View = View.SettingsPage then Colors.WhiteSmoke else Colors.DarkGray))
+        this.BindOnChanged (app, _.View, fun e -> SolidColorBrush(match e.View with | View.SettingsPage -> Colors.WhiteSmoke | _ -> Colors.DarkGray))
+        
+    member this.PlayerButtonColor =
+        this.BindOnChanged (app, _.View, fun e -> SolidColorBrush(match e.View with | View.PlayerPage _  -> Colors.WhiteSmoke | _ -> Colors.DarkGray))
         
     member this.PlayerAvailable =
-        this.Bind (app, fun e -> e.PlayerViewModel.IsSome)
+        this.BindOnChanged (app, _.PlayerViewModel, _.PlayerViewModel.IsSome)
 
 
     static member DesignVM = new MainViewModel(Design.stub)
