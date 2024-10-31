@@ -14,7 +14,7 @@
              mc:Ignorable="d" d:DesignWidth="393" d:DesignHeight="778"
              x:Class="PerryRhodan.AudiobookPlayer.Views.MainView"
              Design.DataContext="{Binding Source={x:Static vm:MainViewModel.DesignVM}}"
-             Background="#202020"
+             Background="Black"
              x:DataType="vm:MainViewModel">
 
     <UserControl.Styles>

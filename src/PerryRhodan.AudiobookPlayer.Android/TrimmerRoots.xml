@@ -1,5 +1,18 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <linker>
     <assembly fullname="Avalonia" preserve="all"/>
+    <assembly fullname="Avalonia.Android" preserve="all"/>
+    <assembly fullname="Avalonia.Base" preserve="all"/>
+    <assembly fullname="Avalonia.Control" preserve="all"/>
+    <assembly fullname="Avalonia.Control.ItemsRepeater" preserve="all"/>
+    <assembly fullname="Avalonia.Xaml.Interactions" preserve="all"/>
+    <assembly fullname="Avalonia.Xaml.Interactions.Custom" preserve="all"/>
+    <assembly fullname="Avalonia.Xaml.Interactions.DragAndDrop" preserve="all"/>
+    <assembly fullname="Avalonia.Xaml.Interactions.Draggable" preserve="all"/>
+    <assembly fullname="Avalonia.Xaml.Interactions.Repsonsive" preserve="all"/>
+    <assembly fullname="Avalonia.Xaml.Interactivity" preserve="all"/>
     <assembly fullname="Avalonia.Skia" />
+    <assembly fullname="FSharp.Control.AsyncSeq" />
+    <assembly fullname="FSharpx.Async" />
+    <assembly fullname="LiteDB" />
 </linker>

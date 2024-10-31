@@ -47,8 +47,8 @@
               RowDefinitions="*,Auto">
 
 
-            <Border CornerRadius="15" Margin="0,3,0,0" Padding="1" ClipToBounds="True">
-                <Grid Grid.Column="0" Margin="0">
+            <Border CornerRadius="15" Margin="0,3,0,0" Padding="1" ClipToBounds="True" Background="Transparent">
+                <Grid Grid.Column="0" Margin="0" Background="Transparent">
 
                     <asyncImageLoader:AdvancedImage Source="{Binding Thumbnail}">
 
@@ -90,7 +90,7 @@
                     </Interaction.Behaviors>
                 </Grid>
             </Border>
-            <Grid Grid.Column="1" Margin="2,0,0,0" Background="Transparent">
+            <Grid Name="TextGrid" Grid.Column="1" RowDefinitions="*" Margin="2,0,0,0" Background="Transparent">
                 <StackPanel Orientation="Vertical" Margin="3" VerticalAlignment="Center">
                     <TextBlock VerticalAlignment="Center" Grid.Column="0" Text="{Binding Title}" TextWrapping="Wrap" />
                 </StackPanel>
