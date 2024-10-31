@@ -12,7 +12,7 @@
         Icon="/Assets/eins_a_launcher.png"
         Title="PerryRhodan.AudiobookPlayer"
         Width="393" Height="778"
-        Background="#202020">
+        Background="Black">
         <Window.Styles>
                 <themes:MaterialTheme BaseTheme="Dark" PrimaryColor="Purple" SecondaryColor="Pink">
 

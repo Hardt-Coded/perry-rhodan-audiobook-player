@@ -18,7 +18,7 @@
     <EnableLLVM>False</EnableLLVM>
     <AndroidUseAapt2>True</AndroidUseAapt2>
     <RunAOTCompilation>False</RunAOTCompilation>
-    <AndroidEnableProfiledAot>False</AndroidEnableProfiledAot>
+    <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
     <AndroidCreatePackagePerAbi>False</AndroidCreatePackagePerAbi>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -28,11 +28,12 @@
     <AndroidDexTool>r8</AndroidDexTool>
     <DebugSymbols>False</DebugSymbols>
     <EnableLLVM>False</EnableLLVM>
-    <AndroidUseAapt2>True</AndroidUseAapt2>
-    <RunAOTCompilation>False</RunAOTCompilation>
-    <AndroidEnableProfiledAot>True</AndroidEnableProfiledAot>
-    <PublishTrimmed>False</PublishTrimmed>
+    <AndroidUseAapt2>true</AndroidUseAapt2>
+    <RunAOTCompilation>true</RunAOTCompilation>
+    <AndroidEnableProfiledAot>true</AndroidEnableProfiledAot>
+    <PublishTrimmed>true</PublishTrimmed>
     <TrimMode>partial</TrimMode>
+    <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
     <AndroidCreatePackagePerAbi>False</AndroidCreatePackagePerAbi>
   </PropertyGroup>
 
@@ -49,6 +50,14 @@
     <PackageReference Update="Microsoft.NET.Runtime.MonoAOTCompiler.Task" Version="8.0.10"  />
   </ItemGroup>
   <ItemGroup>
+<!--    <TrimmerRootAssembly -->
+<!--            Include="Avalonia.Xaml.Interactions" -->
+<!--            Include="Avalonia.Xaml.Interactions.Custom" -->
+<!--            Include="Avalonia.Xaml.Interactions.DragAndDrop" -->
+<!--            Include="Avalonia.Xaml.Interactions.Draggable" -->
+<!--            Include="Avalonia.Xaml.Interactions.Repsonsive" -->
+<!--            Include="Avalonia.Xaml.Interactivity"-->
+<!--    />-->
     <TrimmerRootDescriptor Include="TrimmerRoots.xml" />
   </ItemGroup>
 
@@ -75,10 +84,10 @@
 
 
 
-  <Target Name="CopyFileToCustomDirectory" AfterTargets="AfterCompile">
+  <!--<Target Name="CopyFileToCustomDirectory" AfterTargets="AfterCompile">
     <Copy SourceFiles="$(SolutionDir)PerryRhodan.AudiobookPlayer\obj\$(Configuration)\net8.0\Avalonia\PerryRhodan.AudiobookPlayer.dll" DestinationFolder="$(SolutionDir)PerryRhodan.AudiobookPlayer\obj\$(Configuration)\net8.0\" />
     <Copy SourceFiles="$(SolutionDir)PerryRhodan.AudiobookPlayer\obj\$(Configuration)\net8.0\Avalonia\PerryRhodan.AudiobookPlayer.dll" DestinationFolder="$(SolutionDir)PerryRhodan.AudiobookPlayer\obj\$(Configuration)\net8.0\refint" />
-  </Target>
+  </Target>-->
 
 
 
