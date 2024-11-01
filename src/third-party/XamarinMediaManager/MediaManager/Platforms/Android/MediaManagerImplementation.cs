@@ -114,7 +114,7 @@ namespace MediaManager
         {
             EnsureInit();
             InitTimer();
-            
+
         }
 
         public async Task EnsureInit()
@@ -328,9 +328,13 @@ namespace MediaManager
             if (mediaItem == null)
                 return false;
 
+            System.Diagnostics.Trace.WriteLine($"current PlayQueueItem: {Queue.CurrentIndex}");
             Queue.CurrentIndex = index;
+            System.Diagnostics.Trace.WriteLine($"new PlayQueueItem: {Queue.CurrentIndex}");
 
             MediaController.GetTransportControls().PrepareFromMediaId(mediaItem.Id, null);
+            System.Diagnostics.Trace.WriteLine($"after Prepare PlayQueueItem: idex: {Queue.CurrentIndex}");
+
             MediaController.GetTransportControls().SkipToQueueItem(index);
             MediaController.GetTransportControls().SeekTo((long)startAt.TotalMilliseconds);
             MediaController.GetTransportControls().Play();

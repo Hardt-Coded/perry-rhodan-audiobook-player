@@ -1,5 +1,6 @@
 ﻿namespace PerryRhodan.AudiobookPlayer.ViewModels
 
+open System.Threading.Tasks
 open Domain
 open Services.WebAccess.Downloader
 
@@ -27,7 +28,8 @@ type IMainViewAccessService =
     abstract member GetMainViewModel:unit->IMainViewModel
 
 type IAudioPlayerPause =
-    abstract member Pause:unit->unit
+    abstract member Pause:unit->Task<unit>
+    abstract member Play:unit->Task<unit>
 
 
 type IBitmapConverter =

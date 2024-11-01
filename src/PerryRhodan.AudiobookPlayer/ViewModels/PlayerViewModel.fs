@@ -433,7 +433,7 @@ module PlayerPage =
                                         else
                                             p
 
-                                    audioPlayer.PlayExtern file newPosition
+                                    do! audioPlayer.PlayExtern file newPosition
 
                                     return ()
 
@@ -442,32 +442,32 @@ module PlayerPage =
                                 | [] -> do! Notifications.showErrorMessage "Keine Dateien gefunden."
                                 | _ ->
                                     let file, _ = state.AudioFileList[state.CurrentAudioFileIndex]
-                                    audioPlayer.PlayExtern file state.CurrentPosition
+                                    do! audioPlayer.PlayExtern file state.CurrentPosition
 
                                     return ()
 
                             | SideEffect.Stop ->
-                                audioPlayer.Stop false
+                                do! audioPlayer.Stop false
                                 return ()
 
                             | SideEffect.Next ->
-                                audioPlayer.Next()
+                                do! audioPlayer.Next()
                                 return ()
 
                             | SideEffect.Previous ->
-                                audioPlayer.Previous()
+                                do! audioPlayer.Previous()
                                 return ()
 
                             | SideEffect.JumpForward ->
-                                audioPlayer.JumpForward()
+                                do! audioPlayer.JumpForward()
                                 return ()
 
                             | SideEffect.JumpBackwards ->
-                                audioPlayer.JumpBackwards()
+                                do! audioPlayer.JumpBackwards()
                                 return ()
 
                             | SideEffect.StartAudioBookService fileList ->
-                                audioPlayer.Stop false
+                                do! audioPlayer.Stop false
                                 do! audioPlayer.Init state.AudioBook fileList
 
                                 disposables |> Seq.iter (_.Dispose())
@@ -490,28 +490,28 @@ module PlayerPage =
                                 return ()
 
                             | SideEffect.StartSleepTimer sleepTime ->
-                                audioPlayer.StartSleepTimer sleepTime
+                                do! audioPlayer.StartSleepTimer sleepTime
                                 return ()
 
                             | SideEffect.SetPlaybackSpeed speed ->
-                                audioPlayer.SetPlaybackSpeed speed
+                                do! audioPlayer.SetPlaybackSpeed speed
                                 globalSettings.PlaybackSpeed <- speed
 
                             | SideEffect.SetAudioPositionAbsolute pos ->
-                                audioPlayer.SeekTo pos
+                                do! audioPlayer.SeekTo pos
                                 return ()
 
                             | SideEffect.ContinuePlayingAfterSlide pos ->
-                                audioPlayer.SeekTo pos
+                                do! audioPlayer.SeekTo pos
                                 dispatch <| PlayerControlMsg PlayWithoutRewind
                                 return ()
 
                             | SideEffect.SliderDragStarted ->
-                                audioPlayer.Stop false
+                                do! audioPlayer.Stop false
                                 return ()
 
                             | SideEffect.ClosePlayerPage ->
-                                audioPlayer.Stop false
+                                do! audioPlayer.Stop false
 
                                 DependencyService
                                     .Get<IMainViewModel>()
@@ -574,6 +574,7 @@ module PlayerPage =
 open PlayerPage
 open ReactiveElmish.Avalonia
 open Elmish.SideEffect
+open Elmish
 
 
 type PlayerViewModel(audiobook: AudioBookItemViewModel, startPlaying) =
@@ -584,11 +585,9 @@ type PlayerViewModel(audiobook: AudioBookItemViewModel, startPlaying) =
 
     let local =
         Program.mkAvaloniaProgrammWithSideEffect init update SideEffects.runSideEffects
-        #if DEBUG2
-        |> Elmish.Program.withTrace(fun msg state subIds ->
-            System.Diagnostics.Trace.WriteLine($"PlayerViewModel: Msg: {msg}")
-            System.Diagnostics.Trace.WriteLine($"PlayerViewModel: State: {( { state with AudioFileList = [] })}")
-            if subIds <> [] then System.Diagnostics.Trace.WriteLine($"PlayerViewModel: SubIds: {subIds}")
+        #if DEBUG
+        |> Program.withTrace(fun msg state _ ->
+            System.Diagnostics.Trace.WriteLine($"PlayerViewModel: \r\n Msg: \r\n {msg} \r\n State: \r\n {({ state with AudioFileList = [] })}")
         )
         #endif
         |> Program.mkStore
@@ -615,6 +614,20 @@ type PlayerViewModel(audiobook: AudioBookItemViewModel, startPlaying) =
         with get () =
             this.Bind(local, fun i -> i.CurrentPosition.TotalMilliseconds)
         and set v = local.Dispatch(SetTrackPosition(TimeSpan.FromMilliseconds v))
+
+
+    member this.SliderValue
+        with get () =
+            this.Bind(local, _.CurrentPosition.TotalSeconds)
+        and set v =
+            local.Dispatch(SetTrackPosition(TimeSpan.FromMilliseconds v * 1000.0))
+            #if DEBUG
+            System.Diagnostics.Trace.WriteLine($"PlayerViewModel: SliderValue: {v}")  |> ignore
+            #endif
+
+
+    member this.SliderMax =
+        this.BindOnChanged(local, _.CurrentDuration.TotalSeconds, _.CurrentDuration.TotalSeconds)
 
     member this.CurrentDurationMs =
         this.BindOnChanged(local, _.CurrentDuration.TotalMilliseconds, _.CurrentDuration.TotalMilliseconds)
@@ -764,3 +777,8 @@ module PlayerViewModelStore =
             let vm = new PlayerViewModel(audiobook, startPlaying)
             viewmodel <- Some vm
             vm
+
+
+    let getCurrentPlayerViewModel () =
+        viewmodel
+

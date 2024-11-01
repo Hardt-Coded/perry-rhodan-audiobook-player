@@ -85,7 +85,7 @@ namespace MediaManager
 
         public virtual void PrepareController()
         {
-            
+
             // nix
         }
 
@@ -392,6 +392,7 @@ namespace MediaManager
                 return false;
 
             Queue.CurrentIndex = index;
+            System.Diagnostics.Trace.WriteLine($"PlayQueueItem:  {mediaItem.Title} at {startAt} idex: {index}");
             await MediaPlayer.Play(mediaItem);
             await MediaPlayer.SeekTo(startAt);
             return true;
@@ -471,7 +472,7 @@ namespace MediaManager
             set
             {
                 if (SetProperty(ref _previousPosition, value))
-                    OnPositionChanged(this, new PositionChangedEventArgs(Position));
+                    OnPositionChanged(this, new PositionChangedEventArgs(Position, this.Queue.Current));
             }
         }
 

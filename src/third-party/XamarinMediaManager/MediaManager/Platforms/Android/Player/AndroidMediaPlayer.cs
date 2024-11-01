@@ -1,4 +1,5 @@
-﻿using Android.Content;
+﻿using System;
+using Android.Content;
 using Android.Graphics;
 using Android.Graphics.Drawables;
 using Android.Support.V4.Media.Session;
@@ -170,6 +171,8 @@ namespace MediaManager.Platforms.Android.Player
             Player.SetHandleAudioBecomingNoisy(true);
             Player.SetWakeMode(C.WakeModeNetwork);
 
+
+
             PlayerEventListener = new PlayerEventListener()
             {
                 OnPlayerErrorImpl = (PlaybackException exception) =>
@@ -179,7 +182,11 @@ namespace MediaManager.Platforms.Android.Player
                 OnTracksChangedImpl = (tracks) =>
                 {
                     InvokeBeforePlaying(this, new MediaPlayerEventArgs(MediaManager.Queue.Current, this));
+                    #if DEBUG
+                    System.Diagnostics.Trace.WriteLine($"OnTracksChangedImpl:  pevIndex: {MediaManager.Queue.CurrentIndex} newIndex: {Player.CurrentWindowIndex} - CurMediaItemIndexFromPlayer: {Player.CurrentMediaItemIndex}");
 
+                    System.Diagnostics.Trace.WriteLine($"OnTracksChangedImpl:  {tracks}");
+                    #endif
                     MediaManager.Queue.CurrentIndex = Player.CurrentWindowIndex;
 
                     InvokeAfterPlaying(this, new MediaPlayerEventArgs(MediaManager.Queue.Current, this));
