@@ -541,6 +541,9 @@ module AudioBookItem =
                                     let mainViewModel = DependencyService.Get<IMainViewModel>()
                                     match mainViewModel.CurrentPlayerAudiobookViewModel with
                                     | Some current when current.AudioBook.Id = state.ViewModel.AudioBook.Id ->
+                                        if startPlaying then
+                                            do! DependencyService.Get<IAudioPlayerPause>().Play()
+                                        
                                         return () // do nothing
                                     | _ ->
                                         mainViewModel.OpenMiniplayer state.ViewModel startPlaying

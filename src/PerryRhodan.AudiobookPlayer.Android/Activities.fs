@@ -101,7 +101,7 @@ type MainActivity() as self =
                     let bitmap = BitmapFactory.DecodeFile(path)
                     bitmap :> obj
         }
-        
+
         let packageInfo = self.PackageManager.GetPackageInfo(self.PackageName, PackageInfoFlags.MetaData)
         let packageInformation = {
             new IPackageInformation with
@@ -131,13 +131,13 @@ type MainActivity() as self =
         // convert function to C# Func
 
         // let androidOptions = AndroidPlatformOptions()
-        // // Todo: do not forget Fallback 
+        // // Todo: do not forget Fallback
         // let renderModes = [ AndroidRenderingMode.Vulkan ] |> System.Collections.Generic.List
         // androidOptions.RenderingMode <- renderModes.AsReadOnly()
         //
         // let vulkanOptions = VulkanOptions()
         // vulkanOptions.VulkanInstanceCreationOptions <- VulkanInstanceCreationOptions()
-        
+
         base.CustomizeAppBuilder(builder)
             // .With(androidOptions)
             // .With(vulkanOptions)
@@ -164,9 +164,10 @@ type MainActivity() as self =
         // which are registered in app.xaml.fs are also included in the service provider
         DependencyService.SetComplete()*)
         CrossMediaManager.Current.Init(this)
-        let audioService = AudioPlayerService2()
+        let audioService = AudioPlayerService()
         DependencyService.ServiceCollection
             .AddSingleton<IAudioPlayer>(audioService)
+            .AddSingleton<IAudioPlayerPause>(audioService)
         |> ignore
 
         DependencyService.SetComplete()

@@ -80,12 +80,11 @@
             </StackPanel>
             <controls:MySlider Grid.ColumnSpan="5"
                                Grid.Row="1" Margin="40,5,40,5"
-                               Value="{Binding CurrentPositionMs}"
-                               IsSnapToTickEnabled="True"
+                               Value="{Binding SliderValue}"
                                TickPlacement="Outside"
                                TickFrequency="1000"
                                IsSeeking="{Binding SliderIsDragging}"
-                               Maximum="{Binding CurrentDurationMs}"
+                               Maximum="{Binding SliderMax}"
                                IsEnabled="{Binding !IsLoading}"
                                Foreground="#c0c0c0" />
 
