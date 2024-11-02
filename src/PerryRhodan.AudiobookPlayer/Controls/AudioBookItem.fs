@@ -219,7 +219,7 @@ module AudioBookItem =
             ViewModel = viewmodel
             Audiobook = audiobook
             DownloadState = if audiobook.State.Downloaded then Downloaded else NotDownloaded
-            AmbientColor = None
+            AmbientColor = audiobook.AmbientColor
             ListenState =
                 match audiobook.State.Completed, audiobook.State.CurrentPosition with
                 | true, _           -> Listend
@@ -847,7 +847,7 @@ module private DemoData =
 
 module FallbackImage =
     let fallbackImage ="avares://PerryRhodan.AudiobookPlayer/Assets/AudioBookPlaceholder_Dark.png"
-        
+
 
 type AudioBookItemViewModel(audiobook: AudioBook) as self =
     inherit ReactiveElmishViewModel()
@@ -928,8 +928,8 @@ type AudioBookItemViewModel(audiobook: AudioBook) as self =
                   s.Audiobook.Thumbnail
                   |> Option.defaultValue "avares://PerryRhodan.AudiobookPlayer/Assets/AudioBookPlaceholder_Dark.png"
         )
-    
-    
+
+
 
     member this.LoadingPie = this.BindOnChanged(local, _.DownloadState, fun s ->
         match s.DownloadState with
