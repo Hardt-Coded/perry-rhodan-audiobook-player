@@ -348,6 +348,7 @@ module PlayerPage =
                                         "Konnte Hörbuch Dateien nicht finden."
 
                                 Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
+                                Global.telemetryClient.TrackException(ex)
                                 return None
 
                         | Some audioFileInfo ->
@@ -358,6 +359,7 @@ module PlayerPage =
                     with
                     | ex ->
                         Microsoft.AppCenter.Crashes.Crashes.TrackError(ex)
+                        Global.telemetryClient.TrackException ex
                         return raise ex
 
             }

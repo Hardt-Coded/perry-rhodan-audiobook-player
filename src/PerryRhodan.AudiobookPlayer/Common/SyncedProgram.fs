@@ -96,6 +96,7 @@ module Program =
                         | ex ->
                             // log
                             Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
+                            Global.telemetryClient.TrackException ex
                             #if DEBUG
                             System.Diagnostics.Trace.WriteLine($"Exception: {ex.Message}")
                             #endif

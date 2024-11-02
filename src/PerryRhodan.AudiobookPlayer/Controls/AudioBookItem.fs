@@ -495,6 +495,7 @@ module AudioBookItem =
                     with
                     | ex ->
                         Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
+                        Global.telemetryClient.TrackException ex
                         #if DEBUG
                         System.Diagnostics.Debug.WriteLine($"Error loading image from url: {url}")
                         #endif
@@ -684,6 +685,7 @@ module AudioBookItem =
                 with
                 | ex ->
                     Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
+                    Global.telemetryClient.TrackException ex
                     dispatch <| IsBusy true
                     raise ex
 

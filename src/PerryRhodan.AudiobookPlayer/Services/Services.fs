@@ -777,6 +777,7 @@ module WebAccess =
             | exn ->
                 let ex = exn.GetBaseException()
                 Crashes.TrackError(ex, Map.empty)
+                Global.telemetryClient.TrackException ex
                 match ex with
                 | :? WebException | :? SocketException ->
                     return Error (Network Translations.current.NetworkError)
@@ -816,7 +817,7 @@ module WebAccess =
                             |> Seq.tryHead
                         match location with
                         | None ->
-                            Analytics.TrackEvent("no location on login response found")
+                            Global.telemetryClient.TrackTrace("no location header found.")
                             Error (Other Translations.current.UnexpectedServerBehaviorError)
                         | Some v ->
 
@@ -1089,6 +1090,7 @@ module WebAccess =
             task {
                 try
                     Analytics.TrackEvent("download audiobook")
+                    Global.telemetryClient.TrackEvent ("AudioBookDownload")
 
                     let folders = createCurrentFolders ()
 
@@ -1213,6 +1215,7 @@ module WebAccess =
                 | exn ->
                     let ex = exn.GetBaseException()
                     Crashes.TrackError(ex, Map.empty)
+                    Global.telemetryClient.TrackException ex
                     match ex with
                     | :? WebException | :? SocketException ->
                         return Error (Network Translations.current.NetworkError)
@@ -1529,6 +1532,7 @@ module SupportFeedback =
             with
             | ex ->
                 Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
+                Global.telemetryClient.TrackException ex
                 return Error "Fehler beim Senden der Nachricht. Probieren Sie es noch einmal."
         }
 
@@ -1672,6 +1676,7 @@ module DownloadService =
 
                                  | SignalServiceCrashed ex ->
                                      Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
+                                     Global.telemetryClient.TrackException ex
                                      return! loop { state with ServiceListener = None }
 
                                  | SignalError (info,error) ->
@@ -1727,6 +1732,7 @@ module DownloadService =
                              with
                              | ex ->
                                 Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
+                                Global.telemetryClient.TrackException ex
                                 do! Notifications.showErrorMessage ex.Message |> Async.AwaitTask
                                 return! loop state
 
@@ -1994,6 +2000,7 @@ module DownloadService =
                             with
                             | ex ->
                                 Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
+                                Global.telemetryClient.TrackException ex
                                 return! loop state
                         }
 

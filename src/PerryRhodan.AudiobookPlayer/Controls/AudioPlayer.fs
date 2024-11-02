@@ -598,6 +598,7 @@ module PlayerElmish =
                                 with
                                 | ex ->
                                     Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
+                                    Global.telemetryClient.TrackException ex
                                     Task.FromResult [||]
                             | None -> Task.FromResult [||]
 

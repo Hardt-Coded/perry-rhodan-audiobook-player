@@ -12,11 +12,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="Common\Global.fs" />
     <Compile Include="Common\SideEffectProgram.fs" />
     <Compile Include="Common\SyncedProgram.fs" />
     <Compile Include="Common\Result.fs" />
     <Compile Include="Common\Common.fs" />
-    <Compile Include="Common\Global.fs" />
     <Compile Include="Common\Dependencies.fs" />
     <Compile Include="Common\MessageBoxViewModels.fs" />
     <Compile Include="Common\Task.fs" />

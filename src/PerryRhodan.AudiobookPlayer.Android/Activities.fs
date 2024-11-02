@@ -157,9 +157,11 @@ type MainActivity() as self =
         AppDomain.CurrentDomain.UnhandledException.Subscribe(fun args ->
             let ex = args.ExceptionObject :?> Exception
             Microsoft.AppCenter.Crashes.Crashes.TrackError(ex)
+            Global.telemetryClient.TrackException ex
         ) |> ignore
         AppCenter.Start(Global.appcenterAndroidId, typeof<Analytics>, typeof<Crashes>)
         Microsoft.AppCenter.Analytics.Analytics.TrackEvent("App started")
+        Global.telemetryClient.TrackEvent ("ApplicationStarted")
 
         (*// set complete to build service provider here, to avoid that the dependencies,
         // which are registered in app.xaml.fs are also included in the service provider
@@ -180,11 +182,13 @@ type MainActivity() as self =
         AppDomain.CurrentDomain.UnhandledException.Subscribe(fun args ->
             let ex = args.ExceptionObject :?> Exception
             Microsoft.AppCenter.Crashes.Crashes.TrackError(ex)
+            Global.telemetryClient.TrackException ex
         ) |> ignore
 
 
     override _.OnDestroy() =
         base.OnDestroy()
+        Global.telemetryClient.Flush()
 
     override this.OnStop() =
         base.OnStop()
