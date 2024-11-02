@@ -85,12 +85,7 @@
                     </StackPanel>
                 </Button>
                 
-                <Button  Command="{Binding GetOnlinePicture}" >
-                    <StackPanel Orientation="Horizontal">
-                        <avalonia:MaterialIcon Kind="Picture" />
-                        <Label>Bild von Webseite laden</Label>
-                    </StackPanel>
-                </Button>
+                
                 
                 <!--<Button Command="{Binding ShowMetaData}" >
                     <StackPanel Orientation="Horizontal">

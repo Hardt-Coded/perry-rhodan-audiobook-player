@@ -402,48 +402,6 @@ module BrowserPage =
                                 (StorageError ex.Message) |> Error
 
 
-                //let lookForAlreadyDownloadedAudioBook
-                //    (input:Result<{| New: AudioBookItemViewModel[]; OnDevice: AudioBookItemViewModel [] |},SynchronizeWithCloudErrors>) =
-                //    // check if the audiobook is already downloaded
-                //    match input with
-                //    | Error e -> Error e
-                //    | Ok e ->
-                //        dispatch <| AppendBusyMessage "Prüfe auf verlorene Hörbuchdateien..."
-                //        // get all directories in the download folder
-                //        let folders = Services.Consts.createCurrentFolders ()
-                //        let downloadedFolders =
-                //            System.IO.Directory.GetDirectories(folders.audioBookDownloadFolderBase)
-                //            |> Array.map (fun i ->
-                //                i, i.Split(System.IO.Path.DirectorySeparatorChar) |> Array.last
-                //            )
-                //            |> Array.iter (fun (path, abId) ->
-                //                // are there any files in the subfolder "audio"?
-                //                let areThereAudiofiles =
-                //                    let audioPath = System.IO.Path.Combine(path,"audio")
-                //                    if System.IO.Directory.Exists(audioPath) then
-                //                        System.IO.Directory.GetFiles(System.IO.Path.Combine(path,"audio")).Length > 0
-                //                    else
-                //                        false
-
-                //                if areThereAudiofiles then
-                //                    // find the audiobook in the list
-                //                    match Int32.TryParse(abId) with
-                //                    | true, abId ->
-                //                        e.New
-                //                        |> Array.tryFind (fun a ->
-                //                            a.AudioBook.Id = abId
-                //                        )
-                //                        |> Option.iter (fun a ->
-                //                            let c = 1
-                //                            a.SetDownloadPath path
-                //                        )
-                //                    | _ ->
-                //                        ()
-                //            )
-
-                //        {| New = e.New; OnDevice = e.OnDevice |} |> Ok
-
-
 
                 let addOnlineUrlForPictureForAllWhichHasNone
                     (input:Result<{| New: AudioBookItemViewModel[]; OnDevice: AudioBookItemViewModel [] |},SynchronizeWithCloudErrors>) =
@@ -556,7 +514,6 @@ module BrowserPage =
                         |> Task.bind processNewAddedAudioBooks
                         |> Task.bind repairAudiobookMetadataIfNeeded
                         |> Task.map  fixDownloadFolders
-                        //|> Task.map  lookForAlreadyDownloadedAudioBook
                         |> Task.bind addOnlineUrlForPictureForAllWhichHasNone
                         |> Task.bind processResult
                 with
