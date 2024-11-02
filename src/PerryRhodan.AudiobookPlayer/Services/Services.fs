@@ -21,6 +21,9 @@ open SkiaSharp
 open Dependencies
 
 
+type StateConnectionString = | StateConnectionString of string
+type FileInfoConnectionString = | FileInfoConnectionString of string
+
 
 
 
@@ -143,8 +146,10 @@ module Consts =
                         currentLocalBaseFolder = currentLocalBaseFolder
                         currentLocalDataFolder = currentLocalDataFolder
                         stateFileFolder = stateFileFolder
-                        audioBooksStateDataFile = audioBooksStateDataFile
-                        audioBookAudioFileInfoDb = audioBookAudioFileDb
+                        audioBooksStateDataFilePath = audioBooksStateDataFile
+                        audioBooksStateDataConnectionString = StateConnectionString $"FileName={audioBooksStateDataFile};Upgrade=true;Collation=en-US/None"
+                        audioBookAudioFileInfoDbFilePath = audioBookAudioFileDb
+                        audioBookAudioFileInfoDbConnectionString = FileInfoConnectionString $"Filename={audioBookAudioFileDb};Upgrade=true;Collation=en-US/None"
                         audioBookDownloadFolderBase=audioBookDownloadFolderBase
                     |}
                 folders <- Some result
@@ -236,9 +241,9 @@ module DataBase =
             Directory.CreateDirectory(folders.stateFileFolder) |> ignore
 
 
-    let private insertNewAudioBooksDb (audioBooksStateDataFile:string) (audioBooks:AudioBook[]) =
+    let private insertNewAudioBooksDb (StateConnectionString audioBooksStateDataConnectionString) (audioBooks:AudioBook[]) =
         try
-            use db = new LiteDatabase(audioBooksStateDataFile, mapper)
+            use db = new LiteDatabase(audioBooksStateDataConnectionString, mapper)
             let audioBooksCol =
                 db.GetCollection<AudioBook>("audiobooks")
 
@@ -248,8 +253,8 @@ module DataBase =
         | e -> Error e.Message
 
 
-    let private updateAudioBookDb (audioBooksStateDataFile:string) (audioBook:AudioBook) =
-        use db = new LiteDatabase(audioBooksStateDataFile, mapper)
+    let private updateAudioBookDb (StateConnectionString audioBooksStateDataConnectionString) (audioBook:AudioBook) =
+        use db = new LiteDatabase(audioBooksStateDataConnectionString, mapper)
         let audioBooks = db.GetCollection<AudioBook>("audiobooks")
 
         if audioBooks.Update(audioBook)
@@ -257,30 +262,30 @@ module DataBase =
         else (Error Translations.current.ErrorDbWriteAccess)
 
 
-    let private deleteAudioBookDb (audioBooksStateDataFile:string) (audioBook:AudioBook) =
-        use db = new LiteDatabase(audioBooksStateDataFile, mapper)
+    let private deleteAudioBookDb (StateConnectionString audioBooksStateDataConnectionString) (audioBook:AudioBook) =
+        use db = new LiteDatabase(audioBooksStateDataConnectionString, mapper)
         let audioBooks = db.GetCollection<AudioBook>("audiobooks")
 
         let res =
-            audioBooks.Delete(fun x -> x.Id = audioBook.Id)
+            audioBooks.DeleteMany(fun x -> x.Id = audioBook.Id)
 
         if res > -1
         then (Ok ())
         else (Error Translations.current.ErrorDbWriteAccess)
 
 
-    let private deleteDatabase (audioBooksStateDataFile:string) (audioBookAudioFileDb:string) =
-        use db = new LiteDatabase(audioBooksStateDataFile, mapper)
+    let private deleteDatabase (StateConnectionString audioBooksStateDataConnectionString) (FileInfoConnectionString audioBookAudioFileDbConnectionString) =
+        use db = new LiteDatabase(audioBooksStateDataConnectionString, mapper)
         let _result = db.DropCollection("audiobooks")
-        use db2 = new LiteDatabase(audioBookAudioFileDb, mapper)
+        use db2 = new LiteDatabase(audioBookAudioFileDbConnectionString, mapper)
         let _result = db.DropCollection("audiobookfileinfos")
         ()
 
 
-    let private loadAudioBooksFromDb (audioBooksStateDataFile:string) =
+    let private loadAudioBooksFromDb (StateConnectionString audioBooksStateDataConnectionString) =
         initAppFolders ()
 
-        use db = new LiteDatabase(audioBooksStateDataFile, mapper)
+        use db = new LiteDatabase(audioBooksStateDataConnectionString, mapper)
         let audioBooks =
             db.GetCollection<AudioBook>("audiobooks")
                 .FindAll()
@@ -343,8 +348,8 @@ module DataBase =
                     )
             }
 
-        let loadAudioBookAudioFileInfosFromDb (audioBookAudioFileDb:string) =
-            use db = new LiteDatabase(audioBookAudioFileDb, mapper)
+        let loadAudioBookAudioFileInfosFromDb (FileInfoConnectionString audioBookAudioFileDbConnectionString) =
+            use db = new LiteDatabase(audioBookAudioFileDbConnectionString, mapper)
             let infos =
                 db.GetCollection<AudioBookAudioFilesInfoDb>("audiobookfileinfos")
                     .FindAll()
@@ -354,9 +359,9 @@ module DataBase =
             infos |> Array.Parallel.map toDomain
 
 
-        let addAudioFilesInfoToAudioBook (audioBookAudioFileDb:string) (audioFileInfos:AudioBookAudioFilesInfo []) =
+        let addAudioFilesInfoToAudioBook (FileInfoConnectionString audioBookAudioFileDbConnectionString) (audioFileInfos:AudioBookAudioFilesInfo []) =
             try
-                use db = new LiteDatabase(audioBookAudioFileDb, mapper)
+                use db = new LiteDatabase(audioBookAudioFileDbConnectionString, mapper)
                 let audioBooksCol =
                     db.GetCollection<AudioBookAudioFilesInfoDb>("audiobookfileinfos")
 
@@ -370,8 +375,8 @@ module DataBase =
             | e -> Error e.Message
 
 
-        let updateAudioBookFileInfo (audioBookAudioFileDb:string) (audioFileInfo:AudioBookAudioFilesInfo) =
-            use db = new LiteDatabase(audioBookAudioFileDb, mapper)
+        let updateAudioBookFileInfo (FileInfoConnectionString audioBookAudioFileDbConnectionString) (audioFileInfo:AudioBookAudioFilesInfo) =
+            use db = new LiteDatabase(audioBookAudioFileDbConnectionString, mapper)
             let audioBooks = db.GetCollection<AudioBookAudioFilesInfoDb>("audiobookfileinfos")
 
             let audioFileInfo = audioFileInfo |> fromDomain
@@ -381,12 +386,12 @@ module DataBase =
                 (Error Translations.current.ErrorDbWriteAccess)
 
 
-        let deleteAudioBookInfoFromDb (audioBookAudioFileDb:string) (audioFileInfo:AudioBookAudioFilesInfo) =
-            use db = new LiteDatabase(audioBookAudioFileDb, mapper)
+        let deleteAudioBookInfoFromDb (FileInfoConnectionString audioBookAudioFileDbConnectionString) (audioFileInfo:AudioBookAudioFilesInfo) =
+            use db = new LiteDatabase(audioBookAudioFileDbConnectionString, mapper)
             let audioBooks = db.GetCollection<AudioBookAudioFilesInfoDb>("audiobookfileinfos")
 
             let res =
-                audioBooks.Delete(fun x -> x.Id = audioFileInfo.Id)
+                audioBooks.DeleteMany(fun x -> x.Id = audioFileInfo.Id)
 
             if  res > -1
             then (Ok ())
@@ -413,10 +418,10 @@ module DataBase =
                         let loadStateFromDb () =
                             try
                                 let audioBooks =
-                                    loadAudioBooksFromDb folders.audioBooksStateDataFile
+                                    loadAudioBooksFromDb folders.audioBooksStateDataConnectionString
 
                                 let audioFileInfos =
-                                    AudioBookFiles.loadAudioBookAudioFileInfosFromDb folders.audioBookAudioFileInfoDb
+                                    AudioBookFiles.loadAudioBookAudioFileInfosFromDb folders.audioBookAudioFileInfoDbConnectionString
 
                                 {
                                     AudioBooks = audioBooks
@@ -434,7 +439,7 @@ module DataBase =
                                 let! msg = inbox.Receive()
                                 match msg with
                                 | UpdateAudioBook (audiobook,replyChannel) ->
-                                    let dbRes = updateAudioBookDb folders.audioBooksStateDataFile audiobook
+                                    let dbRes = updateAudioBookDb folders.audioBooksStateDataConnectionString audiobook
                                     match dbRes with
                                     | Ok _ ->
                                         let newState =
@@ -453,7 +458,7 @@ module DataBase =
                                         return! (loop state)
 
                                 | InsertAudioBooks (audiobooks,replyChannel) ->
-                                    let dbRes = insertNewAudioBooksDb folders.audioBooksStateDataFile audiobooks
+                                    let dbRes = insertNewAudioBooksDb folders.audioBooksStateDataConnectionString audiobooks
                                     match dbRes with
                                     | Ok _ ->
                                         let newState =
@@ -477,7 +482,7 @@ module DataBase =
                                     return! (loop state)
 
                                 | RemoveAudiobookFromDatabase (audiobook,replyChannel) ->
-                                    let dbRes = deleteAudioBookDb folders.audioBooksStateDataFile audiobook
+                                    let dbRes = deleteAudioBookDb folders.audioBooksStateDataConnectionString audiobook
                                     match dbRes with
                                     | Ok _ ->
                                         let newState =
@@ -491,7 +496,7 @@ module DataBase =
                                         return! (loop state)
 
                                 | DeleteDatabase ->
-                                    deleteDatabase folders.audioBooksStateDataFile folders.audioBookAudioFileInfoDb
+                                    deleteDatabase folders.audioBooksStateDataConnectionString folders.audioBookAudioFileInfoDbConnectionString
                                     return! (loop <| loadStateFromDb ())
 
 
@@ -519,7 +524,7 @@ module DataBase =
                                                     |> Array.append infos
                                         }
 
-                                    let res = AudioBookFiles.addAudioFilesInfoToAudioBook folders.audioBookAudioFileInfoDb infos
+                                    let res = AudioBookFiles.addAudioFilesInfoToAudioBook folders.audioBookAudioFileInfoDbConnectionString infos
                                     replyChannel.Reply(res)
                                     match res with
                                     | Error _ ->
@@ -543,7 +548,7 @@ module DataBase =
                                                     )
                                         }
 
-                                    let res = AudioBookFiles.updateAudioBookFileInfo folders.audioBookAudioFileInfoDb info
+                                    let res = AudioBookFiles.updateAudioBookFileInfo folders.audioBookAudioFileInfoDbConnectionString info
                                     replyChannel.Reply(res)
                                     match res with
                                     | Error _ ->
@@ -569,7 +574,7 @@ module DataBase =
                                         replyChannel.Reply(Ok())
                                         return! loop state
                                     | Some info ->
-                                        let res = AudioBookFiles.deleteAudioBookInfoFromDb folders.audioBookAudioFileInfoDb info
+                                        let res = AudioBookFiles.deleteAudioBookInfoFromDb folders.audioBookAudioFileInfoDbConnectionString info
                                         replyChannel.Reply(res)
                                         match res with
                                         | Error _ ->
