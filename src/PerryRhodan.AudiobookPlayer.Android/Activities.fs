@@ -15,6 +15,7 @@ open MediaManager
 open Microsoft.AppCenter.Analytics
 open Microsoft.AppCenter
 open Microsoft.AppCenter.Crashes.Android
+open Microsoft.ApplicationInsights.Extensibility
 open PerryRhodan.AudiobookPlayer
 open Microsoft.Extensions.DependencyInjection
 //open PerryRhodan.AudiobookPlayer.Android.AudioPlayerServiceImplementation.DecpencyService
@@ -143,7 +144,7 @@ type MainActivity() as self =
             // .With(vulkanOptions)
             .UseAndroid()
             .WithInterFont()
-
+            
             .UseReactiveUI()
 
 
