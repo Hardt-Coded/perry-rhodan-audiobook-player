@@ -69,6 +69,15 @@ type ActionMenuViewModel(audioBook: AudioBookItemViewModel) =
     member this.CloseDialog() =
         DependencyService.Get<INavigationService>().RestoreBackbuttonCallback "PreviousToActionMenu"
         InteractiveContainer.CloseDialog()
+       
+       
+    member this.GetOnlinePicture() =
+        task {
+            let! picurl = Services.WebAccess.getPictureOnlineUrl this.AudioBook.AudioBook
+            System.Diagnostics.Trace.WriteLine($"GotOnlinePicture: {picurl}")
+            return ()
+        }
+        
         
     
     /// return the screen size for the login form dialog

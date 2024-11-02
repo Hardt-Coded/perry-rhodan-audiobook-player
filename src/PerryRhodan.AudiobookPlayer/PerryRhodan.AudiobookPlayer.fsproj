@@ -19,6 +19,7 @@
     <Compile Include="Common\Global.fs" />
     <Compile Include="Common\Dependencies.fs" />
     <Compile Include="Common\MessageBoxViewModels.fs" />
+    <Compile Include="Common\Task.fs" />
     <Compile Include="LiteDbExtensions\Json.fs" />
     <Compile Include="LiteDbExtensions\Bson.fs" />
     <Compile Include="LiteDbExtensions\FSharpBsonMapper.fs" />

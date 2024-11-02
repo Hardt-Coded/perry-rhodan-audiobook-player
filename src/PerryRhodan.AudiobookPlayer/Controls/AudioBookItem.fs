@@ -1,5 +1,8 @@
 ﻿namespace rec PerryRhodan.AudiobookPlayer.ViewModel
 
+open System.IO
+open System.Net.Http
+open System.Threading.Tasks
 open Avalonia.Controls
 open Avalonia.Media
 open Avalonia.Media.Imaging
@@ -8,6 +11,7 @@ open CherylUI.Controls
 open Common
 open Dependencies
 open Domain
+open MediaManager.Library
 open PerryRhodan.AudiobookPlayer.ViewModels
 open ReactiveElmish
 open ReactiveElmish.Avalonia
@@ -89,7 +93,10 @@ module AudioBookStore =
 
                                 | SideEffect.LoadAudiobooks ->
                                     let! audiobooks = DataBase.loadAudioBooksStateFile()
-                                    dispatch <| AudiobooksLoaded (audiobooks |> Array.map (fun i -> new AudioBookItemViewModel(i)))
+                                    let audioBookViewModels = audiobooks |> Array.map (fun i -> new AudioBookItemViewModel(i))
+                                    while not (audioBookViewModels |> Array.forall (_.IsInitialized)) do
+                                        do! Task.Delay 300
+                                    dispatch <| AudiobooksLoaded audioBookViewModels
                                     return ()
 
 
@@ -131,6 +138,7 @@ module AudioBookItem =
         AmbientColor: string option
         IsPlaying: bool
         IsBusy: bool
+        IsInitialized: bool
     }
 
     and DownloadState =
@@ -149,6 +157,8 @@ module AudioBookItem =
     type Msg =
         | RunOnlySideEffect of SideEffect
 
+        | Initialized
+
         | StartDownload
         | RemoveDownloadFromQueue
         | RemoveAudiobookFromDevice
@@ -164,6 +174,8 @@ module AudioBookItem =
         | UpdateAudioBookPosition of position:TimeSpan
         | UpdateCurrentListenFilename of filename:string
         | UpdateCurrentAudioFileList of audioFiles:AudioBookAudioFilesInfo
+        | UpdateAudiobookPicture of picture:string
+        | UpdateDownloadPath of path:string
         | SetAmbientColor of color:string
         | SendPauseCommandToAudioPlayer
 
@@ -177,6 +189,7 @@ module AudioBookItem =
         SideEffect =
         | None
         | Init
+
         | OpenAudioBookActionMenu
         | CloseAudioBookActionMenu
         | OpenAudioBookPlayer of startPlaying:bool
@@ -192,7 +205,8 @@ module AudioBookItem =
         | MarkAsListend
         | SendPauseCommandToAudioPlayer
 
-
+        | UpdateAudiobookPicture
+        | SaveAmbientColor
 
         | UpdateDatabase
 
@@ -211,9 +225,10 @@ module AudioBookItem =
                 | true, _           -> Listend
                 | false, Some pos   -> InProgress pos
                 | false, None       -> Unlistend
-            AudioFileInfos = DataBase.getAudioBookFileInfoTimeout 100 audiobook.Id // Todo: unbedingt ändern!
+            AudioFileInfos = None
             IsPlaying = false
             IsBusy = false
+            IsInitialized = false
         }, SideEffect.Init
 
 
@@ -222,6 +237,8 @@ module AudioBookItem =
         match msg with
         | IsBusy b ->
             { state with IsBusy =  b }, SideEffect.None
+        | Initialized ->
+            { state with IsInitialized = true }, SideEffect.None
 
         | RunOnlySideEffect sideEffect ->
             state, sideEffect
@@ -328,7 +345,11 @@ module AudioBookItem =
                 }, SideEffect.UpdateDatabase
 
         | SetAmbientColor color ->
-            { state with AmbientColor = Some color }, SideEffect.None
+            { state
+                with
+                    AmbientColor = Some color;
+                    Audiobook = { state.Audiobook with AmbientColor = Some color }
+            }, SideEffect.SaveAmbientColor
 
         | ToggleAmbientColor ->
             // generate random 6 digit hex  string
@@ -344,6 +365,18 @@ module AudioBookItem =
 
         | SendPauseCommandToAudioPlayer ->
             { state with IsPlaying = false }, SideEffect.SendPauseCommandToAudioPlayer
+
+        | UpdateAudiobookPicture picture ->
+            let newAudioBook = { state.Audiobook with Picture = Some picture; Thumbnail = Some picture }
+            { state with Audiobook = newAudioBook }, SideEffect.UpdateAudiobookPicture
+        | UpdateDownloadPath path ->
+            { state with
+                DownloadState = Downloaded
+                Audiobook = {
+                    state.Audiobook with
+                        State = { state.Audiobook.State with DownloadedFolder = Some path }
+
+                } }, SideEffect.UpdateDatabase
 
 
 
@@ -452,49 +485,73 @@ module AudioBookItem =
                 }
 
 
+            let getBitmapFromUrl (url: string) =
+                task {
+                    try
+                        use client = new HttpClient()
+                        let! imageData = client.GetByteArrayAsync(url)
+                        use stream = new MemoryStream(imageData)
+                        return SKBitmap.Decode(stream) |> Some
+                    with
+                    | ex ->
+                        Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
+                        #if DEBUG
+                        System.Diagnostics.Debug.WriteLine($"Error loading image from url: {url}")
+                        #endif
+                        return None
+                }
+
+
             let getAmbientColorFromPicture (picture:string) =
-                let bitmap = SkiaSharp.SKBitmap.Decode picture
-                if bitmap = null then
-                    "#ff483d8b"
-                else
-                    let bitmap = bitmap.Resize(SkiaSharp.SKImageInfo(5,5, SKColorType.Rgb888x), SKSamplingOptions(SKFilterMode.Nearest))
+                task {
+                    let! bitmap =
+                        task {
+                            if picture.StartsWith("http") then
+                                return! getBitmapFromUrl picture
+                             else
+                                return SkiaSharp.SKBitmap.Decode picture |> Option.ofObj
+                        }
+                    match bitmap with
+                    | None ->
+                        return "#ff483d8b"
+                    | Some bitmap ->
+                        let bitmap = bitmap.Resize(SkiaSharp.SKImageInfo(5,5, SKColorType.Rgb888x), SKSamplingOptions(SKFilterMode.Nearest))
+                        let getHue (x,_,_) = x
+                        let hues =
+                            [
+                                bitmap.GetPixel(0,1).ToHsv() |> getHue
+                                bitmap.GetPixel(0,2).ToHsv() |> getHue
+                                bitmap.GetPixel(0,3).ToHsv() |> getHue
+                                bitmap.GetPixel(0,4).ToHsv() |> getHue
+                                bitmap.GetPixel(1,4).ToHsv() |> getHue
+                                bitmap.GetPixel(2,4).ToHsv() |> getHue
+                                bitmap.GetPixel(3,4).ToHsv() |> getHue
+                                bitmap.GetPixel(4,4).ToHsv() |> getHue
+                                bitmap.GetPixel(4,3).ToHsv() |> getHue
+                                bitmap.GetPixel(4,2).ToHsv() |> getHue
+                                bitmap.GetPixel(4,1).ToHsv() |> getHue
+                                bitmap.GetPixel(4,0).ToHsv() |> getHue
+                                bitmap.GetPixel(3,0).ToHsv() |> getHue
+                                bitmap.GetPixel(2,0).ToHsv() |> getHue
+                                bitmap.GetPixel(3,3).ToHsv() |> getHue
+                            ]
 
-                    let getHue (x,_,_) = x
-
-                    let hues =
-                        [
-                            bitmap.GetPixel(0,1).ToHsv() |> getHue
-                            bitmap.GetPixel(0,2).ToHsv() |> getHue
-                            bitmap.GetPixel(0,3).ToHsv() |> getHue
-                            bitmap.GetPixel(0,4).ToHsv() |> getHue
-                            bitmap.GetPixel(1,4).ToHsv() |> getHue
-                            bitmap.GetPixel(2,4).ToHsv() |> getHue
-                            bitmap.GetPixel(3,4).ToHsv() |> getHue
-                            bitmap.GetPixel(4,4).ToHsv() |> getHue
-                            bitmap.GetPixel(4,3).ToHsv() |> getHue
-                            bitmap.GetPixel(4,2).ToHsv() |> getHue
-                            bitmap.GetPixel(4,1).ToHsv() |> getHue
-                            bitmap.GetPixel(4,0).ToHsv() |> getHue
-                            bitmap.GetPixel(3,0).ToHsv() |> getHue
-                            bitmap.GetPixel(2,0).ToHsv() |> getHue
-                            bitmap.GetPixel(3,3).ToHsv() |> getHue
-                        ]
-
-                    let avgeHue = hues |> List.average
-                    let aboveAvg = hues |> List.filter (fun x -> x > avgeHue)
-                    let belowAvg = hues |> List.filter (fun x -> x < avgeHue)
-                    let avgHue =
-                        if aboveAvg.Length > belowAvg.Length then
-                            aboveAvg |> List.average
-                        else
-                            belowAvg |> List.average
+                        let avgeHue = hues |> List.average
+                        let aboveAvg = hues |> List.filter (fun x -> x > avgeHue)
+                        let belowAvg = hues |> List.filter (fun x -> x < avgeHue)
+                        let avgHue =
+                            if aboveAvg.Length > belowAvg.Length then
+                                aboveAvg |> List.average
+                            else
+                                belowAvg |> List.average
 
 
 
-                        //|> List.average
+                            //|> List.average
 
-                    let avgHueColor = SkiaSharp.SKColor.FromHsv(avgHue, 100.0f, 50.0f)
-                    avgHueColor.ToString()
+                        let avgHueColor = SkiaSharp.SKColor.FromHsv(avgHue, 100.0f, 50.0f)
+                        return avgHueColor.ToString()
+                }
 
 
         let runSideEffects (sideEffect:SideEffect) (state:State) (dispatch:Msg -> unit) =
@@ -512,12 +569,18 @@ module AudioBookItem =
                                     return ()
 
                                 | SideEffect.Init ->
-                                    match state.Audiobook.Picture with
-                                    | Some picture ->
-                                        let color = getAmbientColorFromPicture picture
+                                    match state.Audiobook.Picture, state.Audiobook.AmbientColor with
+                                    | Some picture, None ->
+                                        let! color = getAmbientColorFromPicture picture
                                         dispatch <| SetAmbientColor color
-                                    | None ->
+                                    | _ ->
                                         ()
+
+                                    let! fileInfoList =
+                                        DataBase.getAudioBookFileInfo state.Audiobook.Id
+
+                                    fileInfoList |> Option.iter (fun list -> dispatch <| UpdateCurrentAudioFileList list)
+                                    dispatch Initialized
                                     return ()
 
                                 | SideEffect.OpenAudioBookActionMenu ->
@@ -543,7 +606,7 @@ module AudioBookItem =
                                     | Some current when current.AudioBook.Id = state.ViewModel.AudioBook.Id ->
                                         if startPlaying then
                                             do! DependencyService.Get<IAudioPlayerPause>().Play()
-                                        
+
                                         return () // do nothing
                                     | _ ->
                                         mainViewModel.OpenMiniplayer state.ViewModel startPlaying
@@ -587,12 +650,25 @@ module AudioBookItem =
                                     do! updateDatabase state.Audiobook
                                     return ()
 
+                                | SideEffect.SaveAmbientColor ->
+                                    do! updateDatabase state.Audiobook
+                                    return ()
+
+                                | SideEffect.UpdateAudiobookPicture ->
+                                    match state.Audiobook.Picture with
+                                    | Some picture ->
+                                        let! color = getAmbientColorFromPicture picture
+                                        dispatch <| SetAmbientColor color
+                                    | None ->
+                                        ()
+                                    return ()
+
                                 | SideEffect.DownloadCompleted ->
                                     do! updateDatabase state.Audiobook
                                     // refresh ambient color
                                     match state.Audiobook.Picture with
                                     | Some picture ->
-                                        let color = getAmbientColorFromPicture picture
+                                        let! color = getAmbientColorFromPicture picture
                                         dispatch <| SetAmbientColor color
                                     | None ->
                                         ()
@@ -600,7 +676,7 @@ module AudioBookItem =
                                     AudioBookStore.globalAudiobookStore.Dispatch <| AudioBookStore.AudioBookElmish.AudioBookChanged
 
                                 | SideEffect.SendPauseCommandToAudioPlayer ->
-                                    DependencyService.Get<IAudioPlayerPause>().Pause()
+                                    do! DependencyService.Get<IAudioPlayerPause>().Pause()
                             }
 
                         dispatch <| IsBusy true
@@ -763,8 +839,13 @@ module private DemoData =
                 DownloadedFolder = None
                 LastTimeListend = None
             }
+            AmbientColor = Some "#40F040"
         }
 
+
+module FallbackImage =
+    let fallbackImage ="avares://PerryRhodan.AudiobookPlayer/Assets/AudioBookPlaceholder_Dark.png"
+        
 
 type AudioBookItemViewModel(audiobook: AudioBook) as self =
     inherit ReactiveElmishViewModel()
@@ -823,17 +904,20 @@ type AudioBookItemViewModel(audiobook: AudioBook) as self =
     member this.ToggleIsPlaying pstate      = local.Dispatch (ToggleIsPlaying pstate)
     member this.PauseAudiobook()            = local.Dispatch SendPauseCommandToAudioPlayer
 
+    member this.SetPicture picture          = local.Dispatch <| UpdateAudiobookPicture picture
+    member this.SetDownloadPath path        = local.Dispatch <| UpdateDownloadPath path
 
-    member this.StartDownloadVisible    = this.Bind(local, fun s -> s.DownloadState = NotDownloaded)
-    member this.RemoveDownloadVisible   = this.Bind(local, fun s -> s.DownloadState = Queued)
-    member this.RemoveAudiobookFromDeviceVisible = this.Bind(local, fun s -> s.DownloadState = Downloaded)
-    member this.MarkAsListendVisible    = this.Bind(local, fun s -> s.ListenState <> ListenState.Listend)
-    member this.MarkAsUnlistendVisible  = this.Bind(local, fun s -> s.ListenState = ListenState.Listend)
-    member this.OpenPlayerVisible       = this.Bind(local, fun s -> s.DownloadState = Downloaded)
+    member this.StartDownloadVisible                = this.BindOnChanged(local, _.DownloadState, fun s -> s.DownloadState = NotDownloaded)
+    member this.RemoveDownloadVisible               = this.BindOnChanged(local, _.DownloadState, fun s -> s.DownloadState = Queued)
+    member this.RemoveAudiobookFromDeviceVisible    = this.BindOnChanged(local, _.DownloadState, fun s -> s.DownloadState = Downloaded)
+    member this.MarkAsListendVisible                = this.BindOnChanged(local, _.ListenState, fun s -> s.ListenState <> ListenState.Listend)
+    member this.MarkAsUnlistendVisible              = this.BindOnChanged(local, _.ListenState, fun s -> s.ListenState = ListenState.Listend)
+    member this.OpenPlayerVisible                   = this.BindOnChanged(local, _.DownloadState, fun s -> s.DownloadState = Downloaded)
 
+    member this.IsInitialized                       = this.BindOnChanged(local, _.IsInitialized, _.IsInitialized)
 
-    member this.Title = this.Bind(local, _.Audiobook.FullName)
-    member this.EpisodeTitle = this.Bind(local, _.Audiobook.EpisodenTitel)
+    member this.Title                               = this.BindOnChanged(local, _.Audiobook.FullName, _.Audiobook.FullName)
+    member this.EpisodeTitle                        = this.BindOnChanged(local, _.Audiobook.EpisodenTitel, _.Audiobook.EpisodenTitel)
 
     member this.Thumbnail =
         this.BindOnChanged(local,
@@ -842,6 +926,8 @@ type AudioBookItemViewModel(audiobook: AudioBook) as self =
                   s.Audiobook.Thumbnail
                   |> Option.defaultValue "avares://PerryRhodan.AudiobookPlayer/Assets/AudioBookPlaceholder_Dark.png"
         )
+    
+    
 
     member this.LoadingPie = this.BindOnChanged(local, _.DownloadState, fun s ->
         match s.DownloadState with

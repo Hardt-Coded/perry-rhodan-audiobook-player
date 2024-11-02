@@ -23,6 +23,7 @@ module BrowserPage =
         SelectedGroupItems: AudioBookListType
         IsLoading:bool
         SearchText:string
+        BusyMessage:string
     }
 
 
@@ -38,6 +39,8 @@ module BrowserPage =
         | OpenLoginPage
         | SetSearchText of string
         | SetSearchResult of AudioBookItemViewModel []
+        | AppendBusyMessage of string
+
 
 
 
@@ -101,6 +104,7 @@ module BrowserPage =
             PreviousGroups = filterResult.PreviousAvailableGroups
             AvailableGroups = filterResult.AvailableGroups
             SearchText = ""
+            BusyMessage = ""
         }
 
         newModel, if initAudioBooks = [||] then SideEffect.Init else SideEffect.None
@@ -134,7 +138,10 @@ module BrowserPage =
         | ShowErrorMessage e ->
             state, SideEffect.ShowErrorMessage e
         | SetBusy bstate ->
-            { state with IsLoading = bstate}, SideEffect.None
+            { state with IsLoading = bstate; BusyMessage = "" }, SideEffect.None
+        | AppendBusyMessage msg ->
+            { state with BusyMessage = $"{state.BusyMessage}\r\n{msg}" }, SideEffect.None
+
         | OpenLoginPage ->
             state, SideEffect.OpenLoginPage
         | SetSearchText s ->
@@ -144,7 +151,7 @@ module BrowserPage =
 
 
     module SideEffects =
-        open Common
+        open PerryRhodan.AudiobookPlayer.Common
 
         type SynchronizeWithCloudErrors =
             | NoSessionAvailable
@@ -181,9 +188,9 @@ module BrowserPage =
                     }
 
 
-                let loadAudioBooksFromCloud (cookies:Task<Map<string,string> option>) =
+                let loadAudioBooksFromCloud (cookies:Map<string,string> option) =
                     task {
-                        let! cookies = cookies
+                        dispatch <| AppendBusyMessage "Lade verfügbare Hörbücher aus dem Shop..."
                         match cookies with
                         | None ->
                             return Error NoSessionAvailable
@@ -193,89 +200,84 @@ module BrowserPage =
                     }
 
 
+
+
                 let loadAudioBooksFromDevice
                     (modelAudioBooks:AudioBookItemViewModel[])
-                    (loadResult:Task<Result<AudioBook[],SynchronizeWithCloudErrors>>) =
-                    task {
-                        let! cloudAudioBooks = loadResult
-
-                        match cloudAudioBooks with
-                        | Error e -> return Error e
+                    (loadFromCloud:Result<AudioBook[],SynchronizeWithCloudErrors>) =
+                        match loadFromCloud with
+                        | Error e -> Error e
                         | Ok cloudAudioBooks ->
+                            dispatch <| AppendBusyMessage "Suche nach bereits runtergeladenen Hörbücher..."
                             let audioBooksAlreadyOnTheDevice =
                                 DataBase.getAudiobooksFromDownloadFolder cloudAudioBooks
                                 // remove items that are already in the model itself
                                 |> Array.filter (fun i -> modelAudioBooks |> Array.exists (fun a -> a.AudioBook.Id = i.Id) |> not)
 
 
-                            return Ok (audioBooksAlreadyOnTheDevice,cloudAudioBooks)
-                    }
+                            Ok {| OnDevice = audioBooksAlreadyOnTheDevice; InCloud = cloudAudioBooks |}
 
 
                 let processLoadedAudioBookFromDevice
-                    (input:Task<Result<AudioBook [] * AudioBook[],SynchronizeWithCloudErrors>>) =
-                    task {
-                        let! input = input
-                        match input with
-                        | Error e -> return Error e
-                        | Ok (audioBooksItemsAlreadyOnTheDevice, cloudAudioBooks) ->
-                            let _ = audioBooksItemsAlreadyOnTheDevice |> DataBase.insertNewAudioBooksInStateFile
-
-                            return (audioBooksItemsAlreadyOnTheDevice, cloudAudioBooks) |> Ok
-                    }
+                    (input:Result<{| OnDevice: AudioBook []; InCloud:AudioBook[] |},SynchronizeWithCloudErrors>) =
+                     task {
+                         match input with
+                         | Error e -> return Error e
+                         | Ok i ->
+                             let! _ = i.OnDevice |> DataBase.insertNewAudioBooksInStateFile
+                             return {| OnDevice = i.OnDevice; InCloud = i.InCloud |} |> Ok
+                     }
 
 
                 let determinateNewAddedAudioBooks
                     (modelAudioBooks:AudioBookItemViewModel[])
-                    (input:Task<Result<AudioBook [] * AudioBook[],SynchronizeWithCloudErrors>>) =
-                    task {
-                        let! input = input
-                        match input with
-                        | Error e -> return Error e
-                        | Ok (audioBooksAlreadyOnTheDevice, cloudAudioBooks) ->
-                            let audioBooksAlreadyOnTheDevice = audioBooksAlreadyOnTheDevice |> Array.map (fun i -> new AudioBookItemViewModel(i))
-                            let modelAndDeviceAudiobooks = Array.concat [audioBooksAlreadyOnTheDevice; modelAudioBooks]
-                            let newAudioBookItems =
-                                let currentAudioBooks = modelAndDeviceAudiobooks |> Array.map (_.AudioBook)
-                                filterNewAudioBooks currentAudioBooks cloudAudioBooks
-                                |> Array.map (fun i -> new AudioBookItemViewModel(i))
-                            return Ok (newAudioBookItems, audioBooksAlreadyOnTheDevice, cloudAudioBooks)
-                    }
+                    (input:Result<{| OnDevice: AudioBook []; InCloud:AudioBook[] |},SynchronizeWithCloudErrors>) =
+                    match input with
+                    | Error e -> Error e
+                    | Ok i ->
+                         dispatch <| AppendBusyMessage "Ermittle neue Hörbücher..."
+                         let audioBooksAlreadyOnTheDevice = i.OnDevice |> Array.map (fun i -> new AudioBookItemViewModel(i))
+                         let modelAndDeviceAudiobooks = Array.concat [audioBooksAlreadyOnTheDevice; modelAudioBooks]
+                         let newAudioBookItems =
+                             let currentAudioBooks = modelAndDeviceAudiobooks |> Array.map (_.AudioBook)
+                             filterNewAudioBooks currentAudioBooks i.InCloud
+                             |> Array.map (fun i -> new AudioBookItemViewModel(i))
+                         Ok {| New = newAudioBookItems; OnDevice = modelAndDeviceAudiobooks; InCloud = i.InCloud |}
+
 
 
                 let processNewAddedAudioBooks
-                    (input:Task<Result<AudioBookItemViewModel [] * AudioBookItemViewModel [] * AudioBook[],SynchronizeWithCloudErrors>>) =
-                    task {
-                        let! input = input
-                        match input with
-                        | Error e -> return Error e
-                        | Ok (newAudioBookItems,currentAudioBooks,cloudAudioBooks) ->
-                            let onlyAudioBooks =
-                                newAudioBookItems
-                                |> Array.map (_.AudioBook)
+                    (input:Result<{| New: AudioBookItemViewModel[]; OnDevice: AudioBookItemViewModel []; InCloud:AudioBook[] |},SynchronizeWithCloudErrors>) =
+                        task {
+                             match input with
+                             | Error e -> return Error e
+                             | Ok i ->
+                                 dispatch <| AppendBusyMessage "Speichere neue Hörbücher..."
+                                 let onlyAudioBooks =
+                                     i.New
+                                     |> Array.map (_.AudioBook)
 
-                            let! ab =
-                                onlyAudioBooks
-                                |> DataBase.insertNewAudioBooksInStateFile
+                                 let! ab =
+                                     onlyAudioBooks
+                                     |> DataBase.insertNewAudioBooksInStateFile
 
-                            match ab with
-                            | Error e ->
-                                return StorageError e |> Error
-                            | Ok _ ->
-                                return (newAudioBookItems, currentAudioBooks, cloudAudioBooks) |> Ok
+                                 match ab with
+                                 | Error e ->
+                                     return StorageError e |> Error
+                                 | Ok _ ->
+                                     return {| New = i.New; OnDevice = i.OnDevice; InCloud = i.InCloud |} |> Ok
 
-                    }
+                        }
 
 
                 let repairAudiobookMetadataIfNeeded
-                    (input:Task<Result<AudioBookItemViewModel [] * AudioBookItemViewModel [] * AudioBook [],SynchronizeWithCloudErrors>>) =
+                    (input:Result<{| New: AudioBookItemViewModel[]; OnDevice: AudioBookItemViewModel []; InCloud:AudioBook[] |},SynchronizeWithCloudErrors>) =
                     task {
-                        let! input = input
                         match input with
                         | Error e ->
                             return Error e
-                        | Ok (newAudioBookItems,currentAudioBooks,cloudAudioBooks) ->
-
+                        | Ok e ->
+                            dispatch <| AppendBusyMessage "Suche nach defekten Metadaten..."
                             let hasDiffMetaData a b =
                                 a.FullName <> b.FullName ||
                                 a.EpisodeNo <> b.EpisodeNo ||
@@ -286,9 +288,9 @@ module BrowserPage =
 
 
                             let repairedAudioBooksItem =
-                                currentAudioBooks
+                                e.OnDevice
                                 |> Array.choose (fun i ->
-                                    cloudAudioBooks
+                                    e.InCloud
                                     |> Array.tryFind (fun c -> c.Id = i.AudioBook.Id)
                                     |> Option.bind (fun c ->
                                         if hasDiffMetaData c i.AudioBook then
@@ -324,9 +326,9 @@ module BrowserPage =
                                 )
 
                             let nameDiffOldNewDownloaded =
-                                currentAudioBooks
+                                e.OnDevice
                                 |> Array.choose (fun i ->
-                                    cloudAudioBooks
+                                    e.InCloud
                                     |> Array.tryFind (fun c -> c.Id = i.AudioBook.Id && i.DownloadState = AudioBookItem.Downloaded)
                                     |> Option.bind (fun c ->
                                         if c.FullName <> i.AudioBook.FullName then
@@ -340,7 +342,8 @@ module BrowserPage =
 
                             match repairedAudioBooksItem with
                             | [||] ->
-                                return (newAudioBookItems, currentAudioBooks, nameDiffOldNewDownloaded) |> Ok
+                                return {| New = e.New; OnDevice = e.OnDevice; DifferNames = nameDiffOldNewDownloaded |} |> Ok
+                                //return (newAudioBookItems, currentAudioBooks, nameDiffOldNewDownloaded) |> Ok
                             | _ ->
 
                                 for i in repairedAudioBooksItem do
@@ -349,7 +352,7 @@ module BrowserPage =
 
                                 // replacing fixed entries
                                 let currentAudioBooks =
-                                    currentAudioBooks
+                                    e.OnDevice
                                     |> Array.map (fun c ->
                                         match repairedAudioBooksItem |> Array.tryFind (fun r -> c.AudioBook.Id = r.AudioBook.Id) with
                                         | None ->
@@ -358,21 +361,21 @@ module BrowserPage =
                                             r
                                     )
 
-                                return (newAudioBookItems, currentAudioBooks, nameDiffOldNewDownloaded) |> Ok
+                                return {| New = e.New; OnDevice = currentAudioBooks; DifferNames = nameDiffOldNewDownloaded |} |> Ok
+                                //return (newAudioBookItems, currentAudioBooks, nameDiffOldNewDownloaded) |> Ok
 
-                    }
+                     }
 
 
                 let fixDownloadFolders
-                    (input:Task<Result<AudioBookItemViewModel [] * AudioBookItemViewModel [] * {| OldName:string; NewName:string |} [],SynchronizeWithCloudErrors>>) =
-                    task {
-                        let! input = input
+                    (input:Result<{| New: AudioBookItemViewModel[]; OnDevice: AudioBookItemViewModel []; DifferNames: {| OldName:string; NewName:string |} array |},SynchronizeWithCloudErrors>) =
                         match input with
-                        | Error e -> return Error e
-                        | Ok (newAudioBookItems, currentAudioBooks, nameDiffOldNewDownloaded) ->
+                        | Error e -> Error e
+                        | Ok e ->
+                            dispatch <| AppendBusyMessage "Repariere mögliche Probleme mit den Downloadordnern..."
                             let folders = Services.Consts.createCurrentFolders ()
                             try
-                                nameDiffOldNewDownloaded
+                                e.DifferNames
                                 |> Array.map (fun x ->
                                     let oldFolder = System.IO.Path.Combine(folders.audioBookDownloadFolderBase,x.OldName)
                                     let newFolder = System.IO.Path.Combine(folders.audioBookDownloadFolderBase,x.NewName)
@@ -392,26 +395,132 @@ module BrowserPage =
                                     System.IO.Directory.Move(x.OldFolder,x.NewFolder)
                                 )
 
-                                return (newAudioBookItems, currentAudioBooks) |> Ok
+                                //return (newAudioBookItems, currentAudioBooks) |> Ok
+                                {| New = e.New; OnDevice = e.OnDevice |} |> Ok
                             with
                             | ex ->
-                                return (StorageError ex.Message) |> Error
+                                (StorageError ex.Message) |> Error
 
 
+                //let lookForAlreadyDownloadedAudioBook
+                //    (input:Result<{| New: AudioBookItemViewModel[]; OnDevice: AudioBookItemViewModel [] |},SynchronizeWithCloudErrors>) =
+                //    // check if the audiobook is already downloaded
+                //    match input with
+                //    | Error e -> Error e
+                //    | Ok e ->
+                //        dispatch <| AppendBusyMessage "Prüfe auf verlorene Hörbuchdateien..."
+                //        // get all directories in the download folder
+                //        let folders = Services.Consts.createCurrentFolders ()
+                //        let downloadedFolders =
+                //            System.IO.Directory.GetDirectories(folders.audioBookDownloadFolderBase)
+                //            |> Array.map (fun i ->
+                //                i, i.Split(System.IO.Path.DirectorySeparatorChar) |> Array.last
+                //            )
+                //            |> Array.iter (fun (path, abId) ->
+                //                // are there any files in the subfolder "audio"?
+                //                let areThereAudiofiles =
+                //                    let audioPath = System.IO.Path.Combine(path,"audio")
+                //                    if System.IO.Directory.Exists(audioPath) then
+                //                        System.IO.Directory.GetFiles(System.IO.Path.Combine(path,"audio")).Length > 0
+                //                    else
+                //                        false
+
+                //                if areThereAudiofiles then
+                //                    // find the audiobook in the list
+                //                    match Int32.TryParse(abId) with
+                //                    | true, abId ->
+                //                        e.New
+                //                        |> Array.tryFind (fun a ->
+                //                            a.AudioBook.Id = abId
+                //                        )
+                //                        |> Option.iter (fun a ->
+                //                            let c = 1
+                //                            a.SetDownloadPath path
+                //                        )
+                //                    | _ ->
+                //                        ()
+                //            )
+
+                //        {| New = e.New; OnDevice = e.OnDevice |} |> Ok
+
+
+
+                let addOnlineUrlForPictureForAllWhichHasNone
+                    (input:Result<{| New: AudioBookItemViewModel[]; OnDevice: AudioBookItemViewModel [] |},SynchronizeWithCloudErrors>) =
+                    task {
+                        match input with
+                        | Error e ->
+                            return Error e
+                        | Ok e ->
+                            dispatch <| AppendBusyMessage "Füge den Hörbüchern die Haupbildadresse hinzu..."
+                            // split audiobook in 5 packages
+                            let chunks =
+                                Array.concat [e.OnDevice;e.New]
+                                |> Array.filter (fun i -> i.AudioBook.Picture.IsNone)
+                                |> Array.chunkBySize 9
+
+
+                            let runChunk (chunk:AudioBookItemViewModel array) =
+                                task {
+                                    let! audioBooks =
+                                        chunk
+                                        |> Array.map (fun i ->
+                                            task {
+                                                match i.AudioBook.Picture with
+                                                | Some _ ->
+                                                    return ()
+                                                | None ->
+                                                    let! url = Services.WebAccess.getPictureOnlineUrl i.AudioBook
+                                                    match url with
+                                                    | None -> return ()
+                                                    | Some url ->
+                                                        i.SetPicture url
+                                                        return ()
+                                            }
+                                        )
+                                        |> Task.WhenAll
+
+                                    return audioBooks
+                                }
+
+                            #if DEBUG
+                            System.Diagnostics.Trace.WriteLine $"Processing {chunks.Length}..."
+                            #endif
+                            for idx, chunk in chunks |> Array.indexed do
+                                let! _ = runChunk chunk
+                                #if DEBUG
+                                System.Diagnostics.Trace.WriteLine $"Chunk {idx+1} of {chunks.Length} done!"
+                                #endif
+                                // nach 25% der alles chunks z.B. 147
+                                match chunks.Length |> float with
+                                | x when (x * 0.25) |> int = idx + 1 ->
+                                    dispatch <| AppendBusyMessage "25% verarbeitet..."
+                                | x when (x * 0.50) |> int = idx + 1 ->
+                                    dispatch <| AppendBusyMessage "50% verarbeitet..."
+                                | x when (x * 0.75) |> int = idx + 1 ->
+                                    dispatch <| AppendBusyMessage "75% verarbeitet..."
+                                | x when x |> int = idx + 1 ->
+                                    dispatch <| AppendBusyMessage "100% verarbeitet..."
+                                | _ ->
+                                    ()
+
+                            return Ok {| New = e.New; OnDevice = e.OnDevice |}
                     }
 
 
+
                 let processResult
-                    (input:Task<Result<AudioBookItemViewModel [] * AudioBookItemViewModel [] ,SynchronizeWithCloudErrors>>) =
+                    (input:Result<{| New : AudioBookItemViewModel[]; OnDevice : AudioBookItemViewModel[] |} ,SynchronizeWithCloudErrors>) =
                     task {
-                        let! input = input
                         match input with
-                        | Ok (newAudioBookItems,currentAudioBooks) ->
-                            do! newAudioBookItems |> notifyAfterSync
-                            let audioBooks =(Array.concat [newAudioBookItems;currentAudioBooks])
-                            dispatch <| AudioBookItemsChanged audioBooks
+                        | Ok e ->
+                            dispatch <| AppendBusyMessage "Fertig!"
+                            let audioBooks =(Array.concat [e.New;e.OnDevice])
                             // also sync with global store
-                            AudioBookStore.globalAudiobookStore.Dispatch (AudioBookStore.AudioBookElmish.AudiobooksLoaded audioBooks)
+                            AudioBookStore.globalAudiobookStore.Dispatch <| AudioBookStore.AudioBookElmish.AudiobooksLoaded audioBooks
+                            dispatch <| AudioBookItemsChanged audioBooks
+                            do! e.New |> notifyAfterSync
+
                         | Error err ->
                             match err with
                             | NoSessionAvailable ->
@@ -440,14 +549,16 @@ module BrowserPage =
                 try
                     do!
                         checkLoginSession ()
-                        |> loadAudioBooksFromCloud
-                        |> loadAudioBooksFromDevice AudioBookStore.globalAudiobookStore.Model.Audiobooks
-                        |> processLoadedAudioBookFromDevice
-                        |> determinateNewAddedAudioBooks AudioBookStore.globalAudiobookStore.Model.Audiobooks
-                        |> processNewAddedAudioBooks
-                        |> repairAudiobookMetadataIfNeeded
-                        |> fixDownloadFolders
-                        |> processResult
+                        |> Task.bind loadAudioBooksFromCloud
+                        |> Task.map (loadAudioBooksFromDevice AudioBookStore.globalAudiobookStore.Model.Audiobooks)
+                        |> Task.bind processLoadedAudioBookFromDevice
+                        |> Task.map (determinateNewAddedAudioBooks AudioBookStore.globalAudiobookStore.Model.Audiobooks)
+                        |> Task.bind processNewAddedAudioBooks
+                        |> Task.bind repairAudiobookMetadataIfNeeded
+                        |> Task.map  fixDownloadFolders
+                        //|> Task.map  lookForAlreadyDownloadedAudioBook
+                        |> Task.bind addOnlineUrlForPictureForAllWhichHasNone
+                        |> Task.bind processResult
                 with
                 | ex ->
                     do! Notifications.showErrorMessage ex.Message
@@ -456,7 +567,7 @@ module BrowserPage =
 
                 dispatch <| SetBusy false
 
-                    }
+            }
 
 
         let runSideEffects (sideEffect:SideEffect) (state:State) (dispatch:Msg -> unit) =
@@ -555,6 +666,7 @@ module private DemoData =
                 DownloadedFolder = None
                 LastTimeListend = None
             }
+            AmbientColor = Some "#FF0000"
         }
 
     let designAudioBook2 = {
@@ -574,6 +686,7 @@ module private DemoData =
                 DownloadedFolder = None
                 LastTimeListend = None
             }
+            AmbientColor = Some "#00FF00"
         }
 
     let designAudioBook3 = {
@@ -593,10 +706,11 @@ module private DemoData =
                 DownloadedFolder = None
                 LastTimeListend = None
             }
+            AmbientColor = Some "#0000FF"
         }
 
 
-type BrowserViewModel(?audiobookItems) =
+type BrowserViewModel(?audiobookItems) as self =
     inherit ReactiveElmishViewModel()
 
     let audiobookItems = [||] |> defaultArg audiobookItems
@@ -607,20 +721,29 @@ type BrowserViewModel(?audiobookItems) =
 
     let searchStringDebouncer = Extensions.debounce<string>
 
+    do
+        do
+            self.AddDisposable
+                <| AudioBookStore.globalAudiobookStore.Observable.Subscribe(fun s ->
+                    local.Dispatch (s.IsLoading |> SetBusy)
+                )
+            ()
+
     new () =
         new BrowserViewModel([||])
 
     member this.AudioBooks =
         this.Bind(local, fun s -> ObservableCollection(s.AudioBookItems))
 
-    member this.PreviousGroups:string list = this.Bind(local, _.PreviousGroups)
+    member this.PreviousGroups:string list  = this.Bind(local, _.PreviousGroups)
     member this.AvailableGroups:string list = this.Bind(local, _.AvailableGroups)
-    member this.SelectedGroups:string list = this.Bind(local, _.SelectedGroups)
-    member this.GroupItems = this.Bind(local, fun s -> ObservableCollection(match s.SelectedGroupItems with | GroupList grp -> grp | _ -> [||]))
-    member this.IsLoading:bool = this.Bind(local, _.IsLoading)
+    member this.SelectedGroups:string list  = this.Bind(local, _.SelectedGroups)
+    member this.GroupItems                  = this.BindList(local, fun s -> ObservableCollection(match s.SelectedGroupItems with | GroupList grp -> grp | _ -> [||]))
+    member this.IsBusy                      = this.BindOnChanged(local, _.IsLoading, _.IsLoading)
+    member this.BusyMessage                 = this.BindOnChanged(local, _.BusyMessage, _.BusyMessage)
 
-    member this.BackButtonVisible = this.Bind(local, fun s -> s.SelectedGroups.Length > 0)
-    member this.AudioBookItemsVisible = this.Bind(local, fun s -> s.AudioBookItems.Length > 0)
+    member this.BackButtonVisible           = this.Bind(local, fun s -> s.SelectedGroups.Length > 0)
+    member this.AudioBookItemsVisible       = this.Bind(local, fun s -> s.AudioBookItems.Length > 0)
     member this.CategoryItemsVisible =
         this.Bind(local, fun s ->
             match s.SelectedGroupItems with

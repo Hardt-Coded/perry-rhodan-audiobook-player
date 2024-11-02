@@ -6,23 +6,23 @@ open Common
 open HtmlAgilityPack
 
 
-type AudioBookPosition = 
+type AudioBookPosition =
     { Filename: string
       Position: TimeSpan }
 
-type AudioBookState = 
+type AudioBookState =
     { Completed:bool
       CurrentPosition: AudioBookPosition option
       Downloaded:bool
       DownloadedFolder:string option
       LastTimeListend: DateTime option }
-    
+
     with
         static member Empty = {Completed = false; CurrentPosition = None; Downloaded=false; DownloadedFolder = None; LastTimeListend = None}
 
 type AudioBook =
     { Id:int
-      FullName:string 
+      FullName:string
       EpisodeNo:int option
       EpisodenTitel: string
       Group:string
@@ -30,12 +30,14 @@ type AudioBook =
       Thumbnail:string option
       DownloadUrl: string option
       ProductSiteUrl:string option
-      State: AudioBookState }
+      State: AudioBookState
+      AmbientColor: string option
+      }
 
     with
-        static member Empty = 
+        static member Empty =
             { Id = 0
-              FullName="" 
+              FullName=""
               EpisodeNo=None
               EpisodenTitel = ""
               Group = ""
@@ -43,7 +45,8 @@ type AudioBook =
               Thumbnail=None
               DownloadUrl=None
               ProductSiteUrl = None
-              State=AudioBookState.Empty }
+              State=AudioBookState.Empty
+              AmbientColor = None }
 
 type NameGroupedAudioBooks = (string * AudioBook[])[]
 
@@ -68,7 +71,7 @@ type AudioBookAudioFilesInfo = {
 
 module Helpers =
 
-    let getDownloadNameRegex (innerText:string) = 
+    let getDownloadNameRegex (innerText:string) =
         let indexFirst = innerText.IndexOf("(")
         let part = innerText[..indexFirst]
 
@@ -90,29 +93,29 @@ module Helpers =
             input.Replace(searchVal, newText)
         else
             input
-    
-    
+
+
     let getKey (downloadNameRegex:Regex) (innerText:string) =
         if not (downloadNameRegex.IsMatch(innerText)) then "Other"
         else
             let matchTitle = downloadNameRegex.Match(innerText)
             matchTitle.Groups[1].Value.Replace("Nr.", "").Trim()
-    
-    
+
+
     let tryGetEpisodenNumber (downloadNameRegex:Regex) innerText =
-        
+
         let fallBackEpNum () =
-            let innerText = 
+            let innerText =
                 innerText
                 |> regexReplace "40\.000" ""
-    
+
             let ep1Regex = Regex("\d+")
             if ep1Regex.IsMatch(innerText) then
                 let isNum,num = Int32.TryParse(ep1Regex.Match(innerText).Groups[0].Value)
                 if isNum then Some num else None
             else
                 None
-    
+
         if downloadNameRegex.IsMatch(innerText) then
             let epNumRes = Int32.TryParse(downloadNameRegex.Match(innerText).Groups[2].Value)
             match epNumRes with
@@ -120,12 +123,12 @@ module Helpers =
             | _ -> fallBackEpNum ()
         else
             fallBackEpNum ()
-                
+
     open System.Linq
-    
+
     let getEpisodenTitle (downloadNameRegex:Regex) (innerText:string) =
         if not (downloadNameRegex.IsMatch(innerText)) then innerText.Trim()
-        else 
+        else
             let ept = downloadNameRegex.Match(innerText).Groups[4].Value.Trim()
             ept.Substring(0,(ept.Length-2)).ToString().Trim().Replace(":"," -")
 
@@ -159,14 +162,14 @@ module Helpers =
         linkProductSite
         |> RegExHelper.regexMatchGroupOpt 2 "(productID=)(\d*)"
         |> Option.bind tryParseInt
-        
-    
+
+
     let compansateManually (input:string) =
         if input.Contains("Perry Rhodan Storys") then
             input
             |> regexReplace "\([A-Z ]*\d+\)" ""
         else
-            input   
+            input
 
 
     type CompansationItem = {
@@ -188,24 +191,24 @@ module Helpers =
             }
         ]
         items |> List.tryFind (fun i -> i.ProductId = id)
-        
-open System.Linq        
 
-let parseDownloadData htmlData =    
+open System.Linq
+
+let parseDownloadData htmlData =
     let document = HtmlDocument()
     document.LoadHtml(htmlData)
     let divModes = document.DocumentNode.SelectNodes("//div[@id='downloads']")
     divModes
-    |> Seq.toArray 
+    |> Seq.toArray
     |> Array.tryHead
     // only the audiobooks
     |> Option.map (
-        fun i -> 
-            i.Descendants("li") 
-            |> Seq.filter (fun i -> not (i.InnerText.Contains("Impressum"))) 
-            |> Seq.filter (fun i -> 
-                i.Descendants("a") 
-                |> Seq.exists (fun i -> 
+        fun i ->
+            i.Descendants("li")
+            |> Seq.filter (fun i -> not (i.InnerText.Contains("Impressum")))
+            |> Seq.filter (fun i ->
+                i.Descendants("a")
+                |> Seq.exists (fun i ->
                     i.Attributes
                         .Where(fun x -> x.Name = "href")
                         .Any(fun x-> x.Value.Contains("butler.php?action=audio"))
@@ -217,46 +220,47 @@ let parseDownloadData htmlData =
     |> Array.Parallel.map (
         fun i ->
             let downloadRegex = Helpers.getDownloadNameRegex i.InnerText
-            let innerText = i.InnerText |> Helpers.compansateManually 
+            let innerText = i.InnerText |> Helpers.compansateManually
             //   little title work
             let key = innerText |> Helpers.getKey downloadRegex
-            let epNum = innerText |> Helpers.tryGetEpisodenNumber downloadRegex   
+            let epNum = innerText |> Helpers.tryGetEpisodenNumber downloadRegex
             let episodeNumber =
                 if epNum = None then
-                    i.InnerText |> Helpers.tryGetEpisodenNumber downloadRegex 
+                    i.InnerText |> Helpers.tryGetEpisodenNumber downloadRegex
                 else
-                    epNum                
+                    epNum
             let episodeTitle = innerText |> Helpers.getEpisodenTitle downloadRegex
             let linkForMultiDownload = i |> Helpers.tryGetLinkForMultiDownload
             let linkProductSite = i |> Helpers.tryGetProductionPage
             let fullName = Helpers.buildFullName episodeNumber key episodeTitle
-            let productId = 
-                linkProductSite 
+            let productId =
+                linkProductSite
                 |> Helpers.tryGetProductId
                 |> Option.defaultValue -1
 
             // manual compantation of entries
-            let fullName,episodeTitle,episodeNumber,key = 
+            let fullName,episodeTitle,episodeNumber,key =
                 match Helpers.targetCompansation productId with
                 | None ->
                     fullName,episodeTitle,episodeNumber,key
                 | Some item ->
                     item.FullName, item.EpisodeTitle, item.EpisodeNo, item.Group
-            
-                        
+
+
             {   Id = productId
-                FullName = fullName 
+                FullName = fullName
                 EpisodeNo = episodeNumber
                 EpisodenTitel = episodeTitle
                 Group = key
-                DownloadUrl = linkForMultiDownload 
+                DownloadUrl = linkForMultiDownload
                 ProductSiteUrl = linkProductSite
                 Picture = None
                 Thumbnail = None
-                State = AudioBookState.Empty }
+                State = AudioBookState.Empty
+                AmbientColor = None }
     )
     |> Array.filter (fun i -> i.Id <> -1)
-    |> Array.sortBy (fun ab -> 
+    |> Array.sortBy (fun ab ->
             match ab.EpisodeNo with
             | None -> -1
             | Some x -> x
@@ -264,7 +268,7 @@ let parseDownloadData htmlData =
     |> Array.distinct
 
 
-let filterNewAudioBooks (local:AudioBook[]) (online:AudioBook[]) =    
+let filterNewAudioBooks (local:AudioBook[]) (online:AudioBook[]) =
     online
     |> Array.filter (fun i -> local |> Array.exists (fun l -> l.Id = i.Id) |> not)
 
@@ -274,11 +278,11 @@ let synchronizeAudiobooks (local:AudioBook[]) (online:AudioBook[]) =
     Array.concat [|local; differences|]
 
 
-let findDifferentAudioBookNames (local:AudioBook[]) (online:AudioBook[]) = 
+let findDifferentAudioBookNames (local:AudioBook[]) (online:AudioBook[]) =
     local
     |> Array.choose (
-        fun i -> 
-            online 
+        fun i ->
+            online
             |> Array.tryFind (fun l -> l.Id = i.Id)
             |> Option.bind (fun n ->
                 if n.FullName = i.FullName then None else Some n
@@ -290,22 +294,22 @@ let findDifferentAudioBookNames (local:AudioBook[]) (online:AudioBook[]) =
 let parseProductPageForDescription html =
     let document = HtmlDocument()
     document.LoadHtml(html)
-    
+
     let paragraphs =
-        document.DocumentNode                        
+        document.DocumentNode
             .Descendants("p")
         |> Seq.toList
-    
-    let productDetail = 
+
+    let productDetail =
         paragraphs
-        |> List.tryFindIndex (fun i -> 
+        |> List.tryFindIndex (fun i ->
             let idAttribute = i.Attributes.FirstOrDefault(fun x -> x.Name = "id") |> Option.ofObj
             match idAttribute with
             | None -> false
             | Some a ->
                 a.Value = "pricetag"
             )
-        |> Option.bind( 
+        |> Option.bind(
             fun idx ->
                 //get next entry
                 let nextIdx = idx + 1
@@ -316,37 +320,37 @@ let parseProductPageForDescription html =
                     let description = nextEntry.InnerText
                     Some description
         )
-        
-    
+
+
     productDetail
 
 let parseProductPageForImage html =
     let document = HtmlDocument()
     document.LoadHtml(html)
-    
+
     let image =
         document.DocumentNode
             .Descendants("img")
         |> Seq.tryFind (fun i -> i.Attributes.FirstOrDefault(fun x -> x.Name = "id").Value = "imgzoom")
         |> Option.bind (
-            fun i -> 
+            fun i ->
                 let imgSrc = i.Attributes.FirstOrDefault(fun x -> x.Name = "src").Value
                 if imgSrc = "" then None else Some imgSrc
         )
-        
+
     image
-    
-    
-    
-        
 
-module Filters = 
 
-    let nameFilter audiobooks =          
+
+
+
+module Filters =
+
+    let nameFilter audiobooks =
         audiobooks
         |> Array.groupBy (_.Group)
         |> Array.sortBy (fun (key,_) -> key)
-        
+
 
     let nameGroupFilter groupname audiobooks =
         match audiobooks with
@@ -356,23 +360,23 @@ module Filters =
             |> Array.filter (fun (key,_) -> key = groupname)
             |> Array.Parallel.collect (fun (_,items) -> items)
 
-    
+
     let mapFromToName items =
-        let sortedItem = 
-            items 
+        let sortedItem =
+            items
             |> Array.sortBy (
-                fun i -> 
-                    i.EpisodeNo |> Option.defaultValue 0                            
+                fun i ->
+                    i.EpisodeNo |> Option.defaultValue 0
             )
         let groupName = sortedItem[0].Group
-        let firstEpNo = sortedItem[0].EpisodeNo |> Option.defaultValue 0 
+        let firstEpNo = sortedItem[0].EpisodeNo |> Option.defaultValue 0
         let lastEpNo = sortedItem[sortedItem.Length - 1].EpisodeNo |> Option.defaultValue 0
         $"%s{groupName} %i{firstEpNo} - %i{lastEpNo}"
 
     let ``100 episode filter`` audiobooks =
         audiobooks
         |> Array.groupBy (
-            fun i -> 
+            fun i ->
                 let epno = i.EpisodeNo |> Option.defaultValue 0
                 let rest = epno % 100
                 let episodeNo = epno - rest
@@ -384,7 +388,7 @@ module Filters =
     let ``10 episode filter`` audiobooks : AudioBookListType =
         audiobooks
         |> Array.groupBy (
-            fun i -> 
+            fun i ->
                 let epno = i.EpisodeNo |> Option.defaultValue 0
                 let rest = epno % 10
                 let episodeNo = epno - rest
@@ -392,15 +396,15 @@ module Filters =
         )
         |> Array.map (fun (key,items) -> items |> mapFromToName, items)
         |> GroupList
-    
+
     let (|EpisodeNoMore100|_|) audiobooks =
         let episodeNoGreater100 =
             audiobooks |> Array.exists (fun i -> (i.EpisodeNo |> Option.defaultValue 0) > 100)
-                
-        let episodeNoSame100 =                    
+
+        let episodeNoSame100 =
             match audiobooks with
             | [||] -> true
-            | x -> 
+            | x ->
                 let epBase = (x[0].EpisodeNo |> Option.defaultValue 0) / 100
                 audiobooks |> Array.forall (fun i -> ((i.EpisodeNo |> Option.defaultValue 0) / 100) = epBase)
 
@@ -409,11 +413,11 @@ module Filters =
     let (|EpisodeNoMore10|_|) audiobooks =
         let episodeNoGreater10 =
             audiobooks |> Array.exists (fun i -> (i.EpisodeNo |> Option.defaultValue 0) > 10)
-                
-        let episodeNoSame10 = 
+
+        let episodeNoSame10 =
             match audiobooks with
             | [||] -> true
-            | x -> 
+            | x ->
                 let epBase = (x[0].EpisodeNo |> Option.defaultValue 0) / 10
                 audiobooks |> Array.forall (fun i -> ((i.EpisodeNo |> Option.defaultValue 0) / 10) = epBase)
 
@@ -423,12 +427,12 @@ module Filters =
     let groupsFilter (groups:string list) (audiobooks:AudioBookListType) =
         (audiobooks,groups)
         ||> List.fold (
-            fun state item -> 
+            fun state item ->
                 let nameFilterResult =
                     state
                     |> nameGroupFilter item
-                
-                
+
+
                 match nameFilterResult with
                 | EpisodeNoMore100 ->
                     (nameFilterResult |> ``100 episode filter``)
@@ -438,40 +442,40 @@ module Filters =
                     AudioBookList (item ,nameFilterResult)
         )
 
-    
-    
+
+
 let getAudiobooksFromGroup group (audiobooks:(string*AudioBook[])[]) =
     audiobooks
     |> Array.tryFind (fun (key,_) -> key = group)
-    |> Option.map (fun (_,items) -> 
-        items 
-        |> Array.chunkBySize 10 
-        |> Array.mapi (fun idx cItems -> 
+    |> Option.map (fun (_,items) ->
+        items
+        |> Array.chunkBySize 10
+        |> Array.mapi (fun idx cItems ->
             let cItems = cItems |> Array.sortByDescending (fun si -> si.EpisodeNo)
             let firstEpisode = cItems[0].EpisodeNo |> Option.defaultValue 0
             let lastEpisode = (cItems |> Array.last).EpisodeNo |> Option.defaultValue 0
-            
+
             $"%s{group} %i{firstEpisode} - %i{lastEpisode}",cItems
             )
         |> Array.sortByDescending (fun (key,_) -> key)
         )
-    
+
 
 let getAudiobooksFromChunk chunk (audiobooks:(string*AudioBook[])[]) =
     audiobooks
     |> Array.tryFind (fun (key,_) -> key = chunk)
-    |> Option.map (fun (_,items) -> 
+    |> Option.map (fun (_,items) ->
             items |> Array.sortByDescending (fun si -> si.EpisodeNo)
         )
 
 
 module AudioBooks =
-    
+
     let flatten (input:NameGroupedAudioBooks) =
         input |> Array.collect (fun (_,items) -> items)
-        
-    
-    
+
+
+
 
 
 

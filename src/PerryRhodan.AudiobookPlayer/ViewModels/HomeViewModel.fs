@@ -93,7 +93,7 @@ module HomePage =
                             | SideEffect.Init ->
                                 try
                                     let audioBooks =
-                                        AudioBookStore.globalAudiobookStore.Model.Audiobooks
+                                         AudioBookStore.globalAudiobookStore.Model.Audiobooks
 
                                     dispatch <| AudioBooksLoaded audioBooks
                                     return ()
@@ -115,15 +115,23 @@ open ReactiveElmish.Avalonia
 open ReactiveElmish
 open Elmish.SideEffect
 
-type HomeViewModel() =
+type HomeViewModel() as self =
     inherit ReactiveElmishViewModel()
 
     let local =
         Program.mkAvaloniaProgrammWithSideEffect init update SideEffects.runSideEffects
         |> Program.mkStore
 
+    let mutable countAudioBooks = 0
+
     do
-        let a = 1
+        self.AddDisposable
+            <| AudioBookStore.globalAudiobookStore.Observable.Subscribe(fun s ->
+                local.Dispatch (s.IsLoading |> SetBusy)
+                if countAudioBooks <> s.Audiobooks.Length then
+                    countAudioBooks <- s.Audiobooks.Length
+                    local.Dispatch (AudioBooksLoaded s.Audiobooks)
+            )
         ()
 
     member this.AudioBooks =
@@ -159,7 +167,7 @@ type HomeViewModel() =
         with get():int = 0
         and set(value:int) =
             ()
-            
+
     member this.IsEmpty = this.Bind(local, fun i -> i.Audiobooks.Length = 0 && i.LastTimeListenedAudioBook.IsNone)
 
 

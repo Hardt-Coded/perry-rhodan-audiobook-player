@@ -1,6 +1,7 @@
 ﻿module Services
 
 open System
+open System.Diagnostics
 open System.IO
 open Avalonia
 open Avalonia.Controls
@@ -11,6 +12,7 @@ open DialogHostAvalonia
 open Domain
 open System.Net
 open FSharp.Control
+open HtmlAgilityPack
 open Newtonsoft.Json
 open System.Net.Http
 open ICSharpCode.SharpZipLib.Zip
@@ -19,6 +21,7 @@ open FsHttp
 open PerryRhodan.AudiobookPlayer.Notification.ViewModels
 open SkiaSharp
 open Dependencies
+open PerryRhodan.AudiobookPlayer.Common
 
 
 type StateConnectionString = | StateConnectionString of string
@@ -733,17 +736,14 @@ module DataBase =
                     match audiobook with
                     | None -> None
                     | Some audiobook ->
-                        let newState = {
-                            audiobook.State with
-                                Downloaded = onDeviceItem.HasAudioBook
-                                DownloadedFolder=onDeviceItem.AudioBookPath
-                        }
                         Some {
                             audiobook with
-                                State = newState
+                                State.Downloaded = onDeviceItem.HasAudioBook
+                                State.DownloadedFolder = onDeviceItem.AudioBookPath
                                 Picture = onDeviceItem.Pic
                                 Thumbnail = onDeviceItem.Thumb
                         }
+
             )
         result
 
@@ -917,6 +917,58 @@ module WebAccess =
 
         }
 
+
+    let parseFromPictureUrlInHtml html =
+        // parse html and get picture url from element wit id "mainimg"
+        let doc = new HtmlDocument()
+        doc.LoadHtml(html)
+        let img = doc.DocumentNode.SelectSingleNode("//*[@id='mainimg']")
+        if img = null then None
+        else
+            let src = img.Attributes.["src"].Value
+            Some src
+
+
+    let getPictureOnlineUrl (audiobook:AudioBook) =
+        task {
+            match audiobook.ProductSiteUrl with
+            | None ->
+                return None
+
+            | Some siteUrl ->
+                try
+                    let! html =
+                        http {
+                            GET $"{baseUrl}{siteUrl}"
+                            config_transformHttpClient (useAndroidHttpClient false)
+                        }
+                        |> Request.sendTAsync
+
+                        |> Task.map (fun resp ->
+                            if resp.statusCode <> HttpStatusCode.OK then
+                                #if DEBUG
+                                System.Diagnostics.Trace.WriteLine($"getPictureOnlineUrl: Error {resp.statusCode}")
+                                #endif
+                                None
+                            else
+                                Some resp
+                        )
+                        |> Task.map (fun resp -> resp |> Option.map Response.toText)
+
+
+                    return html
+                        |> Option.bind parseFromPictureUrlInHtml
+                        |> Option.map (fun url -> $"{baseUrl}{url}")
+                with
+                | ex ->
+                    #if DEBUG
+                    System.Diagnostics.Trace.WriteLine($"getPictureOnlineUrl:  Error {ex.Message}")
+                    #endif
+                    return None
+
+
+
+        }
 
 
     module Downloader =
