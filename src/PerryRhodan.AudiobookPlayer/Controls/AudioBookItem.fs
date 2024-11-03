@@ -38,6 +38,7 @@ module AudioBookStore =
         }
 
         type Msg =
+            | ReloadAudiobooks
             | AudiobooksLoaded of AudioBookItemViewModel array
             | DeleteAudiobookFromDatabase of AudioBook
             | RemoveAudiobookFromDevice of AudioBook
@@ -58,6 +59,9 @@ module AudioBookStore =
 
         let update (msg:Msg) (state:State) =
             match msg with
+            | ReloadAudiobooks ->
+                state, SideEffect.LoadAudiobooks
+                
             | AudioBookChanged ->
                 state, SideEffect.None
 

@@ -94,6 +94,8 @@
                 <Button Command="{Binding ShowPrivacyPolicies}">Zeige Datenschutzerklärung</Button>
                 <Button Command="{Binding ShowFeedbackPage}">Sende Supportanfrage oder Feedback</Button>
                 <Button Command="{Binding SendMail}">Sende E-Mail</Button>
+                <Button Command="{Binding ShareZippedDatabase}">Exportiere Backup</Button>
+                <Button Command="{Binding ImportZippedDatabase}">Importiere Backup</Button>
             </StackPanel>
         </Grid>
         <Grid Grid.Row="3">

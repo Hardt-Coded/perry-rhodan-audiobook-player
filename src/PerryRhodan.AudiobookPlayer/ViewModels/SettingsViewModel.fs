@@ -1,19 +1,20 @@
 ﻿namespace PerryRhodan.AudiobookPlayer.ViewModels
 
 open System
+open System.IO
 open CherylUI.Controls
 open Dependencies
-open Global
 open Microsoft.Maui.ApplicationModel
+open Microsoft.Maui.ApplicationModel.DataTransfer
+open Microsoft.Maui.Devices
+open Microsoft.Maui.Storage
+open PerryRhodan.AudiobookPlayer.Common
 open PerryRhodan.AudiobookPlayer.Services
-open PerryRhodan.AudiobookPlayer.ViewModels.LoginPage
+open PerryRhodan.AudiobookPlayer.ViewModel
 open PerryRhodan.AudiobookPlayer.Views
 open ReactiveElmish.Avalonia
 open ReactiveElmish
 open Elmish.SideEffect
-open Services
-open Services.DependencyServices
-open Services.Helpers
 
 module SettingsPage =
 
@@ -56,7 +57,7 @@ module SettingsPage =
         | OpenFeedbackPage
         | KeyboardStateChanged
         | CloseDialog
-        
+
         | IsBusy of bool
 
 
@@ -87,7 +88,7 @@ module SettingsPage =
             ExternalAudioBookFileUrl = ""
             ExternalAudioBookName = ""
             FirstStart = false
-            IsBusy = false 
+            IsBusy = false
         }, SideEffect.Init
 
 
@@ -283,7 +284,7 @@ module SideEffects =
                             globalSettings.IsFirstStart <- state.FirstStart
                             return ()
                     }
-                    
+
                 dispatch <| IsBusy false
         }
 
@@ -299,12 +300,12 @@ type SettingsViewModel() =
         Program.mkAvaloniaProgrammWithSideEffect init update SideEffects.runSideEffects
         |> Program.mkStore
 
-    
+
     let feedBackView =
         let view = FeedbackView()
         view.DataContext <- new FeedbackViewModel()
         view
-    
+
 
     // option members from state
     member this.DataProtectionStuff
@@ -350,7 +351,7 @@ type SettingsViewModel() =
             for i in 0 .. 120 do
                 i, $"{i} Minuten"
         |]
-        
+
     member this.YesNorValues =
         [|
             false, "Nein"
@@ -362,26 +363,81 @@ type SettingsViewModel() =
         let uri = Uri("https://www.hardt-solutions.com/PrivacyPolicies/EinsAMedienAudioBookPlayer.html")
         Browser.Default.OpenAsync(uri, BrowserLaunchMode.SystemPreferred) |> ignore
 
-    
+
     member this.ShowFeedbackPage() =
         InteractiveContainer.ShowDialog(feedBackView, true)
-    
+
     member this.GoBackHome() =
         DependencyService.Get<IMainViewModel>().GotoHomePage()
-        
+
     member this.PackageName =
         $"Name: {DependencyService.Get<IPackageInformation>().Name()}"
-        
+
     member this.Version =
         $"Version: {DependencyService.Get<IPackageInformation>().GetVersion()}"
-        
+
     member this.Build =
         $"Build: {DependencyService.Get<IPackageInformation>().GetBuild()}"
-        
+
     member this.SendMail() =
         Launcher.OpenAsync(new Uri("mailto:info@hardt-solutions.de?subject=Eins A Medien Audioplayer"))
-        
-        
+
+
+    member this.ShareZippedDatabase() =
+        try
+            let stateFile = Services.Consts.createCurrentFolders().audioBooksStateDataFilePath
+            // zip file with ICSharpCode.SharpZipLib and share
+            let zipFile = System.IO.Path.Combine(Services.Consts.createCurrentFolders().audioBookDownloadFolderBase, $"{DateTime.Now:```yyyyMMddHHmm``}-einsamedien-backup.zip")
+            let zip = new ICSharpCode.SharpZipLib.Zip.FastZip()
+            zip.CreateZip(zipFile, stateFile.Replace("audiobooks.db",""), true, "audiobooks.db")
+            Share.RequestAsync(ShareFileRequest("Einsamedien Backup", ShareFile(zipFile, "application/zip")))
+            |> Task.tmap (fun () ->
+                System.IO.File.Delete(zipFile)
+            )
+            |> ignore
+        with
+        | ex ->
+            Global.telemetryClient.TrackException ex
+            Services.Notifications.showErrorMessage ex.Message |> ignore
+
+
+    member this.ImportZippedDatabase() =
+        let fileTypes =
+            [
+                (DevicePlatform.Android, ["*/*"] |> List.toSeq )
+            ] |> dict
+        FilePicker.PickMultipleAsync(PickOptions(PickerTitle="Backup auswählen", FileTypes = FilePickerFileType(fileTypes)))
+        |> Task.bind (fun files ->
+            task {
+            if files |> Seq.isEmpty then
+                return ()
+            else
+                let file = files |> Seq.head
+                let folder = Services.Consts.createCurrentFolders()
+                try
+                    if file.FullPath.EndsWith("audiobooks.db") then
+                        File.Move(file.FullPath, folder.audioBooksStateDataFilePath, true)
+                        AudioBookStore.globalAudiobookStore.Dispatch AudioBookStore.AudioBookElmish.ReloadAudiobooks
+                        do! Services.Notifications.showMessage "Erfolgreich" "Ihr Backup wurde erfolgreich importiert. Bitte App neustarten!"
+                        System.Environment.Exit(0)
+                    else
+                        let zip = new ICSharpCode.SharpZipLib.Zip.FastZip()
+                        zip.ExtractZip(file.FullPath, folder.audioBookDownloadFolderBase, "")
+                        let stateFile = System.IO.Path.Combine(folder.audioBookDownloadFolderBase, "audiobooks.db")
+                        if System.IO.File.Exists(stateFile) |> not then
+                            do! Services.Notifications.showErrorMessage "Fehler beim Importieren des Backups: Datei nicht gefunden."
+                        else
+                            File.Move(stateFile, folder.audioBooksStateDataFilePath, true)
+                            AudioBookStore.globalAudiobookStore.Dispatch AudioBookStore.AudioBookElmish.ReloadAudiobooks
+                            do! Services.Notifications.showMessage "Erfolgreich" "Ihr Backup wurde erfolgreich importiert. Bitte die App neustarten!"
+                            System.Environment.Exit(0)
+                with
+                | ex ->
+                    Global.telemetryClient.TrackException ex
+                    do! Services.Notifications.showErrorMessage $"Fehler beim Importieren des Backups: {ex.Message}"
+            }
+        )
+
 
 
     member this.DeveloperModeSwitchCounter = this.Bind(local, fun e -> e.DeveloperModeSwitchCounter)

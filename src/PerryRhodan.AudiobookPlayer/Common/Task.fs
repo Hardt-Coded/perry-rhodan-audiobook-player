@@ -15,7 +15,38 @@ module Task =
         if t.IsCanceled then Canceled
         else if t.IsFaulted then Faulted t.Exception
         else Completed t.Result
+        
+    let private (|TCanceled|TFaulted|TCompleted|) (t: Task) =
+        if t.IsCanceled then TCanceled
+        else if t.IsFaulted then TFaulted t.Exception
+        else TCompleted
 
+    
+    let tmap (f: unit -> 'U) (source: Task) : Task<'U> =
+        if source.Status = TaskStatus.RanToCompletion then
+            try Task.FromResult (f ())
+            with e ->
+                let tcs = TaskCompletionSource<'U> ()
+                tcs.SetException e
+                tcs.Task
+        else
+            let tcs = TaskCompletionSource<'U> ()
+            if source.Status = TaskStatus.Faulted then
+                tcs.SetException source.Exception.InnerExceptions
+                tcs.Task
+            elif source.Status = TaskStatus.Canceled then
+                tcs.SetCanceled ()
+                tcs.Task
+            else
+                let k = function
+                    | TCanceled    -> tcs.SetCanceled ()
+                    | TFaulted e   -> tcs.SetException e.InnerExceptions
+                    | TCompleted   ->
+                        try tcs.SetResult (f ())
+                        with e -> tcs.SetException e
+                source.ContinueWith k |> ignore
+                tcs.Task
+                
     /// <summary>Creates a task workflow from 'source' another, mapping its result with 'f'.</summary>
     let map (f: 'T -> 'U) (source: Task<'T>) : Task<'U> =
         if source.Status = TaskStatus.RanToCompletion then
