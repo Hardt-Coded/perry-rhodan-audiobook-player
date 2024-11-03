@@ -27,7 +27,7 @@ open Services.DependencyServices
 open Xamarin.Android.Net
 open PerryRhodan.AudiobookPlayer.Controls
 open Android.Graphics
-open Avalonia.Xaml.Interactivity
+
 
 
 
@@ -80,6 +80,8 @@ type ServiceConnection() =
 
 
 
+
+
 [<Activity(
     Label = "Eins A Medien Audiobook Player",
     Theme = "@style/MyTheme.NoActionBar",
@@ -93,6 +95,20 @@ type MainActivity() as self =
     inherit AvaloniaMainActivity<App>()
 
 
+    let copyDemoDatabaseToDbFolderWhenDev (packageInfo:PackageInfo) =
+        let pathes = Services.Consts.createCurrentFolders ()
+        let dbExists = System.IO.File.Exists(pathes.audioBooksStateDataFilePath)
+        if packageInfo.PackageName.EndsWith(".dev") && not dbExists then
+            let resourceName = "PerryRhodan.AudiobookPlayer.dev.audiobooks.db"
+            use dbFileStream = typeof<App>.Assembly.GetManifestResourceStream(resourceName)
+            use fileStream = System.IO.File.Create(pathes.audioBooksStateDataFilePath)
+            dbFileStream.CopyTo(fileStream)
+            ()
+        ()
+
+
+
+
     override _.CustomizeAppBuilder(builder) =
 
 
@@ -104,6 +120,9 @@ type MainActivity() as self =
         }
 
         let packageInfo = self.PackageManager.GetPackageInfo(self.PackageName, PackageInfoFlags.MetaData)
+
+        copyDemoDatabaseToDbFolderWhenDev packageInfo
+
         let packageInformation = {
             new IPackageInformation with
                 member this.GetVersion() =
@@ -144,7 +163,7 @@ type MainActivity() as self =
             // .With(vulkanOptions)
             .UseAndroid()
             .WithInterFont()
-            
+
             .UseReactiveUI()
 
 
@@ -184,6 +203,9 @@ type MainActivity() as self =
             Microsoft.AppCenter.Crashes.Crashes.TrackError(ex)
             Global.telemetryClient.TrackException ex
         ) |> ignore
+
+
+
 
 
     override _.OnDestroy() =

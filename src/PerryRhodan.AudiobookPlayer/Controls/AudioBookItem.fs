@@ -22,6 +22,7 @@ open System
 open AudioBookItem
 open Services.DependencyServices
 open SkiaSharp
+open PerryRhodan.AudiobookPlayer.Common
 
 
 
@@ -175,7 +176,7 @@ module AudioBookItem =
         | UpdateAudioBookPosition of position:TimeSpan
         | UpdateCurrentListenFilename of filename:string
         | UpdateCurrentAudioFileList of audioFiles:AudioBookAudioFilesInfo
-        | UpdateAudiobookPicture of picture:string
+        | UpdateAudiobookPicture of picture:string * thumbnail:string
         | UpdateDownloadPath of path:string option
         | SetAmbientColor of color:string
         | SendPauseCommandToAudioPlayer
@@ -206,7 +207,6 @@ module AudioBookItem =
         | MarkAsListend
         | SendPauseCommandToAudioPlayer
 
-        | UpdateAudiobookPicture
         | SaveAmbientColor
 
         | UpdateDatabase
@@ -367,9 +367,9 @@ module AudioBookItem =
         | SendPauseCommandToAudioPlayer ->
             { state with IsPlaying = false }, SideEffect.SendPauseCommandToAudioPlayer
 
-        | UpdateAudiobookPicture picture ->
-            let newAudioBook = { state.Audiobook with Picture = Some picture; Thumbnail = Some picture }
-            { state with Audiobook = newAudioBook }, SideEffect.UpdateAudiobookPicture
+        | UpdateAudiobookPicture (picture, thumbnail) ->
+            let newAudioBook = { state.Audiobook with Picture = Some picture; Thumbnail = Some thumbnail }
+            { state with Audiobook = newAudioBook }, SideEffect.UpdateDatabase
         | UpdateDownloadPath path ->
             { state with
                 DownloadState = if path.IsSome then Downloaded else NotDownloaded
@@ -385,7 +385,7 @@ module AudioBookItem =
     module SideEffects =
 
         [<AutoOpen>]
-        module private Helpers =
+        module Helpers =
 
             let openLoginForm () =
                 Dispatcher.UIThread.Invoke<unit> (fun _ ->
@@ -485,6 +485,9 @@ module AudioBookItem =
                 }
 
 
+            
+            
+            
             let getBitmapFromUrl (url: string) =
                 task {
                     try
@@ -501,58 +504,73 @@ module AudioBookItem =
                         #endif
                         return None
                 }
+                
+            let getAmbientColorFromSkBitmap (bitmap:SKBitmap) =
+                let bitmap = bitmap.Resize(SkiaSharp.SKImageInfo(5,5, SKColorType.Rgb888x), SKSamplingOptions(SKFilterMode.Nearest))
+                let getHue (x,_,_) = x
+                let hues =
+                    [
+                        bitmap.GetPixel(0,1).ToHsv() |> getHue
+                        bitmap.GetPixel(0,2).ToHsv() |> getHue
+                        bitmap.GetPixel(0,3).ToHsv() |> getHue
+                        bitmap.GetPixel(0,4).ToHsv() |> getHue
+                        bitmap.GetPixel(1,4).ToHsv() |> getHue
+                        bitmap.GetPixel(2,4).ToHsv() |> getHue
+                        bitmap.GetPixel(3,4).ToHsv() |> getHue
+                        bitmap.GetPixel(4,4).ToHsv() |> getHue
+                        bitmap.GetPixel(4,3).ToHsv() |> getHue
+                        bitmap.GetPixel(4,2).ToHsv() |> getHue
+                        bitmap.GetPixel(4,1).ToHsv() |> getHue
+                        bitmap.GetPixel(4,0).ToHsv() |> getHue
+                        bitmap.GetPixel(3,0).ToHsv() |> getHue
+                        bitmap.GetPixel(2,0).ToHsv() |> getHue
+                        bitmap.GetPixel(3,3).ToHsv() |> getHue
+                    ]
+
+                let avgeHue = hues |> List.average
+                let aboveAvg = hues |> List.filter (fun x -> x > avgeHue)
+                let belowAvg = hues |> List.filter (fun x -> x < avgeHue)
+                let avgHue =
+                    if aboveAvg.Length > belowAvg.Length then
+                        aboveAvg |> List.average
+                    else
+                        belowAvg |> List.average
+
+                let avgHueColor = SkiaSharp.SKColor.FromHsv(avgHue, 100.0f, 50.0f)
+                avgHueColor.ToString()                
 
 
-            let getAmbientColorFromPicture (picture:string) =
+            let getAmbientColorFromPicUrl (url:string) =
                 task {
-                    let! bitmap =
-                        task {
-                            if picture.StartsWith("http") then
-                                return! getBitmapFromUrl picture
-                             else
-                                return SkiaSharp.SKBitmap.Decode picture |> Option.ofObj
-                        }
-                    match bitmap with
-                    | None ->
-                        return "#ff483d8b"
-                    | Some bitmap ->
-                        let bitmap = bitmap.Resize(SkiaSharp.SKImageInfo(5,5, SKColorType.Rgb888x), SKSamplingOptions(SKFilterMode.Nearest))
-                        let getHue (x,_,_) = x
-                        let hues =
-                            [
-                                bitmap.GetPixel(0,1).ToHsv() |> getHue
-                                bitmap.GetPixel(0,2).ToHsv() |> getHue
-                                bitmap.GetPixel(0,3).ToHsv() |> getHue
-                                bitmap.GetPixel(0,4).ToHsv() |> getHue
-                                bitmap.GetPixel(1,4).ToHsv() |> getHue
-                                bitmap.GetPixel(2,4).ToHsv() |> getHue
-                                bitmap.GetPixel(3,4).ToHsv() |> getHue
-                                bitmap.GetPixel(4,4).ToHsv() |> getHue
-                                bitmap.GetPixel(4,3).ToHsv() |> getHue
-                                bitmap.GetPixel(4,2).ToHsv() |> getHue
-                                bitmap.GetPixel(4,1).ToHsv() |> getHue
-                                bitmap.GetPixel(4,0).ToHsv() |> getHue
-                                bitmap.GetPixel(3,0).ToHsv() |> getHue
-                                bitmap.GetPixel(2,0).ToHsv() |> getHue
-                                bitmap.GetPixel(3,3).ToHsv() |> getHue
-                            ]
-
-                        let avgeHue = hues |> List.average
-                        let aboveAvg = hues |> List.filter (fun x -> x > avgeHue)
-                        let belowAvg = hues |> List.filter (fun x -> x < avgeHue)
-                        let avgHue =
-                            if aboveAvg.Length > belowAvg.Length then
-                                aboveAvg |> List.average
-                            else
-                                belowAvg |> List.average
-
-
-
-                            //|> List.average
-
-                        let avgHueColor = SkiaSharp.SKColor.FromHsv(avgHue, 100.0f, 50.0f)
-                        return avgHueColor.ToString()
+                    try
+                        return!
+                            getBitmapFromUrl url
+                            |> Task.map (
+                                fun t -> t |> Option.map (getAmbientColorFromSkBitmap)
+                            )
+                    with
+                    | ex ->
+                        Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
+                        Global.telemetryClient.TrackException ex
+                        return None
+                    
                 }
+            
+            let getAmbientColorFromPicFile (picture:string) =
+                try
+                    SkiaSharp.SKBitmap.Decode picture
+                    |> Option.ofObj
+                    |> Option.map getAmbientColorFromSkBitmap
+                with
+                | ex ->
+                    Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
+                    Global.telemetryClient.TrackException ex
+                    None
+                
+                
+            
+            
+            
 
 
         let runSideEffects (sideEffect:SideEffect) (state:State) (dispatch:Msg -> unit) =
@@ -570,13 +588,6 @@ module AudioBookItem =
                                     return ()
 
                                 | SideEffect.Init ->
-                                    match state.Audiobook.Picture, state.Audiobook.AmbientColor with
-                                    | Some picture, None ->
-                                        let! color = getAmbientColorFromPicture picture
-                                        dispatch <| SetAmbientColor color
-                                    | _ ->
-                                        ()
-
                                     let! fileInfoList =
                                         DataBase.getAudioBookFileInfo state.Audiobook.Id
 
@@ -655,22 +666,15 @@ module AudioBookItem =
                                     do! updateDatabase state.Audiobook
                                     return ()
 
-                                | SideEffect.UpdateAudiobookPicture ->
-                                    match state.Audiobook.Picture with
-                                    | Some picture ->
-                                        let! color = getAmbientColorFromPicture picture
-                                        dispatch <| SetAmbientColor color
-                                    | None ->
-                                        ()
-                                    return ()
-
+                                
                                 | SideEffect.DownloadCompleted ->
                                     do! updateDatabase state.Audiobook
                                     // refresh ambient color
                                     match state.Audiobook.Picture with
                                     | Some picture ->
-                                        let! color = getAmbientColorFromPicture picture
-                                        dispatch <| SetAmbientColor color
+                                        if  picture.StartsWith("http") |> not then
+                                            getAmbientColorFromPicFile picture
+                                            |> Option.iter (fun color -> dispatch <| SetAmbientColor color)
                                     | None ->
                                         ()
                                     // update the audio file list, to trigger update of other views
@@ -906,7 +910,8 @@ type AudioBookItemViewModel(audiobook: AudioBook) as self =
     member this.ToggleIsPlaying pstate      = local.Dispatch (ToggleIsPlaying pstate)
     member this.PauseAudiobook()            = local.Dispatch SendPauseCommandToAudioPlayer
 
-    member this.SetPicture picture          = local.Dispatch <| UpdateAudiobookPicture picture
+    member this.SetPicture picture thumb    = local.Dispatch <| UpdateAudiobookPicture (picture, thumb)
+    member this.SetAmbientColor color       = local.Dispatch <| SetAmbientColor color
     member this.SetDownloadPath path        = local.Dispatch <| UpdateDownloadPath path
 
     member this.StartDownloadVisible                = this.BindOnChanged(local, _.DownloadState, fun s -> s.DownloadState = NotDownloaded)

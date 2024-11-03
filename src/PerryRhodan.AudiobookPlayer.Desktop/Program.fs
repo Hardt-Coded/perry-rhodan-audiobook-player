@@ -6,11 +6,12 @@ open Avalonia.ReactiveUI
 open Dependencies
 open Microsoft.Extensions.DependencyInjection
 open PerryRhodan.AudiobookPlayer
+open PerryRhodan.AudiobookPlayer.Services.Interfaces
 open Services
 
 
 type ScreenService() =
-    interface DependencyServices.IScreenService with
+    interface IScreenService with
         member this.GetScreenSize() = 
             {| Width = 500; Height = 600; ScaledDensity = 1.0 |}
 
@@ -19,7 +20,7 @@ type ScreenService() =
 
 type HttpMessageHandlerService() =
     let myHttpMessageHandler = new HttpClientHandler()
-    interface DependencyServices.IAndroidHttpMessageHandlerService with
+    interface IAndroidHttpMessageHandlerService with
         member this.GetHttpMesageHandler () =
             myHttpMessageHandler
 
@@ -49,9 +50,9 @@ module Program =
     let main argv =
         
         DependencyService.ServiceCollection
-            .AddSingleton<DependencyServices.IScreenService, ScreenService>()
-            .AddSingleton<DependencyServices.IAndroidHttpMessageHandlerService, HttpMessageHandlerService>()
-            .AddSingleton<DependencyServices.INavigationService, DependencyServices.NavigationService>()
+            .AddSingleton<IScreenService, ScreenService>()
+            .AddSingleton<IAndroidHttpMessageHandlerService, HttpMessageHandlerService>()
+            .AddSingleton<INavigationService, DependencyServices.NavigationService>()
             |> ignore
             
         

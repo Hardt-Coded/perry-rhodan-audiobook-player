@@ -47,11 +47,11 @@
               RowDefinitions="*,Auto">
 
 
-            <Border CornerRadius="15" Margin="0,3,0,0" Padding="1" ClipToBounds="True" Background="Transparent">
+            <Border CornerRadius="15" Padding="1" ClipToBounds="True" Background="Transparent">
                 <Grid Grid.Column="0" Margin="0" Background="Transparent">
-
-                    <asyncImageLoader:AdvancedImage Source="{Binding Thumbnail, FallbackValue={x:Static viewModel:FallbackImage.fallbackImage}}">
-
+                    <asyncImageLoader:AdvancedImage Source="{Binding Thumbnail, FallbackValue={x:Static viewModel:FallbackImage.fallbackImage}}"
+                                                    Margin="-6,5,0,0"
+                                                    CornerRadius="5">
                     </asyncImageLoader:AdvancedImage>
 
                     <Grid RowDefinitions="*" ColumnDefinitions="*"  HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,5,0">
@@ -77,7 +77,7 @@
                     <avalonia:MaterialIcon
                         HorizontalAlignment="Left"
                         VerticalAlignment="Bottom"
-                        Margin="10,0,0,2"
+                        Margin="7,0,0,2"
                         Width="20"
                         Height="20"
                         Kind="CheckCircle"

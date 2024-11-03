@@ -15,4 +15,5 @@
     <assembly fullname="FSharp.Control.AsyncSeq" />
     <assembly fullname="FSharpx.Async" />
     <assembly fullname="LiteDB" />
+    <assembly fullname="LiteDB.FSharp" />
 </linker>

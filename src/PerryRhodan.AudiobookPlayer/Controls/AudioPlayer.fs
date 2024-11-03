@@ -186,36 +186,39 @@ module PlayerElmish =
 
 
         let recalcFileAndPos filename pos mp3List =
-            let index = mp3List |> getIndexForFile filename
+            if mp3List = [] then
+                filename, pos
+            else
+                let index = mp3List |> getIndexForFile filename
 
-            let rec getFileAndPos filename (pos: TimeSpan) =
-                if pos >= TimeSpan.Zero then
-                    let _, currentDuration = mp3List |> getFileFromIndex index
+                let rec getFileAndPos filename (pos: TimeSpan) =
+                    if pos >= TimeSpan.Zero then
+                        let _, currentDuration = mp3List |> getFileFromIndex index
 
-                    if pos > currentDuration then
-                        // try next track
-                        let newFileName, durationNextTrack = mp3List |> getFileFromIndex (index + 1)
+                        if pos > currentDuration then
+                            // try next track
+                            let newFileName, durationNextTrack = mp3List |> getFileFromIndex (index + 1)
 
-                        if filename = newFileName then
-                            // we are at the end of the audio book
-                            filename, durationNextTrack
+                            if filename = newFileName then
+                                // we are at the end of the audio book
+                                filename, durationNextTrack
+                            else
+                                let newPos = pos - durationNextTrack
+                                getFileAndPos newFileName newPos
                         else
-                            let newPos = pos - durationNextTrack
+                            // this is the one
+                            filename, pos
+                    else
+
+                        let newFileName, durationPrevTrack = mp3List |> getFileFromIndex (index - 1)
+                        // we are on the first track
+                        if (filename = newFileName) then
+                            filename, TimeSpan.Zero
+                        else
+                            let newPos = pos + durationPrevTrack
                             getFileAndPos newFileName newPos
-                    else
-                        // this is the one
-                        filename, pos
-                else
 
-                    let newFileName, durationPrevTrack = mp3List |> getFileFromIndex (index - 1)
-                    // we are on the first track
-                    if (filename = newFileName) then
-                        filename, TimeSpan.Zero
-                    else
-                        let newPos = pos + durationPrevTrack
-                        getFileAndPos newFileName newPos
-
-            getFileAndPos filename pos
+                getFileAndPos filename pos
 
 
         let sideEffectOnlyWhenPlaying state sideEffect =

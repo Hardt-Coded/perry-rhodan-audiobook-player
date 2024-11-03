@@ -22,7 +22,6 @@ module Program =
                             // log
                             Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
                             Global.telemetryClient.TrackException ex
-                            raise ex
                             return ()
 
                     } |> Async.StartImmediate
