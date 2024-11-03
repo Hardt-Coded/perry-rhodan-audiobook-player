@@ -206,6 +206,9 @@ let runSideEffect sideEffect state dispatch =
 
 open Elmish.SideEffect
 
+DependencyService.ServiceCollection.AddSingleton<GlobalSettingsService>(GlobalSettingsService()) |> ignore
+DependencyService.SetComplete()
+
 let app =
     Program.mkAvaloniaProgrammWithSideEffect init update runSideEffect
     |> Program.withErrorHandler (fun (_, ex) ->

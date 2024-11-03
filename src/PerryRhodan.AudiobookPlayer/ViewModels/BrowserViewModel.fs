@@ -219,6 +219,7 @@ module BrowserPage =
                             Ok {| OnDevice = audioBooksAlreadyOnTheDevice; InCloud = cloudAudioBooks |}
 
 
+                
                 let processLoadedAudioBookFromDevice
                     (input:Result<{| OnDevice: AudioBook []; InCloud:AudioBook[] |},SynchronizeWithCloudErrors>) =
                      task {
@@ -273,8 +274,29 @@ module BrowserPage =
                                 // ignore these, who has no download folder
                                 | None -> false
                             )
-                            |> Array.iter (fun i -> i.SetDownloadPath None)
+                            |> Array.iter (fun i ->
+                                i.SetDownloadPath None
+                                // also remove orphand pictures
+                                i.SetPicture None None
+                            )
                             
+                            Ok {| New = e.New; OnDevice = e.OnDevice; InCloud = e.InCloud |}
+                            
+                let removeOrphanPictures 
+                    (input:Result<{| New: AudioBookItemViewModel[]; OnDevice: AudioBookItemViewModel []; InCloud:AudioBook[] |},SynchronizeWithCloudErrors>) =
+                        match input with
+                        | Error e -> Error e
+                        | Ok e ->
+                            dispatch <| AppendBusyMessage "Entferne verwaiste Bilder..."
+                            e.OnDevice
+                            |> Array.filter (_.AudioBook.Picture.IsSome)
+                            |> Array.iter (fun i ->
+                                i.AudioBook.Picture
+                                |> Option.iter (fun p ->
+                                    if not <| System.IO.File.Exists(p) then
+                                        i.SetPicture None None
+                                )
+                            )
                             Ok {| New = e.New; OnDevice = e.OnDevice; InCloud = e.InCloud |}
                     
                 
@@ -443,7 +465,9 @@ module BrowserPage =
                         match input with
                         | Ok e ->
                             dispatch <| AppendBusyMessage "Fertig!"
-                            let audioBooks =(Array.concat [e.New;e.OnDevice])
+                            let audioBooks =
+                                (Array.concat [e.New;e.OnDevice])
+                                |> Array.sortBy (_.AudioBook.FullName)
                             // also sync with global store
                             AudioBookStore.globalAudiobookStore.Dispatch <| AudioBookStore.AudioBookElmish.AudiobooksLoaded audioBooks
                             dispatch <| AudioBookItemsChanged audioBooks
@@ -485,6 +509,7 @@ module BrowserPage =
                         |> Task.bind processLoadedAudioBookFromDevice
                         |> Task.map (determinateNewAddedAudioBooks AudioBookStore.globalAudiobookStore.Model.Audiobooks)
                         |> Task.map  checkIfCurrentAudiobookAreReallyDownloaded
+                        |> Task.map  removeOrphanPictures
                         |> Task.bind processNewAddedAudioBooks
                         |> Task.bind repairAudiobookMetadataIfNeeded
                         |> Task.map  fixDownloadFolders

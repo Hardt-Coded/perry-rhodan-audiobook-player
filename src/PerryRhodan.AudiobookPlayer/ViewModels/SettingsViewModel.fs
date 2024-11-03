@@ -369,6 +369,9 @@ type SettingsViewModel() =
     member this.GoBackHome() =
         DependencyService.Get<IMainViewModel>().GotoHomePage()
         
+    member this.PackageName =
+        $"Name: {DependencyService.Get<IPackageInformation>().Name()}"
+        
     member this.Version =
         $"Version: {DependencyService.Get<IPackageInformation>().GetVersion()}"
         

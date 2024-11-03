@@ -87,14 +87,14 @@
                 
                 
                 
-                <!--<Button Command="{Binding ShowMetaData}" >
+                <Button Command="{Binding ShowMetaData}" >
                     <StackPanel Orientation="Horizontal">
                         <avalonia:MaterialIcon Kind="Database" />
                         <Label>Metadata</Label>
                     </StackPanel>
                 </Button>
                 
-                <Button Command="{Binding ToggleAmbientColor}" >
+                <!--<Button Command="{Binding ToggleAmbientColor}" >
                     <StackPanel Orientation="Horizontal">
                         <avalonia:MaterialIcon Kind="Database" />
                         <Label>Random Ambient Color</Label>

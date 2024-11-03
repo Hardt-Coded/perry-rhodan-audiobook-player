@@ -1030,7 +1030,7 @@ module WebAccess =
 
                 //use thumbInputStream = File.OpenRead()
                 use orig = SKBitmap.Decode(imageFullName)
-                use thumb = orig.Resize(SKImageInfo(200, 200), SKSamplingOptions(SKFilterMode.Linear, SKMipmapMode.Linear))
+                use thumb = orig.Resize(SKImageInfo(100, 100), SKSamplingOptions(SKFilterMode.Linear, SKMipmapMode.Linear))
                 if isNull thumb then
                     ()
                 else

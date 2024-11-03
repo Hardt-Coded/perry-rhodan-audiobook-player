@@ -176,7 +176,7 @@ module AudioBookItem =
         | UpdateAudioBookPosition of position:TimeSpan
         | UpdateCurrentListenFilename of filename:string
         | UpdateCurrentAudioFileList of audioFiles:AudioBookAudioFilesInfo
-        | UpdateAudiobookPicture of picture:string * thumbnail:string
+        | UpdateAudiobookPicture of picture:string option * thumbnail:string option
         | UpdateDownloadPath of path:string option
         | SetAmbientColor of color:string
         | SendPauseCommandToAudioPlayer
@@ -368,7 +368,7 @@ module AudioBookItem =
             { state with IsPlaying = false }, SideEffect.SendPauseCommandToAudioPlayer
 
         | UpdateAudiobookPicture (picture, thumbnail) ->
-            let newAudioBook = { state.Audiobook with Picture = Some picture; Thumbnail = Some thumbnail }
+            let newAudioBook = { state.Audiobook with Picture = picture; Thumbnail = thumbnail }
             { state with Audiobook = newAudioBook }, SideEffect.UpdateDatabase
         | UpdateDownloadPath path ->
             { state with
@@ -494,7 +494,8 @@ module AudioBookItem =
                         use client = new HttpClient()
                         let! imageData = client.GetByteArrayAsync(url)
                         use stream = new MemoryStream(imageData)
-                        return SKBitmap.Decode(stream) |> Some
+                        let bitmap = SKBitmap.Decode(stream)
+                        return if bitmap = null || bitmap.IsEmpty || bitmap.IsNull then None else Some bitmap
                     with
                     | ex ->
                         Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
@@ -592,6 +593,18 @@ module AudioBookItem =
                                         DataBase.getAudioBookFileInfo state.Audiobook.Id
 
                                     fileInfoList |> Option.iter (fun list -> dispatch <| UpdateCurrentAudioFileList list)
+                                    
+                                    match state.Audiobook.Picture, state.Audiobook.AmbientColor with
+                                    | Some pic, None ->
+                                        if pic.StartsWith("http") then
+                                            do! getAmbientColorFromPicUrl pic
+                                                |> Task.map (fun t -> t |> Option.iter (fun color -> dispatch <| SetAmbientColor color))
+                                        else
+                                            getAmbientColorFromPicFile pic
+                                            |> Option.iter (fun color -> dispatch <| SetAmbientColor color)
+                                    | _ ->
+                                        ()
+                                    
                                     dispatch Initialized
                                     return ()
 

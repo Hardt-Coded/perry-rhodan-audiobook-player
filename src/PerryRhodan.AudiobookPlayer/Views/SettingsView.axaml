@@ -98,6 +98,7 @@
         </Grid>
         <Grid Grid.Row="3">
             <StackPanel Orientation="Vertical" VerticalAlignment="Bottom">
+                <TextBlock Text="{Binding PackageName}" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
                 <TextBlock Text="{Binding Version}" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
                 <TextBlock Text="{Binding Build}" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
             </StackPanel>

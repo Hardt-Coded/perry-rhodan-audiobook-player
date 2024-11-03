@@ -36,6 +36,7 @@ type IBitmapConverter =
     abstract member GetBitmap:string->obj
     
 type IPackageInformation =
+    abstract member Name:unit->string
     abstract member GetVersion:unit->string
     abstract member GetBuild:unit->string
 

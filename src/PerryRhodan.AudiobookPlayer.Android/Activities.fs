@@ -125,6 +125,8 @@ type MainActivity() as self =
 
         let packageInformation = {
             new IPackageInformation with
+                member this.Name() =
+                    packageInfo.PackageName
                 member this.GetVersion() =
                     packageInfo.VersionName
                 member this.GetBuild() =
@@ -143,7 +145,6 @@ type MainActivity() as self =
             .AddSingleton<INotificationService, NotificationService.NotificationService>()
             .AddTransient<ILoginViewModel, LoginViewModel>()
             .AddSingleton<IActionMenuService, ActionMenuService>()
-            .AddSingleton<GlobalSettingsService>(GlobalSettingsService())
             .AddSingleton<IBitmapConverter>(bitmapConverter)
             .AddSingleton<IPackageInformation>(packageInformation)
             |> ignore
