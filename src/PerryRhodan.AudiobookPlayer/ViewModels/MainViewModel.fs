@@ -3,6 +3,7 @@
 open Avalonia.Media
 open Dependencies
 open PerryRhodan.AudiobookPlayer
+open PerryRhodan.AudiobookPlayer.Services.Interfaces
 open PerryRhodan.AudiobookPlayer.ViewModel
 open PerryRhodan.AudiobookPlayer.Views
 open ReactiveElmish

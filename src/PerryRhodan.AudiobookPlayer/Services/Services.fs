@@ -19,6 +19,7 @@ open ICSharpCode.SharpZipLib.Zip
 open Common
 open FsHttp
 open PerryRhodan.AudiobookPlayer.Notification.ViewModels
+open PerryRhodan.AudiobookPlayer.Services.Interfaces
 open SkiaSharp
 open Dependencies
 open PerryRhodan.AudiobookPlayer.Common
@@ -31,39 +32,6 @@ type FileInfoConnectionString = | FileInfoConnectionString of string
 
 
 module DependencyServices =
-
-
-    type IAndroidDownloadFolder =
-        abstract member GetAndroidDownloadFolder:unit -> string
-
-    type INotificationService =
-        abstract ShowMessage : string->string -> unit
-
-    type IDownloadService =
-        abstract member StartDownload: unit -> unit
-
-    type IAndroidHttpMessageHandlerService =
-        abstract member GetHttpMesageHandler: unit -> HttpMessageHandler
-        abstract member GetCookieContainer: unit -> CookieContainer
-        abstract member SetAutoRedirect: bool -> unit
-
-    type ICloseApplication =
-        abstract member CloseApplication: unit -> unit
-
-    type IScreenService =
-        abstract member GetScreenSize: unit -> {| Width:int; Height:int; ScaledDensity: float |}
-
-    type INavigationService =
-        // abstract property
-        abstract BackbuttonPressedAction:(unit->unit) option with get
-
-        abstract member RegisterBackbuttonPressed: (unit -> unit) -> unit
-        /// resets the back button callback to none
-        abstract member ResetBackbuttonPressed: unit -> unit
-        /// resets the back button callback to none, but memorize the current callback
-        abstract member MemorizeBackbuttonCallback: memoId:string -> unit
-        /// restores the back button callback from the memorized callback, the current one will overwritten
-        abstract member RestoreBackbuttonCallback: memoId:string -> unit
 
 
     type NavigationService() =
@@ -165,7 +133,7 @@ module Consts =
 
 module Notifications =
 
-    let private notificationService = lazy DependencyService.Get<DependencyServices.INotificationService>()
+    let private notificationService = lazy DependencyService.Get<INotificationService>()
 
     let showNotification title message =
         let ns = notificationService.Force()
@@ -668,7 +636,7 @@ module DataBase =
 
 
 
-    let removeAudiobook audiobook =
+    let removeAudiobook (audiobook:AudioBook) =
         task {
             try
                 match audiobook.State.DownloadedFolder with
@@ -758,7 +726,7 @@ module WebAccess =
     open Microsoft.AppCenter.Analytics
 
 
-    let httpHandlerService = lazy DependencyService.Get<DependencyServices.IAndroidHttpMessageHandlerService>()
+    let httpHandlerService = lazy DependencyService.Get<IAndroidHttpMessageHandlerService>()
     let currentHttpClientHandler = lazy httpHandlerService.Force().GetHttpMesageHandler()
     let currentCookieContainer = lazy httpHandlerService.Force().GetCookieContainer()
     let httpClient = lazy (new HttpClient(currentHttpClientHandler.Force()))
@@ -1086,7 +1054,7 @@ module WebAccess =
         }
 
 
-        let downloadAudiobook cookies updateProgress audiobook =
+        let downloadAudiobook cookies updateProgress (audiobook:AudioBook) =
             task {
                 try
                     Analytics.TrackEvent("download audiobook")
@@ -1611,7 +1579,7 @@ module DownloadService =
 
     let private downloadServiceCallback =
         lazy MailboxProcessor<Msg>.Start(
-                 let downloadService = DependencyService.Get<DependencyServices.IDownloadService>()
+                 let downloadService = DependencyService.Get<IDownloadService>()
 
                  fun inbox ->
                     let rec loop (state:HandlerState) =

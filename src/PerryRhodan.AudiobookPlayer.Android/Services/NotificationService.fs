@@ -1,5 +1,7 @@
 ﻿namespace PerryRhodan.AudiobookPlayer.Android
 
+open PerryRhodan.AudiobookPlayer.Services.Interfaces
+
 module NotificationService =
     open AndroidX.AppCompat.App
     open Android.App

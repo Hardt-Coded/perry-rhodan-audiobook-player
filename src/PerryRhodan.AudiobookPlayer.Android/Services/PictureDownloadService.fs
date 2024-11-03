@@ -1,4 +1,4 @@
-﻿module DownloadServiceImplementation
+﻿module PictureDownloadServiceImplementation
 
     open AndroidX.AppCompat.App
     
@@ -6,6 +6,7 @@
     open Android.OS
     open Android.Content
     open PerryRhodan.AudiobookPlayer.Services.Interfaces
+    open PerryRhodan.AudiobookPlayer.ViewModel
     open _Microsoft.Android.Resource.Designer
 
     [<AutoOpen>]
@@ -25,8 +26,8 @@
 
     module private AndroidService =
 
-        [<Service(Exported=true,Name="perry.rhodan.audioplayer.downloadservice.bla0815",ForegroundServiceType=PM.ForegroundService.TypeDataSync)>]
-        type DownloadService() as self =
+        [<Service(Exported=true,Name="perry.rhodan.audioplayer.picdownloadservice",ForegroundServiceType=PM.ForegroundService.TypeDataSync)>]
+        type PictureDownloadService() as self =
 
             inherit Service() with
 
@@ -109,19 +110,23 @@
                         this.StartForeground(downloadServiceNotificationId, buildNotification "Download" "Starte Download!", PM.ForegroundService.TypeDataSync)
                     with
                     | ex ->
+                        Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
+                        Global.telemetryClient.TrackException ex
                         reraise()
                 
                 
                 
                 override this.OnStartCommand (_,_,_) =
                     try
-                        let serviceListener = Services.DownloadService.External.downloadServiceListener downloadServiceMailbox
-
-                        serviceListener |> Services.DownloadService.registerServiceListener 
-
+                        let notification = updateNotification "Download"
+                        let audioBooks = AudioBookStore.globalAudiobookStore.Model.Audiobooks
+                        PerryRhodan.AudiobookPlayer.Services.PictureDownloadService(notification, shutDownService)
+                            .StartDownloadPictures(audioBooks) |> ignore
                         StartCommandResult.Sticky
                     with
                     | ex ->
+                        Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
+                        Global.telemetryClient.TrackException ex
                         reraise()
 
 
@@ -129,8 +134,8 @@
         
         open AndroidCommon.ServiceHelpers
 
-        type DownloadService () =
-            interface IDownloadService with
+        type PictureAndroidDownloadService () =
+            interface IPictureDownloadService with
 
                 override this.StartDownload () =
-                    Application.Context.StartForeGroundService<AndroidService.DownloadService>()
+                    Application.Context.StartForeGroundService<AndroidService.PictureDownloadService>()

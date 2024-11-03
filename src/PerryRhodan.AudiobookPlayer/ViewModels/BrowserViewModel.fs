@@ -7,6 +7,7 @@ open CherylUI.Controls
 open Common
 open Dependencies
 open Domain
+open PerryRhodan.AudiobookPlayer.Services.Interfaces
 open PerryRhodan.AudiobookPlayer.ViewModel
 open PerryRhodan.AudiobookPlayer.ViewModel.AudioBookItem
 open Services
@@ -202,7 +203,7 @@ module BrowserPage =
 
 
 
-                let loadAudioBooksFromDevice
+                let lookForOrphanedAudiobookOnDevice
                     (modelAudioBooks:AudioBookItemViewModel[])
                     (loadFromCloud:Result<AudioBook[],SynchronizeWithCloudErrors>) =
                         match loadFromCloud with
@@ -223,9 +224,9 @@ module BrowserPage =
                      task {
                          match input with
                          | Error e -> return Error e
-                         | Ok i ->
-                             let! _ = i.OnDevice |> DataBase.insertNewAudioBooksInStateFile
-                             return {| OnDevice = i.OnDevice; InCloud = i.InCloud |} |> Ok
+                         | Ok e ->
+                             let! _ = e.OnDevice |> DataBase.insertNewAudioBooksInStateFile
+                             return {| OnDevice = e.OnDevice; InCloud = e.InCloud |} |> Ok
                      }
 
 
@@ -234,18 +235,49 @@ module BrowserPage =
                     (input:Result<{| OnDevice: AudioBook []; InCloud:AudioBook[] |},SynchronizeWithCloudErrors>) =
                     match input with
                     | Error e -> Error e
-                    | Ok i ->
+                    | Ok e ->
                          dispatch <| AppendBusyMessage "Ermittle neue Hörbücher..."
-                         let audioBooksAlreadyOnTheDevice = i.OnDevice |> Array.map (fun i -> new AudioBookItemViewModel(i))
+                         let audioBooksAlreadyOnTheDevice = e.OnDevice |> Array.map (fun i -> new AudioBookItemViewModel(i))
                          let modelAndDeviceAudiobooks = Array.concat [audioBooksAlreadyOnTheDevice; modelAudioBooks]
                          let newAudioBookItems =
                              let currentAudioBooks = modelAndDeviceAudiobooks |> Array.map (_.AudioBook)
-                             filterNewAudioBooks currentAudioBooks i.InCloud
+                             filterNewAudioBooks currentAudioBooks e.InCloud
                              |> Array.map (fun i -> new AudioBookItemViewModel(i))
-                         Ok {| New = newAudioBookItems; OnDevice = modelAndDeviceAudiobooks; InCloud = i.InCloud |}
+                         Ok {| New = newAudioBookItems; OnDevice = modelAndDeviceAudiobooks; InCloud = e.InCloud |}
 
 
+                let checkIfCurrentAudiobookAreReallyDownloaded 
+                    (input:Result<{| New: AudioBookItemViewModel[]; OnDevice: AudioBookItemViewModel []; InCloud:AudioBook[] |},SynchronizeWithCloudErrors>) =
+                        match input with
+                        | Error e -> Error e
+                        | Ok e ->
+                            dispatch <| AppendBusyMessage "Prüfe ob alle Hörbücher wirklich heruntergeladen sind..."
+                            let audioBooks =
+                                e.OnDevice
+                                |> Array.filter (fun i -> i.DownloadState = AudioBookItem.Downloaded)
+                                
 
+                            // check on the file system if the audio books are really downloaded
+                            audioBooks
+                            |> Array.filter (fun i ->
+                                let folder = i.AudioBook.State.DownloadedFolder
+                                match folder with
+                                | Some f ->
+                                    System.IO.Directory.Exists(f)
+                                    |> fun folderExists ->
+                                        if folderExists then
+                                            let audioFiles = System.IO.Directory.GetFiles(f, "*.mp3")
+                                            audioFiles.Length = 0
+                                        else
+                                            true
+                                // ignore these, who has no download folder
+                                | None -> false
+                            )
+                            |> Array.iter (fun i -> i.SetDownloadPath None)
+                            
+                            Ok {| New = e.New; OnDevice = e.OnDevice; InCloud = e.InCloud |}
+                    
+                
                 let processNewAddedAudioBooks
                     (input:Result<{| New: AudioBookItemViewModel[]; OnDevice: AudioBookItemViewModel []; InCloud:AudioBook[] |},SynchronizeWithCloudErrors>) =
                         task {
@@ -403,68 +435,6 @@ module BrowserPage =
 
 
 
-                let addOnlineUrlForPictureForAllWhichHasNone
-                    (input:Result<{| New: AudioBookItemViewModel[]; OnDevice: AudioBookItemViewModel [] |},SynchronizeWithCloudErrors>) =
-                    task {
-                        match input with
-                        | Error e ->
-                            return Error e
-                        | Ok e ->
-                            dispatch <| AppendBusyMessage "Füge den Hörbüchern die Haupbildadresse hinzu..."
-                            // split audiobook in 5 packages
-                            let chunks =
-                                Array.concat [e.OnDevice;e.New]
-                                |> Array.filter (fun i -> i.AudioBook.Picture.IsNone)
-                                |> Array.chunkBySize 9
-
-
-                            let runChunk (chunk:AudioBookItemViewModel array) =
-                                task {
-                                    let! audioBooks =
-                                        chunk
-                                        |> Array.map (fun i ->
-                                            task {
-                                                match i.AudioBook.Picture with
-                                                | Some _ ->
-                                                    return ()
-                                                | None ->
-                                                    let! url = Services.WebAccess.getPictureOnlineUrl i.AudioBook
-                                                    match url with
-                                                    | None -> return ()
-                                                    | Some url ->
-                                                        i.SetPicture url
-                                                        return ()
-                                            }
-                                        )
-                                        |> Task.WhenAll
-
-                                    return audioBooks
-                                }
-
-                            #if DEBUG
-                            System.Diagnostics.Trace.WriteLine $"Processing {chunks.Length}..."
-                            #endif
-                            for idx, chunk in chunks |> Array.indexed do
-                                let! _ = runChunk chunk
-                                #if DEBUG
-                                System.Diagnostics.Trace.WriteLine $"Chunk {idx+1} of {chunks.Length} done!"
-                                #endif
-                                // nach 25% der alles chunks z.B. 147
-                                match chunks.Length |> float with
-                                | x when (x * 0.25) |> int = idx + 1 ->
-                                    dispatch <| AppendBusyMessage "25% verarbeitet..."
-                                | x when (x * 0.50) |> int = idx + 1 ->
-                                    dispatch <| AppendBusyMessage "50% verarbeitet..."
-                                | x when (x * 0.75) |> int = idx + 1 ->
-                                    dispatch <| AppendBusyMessage "75% verarbeitet..."
-                                | x when x |> int = idx + 1 ->
-                                    dispatch <| AppendBusyMessage "100% verarbeitet..."
-                                | _ ->
-                                    ()
-
-                            return Ok {| New = e.New; OnDevice = e.OnDevice |}
-                    }
-
 
 
                 let processResult
@@ -477,6 +447,9 @@ module BrowserPage =
                             // also sync with global store
                             AudioBookStore.globalAudiobookStore.Dispatch <| AudioBookStore.AudioBookElmish.AudiobooksLoaded audioBooks
                             dispatch <| AudioBookItemsChanged audioBooks
+                            do! Task.Delay 1000
+                            // start picture download background service
+                            DependencyService.Get<IPictureDownloadService>().StartDownload()
                             do! e.New |> notifyAfterSync
 
                         | Error err ->
@@ -508,13 +481,13 @@ module BrowserPage =
                     do!
                         checkLoginSession ()
                         |> Task.bind loadAudioBooksFromCloud
-                        |> Task.map (loadAudioBooksFromDevice AudioBookStore.globalAudiobookStore.Model.Audiobooks)
+                        |> Task.map (lookForOrphanedAudiobookOnDevice AudioBookStore.globalAudiobookStore.Model.Audiobooks)
                         |> Task.bind processLoadedAudioBookFromDevice
                         |> Task.map (determinateNewAddedAudioBooks AudioBookStore.globalAudiobookStore.Model.Audiobooks)
+                        |> Task.map  checkIfCurrentAudiobookAreReallyDownloaded
                         |> Task.bind processNewAddedAudioBooks
                         |> Task.bind repairAudiobookMetadataIfNeeded
                         |> Task.map  fixDownloadFolders
-                        |> Task.bind addOnlineUrlForPictureForAllWhichHasNone
                         |> Task.bind processResult
                 with
                 | ex ->

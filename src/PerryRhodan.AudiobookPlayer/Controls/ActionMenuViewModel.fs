@@ -4,6 +4,7 @@ open System
 open CherylUI.Controls
 open Dependencies
 open Microsoft.Maui.ApplicationModel
+open PerryRhodan.AudiobookPlayer.Services.Interfaces
 open PerryRhodan.AudiobookPlayer.ViewModel
 open ReactiveElmish
 open Services

@@ -27,8 +27,9 @@
     <Compile Include="Domain\Domain.fs" />
    
     <Compile Include="Domain\Translations.fs" />
-    <Compile Include="Services\Services.fs" />
+   
     <Compile Include="Services\Interfaces.fs" />
+    <Compile Include="Services\Services.fs" />
     <Compile Include="Services\GlobalSettingsService.fs" />
    
     <Compile Include="Views\ActionMenuView.axaml.fs" />
@@ -46,6 +47,7 @@
     <Compile Include="Controls\Interfaces.fs" />
     <Compile Include="Controls\AudioBookItem.fs" />
     <Compile Include="Controls\AudioPlayer.fs" />
+    <Compile Include="Controls\PictureService.fs" />
     <Compile Include="Controls\ActionMenuViewModel.fs" />
     <Compile Include="Controls\ActionMenuService.fs" />
     <Compile Include="Controls\SeekSlider\MySlider.fs" />

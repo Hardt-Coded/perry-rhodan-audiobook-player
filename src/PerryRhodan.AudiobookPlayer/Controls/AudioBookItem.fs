@@ -12,6 +12,7 @@ open Common
 open Dependencies
 open Domain
 open MediaManager.Library
+open PerryRhodan.AudiobookPlayer.Services.Interfaces
 open PerryRhodan.AudiobookPlayer.ViewModels
 open ReactiveElmish
 open ReactiveElmish.Avalonia
@@ -175,7 +176,7 @@ module AudioBookItem =
         | UpdateCurrentListenFilename of filename:string
         | UpdateCurrentAudioFileList of audioFiles:AudioBookAudioFilesInfo
         | UpdateAudiobookPicture of picture:string
-        | UpdateDownloadPath of path:string
+        | UpdateDownloadPath of path:string option
         | SetAmbientColor of color:string
         | SendPauseCommandToAudioPlayer
 
@@ -371,12 +372,11 @@ module AudioBookItem =
             { state with Audiobook = newAudioBook }, SideEffect.UpdateAudiobookPicture
         | UpdateDownloadPath path ->
             { state with
-                DownloadState = Downloaded
-                Audiobook = {
-                    state.Audiobook with
-                        State = { state.Audiobook.State with DownloadedFolder = Some path }
-
-                } }, SideEffect.UpdateDatabase
+                DownloadState = if path.IsSome then Downloaded else NotDownloaded
+                Audiobook.State.DownloadedFolder = path
+                Audiobook.State.Downloaded = path.IsSome
+            }, SideEffect.UpdateDatabase
+                        
 
 
 

@@ -4,6 +4,7 @@ open System
 open CherylUI.Controls
 open Dependencies
 open Elmish.SideEffect
+open PerryRhodan.AudiobookPlayer.Services.Interfaces
 open ReactiveElmish.Avalonia
 open ReactiveElmish
 open Services
