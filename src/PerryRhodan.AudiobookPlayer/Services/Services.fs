@@ -81,14 +81,11 @@ module Consts =
 
                 let currentLocalBaseFolder =
                     let storageFolder =
-                        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)
+                        Microsoft.Maui.Storage.FileSystem.AppDataDirectory
 
                     let baseFolder =
                         let bf = Path.Combine(storageFolder,"PerryRhodan.AudioBookPlayer")
-                        if not (Directory.Exists(bf)) then
-                            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),"PerryRhodan.AudioBookPlayer")
-                        else
-                            bf
+                        bf
 
                     try
                         if not (Directory.Exists(baseFolder)) then

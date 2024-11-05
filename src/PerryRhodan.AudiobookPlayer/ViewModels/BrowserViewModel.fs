@@ -219,7 +219,7 @@ module BrowserPage =
                             Ok {| OnDevice = audioBooksAlreadyOnTheDevice; InCloud = cloudAudioBooks |}
 
 
-                
+
                 let processLoadedAudioBookFromDevice
                     (input:Result<{| OnDevice: AudioBook []; InCloud:AudioBook[] |},SynchronizeWithCloudErrors>) =
                      task {
@@ -239,7 +239,10 @@ module BrowserPage =
                     | Ok e ->
                          dispatch <| AppendBusyMessage "Ermittle neue Hörbücher..."
                          let audioBooksAlreadyOnTheDevice = e.OnDevice |> Array.map (fun i -> new AudioBookItemViewModel(i))
-                         let modelAndDeviceAudiobooks = Array.concat [audioBooksAlreadyOnTheDevice; modelAudioBooks]
+                         let modelAndDeviceAudiobooks =
+                             Array.concat [audioBooksAlreadyOnTheDevice; modelAudioBooks]
+                             |> Array.distinctBy (_.AudioBook.Id)
+
                          let newAudioBookItems =
                              let currentAudioBooks = modelAndDeviceAudiobooks |> Array.map (_.AudioBook)
                              filterNewAudioBooks currentAudioBooks e.InCloud
@@ -247,7 +250,7 @@ module BrowserPage =
                          Ok {| New = newAudioBookItems; OnDevice = modelAndDeviceAudiobooks; InCloud = e.InCloud |}
 
 
-                let checkIfCurrentAudiobookAreReallyDownloaded 
+                let checkIfCurrentAudiobookAreReallyDownloaded
                     (input:Result<{| New: AudioBookItemViewModel[]; OnDevice: AudioBookItemViewModel []; InCloud:AudioBook[] |},SynchronizeWithCloudErrors>) =
                         match input with
                         | Error e -> Error e
@@ -256,7 +259,7 @@ module BrowserPage =
                             let audioBooks =
                                 e.OnDevice
                                 |> Array.filter (fun i -> i.DownloadState = AudioBookItem.Downloaded)
-                                
+
 
                             // check on the file system if the audio books are really downloaded
                             audioBooks
@@ -279,27 +282,31 @@ module BrowserPage =
                                 // also remove orphand pictures
                                 i.SetPicture None None
                             )
-                            
+
                             Ok {| New = e.New; OnDevice = e.OnDevice; InCloud = e.InCloud |}
-                            
-                let removeOrphanPictures 
+
+                let removeOrphanPictures
                     (input:Result<{| New: AudioBookItemViewModel[]; OnDevice: AudioBookItemViewModel []; InCloud:AudioBook[] |},SynchronizeWithCloudErrors>) =
                         match input with
                         | Error e -> Error e
                         | Ok e ->
                             dispatch <| AppendBusyMessage "Entferne verwaiste Bilder..."
                             e.OnDevice
-                            |> Array.filter (_.AudioBook.Picture.IsSome)
+                            |> Array.filter
+                                (fun i ->
+                                i.AudioBook.Picture
+                                |> Option.map (fun p -> p.StartsWith("http") |> not)
+                                |> Option.defaultValue false)
                             |> Array.iter (fun i ->
                                 i.AudioBook.Picture
                                 |> Option.iter (fun p ->
-                                    if not <| System.IO.File.Exists(p) then
+                                    if (p.StartsWith "http" |> not) &&  (System.IO.File.Exists(p) |> not) then
                                         i.SetPicture None None
                                 )
                             )
                             Ok {| New = e.New; OnDevice = e.OnDevice; InCloud = e.InCloud |}
-                    
-                
+
+
                 let processNewAddedAudioBooks
                     (input:Result<{| New: AudioBookItemViewModel[]; OnDevice: AudioBookItemViewModel []; InCloud:AudioBook[] |},SynchronizeWithCloudErrors>) =
                         task {
