@@ -90,13 +90,10 @@ module Consts =
                     try
                         if not (Directory.Exists(baseFolder)) then
                             Directory.CreateDirectory(baseFolder) |> ignore
-                        let testFile = Path.Combine(baseFolder, "testfile.txt")
-                        File.WriteAllText(testFile, "test!")
-                        File.Delete("test!")
                         baseFolder
                     with
                     | ex ->
-                        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),"PerryRhodan.AudioBookPlayer")
+                        baseFolder
 
                 let currentLocalDataFolder =
                     Path.Combine(currentLocalBaseFolder,"data")
