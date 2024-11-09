@@ -2,53 +2,157 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:vm="clr-namespace:PerryRhodan.AudiobookPlayer.ViewModels"
              xmlns:views="clr-namespace:PerryRhodan.AudiobookPlayer.Views"
-             xmlns:valueSelector="clr-namespace:PerryRhodan.AudiobookPlayer.ValueSelector"
+             xmlns:vm="clr-namespace:PerryRhodan.AudiobookPlayer.ViewModels"
              xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+             xmlns:glassMorphism="clr-namespace:CherylUI.Controls.GlassMorphism;assembly=CherylUI"
+             xmlns:valueSelector="clr-namespace:PerryRhodan.AudiobookPlayer.ValueSelector"
              mc:Ignorable="d" d:DesignWidth="393" d:DesignHeight="738"
              x:Class="PerryRhodan.AudiobookPlayer.Views.HomeView"
              Background="Black"
              Design.DataContext="{Binding Source={x:Static vm:HomeViewModel.DesignVM}}"
-             x:DataType="vm:HomeViewModel">
-    <Grid RowDefinitions="Auto,Auto,*">
-        <!-- Last Listened -->
-        <Grid Grid.Row="0" IsVisible="{Binding HasLastListenedAudioBook}">
-            <TransitioningContentControl>
-                <TransitioningContentControl.PageTransition>
-                    <CrossFade Duration="00:00:00.500" />
-                </TransitioningContentControl.PageTransition>
-                <TransitioningContentControl.Content>
-                    <views:AudioBookItemView DataContext="{Binding LastListendAudiobook}"/>
-                </TransitioningContentControl.Content>
-            </TransitioningContentControl>
+             x:DataType="vm:HomeViewModel"
+             IsEnabled="{Binding !IsBusy}">
+
+    <Interaction.Behaviors>
+        <EventTriggerBehavior EventName="Loaded">
+            <InvokeCommandAction Command="{Binding OnInitialized}" />
+        </EventTriggerBehavior>
+    </Interaction.Behaviors>
+    <Grid RowDefinitions="Auto,Auto,Auto,Auto,*">
+        <TextBlock Grid.Row="0" FontSize="20" HorizontalAlignment="Center" Margin="0,5,0,0">Meine Hörbücher</TextBlock>
+
+       
+        <Grid Row="1" Margin="5,10,5,0">
+            <ScrollViewer HorizontalScrollBarVisibility="Hidden">
+                <ItemsControl ItemsSource="{Binding Filters}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:FilterItem">
+                            <Button Content="{Binding Text}" Command="{Binding Command}"
+                                    Classes.selected="{Binding IsSelected}"
+                                    Classes.isGeneral="{Binding IsGeneral}"/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal" Spacing="5" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.Styles>
+                        <Style Selector="Button">
+                            <Setter Property="Theme" Value="{StaticResource MaterialOutlineButton}" />
+                            <Setter Property="Margin" Value="5,5,5,5" />
+                            <Setter Property="Height" Value="26" />
+                            <Setter Property="FontSize" Value="12" />
+                            <Setter Property="BorderBrush" Value="{DynamicResource MaterialPrimaryDarkBrush}" />
+                            <Setter Property="Foreground" Value="{DynamicResource MaterialPrimaryDarkBrush}" />
+                        </Style>
+                        <Style Selector="Button.selected">
+                            <Setter Property="Background" Value="{DynamicResource MaterialPrimaryLightBrush}" />
+                            <Setter Property="BorderBrush" Value="{DynamicResource MaterialPrimaryLightBrush}" />
+                            <Setter Property="Foreground" Value="{DynamicResource MaterialPrimaryLightForegroundBrush}" />
+                        
+                        </Style>
+                        <Style Selector="Button.isGeneral">
+                            <Setter Property="BorderBrush" Value="{DynamicResource MaterialPrimaryLightBrush}" />
+                            <Setter Property="Foreground" Value="{DynamicResource MaterialPrimaryLightBrush}" />
+                        </Style>
+                        <Style Selector="Button.isGeneral.selected">
+                            <Setter Property="BorderBrush" Value="{DynamicResource MaterialPrimaryLightBrush}" />
+                            <Setter Property="Foreground" Value="{DynamicResource MaterialPrimaryLightForegroundBrush}" />
+                        </Style>
+                    </ItemsControl.Styles>
+                </ItemsControl>    
+            </ScrollViewer>
             
         </Grid>
+        
+        <Grid Grid.Row="2" Margin="15,0,15,0" >
+            <!-- Search Bar -->
+            <TextBox Watermark="Suche" 
+                     
+                     Text="{Binding SearchText, Mode=OneWayToSource}"
+                     FontSize="14"
+                     >
+                <TextBox.InnerRightContent>
+                    <Border Height="{Binding $parent[TextBox].Height}" Width="{Binding $self.Bounds.Height}">
+                        <avalonia:MaterialIcon HorizontalAlignment="Right" VerticalAlignment="Center" Kind="Magnify"
+                                               Width="18" Height="18" />
+                    </Border>
+                </TextBox.InnerRightContent>
+                <TextBox.Styles>
+                    <Style Selector="TextBox controls|MaterialUnderline#PART_Underline">
+                        
+                        <Setter Property="Margin" Value="0,0,0,10" />
+                    </Style>
+                </TextBox.Styles>
+            </TextBox>
 
-        <!-- Empty -->
-        <TextBlock Grid.Row="0" Grid.RowSpan="3" VerticalAlignment="Center" 
-                   HorizontalAlignment="Center"
-                   TextAlignment="Center"
-                   Text="Sie haben noch keine Hörbücher runtergeladen. Stöbern sie doch ein wenig in Ihrem Bestand."
-                   TextWrapping="Wrap"
-                   FontSize="20"
-                   Margin="10"
-                   IsVisible="{Binding IsEmpty}"/>
-		<!-- Audio Books -->
-        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Hidden">
-            <ItemsControl Grid.Row="1" ItemsSource="{Binding AudioBooks}">
+        </Grid>
+
+        <Grid Row="3" Margin="0,5,0,0" ColumnDefinitions="Auto,Auto" HorizontalAlignment="Right" VerticalAlignment="Center">
+            <avalonia:MaterialIcon Grid.Column="0" Kind="Sort" VerticalAlignment="Center" Margin="0,0,0,6"/>
+            <valueSelector:ValueSelector Grid.Column="1" Value="{Binding SortOrder}"
+                                         ItemList="{Binding SortOrders}"
+                                         VerticalAlignment="Center"
+                                         BaseFontSize="40.0"/>
+        </Grid>
+        <!-- Audio Books -->
+        <ScrollViewer Grid.Row="4"
+                      VerticalScrollBarVisibility="Hidden">
+            <ItemsControl ItemsSource="{Binding AudioBooks}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <views:AudioBookItemView DataContext="{Binding .}"/>
+                        <views:AudioBookItemView DataContext="{Binding .}" />
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel Orientation="Vertical"  Margin="0,0,0,100"/>
+                    </ItemsPanelTemplate>    
+                </ItemsControl.ItemsPanel>
             </ItemsControl>
+            
+            <!-- <ItemsRepeater ItemsSource="{Binding AudioBooks}"> -->
+            <!--     <ItemsRepeater.ItemTemplate> -->
+            <!--         <DataTemplate> -->
+            <!--             <views:AudioBookItemView DataContext="{Binding .}" /> -->
+            <!--         </DataTemplate> -->
+            <!--     </ItemsRepeater.ItemTemplate> -->
+            <!-- </ItemsRepeater> -->
         </ScrollViewer>
 
 
-        <!-- Loading -->
-        <Grid Grid.Row="0" Grid.RowSpan="3" IsVisible="{Binding IsLoading}" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <ProgressBar Classes="circular" IsIndeterminate="True"  />
+        <Grid Grid.Row="0" Grid.RowSpan="5" IsVisible="{Binding IsBusy}">
+            <Grid Opacity="0.5">
+                <NotificationCard Height="400" CornerRadius="20" Background="Black" Effect="blur(0)" Opacity="0.3">
+                    <Grid>
+                        <glassMorphism:CherylBackground />
+                    </Grid>
+                </NotificationCard>
+
+            </Grid>
+            <Grid>
+                <NotificationCard Height="400" CornerRadius="20">
+                    <Grid Margin="20">
+                        <TextBlock TextWrapping="Wrap" Text="{Binding BusyMessage}" HorizontalAlignment="Left" VerticalAlignment="Top" />
+                    </Grid>
+                </NotificationCard>
+
+            </Grid>
+
+            <ProgressBar Classes="circular" IsIndeterminate="True" />
         </Grid>
+
+        <controls:FloatingButton Grid.Row="4"
+                                 VerticalAlignment="Bottom"
+                                 HorizontalAlignment="Right"
+                                 IsVisible="{Binding !IsBusy}"
+                                 Margin="20"
+                                 Command="{Binding LoadOnlineAudiobooks}">
+            <avalonia:MaterialIcon Kind="Refresh" Width="30" Height="30" />
+        </controls:FloatingButton>
+
     </Grid>
 </UserControl>

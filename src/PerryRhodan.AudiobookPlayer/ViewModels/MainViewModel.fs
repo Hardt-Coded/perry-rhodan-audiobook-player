@@ -47,11 +47,7 @@ type MainViewModel(root:CompositionRoot) =
             try
                 match m.View with
                 | View.HomePage ->
-                    let view = root.GetView<HomeViewModel>()
-                    view
-
-                | View.BrowserPage ->
-                    root.GetView<BrowserViewModel>()
+                    root.GetView<HomeViewModel>()
 
                 | View.SettingsPage ->
                     root.GetView<SettingsViewModel>()
@@ -84,15 +80,9 @@ type MainViewModel(root:CompositionRoot) =
 
     member this.GotoOptionPage() =
         if not app.Model.IsLoading then app.Dispatch <| SetView View.SettingsPage
-
-    member this.GotoBrowserPage() =
-        if not app.Model.IsLoading then app.Dispatch <| SetView View.BrowserPage
-
+    
     member this.HomeButtonColor =
         this.BindOnChanged (app, _.View, fun e ->  SolidColorBrush(match e.View with | View.HomePage ->  Colors.WhiteSmoke | _ -> Colors.DarkGray))
-
-    member this.BrowserButtonColor =
-        this.BindOnChanged (app, _.View, fun e -> SolidColorBrush(match e.View with | View.BrowserPage -> Colors.WhiteSmoke | _ -> Colors.DarkGray))
 
     member this.SettingsButtonColor =
         this.BindOnChanged (app, _.View, fun e -> SolidColorBrush(match e.View with | View.SettingsPage -> Colors.WhiteSmoke | _ -> Colors.DarkGray))

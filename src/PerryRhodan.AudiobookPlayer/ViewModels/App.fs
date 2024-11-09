@@ -29,7 +29,6 @@ type Model = {
 and [<RequireQualifiedAccess>] View =
     | HomePage
     | PlayerPage of PlayerView
-    | BrowserPage
     | SettingsPage
 
 
@@ -134,7 +133,7 @@ let runSideEffect sideEffect state dispatch =
                     | SideEffect.InitApplication ->
                         // if the global audiobook store is busy display here a loading indicator
                         AudioBookStore.globalAudiobookStore.Observable.Subscribe(fun s ->
-                            dispatch (Msg.IsLoading s.IsLoading)
+                            dispatch (Msg.IsLoading s.IsBusy)
                         ) |> ignore
 
 

@@ -55,7 +55,7 @@
                     </asyncImageLoader:AdvancedImage>
 
                     <Grid RowDefinitions="*" ColumnDefinitions="*"  HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,5,0">
-                        <Canvas Width="30" Height="30" Margin="2,2, 2,0"
+                        <Canvas Width="30" Height="30" Margin="0,2, 6,0"
                                 IsVisible="{Binding !IsDownloaded}">
                             <Path Fill="#303030" StrokeThickness="1" Data="M 30,30 L 0,30 L 30,0 Z" />
                         </Canvas>
@@ -67,7 +67,7 @@
                     <avalonia:MaterialIcon
                         HorizontalAlignment="Right"
                         VerticalAlignment="Bottom"
-                        Margin="0,0,4,0"
+                        Margin="0,0,9,0"
                         Width="20"
                         Height="20"
                         Kind="Download"

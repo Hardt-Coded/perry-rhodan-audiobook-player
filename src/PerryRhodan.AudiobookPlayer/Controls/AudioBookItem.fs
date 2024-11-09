@@ -33,13 +33,14 @@ module AudioBookStore =
 
         type State = {
             Audiobooks:AudioBookItemViewModel array
+            AudiobookGroups: string array
             CurrentAudioBook:AudioBookItemViewModel option
-            IsLoading:bool
+            IsBusy:bool
         }
 
         type Msg =
             | ReloadAudiobooks
-            | AudiobooksLoaded of AudioBookItemViewModel array
+            | AudiobooksLoaded of audioBooks:AudioBookItemViewModel array
             | DeleteAudiobookFromDatabase of AudioBook
             | RemoveAudiobookFromDevice of AudioBook
             | AudioBookChanged // only trigger for the reactive subscriptions on this store
@@ -54,7 +55,12 @@ module AudioBookStore =
 
 
         let init () =
-            { Audiobooks = [||]; CurrentAudioBook = None; IsLoading = false }, SideEffect.LoadAudiobooks
+            {
+                Audiobooks = [||]
+                AudiobookGroups = [||] 
+                CurrentAudioBook = None
+                IsBusy = false
+            }, SideEffect.LoadAudiobooks
 
 
         let update (msg:Msg) (state:State) =
@@ -66,7 +72,8 @@ module AudioBookStore =
                 state, SideEffect.None
 
             | AudiobooksLoaded audiobooks ->
-                { state with Audiobooks = audiobooks }, SideEffect.None
+                let groups = audiobooks |> Array.map (fun i -> i.AudioBook.Group) |> Array.distinct
+                { state with Audiobooks = audiobooks; AudiobookGroups = groups }, SideEffect.None
 
             | DeleteAudiobookFromDatabase audiobook ->
                 { state with
@@ -80,7 +87,7 @@ module AudioBookStore =
                 state, SideEffect.RemoveAudiobookFromDevice audiobook
 
             | IsBusy b ->
-                { state with IsLoading = b }, SideEffect.None
+                { state with IsBusy = b }, SideEffect.None
 
 
         module SideEffects =
@@ -101,7 +108,7 @@ module AudioBookStore =
                                     let! audiobooks = DataBase.loadAudioBooksStateFile()
                                     let audioBookViewModels = audiobooks |> Array.map (fun i -> new AudioBookItemViewModel(i))
                                     while not (audioBookViewModels |> Array.forall (_.IsInitialized)) do
-                                        do! Task.Delay 300
+                                        do! Task.Delay 100
                                     dispatch <| AudiobooksLoaded audioBookViewModels
                                     return ()
 
@@ -901,13 +908,6 @@ type AudioBookItemViewModel(audiobook: AudioBook) as self =
     member this.AmbientColor    = this.BindOnChanged(local, _.AmbientColor, (fun i ->
         let ac = i.AmbientColor |> Option.defaultValue "#ff483d8b"
         Color.Parse ac
-        ))
-
-    member this.IconColor      = this.BindOnChanged(local, _.AmbientColor, (fun i ->
-        i.AmbientColor
-        |> Option.map ColorHelpers.invertHexColor
-        |> Option.defaultValue "#ffffff"
-        |> SolidColorBrush.Parse
         ))
 
     member this.OpenDialog()                = local.Dispatch <| RunOnlySideEffect SideEffect.OpenAudioBookActionMenu

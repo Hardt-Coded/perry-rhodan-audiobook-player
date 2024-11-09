@@ -40,6 +40,7 @@ type ValueSelectorPopup() as this =
             this.ValueSelector <- _mobile
             this.InitializeComponent()
             this.SetTextValues(_mobile.SelectedIndex)
+            this.SetFontSize(_mobile)
             this.CurrentValue <- _mobile.Value
 
 
@@ -99,6 +100,14 @@ type ValueSelectorPopup() as this =
 
             this.SetTextValues(temporaryIndex)
 
+    member private this.SetFontSize(_mobile: ValueSelector) =
+        
+        this.FindControl<TextBlock>("CurrentValueTextMinus2").FontSize <- _mobile.BaseFontSize / 5.0
+        this.FindControl<TextBlock>("CurrentValueTextMinus1").FontSize <- _mobile.BaseFontSize / 2.5
+        this.FindControl<TextBlock>("CurrentValueText").FontSize <- _mobile.BaseFontSize
+        this.FindControl<TextBlock>("CurrentValueTextPlus1").FontSize <- _mobile.BaseFontSize / 2.5
+        this.FindControl<TextBlock>("CurrentValueTextPlus2").FontSize <- _mobile.BaseFontSize / 5.0
+    
     member private this.SetTextValues(index: int) =
         let currentValues = _speedSelector.ItemList |> convertCollectionToTupleArray
 
@@ -144,6 +153,11 @@ type ValueSelectorPopup() as this =
 and ValueSelector() as self =
     inherit UserControl()
 
+    
+    static let BaseFontSizeProperty =
+        AvaloniaProperty.Register<ValueSelector, double>("BaseFontSize", defaultValue = 50.0)    
+        
+    
     static let ValueProperty =
         AvaloniaProperty.RegisterDirect<ValueSelector, obj>(
             "Value",
@@ -186,6 +200,10 @@ and ValueSelector() as self =
         AvaloniaXamlLoader.Load(this)
 
 
+    member this.BaseFontSize
+        with get() = this.GetValue(BaseFontSizeProperty)
+        and set(value) = this.SetValue(BaseFontSizeProperty, value) |> ignore
+    
     member this.Value
         with get():obj = _value
         and set(value:obj) =

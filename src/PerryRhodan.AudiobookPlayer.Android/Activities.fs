@@ -1,5 +1,7 @@
 namespace PerryRhodan.AudiobookPlayer.Android
 
+
+
 open System
 open Android.App
 open Android.Content
@@ -18,7 +20,6 @@ open Microsoft.AppCenter.Crashes.Android
 open Microsoft.ApplicationInsights.Extensibility
 open PerryRhodan.AudiobookPlayer
 open Microsoft.Extensions.DependencyInjection
-//open PerryRhodan.AudiobookPlayer.Android.AudioPlayerServiceImplementation.DecpencyService
 open PerryRhodan.AudiobookPlayer.Services.AudioPlayer
 open PerryRhodan.AudiobookPlayer.Services.Interfaces
 open PerryRhodan.AudiobookPlayer.ViewModels
@@ -27,7 +28,6 @@ open Services.DependencyServices
 open Xamarin.Android.Net
 open PerryRhodan.AudiobookPlayer.Controls
 open Android.Graphics
-
 
 
 
@@ -111,18 +111,24 @@ type MainActivity() as self =
 
     override _.CustomizeAppBuilder(builder) =
 
-
+        AppDomain.CurrentDomain.UnhandledException.Subscribe(fun args ->
+            let ex = args.ExceptionObject :?> Exception
+            Microsoft.AppCenter.Crashes.Crashes.TrackError(ex)
+            Global.telemetryClient.TrackException ex
+        ) |> ignore
+        
+        
         let bitmapConverter = {
             new IBitmapConverter with
                 member this.GetBitmap path =
                     let bitmap = BitmapFactory.DecodeFile(path)
                     bitmap :> obj
         }
-
+        
         let packageInfo = self.PackageManager.GetPackageInfo(self.PackageName, PackageInfoFlags.MetaData)
-
+        
         copyDemoDatabaseToDbFolderWhenDev packageInfo
-
+        
         let packageInformation = {
             new IPackageInformation with
                 member this.Name() =
@@ -132,7 +138,7 @@ type MainActivity() as self =
                 member this.GetBuild() =
                     packageInfo.VersionCode.ToString()
         }
-
+        
         // register services
         DependencyService.ServiceCollection
             .AddSingleton<IScreenService, ScreenService>()
@@ -148,9 +154,9 @@ type MainActivity() as self =
             .AddSingleton<IBitmapConverter>(bitmapConverter)
             .AddSingleton<IPackageInformation>(packageInformation)
             |> ignore
-
+        
         // convert function to C# Func
-
+        
         // let androidOptions = AndroidPlatformOptions()
         // // Todo: do not forget Fallback
         // let renderModes = [ AndroidRenderingMode.Vulkan ] |> System.Collections.Generic.List
@@ -173,16 +179,21 @@ type MainActivity() as self =
 
 
     override this.OnCreate(savedInstanceState) =
-        base.OnCreate savedInstanceState
+        
         AppDomain.CurrentDomain.UnhandledException.Subscribe(fun args ->
             let ex = args.ExceptionObject :?> Exception
             Microsoft.AppCenter.Crashes.Crashes.TrackError(ex)
             Global.telemetryClient.TrackException ex
         ) |> ignore
+        
+        base.OnCreate savedInstanceState
+        
+        
+        
         AppCenter.Start(Global.appcenterAndroidId, typeof<Analytics>, typeof<Crashes>)
         Microsoft.AppCenter.Analytics.Analytics.TrackEvent("App started")
         Global.telemetryClient.TrackEvent ("ApplicationStarted")
-
+        
         (*// set complete to build service provider here, to avoid that the dependencies,
         // which are registered in app.xaml.fs are also included in the service provider
         DependencyService.SetComplete()*)
@@ -192,19 +203,12 @@ type MainActivity() as self =
             .AddSingleton<IAudioPlayer>(audioService)
             .AddSingleton<IAudioPlayerPause>(audioService)
         |> ignore
-
+        
         DependencyService.SetComplete()
-
+        
         Microsoft.Maui.ApplicationModel.Platform.Init(this, savedInstanceState)
-
+        
         AppCompatDelegate.DefaultNightMode <- AppCompatDelegate.ModeNightYes
-
-        AppDomain.CurrentDomain.UnhandledException.Subscribe(fun args ->
-            let ex = args.ExceptionObject :?> Exception
-            Microsoft.AppCenter.Crashes.Crashes.TrackError(ex)
-            Global.telemetryClient.TrackException ex
-        ) |> ignore
-
 
 
 

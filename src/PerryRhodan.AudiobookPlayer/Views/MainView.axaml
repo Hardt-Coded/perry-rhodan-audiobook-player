@@ -94,7 +94,7 @@
                     </TransitioningContentControl>
 
                     <!-- Bottom Navigation -->
-                    <Grid ColumnDefinitions="0.8*, 0.7*, 1.0*, 0.9*" Grid.Row="2"
+                    <Grid ColumnDefinitions="*,*,*" Grid.Row="2"
                           Margin="0,0,0,5">
                         <Button Grid.Row="0"
                                 Grid.Column="0"
@@ -104,10 +104,9 @@
                                 Command="{Binding GotoHomePage}"
                                 Foreground="{Binding HomeButtonColor}">
                             <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                                <avalonia:MaterialIcon Classes="mainButton" Kind="Home" />
+                                <avalonia:MaterialIcon Kind="Home" Classes="mainButton" />
                                 <TextBlock>Start</TextBlock>
                             </StackPanel>
-
                         </Button>
 
                         <Button Grid.Row="0"
@@ -124,33 +123,9 @@
                             </StackPanel>
                         </Button>
 
-                        <Button Grid.Row="0"
-                                Margin="0,0,0,0"
-                                Padding="3,0,3,0"
-                                Classes.needspace="{Binding PlayerAvailable}"
-                                Theme="{StaticResource MaterialFlatButton}"
-                                Command="{Binding GotoBrowserPage}"
-                                Foreground="{Binding BrowserButtonColor}">
-                            <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                                <avalonia:MaterialIcon Kind="Globe" Classes="mainButton" />
-                                <TextBlock>Meine Hörbücher</TextBlock>
-                            </StackPanel>
-                            <Button.Styles>
-								<Style Selector="Button">
-									<Setter Property="Grid.ColumnSpan" Value="2" />
-									<Setter Property="Grid.Column" Value="1" />
-                                <Style Selector="^.needspace">
-                                    <Setter Property="Grid.ColumnSpan" Value="1" />
-                                    <Setter Property="Grid.Column" Value="2" />
-                                </Style>
-								</Style>
-                            </Button.Styles>
-                        </Button>
-
-
 
                         <Button Grid.Row="0"
-                                Grid.Column="3"
+                                Grid.Column="2"
                                 Margin="0,0,0,0"
                                 Padding="3,0,3,0"
                                 Theme="{StaticResource MaterialFlatButton}"

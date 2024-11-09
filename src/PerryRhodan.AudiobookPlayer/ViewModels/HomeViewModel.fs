@@ -1,177 +1,373 @@
 ﻿namespace PerryRhodan.AudiobookPlayer.ViewModels
 
 open System
-open System.Collections.ObjectModel
-open Domain
+open Avalonia.Data.Converters
+open CherylUI.Controls
+open Common
+open Dependencies
+open PerryRhodan.AudiobookPlayer.Controls
+open PerryRhodan.AudiobookPlayer.Services.Interfaces
 open PerryRhodan.AudiobookPlayer.ViewModel
+open ReactiveElmish
+open Services
+
+
+module private DemoData =
+    open Domain
+
+    let designAudioBook = {
+            Id = 1
+            FullName = "Perry Rhodan 3000 - Mythos Erde"
+            EpisodeNo = Some 3000
+            EpisodenTitel = "Mythos Erde"
+            Group = "Perry Rhodan"
+            Picture = Some "avares://PerryRhodan.AudiobookPlayer/Assets/AudioBookPlaceholder_Dark.png"
+            Thumbnail = Some "avares://PerryRhodan.AudiobookPlayer/Assets/AudioBookPlaceholder_Dark.png"
+            DownloadUrl = None
+            ProductSiteUrl = None
+            State = {
+                Completed = true
+                CurrentPosition = None
+                Downloaded = true
+                DownloadedFolder = None
+                LastTimeListend = None
+            }
+            AmbientColor = Some "#FF0000"
+        }
+
+    let designAudioBook2 = {
+            Id = 2
+            FullName = "Perry Rhodan 3001 - Mythos Erde2"
+            EpisodeNo = Some 3000
+            EpisodenTitel = "Mythos Erde2"
+            Group = "Perry Rhodan"
+            Picture = Some "avares://PerryRhodan.AudiobookPlayer/Assets/AudioBookPlaceholder_Dark.png"
+            Thumbnail = Some "avares://PerryRhodan.AudiobookPlayer/Assets/AudioBookPlaceholder_Dark.png"
+            DownloadUrl = None
+            ProductSiteUrl = None
+            State = {
+                Completed = true
+                CurrentPosition = None
+                Downloaded = true
+                DownloadedFolder = None
+                LastTimeListend = None
+            }
+            AmbientColor = Some "#00FF00"
+        }
+
+    let designAudioBook3 = {
+            Id = 3
+            FullName = "Perry Rhodan 3003 - Mythos Erde2"
+            EpisodeNo = Some 3000
+            EpisodenTitel = "Mythos Erde3"
+            Group = "Perry Rhodan - Dies ist ein ganz langer Titel, der nicht in das Fenster passt"
+            Picture = Some "avares://PerryRhodan.AudiobookPlayer/Assets/AudioBookPlaceholder_Dark.png"
+            Thumbnail = Some "avares://PerryRhodan.AudiobookPlayer/Assets/AudioBookPlaceholder_Dark.png"
+            DownloadUrl = None
+            ProductSiteUrl = None
+            State = {
+                Completed = true
+                CurrentPosition = None
+                Downloaded = true
+                DownloadedFolder = None
+                LastTimeListend = None
+            }
+            AmbientColor = Some "#0000FF"
+        }
 
 
 module HomePage =
 
     type State = {
-        Audiobooks: AudioBookItemViewModel array
-        LastTimeListenedAudioBook: AudioBookItemViewModel option
-        IsLoading:bool
+        AudioBooks: AudioBookItemViewModel[]
+        Filter: FilterOptions
+        SortOrder: SortOrder
+        SearchText: string
+        BusyMessage: string
+
+        IsBusy: bool
     }
 
+    and SortOrder =
+        | TitleAsc
+        | TitleDesc
+        | LastListendDesc
+        | IdAsc
+        | IdDesc
+
+
+    and FilterOptions =
+        | All
+        | Downloaded
+        | Unfinished
+        | Finished
+        | NotListend
+        | CurrentlyListening
+        | Group of groupName:string
+        | Free of searchWord:string
+
+
     type Msg =
-        | RunOnlySideEffect of SideEffect
-        | AudioBooksLoaded of AudioBookItemViewModel array
+        | AudioBookItemsChanged of AudioBookItemViewModel array
+        | FilterChanged of FilterOptions
+        | SortOrderChanged of SortOrder
+        | SearchTextChanged of string
+        | AppendBusyMessage of string
+
         | SetBusy of bool
-        | OnError of string
 
 
-    and [<RequireQualifiedAccess>]
-        SideEffect =
+    [<RequireQualifiedAccess>]
+    type SideEffect =
         | None
         | Init
 
 
-    let disposables = new System.Collections.Generic.List<IDisposable>()
+    let init audiobookItems =
+        {
+            AudioBooks = audiobookItems
+            Filter = FilterOptions.Downloaded
+            SortOrder = SortOrder.LastListendDesc
+            SearchText = ""
+            BusyMessage = ""
+            IsBusy = false
+        }, SideEffect.Init
 
-    let emptyModel = { Audiobooks = [||] ; LastTimeListenedAudioBook = None; IsLoading = true }
 
-    let init () =
-        { emptyModel with IsLoading = true }, SideEffect.Init
-
-
-    let update (msg:Msg) (state:State) =
+    let rec update msg state =
         match msg with
-        | RunOnlySideEffect sideEffect ->
-            state, sideEffect
+        | AudioBookItemsChanged audiobookItems ->
+            let filteredAudiobooks =
+                audiobookItems
+                |> filterAudioBooks state.Filter
+                |> sortAudioBooks state.SortOrder
 
-        | AudioBooksLoaded audiobooks ->
-            let lastListenAudioBook =
-                audiobooks
-                |> Array.filter (fun i -> i.DownloadState = AudioBookItem.Downloaded)
-                |> Array.sortByDescending (_.AudioBook.State.LastTimeListend)
-                |> Array.tryHead
-                |> Option.bind (fun i ->
-                    match i.AudioBook.State.LastTimeListend with
-                    | None -> None
-                    | Some _ -> Some i
-                )
+            { state with AudioBooks = filteredAudiobooks }, SideEffect.None
 
-            let newState = {
-                Audiobooks =
-                    audiobooks
-                    |> Array.filter (fun x -> match x.DownloadState with | AudioBookItem.Downloaded | AudioBookItem.Downloading _ -> true | _ -> false)
-                    |> Array.filter (fun i ->
-                        lastListenAudioBook
-                        |> Option.map (fun o -> o.AudioBook.Id <> i.AudioBook.Id)
-                        |> Option.defaultValue true
-                    )
-                LastTimeListenedAudioBook = lastListenAudioBook
-                IsLoading = false
-            }
-            newState, SideEffect.None
+        | FilterChanged filter ->
+            let filteredAudiobooks =
+                AudioBookStore.globalAudiobookStore.Model.Audiobooks
+                |> filterAudioBooks filter
+                |> sortAudioBooks state.SortOrder
+            {
+                state with
+                    Filter = filter
+                    AudioBooks = filteredAudiobooks
+            }, SideEffect.None
+
+        | SortOrderChanged sortOrder ->
+            {
+                state with
+                    SortOrder = sortOrder
+                    AudioBooks = state.AudioBooks |> sortAudioBooks sortOrder
+            }, SideEffect.None
+
+        | SearchTextChanged searchText ->
+            let filteredAudiobooks =
+                AudioBookStore.globalAudiobookStore.Model.Audiobooks
+                |> filterAudioBooks (FilterOptions.Free searchText)
+                |> sortAudioBooks state.SortOrder
+
+            { state with SearchText = searchText; AudioBooks = filteredAudiobooks }, SideEffect.None
+
+        | AppendBusyMessage message ->
+            { state with BusyMessage = $"{state.BusyMessage}\r\n{message}" }, SideEffect.None
 
         | SetBusy isBusy ->
-            { state with IsLoading = isBusy }, SideEffect.None
-
-        | OnError error ->
-            { state with IsLoading = false }, SideEffect.None
+            { state with IsBusy = isBusy }, SideEffect.None
 
 
+    and sortAudioBooks (sortOrder:SortOrder) (audiobooks:AudioBookItemViewModel[]) =
+        match sortOrder with
+        | SortOrder.TitleAsc ->         audiobooks |> Array.sortBy (_.Title)
+        | SortOrder.TitleDesc ->        audiobooks |> Array.sortByDescending (_.Title)
+        | SortOrder.LastListendDesc ->  audiobooks |> Array.sortByDescending (_.AudioBook.State.LastTimeListend)
+        | SortOrder.IdAsc ->            audiobooks |> Array.sortBy (_.AudioBook.Id)
+        | SortOrder.IdDesc ->           audiobooks |> Array.sortByDescending (_.AudioBook.Id)
+
+    and filterAudioBooks (filter:FilterOptions) (audiobooks:AudioBookItemViewModel[]) =
+        match filter with
+        | FilterOptions.All ->                  audiobooks
+        | FilterOptions.Downloaded ->           audiobooks |> Array.filter (_.AudioBook.State.Downloaded)
+        | FilterOptions.Unfinished ->           audiobooks |> Array.filter (fun a -> not a.AudioBook.State.Completed)
+        | FilterOptions.Finished ->             audiobooks |> Array.filter (_.AudioBook.State.Completed)
+        | FilterOptions.NotListend ->           audiobooks |> Array.filter (fun a -> a.AudioBook.State.LastTimeListend.IsNone && not a.AudioBook.State.Completed)
+        | FilterOptions.CurrentlyListening ->   audiobooks |> Array.filter (fun a -> a.AudioBook.State.LastTimeListend.IsSome && not a.AudioBook.State.Completed)
+        | FilterOptions.Group groupName ->      audiobooks |> Array.filter (fun a -> a.AudioBook.Group = groupName)
+        | FilterOptions.Free searchWord ->      audiobooks |> Array.filter (fun a -> a.Title.ToUpperInvariant().Contains (searchWord.ToUpperInvariant()))
 
 
     module SideEffects =
-
-
         let runSideEffects (sideEffect:SideEffect) (state:State) (dispatch:Msg -> unit) =
             task {
-                if sideEffect = SideEffect.None then
-                    return ()
-                else
-                    dispatch <| SetBusy true
-                    do!
-                        task {
-                            match sideEffect with
-                            | SideEffect.None ->
-                                return ()
-
-                            | SideEffect.Init ->
-                                try
-                                    let audioBooks =
-                                         AudioBookStore.globalAudiobookStore.Model.Audiobooks
-
-                                    dispatch <| AudioBooksLoaded audioBooks
-                                    return ()
-                                with
-                                | ex ->
-                                    dispatch <| OnError ex.Message
-                                    return ()
-
-
-                        }
-
-                    dispatch <| SetBusy false
+                match sideEffect with
+                | SideEffect.Init ->
+                    // do something
+                    ()
+                | _ -> ()
             }
+
 
 
 
 open HomePage
-open ReactiveElmish.Avalonia
-open ReactiveElmish
 open Elmish.SideEffect
+open ReactiveElmish.Avalonia
 
-type HomeViewModel() as self =
+
+
+type HomeViewModel(?audiobookItems) as self =
     inherit ReactiveElmishViewModel()
+
+    let audiobookItems = [||] |> defaultArg audiobookItems
+
+    let init () =
+        init audiobookItems
 
     let local =
         Program.mkAvaloniaProgrammWithSideEffect init update SideEffects.runSideEffects
         |> Program.mkStore
 
-    let mutable countAudioBooks = 0
+    let searchStringDebouncer = Extensions.debounce<string>
 
     do
         self.AddDisposable
             <| AudioBookStore.globalAudiobookStore.Observable.Subscribe(fun s ->
-                local.Dispatch (s.IsLoading |> SetBusy)
-                if countAudioBooks <> s.Audiobooks.Length then
-                    countAudioBooks <- s.Audiobooks.Length
-                    local.Dispatch (AudioBooksLoaded s.Audiobooks)
+                local.Dispatch (s.IsBusy |> SetBusy)
+                local.Dispatch (s.Audiobooks |> AudioBookItemsChanged)
             )
         ()
 
+    new () = new HomeViewModel([||])
+
+
     member this.AudioBooks =
-        this.BindList(local, fun s -> ObservableCollection(s.Audiobooks))
-
-    member this.LastListendAudiobook =
-        this.BindOnChanged(local, _.LastTimeListenedAudioBook, fun i -> i.LastTimeListenedAudioBook |> Option.defaultValue AudioBookItemViewModel.DesignVM)
-
-    member this.LastTimeListenedAudioBook =
-        this.BindOnChanged(local, _.LastTimeListenedAudioBook, _.LastTimeListenedAudioBook)
-
-    member this.HasLastListenedAudioBook =
-        this.BindOnChanged(local, _.LastTimeListenedAudioBook.IsSome, _.LastTimeListenedAudioBook.IsSome)
-
-    member this.IsLoading =
-        this.BindOnChanged(local, _.IsLoading, _.IsLoading)
-
-    member this.SelectorValues =
-        [|
-            (1,"eins")
-            (2,"zwei")
-            (3,"drei")
-            (4,"vier")
-            (5,"fünf")
-            (6,"sechs")
-            (7,"sieben")
-            (8,"acht")
-            (9,"neun")
-            (1,"zehn")
-        |]
-
-    member this.SelectorValue
-        with get():int = 0
-        and set(value:int) =
-            ()
-
-    member this.IsEmpty = this.Bind(local, fun i -> i.Audiobooks.Length = 0 && i.LastTimeListenedAudioBook.IsNone)
+        //this.BindList (local, _.AudioBooks)
+        this.BindOnChanged(local,_.AudioBooks, _.AudioBooks)
 
 
+    member this.IsBusy                      = this.BindOnChanged(local, _.IsBusy, _.IsBusy)
+    member this.BusyMessage                 = this.BindOnChanged(local, _.BusyMessage, _.BusyMessage)
 
-    static member DesignVM = new HomeViewModel()
+    member this.SearchText
+        with get() = ""
+        and set(value) =
+            searchStringDebouncer 1000 (fun s ->
+                // protect against null
+                let s = if s = null then "" else s
+                local.Dispatch <| SearchTextChanged s
+            ) value
+
+
+    member this.OnInitialized() =
+        let currentAudioBooks = AudioBookStore.globalAudiobookStore.Model.Audiobooks
+        local.Dispatch (currentAudioBooks |> AudioBookItemsChanged)
+
+
+    member this.LoadOnlineAudiobooks() =
+        task {
+            local.Dispatch (true |> SetBusy)
+
+            let showMessage = Notifications.showMessage
+            let showErrorMessage = Notifications.showErrorMessage
+            let loadCookie = Services.SecureLoginStorage.loadCookie
+            let appendBusyMessage msg = local.Dispatch <| AppendBusyMessage msg
+            let openLogin = this.OpenLogin
+
+
+            let onSuccess audiobooks =
+                local.Dispatch (audiobooks |> AudioBookItemsChanged)
+                AudioBookStore.globalAudiobookStore.Dispatch <| AudioBookStore.AudioBookElmish.AudiobooksLoaded audiobooks
+                DependencyService.Get<IPictureDownloadService>().StartDownload()
+
+
+            do! ShopService.synchronizeWithCloud
+                     showMessage
+                     showErrorMessage
+                     loadCookie
+                     appendBusyMessage
+                     openLogin
+                     onSuccess
+
+            local.Dispatch (false |> SetBusy)
+
+        }
+
+    member this.OpenLogin () =
+        let control = PerryRhodan.AudiobookPlayer.Views.LoginView()
+        let vm = new LoginViewModel()
+        control.DataContext <- vm
+        InteractiveContainer.ShowDialog (control, true)
+
+
+    member this.SortOrder
+        with get() = this.BindOnChanged(local, _.SortOrder, _.SortOrder)
+        and set(value) = local.Dispatch <| SortOrderChanged value
+
+    member this.SortOrders = [|
+        (SortOrder.LastListendDesc  , "Zuletzt gehört")
+        (SortOrder.IdAsc            , "Älteste zuerst")
+        (SortOrder.IdDesc           , "Neuste zuerst")
+        (SortOrder.TitleAsc         , "Titel aufsteigend")
+        (SortOrder.TitleDesc        , "Titel absteigend")
+    |]
+
+
+    member this.Filter
+        with get() = this.BindOnChanged(local, _.Filter, _.Filter)
+        and set(value) = local.Dispatch <| FilterChanged value
+
+
+    member this.Filters =
+        this.BindOnChanged(local, _.AudioBooks, fun _ ->
+            [|
+                FilterOptions.Downloaded             , "Auf dem Gerät"  , true
+                FilterOptions.CurrentlyListening     , "Laufende"       , true
+                FilterOptions.All                    , "Alle"           , true
+                FilterOptions.Unfinished             , "Unbeendet"      , true
+                FilterOptions.NotListend             , "Ungehört"       , true
+                FilterOptions.Finished               , "Beendet"        , true
+
+                
+                let orderedGroups =
+                    AudioBookStore.globalAudiobookStore.Model.AudiobookGroups
+                    |> Array.sortBy id
+                    |> Array.sortBy (fun g ->
+                        match g with
+                        | "Perry Rhodan" -> 0
+                        | "Perry Rhodan Neo" -> 2
+                        | "Perry Rhodan Silber Edition" -> 4
+                        | "Perry Rhodan Classics" -> 6
+                        | x when x.StartsWith("Perry Rhodan") -> 10
+                        | _ -> 1000
+                    )
+                    
+                for group in orderedGroups do
+                    FilterOptions.Group group, group, false                
+                
+            |]
+            |> Array.map (fun (f,s, isGeneral) ->
+                FilterItem(local, f, s, (this.Filter = f), isGeneral)
+            )
+        )
+
+
+
+
+
+    static member DesignVM =
+        new HomeViewModel(
+            [|
+                AudioBookItemViewModel(DemoData.designAudioBook)
+                AudioBookItemViewModel(DemoData.designAudioBook2)
+                AudioBookItemViewModel(DemoData.designAudioBook3)
+            |])
+
+and FilterItem(local, filterOption, text, isSelected, isGeneral) =
+    member this.Command () = local.Dispatch <| FilterChanged filterOption
+    member val FilterOption = filterOption
+    member val Text = text
+    member val IsSelected = isSelected with get, set
+    member val IsGeneral = isGeneral with get, set
 
 

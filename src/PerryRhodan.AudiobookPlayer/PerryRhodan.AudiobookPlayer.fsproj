@@ -34,7 +34,6 @@
 
     <Compile Include="Views\ActionMenuView.axaml.fs" />
     <Compile Include="Views\AudioBookItemView.axaml.fs" />
-    <Compile Include="Views\BrowserView.axaml.fs" />
     <Compile Include="Views\FeedbackView.axaml.fs" />
     <Compile Include="Views\LoginView.axaml.fs" />
     <Compile Include="Views\SettingsView.axaml.fs" />
@@ -57,8 +56,6 @@
     <Compile Include="ViewModels\FeedbackViewModel.fs" />
     <Compile Include="ViewModels\SettingsViewModel.fs" />
     <Compile Include="ViewModels\HomeViewModel.fs" />
-    <Compile Include="ViewModels\BrowserViewModel.fs" />
-    <Compile Include="ViewModels\BrowserNewViewModel.fs" />
     <Compile Include="ViewModels\ViewModelBase.fs" />
     <Compile Include="ViewModels\App.fs" />
     <Compile Include="ViewModels\MainViewModel.fs" />
@@ -75,7 +72,6 @@
   <ItemGroup>
     <PackageReference Include="AsyncImageLoader.Avalonia" Version="3.3.0" />
     <PackageReference Include="Avalonia" Version="11.2.0" />
-    <PackageReference Include="Avalonia.Controls.ItemsRepeater" Version="11.1.4" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.0" />
     <PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.0" />
     <PackageReference Include="Avalonia.ReactiveUI" Version="11.2.0" />
