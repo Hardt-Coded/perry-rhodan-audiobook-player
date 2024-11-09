@@ -48,6 +48,7 @@
     <Compile Include="Controls\AudioBookItem.fs" />
     <Compile Include="Controls\AudioPlayer.fs" />
     <Compile Include="Controls\PictureService.fs" />
+    <Compile Include="Controls\ShopService.fs" />
     <Compile Include="Controls\ActionMenuViewModel.fs" />
     <Compile Include="Controls\ActionMenuService.fs" />
     <Compile Include="Controls\SeekSlider\MySlider.fs" />
@@ -57,6 +58,7 @@
     <Compile Include="ViewModels\SettingsViewModel.fs" />
     <Compile Include="ViewModels\HomeViewModel.fs" />
     <Compile Include="ViewModels\BrowserViewModel.fs" />
+    <Compile Include="ViewModels\BrowserNewViewModel.fs" />
     <Compile Include="ViewModels\ViewModelBase.fs" />
     <Compile Include="ViewModels\App.fs" />
     <Compile Include="ViewModels\MainViewModel.fs" />
@@ -83,6 +85,7 @@
     <PackageReference Include="Avalonia.Xaml.Interactivity" Version="11.2.0" />
     <PackageReference Include="CherylUI" Version="1.5.0" />
     <PackageReference Include="DialogHost.Avalonia" Version="0.9.0-preview1" />
+    <PackageReference Include="FsToolkit.ErrorHandling.TaskResult" Version="4.18.0" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.66" />
     <PackageReference Include="Material.Avalonia" Version="3.7.4" />
     <PackageReference Include="Material.Avalonia.Dialogs" Version="3.7.4" />

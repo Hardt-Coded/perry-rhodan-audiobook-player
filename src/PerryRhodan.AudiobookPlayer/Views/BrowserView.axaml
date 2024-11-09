@@ -7,6 +7,7 @@
              xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
              xmlns:glassMorphism="clr-namespace:CherylUI.Controls.GlassMorphism;assembly=CherylUI"
+             xmlns:valueSelector="clr-namespace:PerryRhodan.AudiobookPlayer.ValueSelector"
              mc:Ignorable="d" d:DesignWidth="393" d:DesignHeight="738"
              x:Class="PerryRhodan.AudiobookPlayer.Views.BrowserView"
              Background="Black"
@@ -14,13 +15,12 @@
              x:DataType="vm:BrowserViewModel">
     <Interaction.Behaviors>
         <EventTriggerBehavior EventName="Loaded">
-            <InvokeCommandAction Command="{Binding OnLoaded}" />
+            <InvokeCommandAction Command="{Binding OnInitialized}" />
         </EventTriggerBehavior>
     </Interaction.Behaviors>
     <Grid RowDefinitions="Auto,Auto,Auto,*">
         <TextBlock Grid.Row="0" FontSize="24" HorizontalAlignment="Center">Bestand durchstöbern</TextBlock>
-
-        <!-- Update -->
+        
         <Grid Grid.Row="1" Margin="5,5,5,25">
             <!-- Search Bar -->
             <TextBox Watermark="Suche" Margin="30,0,30,0" Text="{Binding SearchText, Mode=OneWayToSource}">
@@ -33,56 +33,31 @@
             </TextBox>
 
         </Grid>
-        <!-- Audio Books -->
-        <ScrollViewer Grid.Row="3" VerticalScrollBarVisibility="Hidden"
-                      IsVisible="{Binding AudioBookItemsVisible}">
-            <ItemsControl Grid.Row="1" ItemsSource="{Binding AudioBooks}">
-                <ItemsControl.ItemTemplate>
+        <Grid Row="2">
+            <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                <avalonia:MaterialIcon Kind="Sort" />
+                <valueSelector:ValueSelector Value="{Binding SortOrder}"
+                                             ItemList="{Binding SortOrders}"
+                                             HorizontalContentAlignment="Right"/>    
+            </StackPanel>
+            
+        </Grid>
+            <!-- Audio Books -->
+        <ScrollViewer Grid.Row="3" 
+                      VerticalScrollBarVisibility="Hidden">
+            <ItemsRepeater  ItemsSource="{Binding AudioBooks}"
+            >
+                <ItemsRepeater.ItemTemplate>
                     <DataTemplate>
                         <views:AudioBookItemView DataContext="{Binding .}" />
                     </DataTemplate>
-                </ItemsControl.ItemTemplate>
-                <ItemsControl.Template>
-                    <ControlTemplate>
-                        <ItemsPresenter Margin="0,0,0,100" />
-                    </ControlTemplate>
-                </ItemsControl.Template>
-            </ItemsControl>
-        </ScrollViewer>
-
-        <TextBlock Grid.Row="2"
-                   HorizontalAlignment="Center"
-                   Text="Kein Bestand vorhanden, bitte aktualisieren."
-                   TextWrapping="Wrap"
-                   IsVisible="{Binding IsEmpty}"
-                   FontSize="16"
-                   Margin="0,0,0,10" />
-        <ScrollViewer Grid.Row="3"
-                      VerticalScrollBarVisibility="Hidden"
-                      IsVisible="{Binding CategoryItemsVisible}">
-            <ItemsControl Grid.Row="1" ItemsSource="{Binding AvailableGroups}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Button Theme="{StaticResource MaterialFlatButton}"
-                                FontSize="20"
-                                HorizontalContentAlignment="Left"
-                                Margin="35,0,35,0"
-                                Command="{Binding $parent[ItemsControl].((vm:BrowserViewModel)DataContext).SelectAdditionalGroup }"
-                                CommandParameter="{Binding .}">
-                            <Grid ColumnDefinitions="Auto, *">
-                                <avalonia:MaterialIcon Grid.Column="0" Kind="Folder" Margin="0,0,10,0" Width="20"
-                                                       Height="20" VerticalAlignment="Top" />
-                                <TextBlock Grid.Column="1" Text="{Binding .}" TextWrapping="Wrap" />
-                            </Grid>
-                        </Button>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-                <ItemsControl.Template>
-                    <ControlTemplate>
-                        <ItemsPresenter Margin="0,0,0,100" />
-                    </ControlTemplate>
-                </ItemsControl.Template>
-            </ItemsControl>
+                </ItemsRepeater.ItemTemplate>
+                <!-- <ItemsRepeater.ItemsSourceView> -->
+                <!--     <ControlTemplate> -->
+                <!--         <ItemsPresenter Margin="0,0,0,100" /> -->
+                <!--     </ControlTemplate> -->
+                <!-- </ItemsRepeater.ItemsSourceView> -->
+            </ItemsRepeater>
         </ScrollViewer>
 
 
@@ -113,15 +88,6 @@
                                  Margin="20"
                                  Command="{Binding LoadOnlineAudiobooks}">
             <avalonia:MaterialIcon Kind="Refresh" Width="30" Height="30" />
-        </controls:FloatingButton>
-
-        <controls:FloatingButton Grid.Row="3"
-                                 IsVisible="{Binding BackButtonVisible}"
-                                 VerticalAlignment="Bottom"
-                                 HorizontalAlignment="Left"
-                                 Margin="20"
-                                 Command="{Binding RemoveLastSelectedGroup}">
-            <avalonia:MaterialIcon Kind="ArrowLeft" Width="30" Height="30" />
         </controls:FloatingButton>
 
     </Grid>

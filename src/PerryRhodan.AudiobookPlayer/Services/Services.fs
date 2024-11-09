@@ -1315,7 +1315,7 @@ module SecureLoginStorage =
                 let! cookie =
                     secCookieKey
                     |> getSecuredValue
-                return cookie |> Option.map (fun i -> JsonConvert.DeserializeObject<Map<string,string>>(i)) |> Ok
+                return cookie |> Option.map JsonConvert.DeserializeObject<Map<string,string>> |> Ok
             with
             | e -> return (Error e.Message)
         }

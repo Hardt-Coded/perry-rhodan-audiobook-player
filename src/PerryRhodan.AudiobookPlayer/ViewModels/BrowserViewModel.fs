@@ -14,7 +14,7 @@ open Services
 open Services.DependencyServices
 
 
-module BrowserPage =
+module BrowserPageOld =
 
     type State = {
         AudioBookItems: AudioBookItemViewModel []
@@ -154,382 +154,9 @@ module BrowserPage =
     module SideEffects =
         open PerryRhodan.AudiobookPlayer.Common
 
-        type SynchronizeWithCloudErrors =
-            | NoSessionAvailable
-            | WebError of ComError
-            | StorageError of string
+        
 
-        let private synchronizeWithCloudCmd state dispatch =
-            task {
-                dispatch <| SetBusy true
-
-
-                let notifyAfterSync (synchedAb:AudioBookItemViewModel []) =
-                    task {
-                        match synchedAb with
-                        | [||] ->
-                            do! Notifications.showMessage "Neue Hörbücher" $"{Translations.current.NoNewAudioBooksSinceLastRefresh} ¯\_(ツ)_/¯"
-                        | _ ->
-                            let message = synchedAb |> Array.map (_.AudioBook.FullName) |> String.concat "\r\n"
-                            do! Notifications.showMessage Translations.current.NewAudioBooksSinceLastRefresh message
-                    }
-
-
-                let checkLoginSession () =
-                    task {
-                        let! cookies = SecureLoginStorage.loadCookie ()
-                        match cookies with
-                        | Ok (Some cc) ->
-                            return Some cc
-                        | Error e ->
-                            do! Notifications.showErrorMessage e
-                            return None
-                        | Ok None ->
-                            return None
-                    }
-
-
-                let loadAudioBooksFromCloud (cookies:Map<string,string> option) =
-                    task {
-                        dispatch <| AppendBusyMessage "Lade verfügbare Hörbücher aus dem Shop..."
-                        match cookies with
-                        | None ->
-                            return Error NoSessionAvailable
-                        | Some cookies ->
-                            let! audioBooks = WebAccess.getAudiobooksOnline cookies
-                            return audioBooks |> Result.mapError WebError
-                    }
-
-
-
-
-                let lookForOrphanedAudiobookOnDevice
-                    (modelAudioBooks:AudioBookItemViewModel[])
-                    (loadFromCloud:Result<AudioBook[],SynchronizeWithCloudErrors>) =
-                        match loadFromCloud with
-                        | Error e -> Error e
-                        | Ok cloudAudioBooks ->
-                            dispatch <| AppendBusyMessage "Suche nach bereits runtergeladenen Hörbücher..."
-                            let audioBooksAlreadyOnTheDevice =
-                                DataBase.getAudiobooksFromDownloadFolder cloudAudioBooks
-                                // remove items that are already in the model itself
-                                |> Array.filter (fun i -> modelAudioBooks |> Array.exists (fun a -> a.AudioBook.Id = i.Id) |> not)
-
-
-                            Ok {| OnDevice = audioBooksAlreadyOnTheDevice; InCloud = cloudAudioBooks |}
-
-
-
-                let processLoadedAudioBookFromDevice
-                    (input:Result<{| OnDevice: AudioBook []; InCloud:AudioBook[] |},SynchronizeWithCloudErrors>) =
-                     task {
-                         match input with
-                         | Error e -> return Error e
-                         | Ok e ->
-                             let! _ = e.OnDevice |> DataBase.insertNewAudioBooksInStateFile
-                             return {| OnDevice = e.OnDevice; InCloud = e.InCloud |} |> Ok
-                     }
-
-
-                let determinateNewAddedAudioBooks
-                    (modelAudioBooks:AudioBookItemViewModel[])
-                    (input:Result<{| OnDevice: AudioBook []; InCloud:AudioBook[] |},SynchronizeWithCloudErrors>) =
-                    match input with
-                    | Error e -> Error e
-                    | Ok e ->
-                         dispatch <| AppendBusyMessage "Ermittle neue Hörbücher..."
-                         let audioBooksAlreadyOnTheDevice = e.OnDevice |> Array.map (fun i -> new AudioBookItemViewModel(i))
-                         let modelAndDeviceAudiobooks =
-                             Array.concat [audioBooksAlreadyOnTheDevice; modelAudioBooks]
-                             |> Array.distinctBy (_.AudioBook.Id)
-
-                         let newAudioBookItems =
-                             let currentAudioBooks = modelAndDeviceAudiobooks |> Array.map (_.AudioBook)
-                             filterNewAudioBooks currentAudioBooks e.InCloud
-                             |> Array.map (fun i -> new AudioBookItemViewModel(i))
-                         Ok {| New = newAudioBookItems; OnDevice = modelAndDeviceAudiobooks; InCloud = e.InCloud |}
-
-
-                let checkIfCurrentAudiobookAreReallyDownloaded
-                    (input:Result<{| New: AudioBookItemViewModel[]; OnDevice: AudioBookItemViewModel []; InCloud:AudioBook[] |},SynchronizeWithCloudErrors>) =
-                        match input with
-                        | Error e -> Error e
-                        | Ok e ->
-                            dispatch <| AppendBusyMessage "Prüfe ob alle Hörbücher wirklich heruntergeladen sind..."
-                            let audioBooks =
-                                e.OnDevice
-                                |> Array.filter (fun i -> i.DownloadState = AudioBookItem.Downloaded)
-
-
-                            // check on the file system if the audio books are really downloaded
-                            audioBooks
-                            |> Array.filter (fun i ->
-                                let folder = i.AudioBook.State.DownloadedFolder
-                                match folder with
-                                | Some f ->
-                                    System.IO.Directory.Exists(f)
-                                    |> fun folderExists ->
-                                        if folderExists then
-                                            let audioFiles = System.IO.Directory.GetFiles(f, "*.mp3")
-                                            audioFiles.Length = 0
-                                        else
-                                            true
-                                // ignore these, who has no download folder
-                                | None -> false
-                            )
-                            |> Array.iter (fun i ->
-                                i.SetDownloadPath None
-                                // also remove orphand pictures
-                                i.SetPicture None None
-                            )
-
-                            Ok {| New = e.New; OnDevice = e.OnDevice; InCloud = e.InCloud |}
-
-                let removeOrphanPictures
-                    (input:Result<{| New: AudioBookItemViewModel[]; OnDevice: AudioBookItemViewModel []; InCloud:AudioBook[] |},SynchronizeWithCloudErrors>) =
-                        match input with
-                        | Error e -> Error e
-                        | Ok e ->
-                            dispatch <| AppendBusyMessage "Entferne verwaiste Bilder..."
-                            e.OnDevice
-                            |> Array.filter
-                                (fun i ->
-                                i.AudioBook.Picture
-                                |> Option.map (fun p -> p.StartsWith("http") |> not)
-                                |> Option.defaultValue false)
-                            |> Array.iter (fun i ->
-                                i.AudioBook.Picture
-                                |> Option.iter (fun p ->
-                                    if (p.StartsWith "http" |> not) &&  (System.IO.File.Exists(p) |> not) then
-                                        i.SetPicture None None
-                                )
-                            )
-                            Ok {| New = e.New; OnDevice = e.OnDevice; InCloud = e.InCloud |}
-
-
-                let processNewAddedAudioBooks
-                    (input:Result<{| New: AudioBookItemViewModel[]; OnDevice: AudioBookItemViewModel []; InCloud:AudioBook[] |},SynchronizeWithCloudErrors>) =
-                        task {
-                             match input with
-                             | Error e -> return Error e
-                             | Ok i ->
-                                 dispatch <| AppendBusyMessage "Speichere neue Hörbücher..."
-                                 let onlyAudioBooks =
-                                     i.New
-                                     |> Array.map (_.AudioBook)
-
-                                 let! ab =
-                                     onlyAudioBooks
-                                     |> DataBase.insertNewAudioBooksInStateFile
-
-                                 match ab with
-                                 | Error e ->
-                                     return StorageError e |> Error
-                                 | Ok _ ->
-                                     return {| New = i.New; OnDevice = i.OnDevice; InCloud = i.InCloud |} |> Ok
-
-                        }
-
-
-                let repairAudiobookMetadataIfNeeded
-                    (input:Result<{| New: AudioBookItemViewModel[]; OnDevice: AudioBookItemViewModel []; InCloud:AudioBook[] |},SynchronizeWithCloudErrors>) =
-                    task {
-                        match input with
-                        | Error e ->
-                            return Error e
-                        | Ok e ->
-                            dispatch <| AppendBusyMessage "Suche nach defekten Metadaten..."
-                            let hasDiffMetaData a b =
-                                a.FullName <> b.FullName ||
-                                a.EpisodeNo <> b.EpisodeNo ||
-                                a.EpisodenTitel <> b.EpisodenTitel ||
-                                a.Group <> b.Group
-
-                            let folders = Services.Consts.createCurrentFolders ()
-
-
-                            let repairedAudioBooksItem =
-                                e.OnDevice
-                                |> Array.choose (fun i ->
-                                    e.InCloud
-                                    |> Array.tryFind (fun c -> c.Id = i.AudioBook.Id)
-                                    |> Option.bind (fun c ->
-                                        if hasDiffMetaData c i.AudioBook then
-                                            let newAudioBookFolder = System.IO.Path.Combine(folders.audioBookDownloadFolderBase, c.FullName)
-
-                                            let opt predicate input =
-                                                if predicate then
-                                                    Some input
-                                                else
-                                                    None
-
-                                            let newAb = {
-                                                i.AudioBook with
-                                                    FullName = c.FullName
-                                                    EpisodeNo = c.EpisodeNo
-                                                    EpisodenTitel = c.EpisodenTitel
-                                                    Group = c.Group
-                                                    Thumbnail = System.IO.Path.Combine(newAudioBookFolder, c.FullName + ".thumb.jpg") |> opt i.AudioBook.State.Downloaded
-                                                    Picture =   System.IO.Path.Combine(newAudioBookFolder, c.FullName + ".jpg") |> opt i.AudioBook.State.Downloaded
-                                                    State = {
-                                                        i.AudioBook.State with
-                                                            DownloadedFolder = System.IO.Path.Combine(newAudioBookFolder,"audio") |> opt i.AudioBook.State.Downloaded
-                                                    }
-                                            }
-                                            // we need to generate a new Item, because the dispatch itself contains also the audiobook data
-                                            let newItem =
-                                                new AudioBookItemViewModel(newAb)
-
-                                            Some newItem
-                                        else
-                                            None
-                                    )
-                                )
-
-                            let nameDiffOldNewDownloaded =
-                                e.OnDevice
-                                |> Array.choose (fun i ->
-                                    e.InCloud
-                                    |> Array.tryFind (fun c -> c.Id = i.AudioBook.Id && i.DownloadState = AudioBookItem.Downloaded)
-                                    |> Option.bind (fun c ->
-                                        if c.FullName <> i.AudioBook.FullName then
-                                            Some {| OldName = i.AudioBook.FullName; NewName = c.FullName |}
-                                        else
-                                            None
-                                    )
-                                )
-
-
-
-                            match repairedAudioBooksItem with
-                            | [||] ->
-                                return {| New = e.New; OnDevice = e.OnDevice; DifferNames = nameDiffOldNewDownloaded |} |> Ok
-                                //return (newAudioBookItems, currentAudioBooks, nameDiffOldNewDownloaded) |> Ok
-                            | _ ->
-
-                                for i in repairedAudioBooksItem do
-                                    let! result = DataBase.updateAudioBookInStateFile i.AudioBook
-                                    ()
-
-                                // replacing fixed entries
-                                let currentAudioBooks =
-                                    e.OnDevice
-                                    |> Array.map (fun c ->
-                                        match repairedAudioBooksItem |> Array.tryFind (fun r -> c.AudioBook.Id = r.AudioBook.Id) with
-                                        | None ->
-                                            c
-                                        | Some r ->
-                                            r
-                                    )
-
-                                return {| New = e.New; OnDevice = currentAudioBooks; DifferNames = nameDiffOldNewDownloaded |} |> Ok
-                                //return (newAudioBookItems, currentAudioBooks, nameDiffOldNewDownloaded) |> Ok
-
-                     }
-
-
-                let fixDownloadFolders
-                    (input:Result<{| New: AudioBookItemViewModel[]; OnDevice: AudioBookItemViewModel []; DifferNames: {| OldName:string; NewName:string |} array |},SynchronizeWithCloudErrors>) =
-                        match input with
-                        | Error e -> Error e
-                        | Ok e ->
-                            dispatch <| AppendBusyMessage "Repariere mögliche Probleme mit den Downloadordnern..."
-                            let folders = Services.Consts.createCurrentFolders ()
-                            try
-                                e.DifferNames
-                                |> Array.map (fun x ->
-                                    let oldFolder = System.IO.Path.Combine(folders.audioBookDownloadFolderBase,x.OldName)
-                                    let newFolder = System.IO.Path.Combine(folders.audioBookDownloadFolderBase,x.NewName)
-                                    {|
-                                        OldFolder =     oldFolder
-                                        NewFolder =     newFolder
-
-                                        OldPicName =    System.IO.Path.Combine(oldFolder, x.OldName + ".jpg")
-                                        NewPicName =    System.IO.Path.Combine(oldFolder, x.NewName + ".jpg")
-                                        OldThumbName =  System.IO.Path.Combine(oldFolder, x.OldName + ".thumb.jpg")
-                                        NewThumbName =  System.IO.Path.Combine(oldFolder, x.NewName + ".thumb.jpg")
-                                    |}
-                                )
-                                |> Array.iter (fun x ->
-                                    System.IO.File.Move(x.OldPicName,x.NewPicName)
-                                    System.IO.File.Move(x.OldThumbName,x.NewThumbName)
-                                    System.IO.Directory.Move(x.OldFolder,x.NewFolder)
-                                )
-
-                                //return (newAudioBookItems, currentAudioBooks) |> Ok
-                                {| New = e.New; OnDevice = e.OnDevice |} |> Ok
-                            with
-                            | ex ->
-                                (StorageError ex.Message) |> Error
-
-
-
-
-
-                let processResult
-                    (input:Result<{| New : AudioBookItemViewModel[]; OnDevice : AudioBookItemViewModel[] |} ,SynchronizeWithCloudErrors>) =
-                    task {
-                        match input with
-                        | Ok e ->
-                            dispatch <| AppendBusyMessage "Fertig!"
-                            let audioBooks =
-                                (Array.concat [e.New;e.OnDevice])
-                                |> Array.sortBy (_.AudioBook.FullName)
-                            // also sync with global store
-                            AudioBookStore.globalAudiobookStore.Dispatch <| AudioBookStore.AudioBookElmish.AudiobooksLoaded audioBooks
-                            dispatch <| AudioBookItemsChanged audioBooks
-                            do! Task.Delay 1000
-                            // start picture download background service
-                            DependencyService.Get<IPictureDownloadService>().StartDownload()
-                            do! e.New |> notifyAfterSync
-
-                        | Error err ->
-                            match err with
-                            | NoSessionAvailable ->
-                                dispatch <| OpenLoginPage
-
-                            | WebError comError ->
-                                match comError with
-                                | SessionExpired e ->
-                                    dispatch <| OpenLoginPage
-
-                                | Other e ->
-                                    do! Notifications.showErrorMessage e
-
-                                | Exception e ->
-                                    let ex = e.GetBaseException()
-                                    let msg = ex.Message + "|" + ex.StackTrace
-                                    do! Notifications.showErrorMessage msg
-
-                                | Network msg ->
-                                    do! Notifications.showErrorMessage msg
-
-                            | StorageError msg ->
-                                do! Notifications.showErrorMessage msg
-                    }
-
-                try
-                    do!
-                        checkLoginSession ()
-                        |> Task.bind loadAudioBooksFromCloud
-                        |> Task.map (lookForOrphanedAudiobookOnDevice AudioBookStore.globalAudiobookStore.Model.Audiobooks)
-                        |> Task.bind processLoadedAudioBookFromDevice
-                        |> Task.map (determinateNewAddedAudioBooks AudioBookStore.globalAudiobookStore.Model.Audiobooks)
-                        |> Task.map  checkIfCurrentAudiobookAreReallyDownloaded
-                        |> Task.map  removeOrphanPictures
-                        |> Task.bind processNewAddedAudioBooks
-                        |> Task.bind repairAudiobookMetadataIfNeeded
-                        |> Task.map  fixDownloadFolders
-                        |> Task.bind processResult
-                with
-                | ex ->
-                    do! Notifications.showErrorMessage ex.Message
-
-
-
-                dispatch <| SetBusy false
-
-            }
+        
 
 
         let runSideEffects (sideEffect:SideEffect) (state:State) (dispatch:Msg -> unit) =
@@ -563,7 +190,7 @@ module BrowserPage =
                                 return ()
 
                             | SideEffect.LoadOnlineAudioBooks ->
-                                do! synchronizeWithCloudCmd state dispatch
+                                raise <| NotImplementedException ("View fliegt raus")
 
                                 return ()
 
@@ -605,7 +232,7 @@ module BrowserPage =
                     dispatch <| SetBusy false
             }
 
-open BrowserPage
+open BrowserPageOld
 open ReactiveElmish.Avalonia
 open ReactiveElmish
 open Elmish.SideEffect
@@ -672,7 +299,7 @@ module private DemoData =
         }
 
 
-type BrowserViewModel(?audiobookItems) as self =
+type BrowserOldViewModel(?audiobookItems) as self =
     inherit ReactiveElmishViewModel()
 
     let audiobookItems = [||] |> defaultArg audiobookItems
@@ -692,7 +319,7 @@ type BrowserViewModel(?audiobookItems) as self =
             ()
 
     new () =
-        new BrowserViewModel([||])
+        new BrowserOldViewModel([||])
 
     member this.AudioBooks =
         this.Bind(local, fun s -> ObservableCollection(s.AudioBookItems))
@@ -755,7 +382,7 @@ type BrowserViewModel(?audiobookItems) as self =
 
 
     static member DesignVM =
-        new BrowserViewModel(
+        new BrowserOldViewModel(
             [|
                 AudioBookItemViewModel(DemoData.designAudioBook)
                 AudioBookItemViewModel(DemoData.designAudioBook2)
