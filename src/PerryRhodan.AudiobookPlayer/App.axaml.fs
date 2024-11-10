@@ -5,9 +5,6 @@ open Avalonia.Controls
 open Avalonia.Controls.ApplicationLifetimes
 open Avalonia.Markup.Xaml
 open Dependencies
-open Microsoft.AppCenter
-open Microsoft.AppCenter.Analytics
-open Microsoft.AppCenter.Crashes
 open Microsoft.Extensions.DependencyInjection
 open PerryRhodan.AudiobookPlayer.Controls
 open PerryRhodan.AudiobookPlayer.Services

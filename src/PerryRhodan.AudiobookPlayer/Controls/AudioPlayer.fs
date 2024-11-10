@@ -600,7 +600,6 @@ module PlayerElmish =
                                     |> Task.WhenAll
                                 with
                                 | ex ->
-                                    Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
                                     Global.telemetryClient.TrackException ex
                                     Task.FromResult [||]
                             | None -> Task.FromResult [||]
@@ -817,21 +816,6 @@ open Elmish
 
 
 type AudioPlayerService() =
-
-
-
-    //let store =
-        //Program.syncedProgrammWithSideEffect
-        //    PlayerElmish.init
-        //    PlayerElmish.update
-        //    (PlayerElmish.SideEffects.createSideEffectsProcessor ())
-        //#if DEBUG
-        //|> Program.withSyncedTrace(fun msg state ->
-        //    System.Diagnostics.Trace.WriteLine($"Player: \r\n Msg: \r\n {msg} \r\n State: \r\n {({ state with Mp3FileList = [] })}")
-        //)
-        //#endif
-        //|> Program.mkSyncedStore
-
 
     let store =
         Program.mkAvaloniaProgrammWithSideEffect

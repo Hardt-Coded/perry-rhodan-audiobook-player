@@ -93,14 +93,11 @@
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
 
     <PackageReference Include="FsHttp" Version="14.4.0" />
-    <PackageReference Include="Microsoft.AppCenter" Version="5.0.5" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="FSharp.Control.AsyncSeq" Version="3.2.1" />
     <PackageReference Include="FSharpx.Async" Version="1.14.1" />
-    <PackageReference Include="Microsoft.AppCenter.Analytics" Version="5.0.5" />
-    <PackageReference Include="Microsoft.AppCenter.Crashes" Version="5.0.3" />
     <PackageReference Include="SharpZipLib" Version="1.4.2" />
-    <PackageReference Include="SkiaSharp" Version="3.0.0-preview.5.4" />
+    <PackageReference Include="SkiaSharp" Version="3.118.0-preview.1.2" />
     <PackageReference Include="taglib-sharp-netstandard2.0" Version="2.1.0" />
   </ItemGroup>
 

@@ -103,7 +103,6 @@
                         this.StartForeground(downloadServiceNotificationId, buildNotification "Download" "Starte Download!", PM.ForegroundService.TypeDataSync)
                     with
                     | ex ->
-                        Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
                         Global.telemetryClient.TrackException ex
                         reraise()
 
@@ -118,7 +117,6 @@
                         StartCommandResult.Sticky
                     with
                     | ex ->
-                        Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
                         Global.telemetryClient.TrackException ex
                         shutDownService()
                         StartCommandResult.Sticky

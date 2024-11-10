@@ -20,8 +20,12 @@ module Program =
                         with
                         | ex ->
                             // log
-                            Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
-                            Global.telemetryClient.TrackException ex
+                            let props =
+                                [
+                                    "sideEffect", sideEffect.ToString()
+                                    "state", state.ToString()
+                                ] |> Map.ofList
+                            Global.telemetryClient.TrackException(ex, props)
                             return ()
 
                     } |> Async.StartImmediate

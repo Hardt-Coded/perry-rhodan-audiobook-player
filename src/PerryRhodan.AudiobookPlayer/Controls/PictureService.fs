@@ -62,7 +62,6 @@ type PictureDownloadService (notificationCallback: (string -> unit), finishedCal
                 with
                 | ex ->
                     // log
-                    Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
                     Global.telemetryClient.TrackException ex
                     ()
             return ()
@@ -79,7 +78,6 @@ type PictureDownloadService (notificationCallback: (string -> unit), finishedCal
                 with
                 | ex ->
                     // log
-                    Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
                     Global.telemetryClient.TrackException ex
             }
 

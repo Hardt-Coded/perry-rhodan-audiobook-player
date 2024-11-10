@@ -509,8 +509,7 @@ module AudioBookItem =
                         return if bitmap = null || bitmap.IsEmpty || bitmap.IsNull then None else Some bitmap
                     with
                     | ex ->
-                        Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
-                        Global.telemetryClient.TrackException ex
+                        Global.telemetryClient.TrackException (ex, [("url", url)] |> Map.ofList)
                         #if DEBUG
                         System.Diagnostics.Debug.WriteLine($"Error loading image from url: {url}")
                         #endif
@@ -545,8 +544,10 @@ module AudioBookItem =
                 let avgHue =
                     if aboveAvg.Length > belowAvg.Length then
                         aboveAvg |> List.average
-                    else
+                    elif aboveAvg.Length < belowAvg.Length then
                         belowAvg |> List.average
+                    else
+                        avgeHue
 
                 let avgHueColor = SkiaSharp.SKColor.FromHsv(avgHue, 100.0f, 50.0f)
                 avgHueColor.ToString()                
@@ -562,7 +563,6 @@ module AudioBookItem =
                             )
                     with
                     | ex ->
-                        Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
                         Global.telemetryClient.TrackException ex
                         return None
                     
@@ -575,7 +575,6 @@ module AudioBookItem =
                     |> Option.map getAmbientColorFromSkBitmap
                 with
                 | ex ->
-                    Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
                     Global.telemetryClient.TrackException ex
                     None
                 
@@ -712,7 +711,6 @@ module AudioBookItem =
 
                 with
                 | ex ->
-                    Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
                     Global.telemetryClient.TrackException ex
                     dispatch <| IsBusy true
                     raise ex

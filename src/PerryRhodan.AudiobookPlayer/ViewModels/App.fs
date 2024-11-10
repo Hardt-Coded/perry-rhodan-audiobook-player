@@ -211,7 +211,6 @@ DependencyService.SetComplete()
 let app =
     Program.mkAvaloniaProgrammWithSideEffect init update runSideEffect
     |> Program.withErrorHandler (fun (_, ex) ->
-        Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
         Global.telemetryClient.TrackException ex
     )
     //|> Program.withConsoleTrace
