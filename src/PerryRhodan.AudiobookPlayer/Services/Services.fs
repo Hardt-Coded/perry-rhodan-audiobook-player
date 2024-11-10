@@ -3,6 +3,7 @@
 open System
 open System.Diagnostics
 open System.IO
+open System.Threading
 open Avalonia
 open Avalonia.Controls
 open Avalonia.Controls.Platform
@@ -127,7 +128,26 @@ module Consts =
 
 module Notifications =
 
+    open System.Reflection
+    open System.Threading.Tasks
+
     let private notificationService = lazy DependencyService.Get<INotificationService>()
+
+    let private hasDialogHostLoadedInstances () =
+        let fieldInfo = typeof<DialogHost>.GetField("LoadedInstances", BindingFlags.Static ||| BindingFlags.NonPublic)
+        match fieldInfo with
+        | null -> false
+        | _ ->
+            let value = fieldInfo.GetValue(null) :?> seq<DialogHost>
+            if value = null then false else value |> Seq.length > 0
+
+    let waitUntilDialogHostHasAnInstance (timeoutMs:int) =
+        task {
+            let token = CancellationTokenSource(timeoutMs).Token
+            while hasDialogHostLoadedInstances() |> not && token.IsCancellationRequested |> not do
+                do! Task.Delay 100
+        }
+
 
     let showNotification title message =
         let ns = notificationService.Force()
@@ -150,6 +170,7 @@ module Notifications =
     let showErrorMessage (msg:string) =
         Dispatcher.UIThread.InvokeAsync<unit> (fun _ ->
             task {
+                do! waitUntilDialogHostHasAnInstance 2000
                 let! _ = DialogHost.Show(MessageBoxViewModel("Achtung!", msg))
                 ()
             }
@@ -158,6 +179,8 @@ module Notifications =
     let showMessage title (msg:string) =
         Dispatcher.UIThread.InvokeAsync<unit> (fun _ ->
             task {
+                // Get static private enumerable "LoadedInstances" from class DialogHost, use Reflection
+                do! waitUntilDialogHostHasAnInstance 2000
                 let! _ = DialogHost.Show(MessageBoxViewModel(title, msg))
                 ()
             }
@@ -167,6 +190,7 @@ module Notifications =
     let showQuestionDialog title message okButtonLabel cancelButtonLabel =
         Dispatcher.UIThread.InvokeAsync<bool> (fun _ ->
             task {
+                do! waitUntilDialogHostHasAnInstance 2000
                 let! res = DialogHost.Show(QuestionBoxViewModel(title, message, okButtonLabel, cancelButtonLabel))
                 return res = "OK"
             }
@@ -716,8 +740,6 @@ module WebAccess =
     open Consts
     open DataBase
     open System.Net.Sockets
-    open Microsoft.AppCenter.Crashes
-    open Microsoft.AppCenter.Analytics
 
 
     let httpHandlerService = lazy DependencyService.Get<IAndroidHttpMessageHandlerService>()
@@ -738,7 +760,6 @@ module WebAccess =
             with
             | exn ->
                 let ex = exn.GetBaseException()
-                Crashes.TrackError(ex, Map.empty)
                 Global.telemetryClient.TrackException ex
                 match ex with
                 | :? WebException | :? SocketException ->
@@ -1051,9 +1072,7 @@ module WebAccess =
         let downloadAudiobook cookies updateProgress (audiobook:AudioBook) =
             task {
                 try
-                    Analytics.TrackEvent("download audiobook")
                     Global.telemetryClient.TrackEvent ("AudioBookDownload")
-
                     let folders = createCurrentFolders ()
 
                     if audiobook.State.Downloaded then
@@ -1176,7 +1195,6 @@ module WebAccess =
                 with
                 | exn ->
                     let ex = exn.GetBaseException()
-                    Crashes.TrackError(ex, Map.empty)
                     Global.telemetryClient.TrackException ex
                     match ex with
                     | :? WebException | :? SocketException ->
@@ -1493,7 +1511,6 @@ module SupportFeedback =
                     return Ok ()
             with
             | ex ->
-                Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
                 Global.telemetryClient.TrackException ex
                 return Error "Fehler beim Senden der Nachricht. Probieren Sie es noch einmal."
         }
@@ -1637,7 +1654,6 @@ module DownloadService =
                                      return! loop { state with ServiceListener = Some listener }
 
                                  | SignalServiceCrashed ex ->
-                                     Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
                                      Global.telemetryClient.TrackException ex
                                      return! loop { state with ServiceListener = None }
 
@@ -1693,7 +1709,6 @@ module DownloadService =
 
                              with
                              | ex ->
-                                Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
                                 Global.telemetryClient.TrackException ex
                                 do! Notifications.showErrorMessage ex.Message |> Async.AwaitTask
                                 return! loop state
@@ -1961,7 +1976,6 @@ module DownloadService =
                                     return! loop state
                             with
                             | ex ->
-                                Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
                                 Global.telemetryClient.TrackException ex
                                 return! loop state
                         }
