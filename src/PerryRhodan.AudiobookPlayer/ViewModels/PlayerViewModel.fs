@@ -8,6 +8,7 @@ open Avalonia.Controls
 open Avalonia.Controls.Primitives
 open Dependencies
 open Domain
+open Microsoft.Extensions.DependencyInjection
 open PerryRhodan.AudiobookPlayer.Services
 open PerryRhodan.AudiobookPlayer.Services.AudioPlayer
 open PerryRhodan.AudiobookPlayer.Services.AudioPlayer.PlayerElmish
@@ -347,7 +348,6 @@ module PlayerPage =
                                     Notifications.showErrorMessage
                                         "Konnte Hörbuch Dateien nicht finden."
 
-                                Microsoft.AppCenter.Crashes.Crashes.TrackError(ex, Map.empty)
                                 Global.telemetryClient.TrackException(ex)
                                 return None
 
@@ -358,7 +358,6 @@ module PlayerPage =
                                 |> Some
                     with
                     | ex ->
-                        Microsoft.AppCenter.Crashes.Crashes.TrackError(ex)
                         Global.telemetryClient.TrackException ex
                         return raise ex
 
@@ -370,7 +369,21 @@ module PlayerPage =
                     return ()
                  else
 
-                    let audioPlayer = DependencyService.Get<IAudioPlayer>()
+                    // somehow there is an null ref exception on the audioplayer, so make sure, if this happen, to reregister the service
+                    let audioPlayer =
+                        let ab = DependencyService.Get<IAudioPlayer>()
+                        if ab = Unchecked.defaultof<_> then
+                            // register the audioplayer
+                            let audioService = new AudioPlayerService()
+                            DependencyService.ServiceCollection
+                                .AddSingleton<IAudioPlayer>(audioService)
+                                .AddSingleton<IAudioPlayerPause>(audioService)
+                            |> ignore
+                            DependencyService.SetComplete()
+                            audioService :> IAudioPlayer
+                        else
+                            ab
+                            
                     let globalSettings = DependencyService.Get<GlobalSettingsService>()
                     dispatch <| SetBusy true
                     do!
