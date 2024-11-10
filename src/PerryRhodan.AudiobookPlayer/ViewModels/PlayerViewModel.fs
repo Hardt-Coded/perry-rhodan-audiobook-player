@@ -669,7 +669,7 @@ type PlayerViewModel(audiobook: AudioBookItemViewModel, startPlaying) =
     member this.TotalPositionString =
         this.BindOnChanged(
             local,
-            _.CurrentPosition,
+            (fun s -> s.CurrentPosition,s.CurrentAudioFileIndex),
             fun s ->
                 let pos = getPositionAudioBookTotal s
                 $"Gesamt: {pos.CurrentPos:``hh\:mm\:ss``} / {pos.Total:``hh\:mm\:ss``}"
