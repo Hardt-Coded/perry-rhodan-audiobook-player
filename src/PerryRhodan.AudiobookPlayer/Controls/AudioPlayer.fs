@@ -634,7 +634,7 @@ module PlayerElmish =
                                     if currentPos <> previousPosition then
                                         dispatch <| StateControlMsg (UpdatePosition currentPos)
                                         previousPosition <- currentPos
-                                        
+
                                     if currentItem <> previousMediaItem then
                                         dispatch <| StateControlMsg (UpdateCurrentMediaItem currentItem)
                                         previousMediaItem <- currentItem
@@ -785,7 +785,7 @@ type IAudioPlayer =
     abstract member DisableAudioPlayer: unit -> Task<unit>
 
     abstract member Play: unit -> Task<unit>
-    abstract member PlayExtern: file: string -> pos: TimeSpan -> Task<unit>
+    abstract member PlayExtern: file: string -> pos: TimeSpan -> force:bool ->  Task<unit>
     abstract member Pause: unit -> Task<unit>
     abstract member PlayPause: unit -> Task<unit>
     abstract member Stop: bool -> Task<unit>
@@ -849,8 +849,12 @@ type AudioPlayerService() =
                     state.AudioBook |> Option.iter (fun ab ->
                         ab.UpdateAudioBookPosition (state.Position)
                         ab.UpdateCurrentListenFilename (state.Filename)
+                        
                     )
                 | _ -> ()
+                
+                // update player state
+                state.AudioBook |> Option.iter (fun ab -> ab.ToggleIsPlaying (state.State = AudioPlayerState.Playing))
             )
 
 
@@ -883,9 +887,9 @@ type AudioPlayerService() =
             }
 
 
-        member this.PlayExtern file pos =
+        member this.PlayExtern file pos force =
             task {
-                if not store.Model.IsBusy then
+                if not store.Model.IsBusy || force then
                     store.Dispatch <| PlayerControlMsg (PlayExtern (file, pos))
             }
 

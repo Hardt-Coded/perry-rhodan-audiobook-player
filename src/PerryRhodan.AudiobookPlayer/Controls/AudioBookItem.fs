@@ -901,7 +901,7 @@ type AudioBookItemViewModel(audiobook: AudioBook) as self =
     member this.IsNotDownloaded = this.BindOnChanged(local,_.DownloadState, fun s -> s.DownloadState = NotDownloaded)
     member this.IsComplete      = this.BindOnChanged(local,_.ListenState, fun s -> s.ListenState = Listend)
     member this.IsPlaying       = this.BindOnChanged(local,_.IsPlaying, _.IsPlaying)
-    member this.IsPlayButtonVisible = this.BindOnChanged(local,_.DownloadState, fun s ->  s.DownloadState = Downloaded && not s.IsPlaying)
+    member this.IsPlayButtonVisible = this.BindOnChanged(local, (fun s -> s.DownloadState, s.IsPlaying), fun s ->  s.DownloadState = Downloaded && not s.IsPlaying)
     member this.ListenState     = this.BindOnChanged(local, _.ListenState, _.ListenState)
     member this.AmbientColor    = this.BindOnChanged(local, _.AmbientColor, (fun i ->
         let ac = i.AmbientColor |> Option.defaultValue "#ff483d8b"
@@ -922,7 +922,7 @@ type AudioBookItemViewModel(audiobook: AudioBook) as self =
     member this.UpdateAudioBookPosition pos = local.Dispatch (UpdateAudioBookPosition pos)
     member this.UpdateCurrentListenFilename filename = local.Dispatch (UpdateCurrentListenFilename filename)
     member this.ToggleAmbientColor()        = local.Dispatch (ToggleAmbientColor)
-    member this.ToggleIsPlaying pstate      = local.Dispatch (ToggleIsPlaying pstate)
+    member this.ToggleIsPlaying pstate      = if pstate <> this.IsPlaying then local.Dispatch (ToggleIsPlaying pstate)
     member this.PauseAudiobook()            = local.Dispatch SendPauseCommandToAudioPlayer
 
     member this.SetPicture picture thumb    = local.Dispatch <| UpdateAudiobookPicture (picture, thumb)

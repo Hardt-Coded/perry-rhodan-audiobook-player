@@ -60,7 +60,7 @@ module PlayerPage =
         | SetBusy of bool
 
     and PlayerControlMsg =
-        | Play
+        | Play of force:bool
         | PlayWithoutRewind
         | Stop
 
@@ -79,7 +79,7 @@ module PlayerPage =
 
         | StartAudioBookService of fileList: (string * TimeSpan) list
 
-        | Play
+        | Play of force:bool
         | PlayWithoutRewind
         | Stop
         | Next
@@ -131,7 +131,7 @@ module PlayerPage =
         | RunOnlySideEffect sideEffect ->
             state, sideEffect
 
-        | PlayerControlMsg Play ->
+        | PlayerControlMsg (Play force) ->
             let state = state |> fixModelWhenCurrentTrackGreaterThanNumberOfTracks
 
             {
@@ -143,7 +143,7 @@ module PlayerPage =
                         else
                             state.CurrentAudioFileIndex
             },
-            SideEffect.Play
+            SideEffect.Play force
 
         | PlayerControlMsg PlayWithoutRewind ->
             let state = state |> fixModelWhenCurrentTrackGreaterThanNumberOfTracks
@@ -402,7 +402,7 @@ module PlayerPage =
                                         state.StartPlayingOnOpen
                                         && audioPlayer.AudioPlayerInformation.State = AudioPlayerState.Stopped
                                     then
-                                        dispatch <| PlayerControlMsg Play
+                                        dispatch <| PlayerControlMsg (Play true)
 
                                 // the user tapped on a different audiobook
                                 | Some infoAudioBook ->
@@ -432,7 +432,7 @@ module PlayerPage =
 
                                 return ()
 
-                            | SideEffect.Play ->
+                            | SideEffect.Play force ->
                                 match state.AudioFileList with
                                 | [] -> do! Notifications.showErrorMessage "Keine Dateien gefunden."
                                 | _ ->
@@ -448,16 +448,14 @@ module PlayerPage =
                                         else
                                             p
 
-                                    do! audioPlayer.PlayExtern file newPosition
-
-                                    return ()
+                                    do! audioPlayer.PlayExtern file newPosition force
 
                             | SideEffect.PlayWithoutRewind ->
                                 match state.AudioFileList with
                                 | [] -> do! Notifications.showErrorMessage "Keine Dateien gefunden."
                                 | _ ->
                                     let file, _ = state.AudioFileList[state.CurrentAudioFileIndex]
-                                    do! audioPlayer.PlayExtern file state.CurrentPosition
+                                    do! audioPlayer.PlayExtern file state.CurrentPosition false
 
                                     return ()
 
@@ -496,7 +494,7 @@ module PlayerPage =
                                 dispatch <| UpdateScreenInformation audioPlayer.AudioPlayerInformation
 
                                 if state.StartPlayingOnOpen then
-                                    dispatch <| PlayerControlMsg Play
+                                    dispatch <| PlayerControlMsg (Play true)
 
                                 return ()
 
@@ -732,7 +730,7 @@ type PlayerViewModel(audiobook: AudioBookItemViewModel, startPlaying) =
 
 
     member this.Play() =
-        local.Dispatch <| PlayerControlMsg Play
+        local.Dispatch <| PlayerControlMsg (Play false)
 
     member this.IsPlaying =
         this.BindOnChanged(local, _.CurrentState, (fun i -> i.CurrentState = AudioPlayerState.Playing))
