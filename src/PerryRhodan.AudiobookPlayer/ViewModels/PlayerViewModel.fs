@@ -712,7 +712,7 @@ type PlayerViewModel(audiobook: AudioBookItemViewModel, startPlaying) =
 
     member this.PlaybackSpeeds =
         [|
-            for i in 0.1m .. 0.1m .. 3.0m do
+            for i in 0.1m .. 0.1m .. 6.0m do
                 i, $"{i:``0.0x``}"
         |]
 
