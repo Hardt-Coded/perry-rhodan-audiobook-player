@@ -540,6 +540,8 @@ module PlayerElmish =
             let mutable currentMediaItems: IMediaItem array = [||]
             let disposables = new System.Collections.Generic.List<IDisposable>()
             let mutable suppressPositionAndTrackUpdates = false
+            let mutable previousPosition = TimeSpan.Zero
+            let mutable previousMediaItem = Unchecked.defaultof<IMediaItem>
             // used to deteminate, if we need to save the position
 
             let playQueueBouncer =
@@ -626,26 +628,19 @@ module PlayerElmish =
                             Reactive.Linq.Observable.Interval (TimeSpan.FromSeconds 1)
                             |> Observable.subscribe (fun _ ->
                                 if (CrossMediaManager.Current.Queue.Current.Id <> "empty") && not suppressPositionAndTrackUpdates then
-                                    dispatch <| StateControlMsg (UpdatePosition CrossMediaManager.Current.Position)
-                                    dispatch <| StateControlMsg (UpdateCurrentMediaItem CrossMediaManager.Current.Queue.Current)
+                                    let currentPos = CrossMediaManager.Current.Position
+                                    let currentItem = CrossMediaManager.Current.Queue.Current
+                                    // only send position and track updates, if they changed
+                                    if currentPos <> previousPosition then
+                                        dispatch <| StateControlMsg (UpdatePosition currentPos)
+                                        previousPosition <- currentPos
+                                        
+                                    if currentItem <> previousMediaItem then
+                                        dispatch <| StateControlMsg (UpdateCurrentMediaItem currentItem)
+                                        previousMediaItem <- currentItem
                             )
 
                         disposables.Add posTimer
-
-
-
-                        // let mediaItemDebouncer =
-                        //      Common.Extensions.debounce<IMediaItem> 750 (fun mediaItem ->
-                        //
-                        //     )
-                        //disposables.Add
-                        //    <| CrossMediaManager.Current.MediaItemChanged.Subscribe(fun e ->
-                        //         //mediaItemDebouncer e.MediaItem
-                        //        if e.MediaItem.Id <> "empty" && not suppressPositionAndTrackUpdates then
-                        //            dispatch <| StateControlMsg (UpdateCurrentMediaItem e.MediaItem)
-                        //    )
-
-
 
                         let stateDebouncer =
                             Common.Extensions.debounce<AudioPlayerState> 750 (fun state ->
