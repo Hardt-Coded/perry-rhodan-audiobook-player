@@ -3,7 +3,6 @@
 open System.IO
 open System.Net.Http
 open System.Threading.Tasks
-open Avalonia.Controls
 open Avalonia.Media
 open Avalonia.Media.Imaging
 open Avalonia.Threading
@@ -11,7 +10,6 @@ open CherylUI.Controls
 open Common
 open Dependencies
 open Domain
-open MediaManager.Library
 open Microsoft.ApplicationInsights.DataContracts
 open PerryRhodan.AudiobookPlayer.DownloaderCommon
 open PerryRhodan.AudiobookPlayer.Services
@@ -23,9 +21,8 @@ open Elmish.SideEffect
 open Services
 open System
 open AudioBookItem
-open Services.DependencyServices
 open SkiaSharp
-open PerryRhodan.AudiobookPlayer.Common
+
 
 
 
