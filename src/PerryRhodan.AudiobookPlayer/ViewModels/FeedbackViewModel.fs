@@ -4,6 +4,7 @@ open System
 open CherylUI.Controls
 open Dependencies
 open Elmish.SideEffect
+open PerryRhodan.AudiobookPlayer.Services
 open PerryRhodan.AudiobookPlayer.Services.Interfaces
 open ReactiveElmish.Avalonia
 open ReactiveElmish
@@ -57,7 +58,7 @@ module FeedbackPage =
 
                 | SideEffect.SendFeedback ->
                     dispatch <| SetBusy true
-                    let! res = Services.SupportFeedback.sendSupportFeedBack state.EMail "Feedback" state.Message
+                    let! res = SupportFeedback.sendSupportFeedBack state.EMail "Feedback" state.Message
                     dispatch <| SetBusy false
 
                     match res with

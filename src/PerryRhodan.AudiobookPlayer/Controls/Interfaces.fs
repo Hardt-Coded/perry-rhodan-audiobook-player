@@ -2,7 +2,7 @@
 
 open System.Threading.Tasks
 open Domain
-open Services.WebAccess.Downloader
+open PerryRhodan.AudiobookPlayer.DownloaderCommon
 
 type IAudioBookItemViewModel =
     abstract member SetUploadDownloadState:(int*int)->unit
@@ -11,7 +11,8 @@ type IAudioBookItemViewModel =
     abstract member AudioBook:AudioBook
 
 
-type ILoginViewModel = interface end
+type ILoginViewModel =
+    abstract member SetShop:Shop->unit
 
 
 type IActionMenuService =

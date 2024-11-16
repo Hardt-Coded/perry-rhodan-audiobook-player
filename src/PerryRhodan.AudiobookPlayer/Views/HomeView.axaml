@@ -21,7 +21,22 @@
         </EventTriggerBehavior>
     </Interaction.Behaviors>
     <Grid RowDefinitions="Auto,Auto,Auto,Auto,*">
-        <TextBlock Grid.Row="0" FontSize="20" HorizontalAlignment="Center" Margin="0,5,0,0">Meine Hörbücher</TextBlock>
+        <Grid Grid.Row="0" RowDefinitions="*,*" ColumnDefinitions="*,*,*"> 
+            <TextBlock Grid.Row="0" Grid.ColumnSpan="3" FontSize="20" HorizontalAlignment="Center" Margin="0,5,0,10">Meine Hörbücher</TextBlock>
+            <TextBlock Grid.Row="1" Grid.Column="0" Classes.selected="{Binding IsOldShop}">Alter Shop</TextBlock>
+            <ToggleSwitch Grid.Row="1" Grid.Column="1" IsChecked="{Binding IsNewShop}" HorizontalAlignment="Center"></ToggleSwitch>
+            <TextBlock Grid.Row="1" Grid.Column="2" Classes.selected="{Binding IsNewShop}">Neuer Shop</TextBlock>
+            <Grid.Styles>
+                <Style Selector="TextBlock">
+                    <Setter Property="HorizontalAlignment" Value="Center" />
+                    <Setter Property="FontSize" Value="16" />
+                </Style>
+                <Style Selector="TextBlock.selected">
+                    <Setter Property="Foreground" Value="{DynamicResource MaterialPrimaryLightBrush}" />
+                    <Setter Property="FontSize" Value="20" />
+                </Style>
+            </Grid.Styles>
+        </Grid>
 
        
         <Grid Row="1" Margin="5,10,5,0">

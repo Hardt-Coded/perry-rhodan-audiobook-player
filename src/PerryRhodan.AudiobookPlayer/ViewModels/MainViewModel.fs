@@ -75,8 +75,6 @@ type MainViewModel(root:CompositionRoot) =
     member this.OpenMiniplayer audiobook startPlaying =
         if not app.Model.IsLoading then app.Dispatch <| OpenMiniplayer (audiobook, startPlaying)
 
-    member this.OpenLoginForm() =
-        if not app.Model.IsLoading then app.Dispatch OpenLoginView
 
     member this.GotoOptionPage() =
         if not app.Model.IsLoading then app.Dispatch <| SetView View.SettingsPage

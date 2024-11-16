@@ -37,10 +37,10 @@
         abstract ShowMessage : string->string -> unit
 
     type IDownloadService =
-        abstract member StartDownload: unit -> unit
+        abstract member StartDownload: Shop -> unit
         
     type IPictureDownloadService =
-        abstract member StartDownload: unit -> unit
+        abstract member StartDownload: Shop -> unit
 
     type IAndroidHttpMessageHandlerService =
         abstract member GetHttpMesageHandler: unit -> HttpMessageHandler

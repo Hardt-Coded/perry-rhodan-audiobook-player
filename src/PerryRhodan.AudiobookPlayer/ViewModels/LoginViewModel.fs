@@ -3,7 +3,9 @@
 open System
 open CherylUI.Controls
 open Dependencies
+open Domain
 open Global
+open PerryRhodan.AudiobookPlayer
 open PerryRhodan.AudiobookPlayer.Services.Interfaces
 open ReactiveElmish.Avalonia
 open ReactiveElmish
@@ -14,16 +16,19 @@ open Services.Helpers
 
 
 module LoginPage =
+    
     type State = {
         Username:string
         Password:string
         LoginFailed:bool
         RememberLogin:bool
+        Shop: Shop
         IsLoading:bool
     }
 
     type Msg =
         | TryLogin
+        | SetShop of Shop
         | LoginFailed
         | LoginSucceeded of Map<string,string>
         | ChangeRememberLogin of bool
@@ -46,12 +51,22 @@ module LoginPage =
         | CloseDialog
 
 
-    let init () =
-        { Username = ""; Password = ""; LoginFailed = false; RememberLogin = false; IsLoading = false }, SideEffect.LoadStoredCredentials
+    let init shop =
+        {
+            Username = ""
+            Password = ""
+            LoginFailed = false
+            RememberLogin = false
+            IsLoading = false
+            Shop = shop
+        }, SideEffect.LoadStoredCredentials
 
 
     let update msg (state:State) =
         match msg with
+        | SetShop s ->
+            {state with Shop = s}, SideEffect.None
+            
         | TryLogin ->
             match state.Username,state.Password with
             | "", "" ->
@@ -107,7 +122,13 @@ module LoginPage =
                             | SideEffect.TryLogin ->
                                 try
                                     let username = state.Username.Trim()
-                                    let! cc = WebAccess.login username state.Password
+                                    let! cc =
+                                        match state.Shop with
+                                        | Shop.NewShop ->
+                                            NewShopWebAccessService.login username state.Password
+                                        | Shop.OldShop ->
+                                            OldShopWebAccessService.login username state.Password
+                                        
                                     match cc with
                                     | Ok cc ->
                                         match cc with
@@ -142,7 +163,14 @@ module LoginPage =
 
                             | SideEffect.LoadStoredCredentials ->
                                     dispatch <| SetBusy true
-                                    let! res = SecureLoginStorage.loadLoginCredentials ()
+                                    let! res =
+                                        match state.Shop with
+                                        | Shop.NewShop ->
+                                            SecureLoginStorage.loadNewShopLoginCredentials ()
+                                        | Shop.OldShop ->
+                                            SecureLoginStorage.loadOldShopLoginCredentials ()
+                                            
+                                            
                                     match res with
                                     | Error e ->
                                         System.Diagnostics.Debug.WriteLine("Error loading cred: " + e)
@@ -163,7 +191,13 @@ module LoginPage =
                                 dispatch <| SetBusy true
 
                                 if rememberLogin then
-                                    let! res = SecureLoginStorage.saveLoginCredentials state.Username state.Password state.RememberLogin
+                                    let! res =
+                                        match state.Shop with
+                                        | Shop.NewShop ->
+                                            SecureLoginStorage.saveNewShopLoginCredentials state.Username state.Password state.RememberLogin
+                                        | Shop.OldShop ->
+                                            SecureLoginStorage.saveOldShopLoginCredentials state.Username state.Password state.RememberLogin
+                                            
                                     match res with
                                     | Error e ->
                                         let msg = $"Error storing cred: {e}"
@@ -171,7 +205,14 @@ module LoginPage =
                                         do! Notifications.showErrorMessage msg
                                     | Ok _ -> ()
 
-                                let! storeRes =  SecureLoginStorage.saveCookie cookie
+                                let! storeRes =
+                                    match state.Shop with
+                                    | Shop.NewShop ->
+                                        SecureLoginStorage.saveNewShopCookie cookie
+                                    | Shop.OldShop ->
+                                        SecureLoginStorage.saveOldShopCookie cookie
+                                        
+                                        
                                 match storeRes with
                                 | Error e ->
                                     let msg = $"Error storing cookie: {e}"
@@ -204,9 +245,11 @@ module LoginPage =
 
 open LoginPage
 
-type LoginViewModel(?designView) =
+type LoginViewModel(shop:Shop,?designView) =
     inherit ReactiveElmishViewModel()
 
+    let init () = init shop
+    
     let local =
         Program.mkAvaloniaProgrammWithSideEffect init update SideEffects.runSideEffects
         |> Program.mkStore
@@ -220,11 +263,15 @@ type LoginViewModel(?designView) =
             ()
 
 
-    new() =
-        new LoginViewModel(false)
+    new (shop:Shop) =
+        new LoginViewModel(shop, false)
 
-    interface ILoginViewModel
+    interface ILoginViewModel with
+        member this.SetShop s = this.SetShop s
 
+    member this.ShopLabel = this.BindOnChanged(local, _.Shop, (fun s -> match s.Shop with | NewShop -> $"Login Neuer Shop" | OldShop -> $"Login Alter Shop"))
+    member this.SetShop s = local.Dispatch (SetShop s)
+    
     member this.Username
         with get() = this.Bind(local, _.Username)
         and set v = local.Dispatch (ChangeUsername v)
@@ -253,4 +300,4 @@ type LoginViewModel(?designView) =
         | null -> 0.0
         | ip -> ip.OccludedRect.Height
         )
-    static member DesignVM = new LoginViewModel(true)
+    static member DesignVM = new LoginViewModel(NewShop, true)

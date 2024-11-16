@@ -163,7 +163,7 @@ type MainActivity() as self =
             .AddSingleton<IDownloadService, DownloadServiceImplementation.DependencyService.DownloadService>()
             .AddSingleton<IPictureDownloadService, PictureDownloadServiceImplementation.DependencyService.PictureAndroidDownloadService>()
             .AddSingleton<INotificationService, NotificationService.NotificationService>()
-            .AddTransient<ILoginViewModel, LoginViewModel>()
+            .AddTransient<ILoginViewModel, LoginViewModel>(fun sp -> LoginViewModel(Domain.Shop.NewShop))
             .AddSingleton<IActionMenuService, ActionMenuService>()
             .AddSingleton<IBitmapConverter>(bitmapConverter)
             .AddSingleton<IPackageInformation>(packageInformation)
@@ -174,7 +174,7 @@ type MainActivity() as self =
 
         let androidOptions = AndroidPlatformOptions()
         // Todo: do not forget Fallback
-        let renderModes = [ AndroidRenderingMode.Vulkan ] |> System.Collections.Generic.List
+        let renderModes = [ AndroidRenderingMode.Vulkan; AndroidRenderingMode.Egl; AndroidRenderingMode.Software ] |> System.Collections.Generic.List
         androidOptions.RenderingMode <- renderModes.AsReadOnly()
         //
         let vulkanOptions = VulkanOptions()

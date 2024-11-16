@@ -31,7 +31,10 @@
 
     <Compile Include="Services\Interfaces.fs" />
     <Compile Include="Services\Services.fs" />
-    <Compile Include="Services\OldShopWebAccessService.fs" />
+    <Compile Include="Services\DatabaseService.fs" />
+    <Compile Include="Services\ShopWebAccessService.fs" />
+    <Compile Include="Services\DownloadService.fs" />
+    <Compile Include="Services\SupportFeedbackService.fs" />
     <Compile Include="Services\GlobalSettingsService.fs" />
 
     <Compile Include="Views\ActionMenuView.axaml.fs" />

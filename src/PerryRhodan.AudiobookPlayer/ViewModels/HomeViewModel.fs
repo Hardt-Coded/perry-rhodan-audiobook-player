@@ -5,6 +5,7 @@ open Avalonia.Data.Converters
 open CherylUI.Controls
 open Common
 open Dependencies
+open Domain
 open PerryRhodan.AudiobookPlayer.Controls
 open PerryRhodan.AudiobookPlayer.Services.Interfaces
 open PerryRhodan.AudiobookPlayer.ViewModel
@@ -34,6 +35,7 @@ module private DemoData =
                 LastTimeListend = None
             }
             AmbientColor = Some "#FF0000"
+            PublishingDate = None
         }
 
     let designAudioBook2 = {
@@ -55,6 +57,7 @@ module private DemoData =
                 LastTimeListend = None
             }
             AmbientColor = Some "#00FF00"
+            PublishingDate = None
         }
 
     let designAudioBook3 = {
@@ -76,6 +79,7 @@ module private DemoData =
                 LastTimeListend = None
             }
             AmbientColor = Some "#0000FF"
+            PublishingDate = None
         }
 
 
@@ -87,7 +91,7 @@ module HomePage =
         SortOrder: SortOrder
         SearchText: string
         BusyMessage: string
-
+        Shop: Shop
         IsBusy: bool
     }
 
@@ -111,11 +115,13 @@ module HomePage =
 
 
     type Msg =
+        | SwitchShop of Shop
         | AudioBookItemsChanged of AudioBookItemViewModel array
         | FilterChanged of FilterOptions
         | SortOrderChanged of SortOrder
         | SearchTextChanged of string
         | AppendBusyMessage of string
+        | ClearBusyMessage
 
         | SetBusy of bool
 
@@ -134,11 +140,21 @@ module HomePage =
             SearchText = ""
             BusyMessage = ""
             IsBusy = false
+            Shop = NewShop
         }, SideEffect.Init
 
 
     let rec update msg state =
         match msg with
+        | SwitchShop shop ->
+            let filteredAudiobooks =
+                match shop with
+                | NewShop -> AudioBookStore.globalAudiobookStore.Model.NewShopAudiobooks
+                | OldShop -> AudioBookStore.globalAudiobookStore.Model.OldShopAudiobooks
+                |> filterAudioBooks state.Filter
+                |> sortAudioBooks state.SortOrder
+            { state with Shop = shop; AudioBooks = filteredAudiobooks }, SideEffect.None
+        
         | AudioBookItemsChanged audiobookItems ->
             let filteredAudiobooks =
                 audiobookItems
@@ -149,7 +165,9 @@ module HomePage =
 
         | FilterChanged filter ->
             let filteredAudiobooks =
-                AudioBookStore.globalAudiobookStore.Model.OldShopAudiobooks
+                match state.Shop with
+                | NewShop -> AudioBookStore.globalAudiobookStore.Model.NewShopAudiobooks
+                | OldShop -> AudioBookStore.globalAudiobookStore.Model.OldShopAudiobooks
                 |> filterAudioBooks filter
                 |> sortAudioBooks state.SortOrder
             {
@@ -167,7 +185,9 @@ module HomePage =
 
         | SearchTextChanged searchText ->
             let filteredAudiobooks =
-                AudioBookStore.globalAudiobookStore.Model.OldShopAudiobooks
+                match state.Shop with
+                | NewShop -> AudioBookStore.globalAudiobookStore.Model.NewShopAudiobooks
+                | OldShop -> AudioBookStore.globalAudiobookStore.Model.OldShopAudiobooks
                 |> filterAudioBooks (FilterOptions.Free searchText)
                 |> sortAudioBooks state.SortOrder
 
@@ -175,6 +195,8 @@ module HomePage =
 
         | AppendBusyMessage message ->
             { state with BusyMessage = $"{state.BusyMessage}\r\n{message}" }, SideEffect.None
+        | ClearBusyMessage ->
+            { state with BusyMessage = "" }, SideEffect.None
 
         | SetBusy isBusy ->
             { state with IsBusy = isBusy }, SideEffect.None
@@ -237,7 +259,9 @@ type HomeViewModel(?audiobookItems) as self =
         self.AddDisposable
             <| AudioBookStore.globalAudiobookStore.Observable.Subscribe(fun s ->
                 local.Dispatch (s.IsBusy |> SetBusy)
-                local.Dispatch (s.OldShopAudiobooks |> AudioBookItemsChanged)
+                match local.Model.Shop with
+                | NewShop -> local.Dispatch (s.NewShopAudiobooks |> AudioBookItemsChanged)
+                | OldShop -> local.Dispatch (s.OldShopAudiobooks |> AudioBookItemsChanged)
             )
         ()
 
@@ -248,9 +272,15 @@ type HomeViewModel(?audiobookItems) as self =
         //this.BindList (local, _.AudioBooks)
         this.BindOnChanged(local,_.AudioBooks, _.AudioBooks)
 
+    member this.IsNewShop 
+        with get() = this.BindOnChanged(local, _.Shop, _.Shop.IsNewShop)
+        and set(value) = local.Dispatch <| SwitchShop (if value then NewShop else OldShop)
+        
+    member this.IsOldShop =
+        this.BindOnChanged(local, _.Shop, _.Shop.IsOldShop)
 
     member this.IsBusy                      = this.BindOnChanged(local, _.IsBusy, _.IsBusy)
-    member this.BusyMessage                 = this.BindOnChanged(local, _.BusyMessage, _.BusyMessage)
+    member this.BusyMessage               = this.BindOnChanged(local, _.BusyMessage, _.BusyMessage)
 
     member this.SearchText
         with get() = ""
@@ -263,7 +293,11 @@ type HomeViewModel(?audiobookItems) as self =
 
 
     member this.OnInitialized() =
-        let currentAudioBooks = AudioBookStore.globalAudiobookStore.Model.OldShopAudiobooks
+        let currentAudioBooks =
+            match local.Model.Shop with
+            | NewShop -> AudioBookStore.globalAudiobookStore.Model.NewShopAudiobooks
+            | OldShop -> AudioBookStore.globalAudiobookStore.Model.OldShopAudiobooks
+                
         local.Dispatch (currentAudioBooks |> AudioBookItemsChanged)
 
 
@@ -271,26 +305,58 @@ type HomeViewModel(?audiobookItems) as self =
         task {
             local.Dispatch (true |> SetBusy)
 
-            let showMessage = Notifications.showMessage
-            let showErrorMessage = Notifications.showErrorMessage
-            let loadCookie = Services.SecureLoginStorage.loadCookie
+            let showMessage title message =
+                task {
+                    do! Notifications.showMessage title message
+                    local.Dispatch <| ClearBusyMessage
+                }
+                
+            let showErrorMessage message =
+                task {
+                    do! Notifications.showErrorMessage message
+                    local.Dispatch <| ClearBusyMessage
+                }
+                
+            let loadCookie =
+                match local.Model.Shop with
+                | NewShop -> Services.SecureLoginStorage.loadNewShopCookie
+                | OldShop -> Services.SecureLoginStorage.loadOldShopCookie
+                
             let appendBusyMessage msg = local.Dispatch <| AppendBusyMessage msg
-            let openLogin = this.OpenLogin
+            let openLogin =
+                local.Dispatch <| ClearBusyMessage
+                this.OpenLogin
 
 
             let onSuccess audiobooks =
                 local.Dispatch (audiobooks |> AudioBookItemsChanged)
-                AudioBookStore.globalAudiobookStore.Dispatch <| AudioBookStore.AudioBookElmish.AudiobooksLoaded audiobooks
-                DependencyService.Get<IPictureDownloadService>().StartDownload()
+                match local.Model.Shop with
+                | OldShop ->
+                    AudioBookStore.globalAudiobookStore.Dispatch <| AudioBookStore.AudioBookElmish.AudiobooksLoaded (audiobooks, [||])
+                | NewShop ->
+                    AudioBookStore.globalAudiobookStore.Dispatch <| AudioBookStore.AudioBookElmish.AudiobooksLoaded ([||], audiobooks)
+                    
+                DependencyService.Get<IPictureDownloadService>().StartDownload local.Model.Shop
 
-
-            do! ShopService.synchronizeWithCloud
+            match local.Model.Shop with
+            | OldShop ->
+                do! ShopService.synchronizeWithCloudOldShop
                      showMessage
                      showErrorMessage
                      loadCookie
                      appendBusyMessage
                      openLogin
                      onSuccess
+                     
+            | NewShop ->
+                do! ShopService.synchronizeWithCloudNewShop
+                     showMessage
+                     showErrorMessage
+                     loadCookie
+                     appendBusyMessage
+                     openLogin
+                     onSuccess
+            
 
             local.Dispatch (false |> SetBusy)
 
@@ -298,7 +364,7 @@ type HomeViewModel(?audiobookItems) as self =
 
     member this.OpenLogin () =
         let control = PerryRhodan.AudiobookPlayer.Views.LoginView()
-        let vm = new LoginViewModel()
+        let vm = new LoginViewModel(local.Model.Shop)
         control.DataContext <- vm
         InteractiveContainer.ShowDialog (control, true)
 
@@ -333,7 +399,9 @@ type HomeViewModel(?audiobookItems) as self =
 
                 
                 let orderedGroups =
-                    AudioBookStore.globalAudiobookStore.Model.OldShopAudiobookGroups
+                    match local.Model.Shop with
+                    | NewShop -> AudioBookStore.globalAudiobookStore.Model.NewShopAudiobookGroups
+                    | OldShop -> AudioBookStore.globalAudiobookStore.Model.OldShopAudiobookGroups
                     |> Array.sortBy id
                     |> Array.sortBy (fun g ->
                         match g with
@@ -361,9 +429,9 @@ type HomeViewModel(?audiobookItems) as self =
     static member DesignVM =
         new HomeViewModel(
             [|
-                AudioBookItemViewModel(DemoData.designAudioBook)
-                AudioBookItemViewModel(DemoData.designAudioBook2)
-                AudioBookItemViewModel(DemoData.designAudioBook3)
+                AudioBookItemViewModel(NewShop, DemoData.designAudioBook)
+                AudioBookItemViewModel(NewShop, DemoData.designAudioBook2)
+                AudioBookItemViewModel(NewShop, DemoData.designAudioBook3)
             |])
 
 and FilterItem(local, filterOption, text, isSelected, isGeneral) =

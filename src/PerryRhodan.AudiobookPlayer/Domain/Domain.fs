@@ -4,7 +4,12 @@ open System
 open System.Text.RegularExpressions
 open Common
 open HtmlAgilityPack
+open Microsoft.ApplicationInsights.DataContracts
 
+
+type Shop =
+    | OldShop
+    | NewShop
 
 type AudioBookPosition =
     { Filename: string
@@ -33,6 +38,7 @@ type AudioBook = {
         State: AudioBookState
         AmbientColor: string option
         ShopId:string option
+        PublishingDate: DateOnly option
     }
 
     with
@@ -48,7 +54,9 @@ type AudioBook = {
             DownloadUrl=None
             ProductSiteUrl = None
             State=AudioBookState.Empty
-            AmbientColor = None }
+            AmbientColor = None
+            PublishingDate = None
+        }
 
 type NameGroupedAudioBooks = (string * AudioBook[])[]
 
@@ -133,8 +141,8 @@ module Helpers =
         else
             let ept = downloadNameRegex.Match(innerText).Groups[4].Value.Trim()
             ept.Substring(0,(ept.Length-2)).ToString().Trim().Replace(":"," -")
-            
-            
+
+
     let getNewShopEpisodenTitle (downloadNameRegex:Regex) (innerText:string) =
         if not (downloadNameRegex.IsMatch(innerText)) then innerText.Trim()
         else
@@ -160,8 +168,8 @@ module Helpers =
         match episodeNumber with
         | None -> $"%s{key} - %s{episodeTitle}"
         | Some no -> $"%s{key} %i{no} - %s{episodeTitle}"
-        
-        
+
+
     let buildNewShopFullName episodeNumber key episodeTitle =
         match episodeNumber with
         | None -> $"%s{key} - %s{episodeTitle}"
@@ -210,201 +218,234 @@ module Helpers =
 open System.Linq
 
 let parseOldShopDownloadData htmlData =
-    let document = HtmlDocument()
-    document.LoadHtml(htmlData)
-    let divModes = document.DocumentNode.SelectNodes("//div[@id='downloads']")
-    divModes
-    |> Seq.toArray
-    |> Array.tryHead
-    // only the audiobooks
-    |> Option.map (
-        fun i ->
-            i.Descendants("li")
-            |> Seq.filter (fun i -> not (i.InnerText.Contains("Impressum")))
-            |> Seq.filter (fun i ->
-                i.Descendants("a")
-                |> Seq.exists (fun i ->
-                    i.Attributes
-                        .Where(fun x -> x.Name = "href")
-                        .Any(fun x-> x.Value.Contains("butler.php?action=audio"))
-                    )
-            )
-            |> Seq.toArray
-    )
-    |> Option.defaultValue [||]
-    |> Array.Parallel.map (
-        fun i ->
-            let downloadRegex = Helpers.getDownloadNameRegex i.InnerText
-            let innerText = i.InnerText |> Helpers.compansateManually
-            //   little title work
-            let key = innerText |> Helpers.getKey downloadRegex
-            let epNum = innerText |> Helpers.tryGetEpisodenNumber downloadRegex
-            let episodeNumber =
-                if epNum = None then
-                    i.InnerText |> Helpers.tryGetEpisodenNumber downloadRegex
-                else
-                    epNum
-            let episodeTitle = innerText |> Helpers.getEpisodenTitle downloadRegex
-            let linkForMultiDownload = i |> Helpers.tryGetLinkForMultiDownload
-            let linkProductSite = i |> Helpers.tryGetProductionPage
-            let fullName = Helpers.buildFullName episodeNumber key episodeTitle
-            let productId =
-                linkProductSite
-                |> Helpers.tryGetProductId
-                |> Option.defaultValue -1
+    try
+        let document = HtmlDocument()
+        document.LoadHtml(htmlData)
+        let divModes = document.DocumentNode.SelectNodes("//div[@id='downloads']")
+        divModes
+        |> Seq.toArray
+        |> Array.tryHead
+        // only the audiobooks
+        |> Option.map (
+            fun i ->
+                i.Descendants("li")
+                |> Seq.filter (fun i -> not (i.InnerText.Contains("Impressum")))
+                |> Seq.filter (fun i ->
+                    i.Descendants("a")
+                    |> Seq.exists (fun i ->
+                        i.Attributes
+                            .Where(fun x -> x.Name = "href")
+                            .Any(fun x-> x.Value.Contains("butler.php?action=audio"))
+                        )
+                )
+                |> Seq.toArray
+        )
+        |> Option.defaultValue [||]
+        |> Array.Parallel.map (
+            fun i ->
+                let downloadRegex = Helpers.getDownloadNameRegex i.InnerText
+                let innerText = i.InnerText |> Helpers.compansateManually
+                //   little title work
+                let key = innerText |> Helpers.getKey downloadRegex
+                let epNum = innerText |> Helpers.tryGetEpisodenNumber downloadRegex
+                let episodeNumber =
+                    if epNum = None then
+                        i.InnerText |> Helpers.tryGetEpisodenNumber downloadRegex
+                    else
+                        epNum
+                let episodeTitle = innerText |> Helpers.getEpisodenTitle downloadRegex
+                let linkForMultiDownload = i |> Helpers.tryGetLinkForMultiDownload
+                let linkProductSite = i |> Helpers.tryGetProductionPage
+                let fullName = Helpers.buildFullName episodeNumber key episodeTitle
+                let productId =
+                    linkProductSite
+                    |> Helpers.tryGetProductId
+                    |> Option.defaultValue -1
 
-            // manual compantation of entries
-            let fullName,episodeTitle,episodeNumber,key =
-                match Helpers.targetCompansation productId with
-                | None ->
-                    fullName,episodeTitle,episodeNumber,key
-                | Some item ->
-                    item.FullName, item.EpisodeTitle, item.EpisodeNo, item.Group
+                // manual compantation of entries
+                let fullName,episodeTitle,episodeNumber,key =
+                    match Helpers.targetCompansation productId with
+                    | None ->
+                        fullName,episodeTitle,episodeNumber,key
+                    | Some item ->
+                        item.FullName, item.EpisodeTitle, item.EpisodeNo, item.Group
 
 
-            {   Id = productId
-                ShopId = Some (productId.ToString())
-                FullName = fullName
-                EpisodeNo = episodeNumber
-                EpisodenTitel = episodeTitle
-                Group = key
-                DownloadUrl = linkForMultiDownload
-                ProductSiteUrl = linkProductSite
-                Picture = None
-                Thumbnail = None
-                State = AudioBookState.Empty
-                AmbientColor = None }
-    )
-    |> Array.filter (fun i -> i.Id <> -1)
-    |> Array.sortBy (fun ab ->
-            match ab.EpisodeNo with
-            | None -> -1
-            | Some x -> x
-    )
-    |> Array.distinct
+                {
+                    Id = productId
+                    ShopId = Some (productId.ToString())
+                    FullName = fullName
+                    EpisodeNo = episodeNumber
+                    EpisodenTitel = episodeTitle
+                    Group = key
+                    DownloadUrl = linkForMultiDownload
+                    ProductSiteUrl = linkProductSite
+                    Picture = None
+                    Thumbnail = None
+                    State = AudioBookState.Empty
+                    AmbientColor = None
+                    PublishingDate = None
+                }
+        )
+        |> Array.filter (fun i -> i.Id <> -1)
+        |> Array.sortBy (fun ab ->
+                match ab.EpisodeNo with
+                | None -> -1
+                | Some x -> x
+        )
+        |> Array.distinct
+        |> Ok
+    with
+    | ex ->
+        Global.telemetryClient.TrackTrace ("Error in parseOldShopDownloadData", SeverityLevel.Error)
+        Global.telemetryClient.TrackException ex
+        Error "Fehler beim Parsen der Downloadseite vom alten Shop" 
 
 
 let private onlyNumRegex = Regex(@"\d+", RegexOptions.Compiled)
 
 
 let parseNewShopDownloadData htmlData =
-    
-    let document = HtmlDocument()
-    document.LoadHtml htmlData
-    // Todo: null check
-    document.DocumentNode.SelectNodes("//div[contains(@id,'product')]")
-    |> Seq.toList
-    |> List.map (fun node ->
-        let title = node.SelectSingleNode(".//span[contains(@class,'audiobook-item-title')]").InnerText
-        let productUrl = node.SelectSingleNode(".//a").GetAttributeValue("href", "") |> Option.ofObj
-        // the download url is the one, where the download attribute contains a zip file
-        let downloadUrl = $"""https://www.einsamedien-verlag.de{node.SelectSingleNode(".//a[contains(@download,'.zip')]").GetAttributeValue("href", "")}"""
-        let downloadRegex = Helpers.getDownloadNameRegex title
-        let innerText = title |> Helpers.compansateManually
-        let key = innerText |> Helpers.getKey downloadRegex
-        let epNum = innerText |> Helpers.tryGetEpisodenNumber downloadRegex
-        let episodeNumber =
-            if epNum = None then
-                title |> Helpers.tryGetEpisodenNumber downloadRegex
-            else
-                epNum
-        let episodeTitle = innerText |> Helpers.getNewShopEpisodenTitle downloadRegex
-        // picture is on a button with the attibute "data-artwork-url"
-        let pictureUrl =
-            // get the 512x512 picture
-            node.SelectSingleNode(".//img").GetAttributeValue("srcset", "")
-            |> Option.ofObj
-            |> Option.bind (fun x ->
-                // split by ,
-                let splitted =
-                    x.Split(',')
-                    |> Array.map (fun x -> x.Trim())
-                    |> Array.map (fun x -> x.Split('?').[0])
-                    
-                match splitted with
-                | [||] ->
-                    // get url from img tag
-                    node.SelectSingleNode(".//img").GetAttributeValue("src", "") |> Option.ofObj
-                    
-                | _ ->
-                    let bestPicture =
-                        splitted
-                        |> Array.tryFind (fun x -> x.Contains("512x512"))
-                        |> Option.defaultValue splitted.[0]
-                        
-                    Some bestPicture
-            )
-            
-            
-        let thumbnailUrl =
-            // get the 512x512 picture
-            node.SelectSingleNode(".//img").GetAttributeValue("srcset", "")
-            |> Option.ofObj
-            |> Option.bind (fun x ->
-                // split by ,
-                let split =
-                    x.Split(',')
-                    |> Array.map (fun x -> x.Trim())
-                    |> Array.map (fun x -> x.Split('?').[0])
-                    
-                match split with
-                | [||] ->
-                    // get url from img tag
-                    node.SelectSingleNode(".//img").GetAttributeValue("src", "") |> Option.ofObj
-                    
-                | _ ->
-                    // 280x280, or 360x360 or the first one
-                    let bestPicture =
-                        let firstChoice =
-                            split
-                            |> Array.tryFind (fun x -> x.Contains("280x280"))
-                        match firstChoice with
-                        | Some x -> Some x
-                        | None ->
-                            split
-                            |> Array.tryFind (fun x -> x.Contains("360x360"))
-                            |> Option.defaultValue split.[0]
-                            |> Some
-                        
-                    bestPicture
-            )
-            
-                
-        let internalProductId =
-            // product id is in the div id after the word "product"
-            node.GetAttributeValue("id", "")
-            |> Option.ofObj
-            |> Option.bind (fun x ->
-                // extract the number use regex
-                onlyNumRegex.Match(x) |> Option.ofObj |> Option.map (fun x -> x.Value |> Int32.Parse) 
-            )
-            |> Option.defaultValue -1
-            
-        let shopProductId =
-            // product id is in the div id after the word "product"
-            node.GetAttributeValue("id", "")
-            |> Option.ofObj
-            |> Option.map (_.Replace("product", ""))
-            
-            
-        let fullName = Helpers.buildNewShopFullName episodeNumber key episodeTitle
-        
-        {
-            Id = internalProductId
-            ShopId = shopProductId
-            FullName = fullName
-            EpisodeNo = episodeNumber
-            EpisodenTitel = episodeTitle
-            Group = key
-            DownloadUrl = Some downloadUrl
-            ProductSiteUrl = productUrl
-            Picture = pictureUrl
-            Thumbnail = thumbnailUrl
-            State = AudioBookState.Empty
-            AmbientColor = None
-        }
-    )
+    try
+        let document = HtmlDocument()
+        document.LoadHtml htmlData
+        // Todo: null check
+        document.DocumentNode.SelectNodes("//div[contains(@id,'product')]")
+        |> Seq.toArray
+        |> Array.Parallel.map (fun node ->
+            let title = node.SelectSingleNode(".//span[contains(@class,'audiobook-item-title')]").InnerText
+            let productUrl = node.SelectSingleNode(".//a").GetAttributeValue("href", "") |> Option.ofObj
+            // the download url is the one, where the download attribute contains a zip file
+            let downloadUrl = $"""https://www.einsamedien-verlag.de{node.SelectSingleNode(".//a[contains(@download,'.zip')]").GetAttributeValue("href", "")}"""
+            let downloadRegex = Helpers.getDownloadNameRegex title
+            let innerText = title |> Helpers.compansateManually
+            let key = innerText |> Helpers.getKey downloadRegex
+            // Replace Names, make them nicer
+            let key =
+                key
+                    .Replace("PERRY RHODAN", "Perry Rhodan")
+            let epNum = innerText |> Helpers.tryGetEpisodenNumber downloadRegex
+            let episodeNumber =
+                if epNum = None then
+                    title |> Helpers.tryGetEpisodenNumber downloadRegex
+                else
+                    epNum
+            let episodeTitle = innerText |> Helpers.getNewShopEpisodenTitle downloadRegex
+            // picture is on a button with the attibute "data-artwork-url"
+            let pictureUrl =
+                // get the 512x512 picture
+                node.SelectSingleNode(".//img").GetAttributeValue("srcset", "")
+                |> Option.ofObj
+                |> Option.bind (fun x ->
+                    // split by ,
+                    let splitted =
+                        x.Split(',')
+                        |> Array.map (fun x -> x.Trim())
+                        |> Array.map (fun x -> x.Split('?').[0])
 
+                    match splitted with
+                    | [||] ->
+                        // get url from img tag
+                        node.SelectSingleNode(".//img").GetAttributeValue("src", "") |> Option.ofObj
+
+                    | _ ->
+                        let bestPicture =
+                            splitted
+                            |> Array.tryFind (fun x -> x.Contains("512x512"))
+                            |> Option.defaultValue splitted.[0]
+
+                        Some bestPicture
+                )
+
+
+            let thumbnailUrl =
+                // get the 512x512 picture
+                node.SelectSingleNode(".//img").GetAttributeValue("srcset", "")
+                |> Option.ofObj
+                |> Option.bind (fun x ->
+                    // split by ,
+                    let split =
+                        x.Split(',')
+                        |> Array.map (fun x -> x.Trim())
+                        |> Array.map (fun x -> x.Split('?').[0])
+
+                    match split with
+                    | [||] ->
+                        // get url from img tag
+                        node.SelectSingleNode(".//img").GetAttributeValue("src", "") |> Option.ofObj
+
+                    | _ ->
+                        // 280x280, or 360x360 or the first one
+                        let bestPicture =
+                            let firstChoice =
+                                split
+                                |> Array.tryFind (fun x -> x.Contains("280x280"))
+                            match firstChoice with
+                            | Some x -> Some x
+                            | None ->
+                                split
+                                |> Array.tryFind (fun x -> x.Contains("360x360"))
+                                |> Option.defaultValue split.[0]
+                                |> Some
+
+                        bestPicture
+                )
+
+
+            let internalProductId =
+                // product id is in the div id after the word "product"
+                node.GetAttributeValue("id", "")
+                |> Option.ofObj
+                |> Option.bind (fun x ->
+                    // extract the number use regex
+                    onlyNumRegex.Match(x) |> Option.ofObj |> Option.map (fun x -> x.Value |> Int32.Parse)
+                )
+                |> Option.defaultValue -1
+
+            let shopProductId =
+                // product id is in the div id after the word "product"
+                node.GetAttributeValue("id", "")
+                |> Option.ofObj
+                |> Option.map (_.Replace("product", ""))
+                
+            let publishingDate =
+                node.SelectSingleNode(".//span[contains(text(),'Veröffentlicht')]")
+                |> Option.ofObj
+                |> Option.map  (_.NextSibling.InnerText)
+                |> Option.bind (fun x ->
+                    match DateOnly.TryParseExact(x.Trim(), "dd.MM.yy") with
+                    | true, date -> Some date
+                    | _ -> None
+                    )
+
+
+            let fullName = Helpers.buildNewShopFullName episodeNumber key episodeTitle
+
+            {
+                Id = internalProductId
+                ShopId = shopProductId
+                FullName = fullName
+                EpisodeNo = episodeNumber
+                EpisodenTitel = episodeTitle
+                Group = key
+                DownloadUrl = Some downloadUrl
+                ProductSiteUrl = productUrl
+                Picture = pictureUrl
+                Thumbnail = thumbnailUrl
+                State = AudioBookState.Empty
+                AmbientColor = None
+                PublishingDate = publishingDate
+            }
+        )
+        |> Array.Parallel.filter (fun i -> i.Id <> -1)
+        |> Array.Parallel.sortBy (_.FullName)
+        |> Array.distinct
+        |> Ok
+    with
+    | ex ->
+        Global.telemetryClient.TrackTrace ("Error in parseOldShopDownloadData", SeverityLevel.Error)
+        Global.telemetryClient.TrackException ex
+        Error "Fehler beim Parsen der Downloadseite vom alten Shop"
 
 let filterNewAudioBooks (local:AudioBook[]) (online:AudioBook[]) =
     online

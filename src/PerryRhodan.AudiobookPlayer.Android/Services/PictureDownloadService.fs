@@ -5,6 +5,7 @@
     open Android.App
     open Android.OS
     open Android.Content
+    open Domain
     open PerryRhodan.AudiobookPlayer.Services.Interfaces
     open PerryRhodan.AudiobookPlayer.ViewModel
     open _Microsoft.Android.Resource.Designer
@@ -108,11 +109,23 @@
 
 
 
-                override this.OnStartCommand (_,_,_) =
+                override this.OnStartCommand (intent,_,_) =
                     try
+                        let shop =
+                            match intent.GetStringExtra("shop") with
+                            | null -> NewShop
+                            | "OldShop" -> OldShop
+                            | "NewShop" -> NewShop
+                            | _ -> NewShop
+                            
+                            
                         let notification = updateNotification "Download"
-                        let audioBooks = AudioBookStore.globalAudiobookStore.Model.Audiobooks
-                        PerryRhodan.AudiobookPlayer.Services.PictureDownloadService(notification, shutDownService)
+                        let audioBooks =
+                            match shop with
+                            | NewShop -> AudioBookStore.globalAudiobookStore.Model.NewShopAudiobooks
+                            | OldShop -> AudioBookStore.globalAudiobookStore.Model.OldShopAudiobooks
+                            
+                        PerryRhodan.AudiobookPlayer.Services.PictureDownloadService(shop, notification, shutDownService)
                             .StartDownloadPictures(audioBooks) |> ignore
                         StartCommandResult.Sticky
                     with
@@ -128,5 +141,7 @@
         type PictureAndroidDownloadService () =
             interface IPictureDownloadService with
 
-                override this.StartDownload () =
-                    Application.Context.StartForeGroundService<AndroidService.PictureDownloadService>()
+                override this.StartDownload shop =
+                    let bundle = new Bundle()
+                    bundle.PutString("shop", shop.ToString()) |> ignore
+                    Application.Context.StartForeGroundService<AndroidService.PictureDownloadService>(bundle)

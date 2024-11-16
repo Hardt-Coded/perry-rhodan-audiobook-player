@@ -4,19 +4,25 @@ open System.Threading.Tasks
 open Common
 open Domain
 open FsToolkit.ErrorHandling
+open PerryRhodan.AudiobookPlayer
 open PerryRhodan.AudiobookPlayer.ViewModel
 open Services
 
 
 module ShopService =
-    
+
     type SynchronizeWithCloudErrors =
         | NoSessionAvailable
         | WebError of ComError
         | StorageError of string
-    
-    
-    let synchronizeWithCloud
+
+
+    let private synchronizeWithCloud
+        (shop: Shop)
+        getCurrentAudiobooks
+        getAudiobooksOnline
+        insertNewAudioBooksInStateFile
+        updateAudioBookInStateFile
         showMessage
         showErrorMessage
         (loadCookie: unit -> Task<Result<Map<string,string> option, string>>)
@@ -24,7 +30,7 @@ module ShopService =
         openLogin
         onSuccess =
             task {
-                
+
 
                 let notifyAfterSync (synchedAb:AudioBookItemViewModel []) =
                     task {
@@ -54,8 +60,9 @@ module ShopService =
                             return! Error NoSessionAvailable
                         | Some cookies ->
                             let! audioBooks =
-                                WebAccess.getAudiobooksOnline cookies
+                                getAudiobooksOnline cookies
                                 |> Task.map (fun i -> i |> Result.mapError WebError)
+                            let debugAudioBooks = audioBooks |> Array.Parallel.map (fun i -> $"%A{i}")
                             return audioBooks
                     }
 
@@ -63,16 +70,16 @@ module ShopService =
 
 
                 let lookForOrphanedAudiobookOnDevice
-                    (modelAudioBooks:AudioBookItemViewModel array)
+                    (getCurrentAudiobooks:unit -> AudioBookItemViewModel array)
                     (cloudAudioBooks:AudioBook array) =
                         appendMessage "Suche nach bereits runtergeladenen Hörbücher..."
-                        let audioBooksAlreadyOnTheDevice =
-                            DataBase.getAudiobooksFromDownloadFolder cloudAudioBooks
+                        let audioBooksAlreadyOnTheDevice : AudioBook [] =
+                            DataBaseCommon.getAudiobooksFromDownloadFolder cloudAudioBooks
                             // remove items that are already in the model itself
-                            |> Array.filter (fun i -> modelAudioBooks |> Array.exists (fun a -> a.AudioBook.Id = i.Id) |> not)
+                            |> Array.filter (fun i -> getCurrentAudiobooks () |> Array.exists (fun a -> a.AudioBook.Id = i.Id) |> not)
                         {| OnDevice = audioBooksAlreadyOnTheDevice; InCloud = cloudAudioBooks |}
-                        
-                            
+
+
 
 
 
@@ -80,26 +87,26 @@ module ShopService =
                     (input:{| OnDevice: AudioBook []; InCloud:AudioBook[] |}) =
                     taskResult {
                         let! _ =
-                            input.OnDevice |> DataBase.insertNewAudioBooksInStateFile
+                            input.OnDevice |> insertNewAudioBooksInStateFile
                             |> Task.map (fun i -> i |> Result.mapError StorageError)
                         return {| OnDevice = input.OnDevice; InCloud = input.InCloud |}
                      }
-                     
+
 
 
                 let determinateNewAddedAudioBooks
-                    (modelAudioBooks:AudioBookItemViewModel[])
+                    (getCurrentAudioBooks:unit -> AudioBookItemViewModel[])
                     (input:{| OnDevice: AudioBook []; InCloud:AudioBook[] |}) =
                         appendMessage "Ermittle neue Hörbücher..."
-                        let audioBooksAlreadyOnTheDevice = input.OnDevice |> Array.map (fun i -> new AudioBookItemViewModel(i))
+                        let audioBooksAlreadyOnTheDevice = input.OnDevice |> Array.map (fun i -> new AudioBookItemViewModel(shop, i))
                         let modelAndDeviceAudiobooks =
-                         Array.concat [audioBooksAlreadyOnTheDevice; modelAudioBooks]
+                         Array.concat [audioBooksAlreadyOnTheDevice; getCurrentAudioBooks() ]
                          |> Array.distinctBy (_.AudioBook.Id)
 
                         let newAudioBookItems =
                          let currentAudioBooks = modelAndDeviceAudiobooks |> Array.map (_.AudioBook)
                          filterNewAudioBooks currentAudioBooks input.InCloud
-                         |> Array.map (fun i -> new AudioBookItemViewModel(i))
+                         |> Array.map (fun i -> new AudioBookItemViewModel(shop, i))
                         {| New = newAudioBookItems; OnDevice = modelAndDeviceAudiobooks; InCloud = input.InCloud |}
 
 
@@ -164,9 +171,9 @@ module ShopService =
 
                              let! _ =
                                  onlyAudioBooks
-                                 |> DataBase.insertNewAudioBooksInStateFile
+                                 |> insertNewAudioBooksInStateFile
                                  |> Task.map (fun i -> i |> Result.mapError StorageError)
-                             
+
                              return {| New = input.New; OnDevice = input.OnDevice; InCloud = input.InCloud |}
 
                         }
@@ -215,7 +222,7 @@ module ShopService =
                                         }
                                         // we need to generate a new Item, because the dispatch itself contains also the audiobook data
                                         let newItem =
-                                            new AudioBookItemViewModel(newAb)
+                                            new AudioBookItemViewModel(shop,newAb)
 
                                         Some newItem
                                     else
@@ -246,7 +253,7 @@ module ShopService =
 
                             for i in repairedAudioBooksItem do
                                 let! _ =
-                                    DataBase.updateAudioBookInStateFile i.AudioBook
+                                    updateAudioBookInStateFile i.AudioBook
                                     |> Task.map (fun i -> i |> Result.mapError StorageError)
                                 ()
 
@@ -308,7 +315,7 @@ module ShopService =
                             let audioBooks =
                                 (Array.concat [e.New;e.OnDevice])
                                 |> Array.sortBy (_.AudioBook.FullName)
-                            
+
                             onSuccess audioBooks
                             // also sync with global store
                             //AudioBookStore.globalAudiobookStore.Dispatch <| AudioBookStore.AudioBookElmish.AudiobooksLoaded audioBooks
@@ -346,19 +353,64 @@ module ShopService =
                     do!
                         checkLoginSession ()
                         |> TaskResult.bind loadAudioBooksFromCloud
-                        |> TaskResult.map (lookForOrphanedAudiobookOnDevice AudioBookStore.globalAudiobookStore.Model.OldShopAudiobooks)
+                        |> TaskResult.map (lookForOrphanedAudiobookOnDevice getCurrentAudiobooks)
                         |> TaskResult.bind processLoadedAudioBookFromDevice
-                        |> TaskResult.map (determinateNewAddedAudioBooks AudioBookStore.globalAudiobookStore.Model.OldShopAudiobooks)
+                        |> TaskResult.map (determinateNewAddedAudioBooks getCurrentAudiobooks)
                         |> TaskResult.map  checkIfCurrentAudiobookAreReallyDownloaded
                         |> TaskResult.map  removeOrphanPictures
                         |> TaskResult.bind processNewAddedAudioBooks
                         |> TaskResult.bind repairAudiobookMetadataIfNeeded
                         |> TaskResult.bind fixDownloadFolders
                         |> Task.bind processResult
-                    
+
                 with
                 | ex ->
                     do! showErrorMessage ex.Message
 
             }
 
+
+
+
+    let synchronizeWithCloudOldShop
+        showMessage
+        showErrorMessage
+        (loadCookie: unit -> Task<Result<Map<string,string> option, string>>)
+        appendMessage
+        openLogin
+        onSuccess
+        =
+        synchronizeWithCloud
+            OldShop
+            (fun () -> AudioBookStore.globalAudiobookStore.Model.OldShopAudiobooks)
+            OldShopWebAccessService.getAudiobooksOnline
+            OldShopDatabase.storageProcessor.InsertNewAudioBooksInStateFile
+            OldShopDatabase.storageProcessor.UpdateAudioBookInStateFile
+            showMessage
+            showErrorMessage
+            (loadCookie: unit -> Task<Result<Map<string,string> option, string>>)
+            appendMessage
+            openLogin
+            onSuccess
+
+
+    let synchronizeWithCloudNewShop
+        showMessage
+        showErrorMessage
+        (loadCookie: unit -> Task<Result<Map<string,string> option, string>>)
+        appendMessage
+        openLogin
+        onSuccess
+        =
+        synchronizeWithCloud
+            NewShop
+            (fun () -> AudioBookStore.globalAudiobookStore.Model.NewShopAudiobooks)
+            NewShopWebAccessService.getAudiobooksOnline
+            NewShopDatabase.storageProcessor.InsertNewAudioBooksInStateFile
+            NewShopDatabase.storageProcessor.UpdateAudioBookInStateFile
+            showMessage
+            showErrorMessage
+            (loadCookie: unit -> Task<Result<Map<string,string> option, string>>)
+            appendMessage
+            openLogin
+            onSuccess

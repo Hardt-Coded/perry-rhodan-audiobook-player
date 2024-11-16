@@ -1,11 +1,13 @@
 ﻿module DownloadServiceImplementation
 
     open AndroidX.AppCompat.App
-    
+
     open Android.App
     open Android.OS
     open Android.Content
+    open Domain
     open PerryRhodan.AudiobookPlayer.Services.Interfaces
+    open PerryRhodan.AudiobookPlayer.Services
     open _Microsoft.Android.Resource.Designer
 
     [<AutoOpen>]
@@ -13,8 +15,8 @@
 
 
         let smallIcon = Resource.Drawable.einsa_small_icon
-    
-        let logo = 
+
+        let logo =
             Android.Graphics.BitmapFactory.DecodeResource(Application.Context.Resources ,Resource.Drawable.eins_a_medien_logo)
 
         let downloadServiceNotificationId = 234254
@@ -34,8 +36,8 @@
                     let intent = new Intent(self, typeof<AppCompatActivity>)
                     let pendingIntentId = 83475
                     let pendingIntent = PendingIntent.GetActivity(self, pendingIntentId, intent, PendingIntentFlags.Immutable ||| PendingIntentFlags.UpdateCurrent)
-                   
-                    let builder = 
+
+                    let builder =
                         if (Build.VERSION.SdkInt >= BuildVersionCodes.O) then
                             (new Notification.Builder(self, downloadServiceChannelId))
                                 .SetContentIntent(pendingIntent)
@@ -43,7 +45,7 @@
                                 .SetContentText(text)
                                 .SetSmallIcon(smallIcon)
                                 .SetLargeIcon(logo)
-                                
+
                         else
                             (new Notification.Builder(self, downloadServiceChannelId))
                                 .SetContentIntent(pendingIntent)
@@ -53,10 +55,10 @@
                                 .SetLargeIcon(logo)
                                 .SetSound(null)
                                 .SetVibrate(null)
-                               
+
                     builder.Build()
 
-                
+
                 let createNotificationChannel (manager:NotificationManager) =
                     if (Build.VERSION.SdkInt >= BuildVersionCodes.O) then
                         let channelNameJava = new Java.Lang.String(downloadServiceChannelName)
@@ -65,8 +67,8 @@
                         channel.SetVibrationPattern(null)
                         manager.CreateNotificationChannel(channel) |> ignore
                     ()
-                
-                
+
+
                 let createDownloadServiceNotification title text =
 
                     let manager = (Application.Context.GetSystemService(Application.NotificationService) :?> NotificationManager)
@@ -78,23 +80,25 @@
 
                     createNotificationChannel manager
                     notify manager title text
-                    
-            
+
+
                 let updateNotification title text =
                     //createDownloadServiceNotification title text
                     let manager = (Application.Context.GetSystemService(Application.NotificationService) :?> NotificationManager)
                     let notification = buildNotification title text
                     manager.Notify(downloadServiceNotificationId, notification)
-                
+
 
                 let shutDownService () =
                     self.StopForeground(true)
                     self.StopSelf()
 
 
-                let downloadServiceMailbox =
-                     Services.DownloadService.External.createExternalDownloadService
-                        Services.DownloadService.External.startDownload
+                let downloadServiceMailbox(shop:Shop) : MailboxProcessor<_>=
+                    let startDownload = DownloadService.External.startDownload shop
+                    DownloadService.External.createExternalDownloadService
+                        shop
+                        startDownload
                         shutDownService
                         updateNotification
 
@@ -110,14 +114,25 @@
                     with
                     | ex ->
                         reraise()
-                
-                
-                
-                override this.OnStartCommand (_,_,_) =
-                    try
-                        let serviceListener = Services.DownloadService.External.downloadServiceListener downloadServiceMailbox
 
-                        serviceListener |> Services.DownloadService.registerServiceListener 
+
+
+                override this.OnStartCommand (intent,_,_) =
+                    try
+                        let shop =
+                            match intent.GetStringExtra("shop") with
+                            | null -> NewShop
+                            | "OldShop" -> OldShop
+                            | "NewShop" -> NewShop
+                            | _ -> NewShop
+
+                        let callbackService =
+                            match shop with
+                            | NewShop -> DownloadService.External.newShopCallbackService
+                            | OldShop -> DownloadService.External.oldShopCallbackService
+
+                        let serviceListener = DownloadService.External.downloadServiceListener (downloadServiceMailbox shop)
+                        serviceListener |> callbackService.RegisterServiceListener
 
                         StartCommandResult.Sticky
                     with
@@ -126,11 +141,13 @@
 
 
     module DependencyService =
-        
+
         open AndroidCommon.ServiceHelpers
 
         type DownloadService () =
             interface IDownloadService with
 
-                override this.StartDownload () =
-                    Application.Context.StartForeGroundService<AndroidService.DownloadService>()
+                override this.StartDownload shop =
+                    let bundle = new Bundle()
+                    bundle.PutString("shop", shop.ToString()) |> ignore
+                    Application.Context.StartForeGroundService<AndroidService.DownloadService>(bundle) |> ignore

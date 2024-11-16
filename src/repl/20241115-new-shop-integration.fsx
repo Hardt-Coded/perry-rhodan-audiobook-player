@@ -1,5 +1,5 @@
 ﻿#r "nuget: HtmlAgilityPack, 1.11.33"
-#r @"..\PerryRhodan.AudiobookPlayer/bin/Debug/net8.0/PerryRhodan.AudiobookPlayer.dll"
+#r @"..\PerryRhodan.AudiobookPlayer/bin/Debug/net9.0/PerryRhodan.AudiobookPlayer.dll"
 
 open System
 open System.IO
@@ -133,6 +133,16 @@ let result =
             else
                 epNum
         let episodeTitle = innerText |> Helpers.getNewShopEpisodenTitle downloadRegex
+        // get date from this string "<span>Veröffentlicht:</span> 05.07.24"
+        let date =
+            node.SelectSingleNode(".//span[contains(text(),'Veröffentlicht')]")
+            |> Option.ofObj
+            |> Option.map  (_.NextSibling.InnerText)
+            |> Option.bind (fun x ->
+                match DateOnly.TryParseExact(x.Trim(), "dd.MM.yy") with
+                | true, date -> Some date
+                | _ -> None
+                )
         // picture is on a button with the attibute "data-artwork-url"
         let pictureUrl =
             // get the 512x512 picture
@@ -226,11 +236,12 @@ let result =
             Thumbnail = thumbnailUrl
             State = AudioBookState.Empty
             AmbientColor = None
+            PublishingDate = date
         }
     )
     
 result |> Seq.iter (fun x -> printfn $"""%-10s{x.Id.ToString()} |%-40s{x.Group} | %-80s{x.FullName} | %-40s{x.EpisodenTitel} | %-10s{match x.EpisodeNo with | Some y -> y.ToString() | None -> "None"} """)
-result |> Seq.iter (fun x -> printfn $"""%-10s{x.Id.ToString()} | %-140s{match x.Thumbnail with | Some y -> y.ToString() | None -> "None"} | %-140s{match x.Picture with | Some y -> y.ToString() | None -> "None"} """) 
+result |> Seq.iter (fun x -> printfn $"""%-10s{x.Id.ToString()} | %-30s{match x.PublishingDate with | Some y -> y.ToString() | None -> "None"} | %-140s{match x.Picture with | Some y -> y.ToString() | None -> "None"} """) 
     
     
     

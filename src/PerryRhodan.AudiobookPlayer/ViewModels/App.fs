@@ -38,7 +38,6 @@ type Msg =
 
     | OpenPlayerPage of viewModel: AudioBookItemViewModel * startPlaying: bool
     | OpenCurrentPlayerPage
-    | OpenLoginView
 
     | CloseMiniplayer
     | OpenMiniplayer of audiobook:AudioBookItemViewModel * startPlaying: bool
@@ -58,8 +57,6 @@ type SideEffect =
     | OpenMiniplayer of audiobook:AudioBookItemViewModel * startPlaying:bool
     | OpenPlayerPage of audiobook:AudioBookItemViewModel * startPlaying:bool
     | OpenCurrentPlayerPage
-
-    | OpenLoginView
 
 
 
@@ -90,8 +87,7 @@ let update msg state =
     | CloseMiniplayer ->
         { state with PlayerViewModel = None; MiniPlayerControl = None }, SideEffect.None
 
-    | OpenLoginView ->
-        state, SideEffect.OpenLoginView
+    
 
     | IsLoading isLoading ->
         { state with IsLoading = isLoading }, SideEffect.None
@@ -123,12 +119,6 @@ let runSideEffect sideEffect state dispatch =
                     match sideEffect with
                     | SideEffect.None ->
                         return ()
-
-                    | SideEffect.OpenLoginView ->
-                        let control = LoginView()
-                        let vm = new LoginViewModel()
-                        control.DataContext <- vm
-                        InteractiveContainer.ShowDialog(control, true)
 
                     | SideEffect.InitApplication ->
                         // if the global audiobook store is busy display here a loading indicator

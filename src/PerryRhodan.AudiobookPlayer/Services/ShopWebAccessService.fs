@@ -9,19 +9,19 @@ open Dependencies
 open Domain
 open HtmlAgilityPack
 open Microsoft.ApplicationInsights.DataContracts
+open PerryRhodan.AudiobookPlayer.Services.DataBaseCommon
 open PerryRhodan.AudiobookPlayer.Services.Interfaces
 open FsToolkit.ErrorHandling
 open System.Net.Sockets
 open FsHttp
 open Services.Consts
-open Services.DataBase
 open ICSharpCode.SharpZipLib.Zip
 open SkiaSharp
 
 
 
 module DownloaderCommon =
-    
+
     type UpdateProgress = {
             UpdateProgress:int * int -> unit
             FileSize:int
@@ -34,8 +34,8 @@ module DownloaderCommon =
                         FileSize = filesize
                         CurrentProgress = currentProgress
                     }
-                    
-                    
+
+
     type ImagePaths = {
             Image:string
             Thumbnail:string
@@ -45,8 +45,8 @@ module DownloaderCommon =
         TargetFolder:string
         Images: ImagePaths option
     }
-    
-    
+
+
     let copyStream (src:Stream) (dst:Stream) =
         let buffer:byte[] = Array.zeroCreate (1024*1024)
         let dowloadStreamSeq =
@@ -67,7 +67,7 @@ module DownloaderCommon =
 
 
 module WebAccessCommon =
-    
+
     let httpHandlerService = lazy DependencyService.Get<IAndroidHttpMessageHandlerService>()
     let currentHttpClientHandler = lazy httpHandlerService.Force().GetHttpMesageHandler()
     let currentCookieContainer = lazy httpHandlerService.Force().GetCookieContainer()
@@ -76,8 +76,8 @@ module WebAccessCommon =
         httpHandlerService.Force().SetAutoRedirect redirect
         fun _ -> httpClient.Force()
     )
-    
-    
+
+
     let handleException f =
         task {
             try
@@ -95,12 +95,12 @@ module WebAccessCommon =
                 | _ ->
                     return Error (Other Translations.current.InternalError)
         }
-    
+
 
 
     let getAudiobooksOnlineBase
         getDownloadPage
-        parseShopDownloadData
+        (parseShopDownloadData: string -> Result<AudioBook[],string>) 
         cookies =
         task {
             initAppFolders ()
@@ -108,18 +108,20 @@ module WebAccessCommon =
             let! html = getDownloadPage cookies
             let audioBooks =
                 html
-                |> Result.map parseShopDownloadData
+                |> Result.bind (fun d -> parseShopDownloadData d |> Result.mapError ComError.Other)
+                |> Result.map (Array.distinctBy (fun (ab: AudioBook) -> ab.Id))
+
 
             return audioBooks
         }
-        
-        
+
+
 
 [<RequireQualifiedAccess>]
 module OldShopWebAccessService =
-    
+
     open WebAccessCommon
-    
+
     let baseUrl = "https://www.einsamedien.de/"
 
 
@@ -206,7 +208,7 @@ module OldShopWebAccessService =
 
 
     let getAudiobooksOnline = getAudiobooksOnlineBase getDownloadPage parseOldShopDownloadData
-        
+
 
 
     let private getDownloadUrl cookies url =
@@ -357,13 +359,13 @@ module OldShopWebAccessService =
 
                 //use thumbInputStream = File.OpenRead()
                 use orig = SKBitmap.Decode(imageFullName)
-                use thumb = orig.Resize(SKImageInfo(100, 100), SKSamplingOptions(SKFilterMode.Linear, SKMipmapMode.Linear))
+                use thumb = orig.Resize(SKImageInfo(280, 280), SKSamplingOptions(SKFilterMode.Linear, SKMipmapMode.Linear))
                 if isNull thumb then
                     ()
                 else
                     use thumbImage = SKImage.FromBitmap(thumb)
                     use fileStream = new FileStream(thumbFullName,FileMode.Create)
-                    thumbImage.Encode(SKEncodedImageFormat.Jpeg,90).SaveTo(fileStream)
+                    thumbImage.Encode(SKEncodedImageFormat.Jpeg,100).SaveTo(fileStream)
 
                     fileStream.Close()
 
@@ -375,14 +377,14 @@ module OldShopWebAccessService =
                 try
                     Global.telemetryClient.TrackEvent ("AudioBookDownload")
                     let folders = createCurrentFolders ()
-                    
+
                     match audiobook with
                     | { State = { Downloaded = true } } ->
                         return Error (Other "Audiobook already downloaded!")
-                        
+
                     | { DownloadUrl = None } ->
                         return Error (Other "No download url found!")
-                        
+
                     | { DownloadUrl = Some abDownloadUrl } ->
                         let audioBookFolder = Path.Combine(folders.audioBookDownloadFolderBase,$"{audiobook.Id}")
                         if not (Directory.Exists(audioBookFolder)) then
@@ -505,14 +507,14 @@ module OldShopWebAccessService =
                     | _ ->
                         return Error (Other Translations.current.InternalError)
             }
-   
+
 
 
 [<RequireQualifiedAccess>]
 module NewShopWebAccessService =
-    
+
     open WebAccessCommon
-    
+
     let baseUrl = "https://www.einsamedien-verlag.de/"
 
 
@@ -553,7 +555,7 @@ module NewShopWebAccessService =
                             return (Some cookies)
                     }
                 )
-                
+
             return res
         }
 
@@ -604,44 +606,7 @@ module NewShopWebAccessService =
         }
 
 
-    let getAudiobooksOnline = getAudiobooksOnlineBase getDownloadPage parseOldShopDownloadData
-        
-
-
-    let private getDownloadUrl cookies url =
-        task {
-            let seqCC = cookies |> Map.toSeq
-
-            let! res =
-                fun () ->
-                    http {
-                        GET $"{baseUrl}{url}"
-                        headers [
-                            "Cookie", seqCC |> Seq.map (fun (k,v) -> $"{k}={v}") |> String.concat "; "
-                        ]
-                        config_transformHttpClient (useAndroidHttpClient false)
-                    }
-                    |> Request.sendTAsync
-                |> handleException
-
-            return
-                res
-                |> Result.bind (
-                    fun resp ->
-                        let location = resp.headers |> Seq.filter (fun m -> m.Key = "Location") |> Seq.tryHead
-                        match location with
-                        | None ->
-                            Error (Other Translations.current.NoDownloadUrlFoundError)
-                        | Some location ->
-                            let downloadUrl = location.Value |> Seq.head
-                            if downloadUrl.Contains("index.php?id=98") then
-                                Error (SessionExpired Translations.current.SessionExpired)
-                            else
-                                Ok downloadUrl
-                )
-
-
-        }
+    let getAudiobooksOnline = getAudiobooksOnlineBase getDownloadPage parseNewShopDownloadData
 
 
 
@@ -717,19 +682,19 @@ module NewShopWebAccessService =
             progress
 
 
-        let downloadAudiobook cookies updateProgress (audiobook:AudioBook) =
+        let downloadAudiobook (cookies:Map<string,string>) updateProgress (audiobook:AudioBook) =
             task {
                 try
                     Global.telemetryClient.TrackEvent ("AudioBookDownload")
                     let folders = createCurrentFolders ()
-                    
+
                     match audiobook with
                     | { State = { Downloaded = true } } ->
                         return Error (Other "Audiobook already downloaded!")
-                        
+
                     | { DownloadUrl = None } ->
                         return Error (Other "No download url found!")
-                        
+
                     | { DownloadUrl = Some abDownloadUrl } ->
                         let audioBookFolder = Path.Combine(folders.audioBookDownloadFolderBase,$"{audiobook.Id}")
                         if not (Directory.Exists(audioBookFolder)) then
@@ -739,11 +704,14 @@ module NewShopWebAccessService =
                         if File.Exists(noMediaFile) |> not then
                             do! File.WriteAllTextAsync(noMediaFile,"") |> Async.AwaitTask
 
-                        
+
                         try
                             let! resp =
                                 http {
                                     GET abDownloadUrl
+                                    headers [
+                                        "Cookie", cookies |> Map.toList |> List.map (fun (k,v) -> $"{k}={v}") |> String.concat "; "
+                                    ]
                                     config_transformHttpClient (useAndroidHttpClient true)
                                 }
                                 |> Request.sendAsync

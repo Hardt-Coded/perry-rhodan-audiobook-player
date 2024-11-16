@@ -321,13 +321,18 @@ module PlayerPage =
             | _ -> 0
 
 
-        let private loadFiles (model: AudioBook) =
+        let private loadFiles (shop:Shop) (model: AudioBook) =
             task {
                 match model.State.DownloadedFolder with
                 | None -> return None
                 | Some folder ->
                     try
-                        let! audioFileInfo = DataBase.getAudioBookFileInfo model.Id
+                        let! audioFileInfo =
+                            match shop with
+                            | OldShop ->
+                                OldShopDatabase.storageProcessor.GetAudioBookFileInfo model.Id
+                            | NewShop ->
+                                NewShopDatabase.storageProcessor.GetAudioBookFileInfo model.Id
 
                         match audioFileInfo with
                         | None ->
@@ -406,7 +411,7 @@ module PlayerPage =
 
                                 // the user tapped on a different audiobook
                                 | Some infoAudioBook ->
-                                    let! files = state.AudioBook.AudioBook |> loadFiles
+                                    let! files = state.AudioBook.AudioBook |> loadFiles state.AudioBook.Shop
 
                                     match files with
                                     | None ->
@@ -417,7 +422,7 @@ module PlayerPage =
 
                                 | _ ->
                                     // there is no current state in the store, so load the files and connect to the service
-                                    let! files = state.AudioBook.AudioBook |> loadFiles
+                                    let! files = state.AudioBook.AudioBook |> loadFiles state.AudioBook.Shop
 
                                     match files with
                                     | None ->
