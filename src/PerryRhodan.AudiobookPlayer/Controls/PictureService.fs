@@ -1,11 +1,7 @@
 ﻿namespace PerryRhodan.AudiobookPlayer.Services
 
-open System.IO
 open PerryRhodan.AudiobookPlayer.ViewModel
-open System.Threading.Tasks
-open PerryRhodan.AudiobookPlayer.Common
-open Services
-open SkiaSharp
+open FsToolkit.ErrorHandling
 
 
 
@@ -41,21 +37,6 @@ type PictureDownloadService (notificationCallback: (string -> unit), finishedCal
                                             AudioBookItem.SideEffects.Helpers.getAmbientColorFromPicUrl url
 
                                         color |> Option.iter audiobook.SetAmbientColor
-
-                                        // not now, maybe later
-                                        //let folders = Consts.createCurrentFolders()
-                                        //let audioBookPath = Path.Combine(folders.audioBookDownloadFolderBase,$"{audiobook.AudioBook.Id}")
-                                        //if not <| Directory.Exists audioBookPath then Directory.CreateDirectory audioBookPath |> ignore
-                                        //let picturePath = Path.Combine(audioBookPath, $"{audiobook.AudioBook.Id}.png")
-                                        //let thumbFullName = Path.Combine(audioBookPath,$"{audiobook.AudioBook.Id}.thumb.png")
-                                        //SKImage.FromBitmap(bitmap).Encode(SKEncodedImageFormat.Png, 90).AsStream().CopyTo(File.Create(picturePath))
-                                        //use thumb = bitmap.Resize(SKImageInfo(100, 100), SKSamplingOptions(SKFilterMode.Linear, SKMipmapMode.Linear))
-                                        //let thumb = if thumb = null || thumb.IsEmpty || thumb.IsNull then bitmap else thumb
-                                        //SKImage.FromBitmap(thumb).Encode(SKEncodedImageFormat.Png, 90).AsStream().CopyTo(File.Create(thumbFullName))
-                                        //audiobook.SetPicture (Some picturePath) (Some thumbFullName)
-                                        //let color = AudioBookItem.SideEffects.Helpers.getAmbientColorFromSkBitmap bitmap
-                                        //// save ambient color
-                                        //audiobook.SetAmbientColor color
                                         ()
                                 }
                             )

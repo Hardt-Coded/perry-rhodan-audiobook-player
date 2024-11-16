@@ -17,6 +17,7 @@ module private DemoData =
 
     let designAudioBook = {
             Id = 1
+            ShopId = None
             FullName = "Perry Rhodan 3000 - Mythos Erde"
             EpisodeNo = Some 3000
             EpisodenTitel = "Mythos Erde"
@@ -37,6 +38,7 @@ module private DemoData =
 
     let designAudioBook2 = {
             Id = 2
+            ShopId = None
             FullName = "Perry Rhodan 3001 - Mythos Erde2"
             EpisodeNo = Some 3000
             EpisodenTitel = "Mythos Erde2"
@@ -57,6 +59,7 @@ module private DemoData =
 
     let designAudioBook3 = {
             Id = 3
+            ShopId = None
             FullName = "Perry Rhodan 3003 - Mythos Erde2"
             EpisodeNo = Some 3000
             EpisodenTitel = "Mythos Erde3"
@@ -146,7 +149,7 @@ module HomePage =
 
         | FilterChanged filter ->
             let filteredAudiobooks =
-                AudioBookStore.globalAudiobookStore.Model.Audiobooks
+                AudioBookStore.globalAudiobookStore.Model.OldShopAudiobooks
                 |> filterAudioBooks filter
                 |> sortAudioBooks state.SortOrder
             {
@@ -164,7 +167,7 @@ module HomePage =
 
         | SearchTextChanged searchText ->
             let filteredAudiobooks =
-                AudioBookStore.globalAudiobookStore.Model.Audiobooks
+                AudioBookStore.globalAudiobookStore.Model.OldShopAudiobooks
                 |> filterAudioBooks (FilterOptions.Free searchText)
                 |> sortAudioBooks state.SortOrder
 
@@ -234,7 +237,7 @@ type HomeViewModel(?audiobookItems) as self =
         self.AddDisposable
             <| AudioBookStore.globalAudiobookStore.Observable.Subscribe(fun s ->
                 local.Dispatch (s.IsBusy |> SetBusy)
-                local.Dispatch (s.Audiobooks |> AudioBookItemsChanged)
+                local.Dispatch (s.OldShopAudiobooks |> AudioBookItemsChanged)
             )
         ()
 
@@ -260,7 +263,7 @@ type HomeViewModel(?audiobookItems) as self =
 
 
     member this.OnInitialized() =
-        let currentAudioBooks = AudioBookStore.globalAudiobookStore.Model.Audiobooks
+        let currentAudioBooks = AudioBookStore.globalAudiobookStore.Model.OldShopAudiobooks
         local.Dispatch (currentAudioBooks |> AudioBookItemsChanged)
 
 
@@ -330,7 +333,7 @@ type HomeViewModel(?audiobookItems) as self =
 
                 
                 let orderedGroups =
-                    AudioBookStore.globalAudiobookStore.Model.AudiobookGroups
+                    AudioBookStore.globalAudiobookStore.Model.OldShopAudiobookGroups
                     |> Array.sortBy id
                     |> Array.sortBy (fun g ->
                         match g with

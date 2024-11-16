@@ -625,7 +625,7 @@ module PlayerElmish =
                         // mediaplayer messes up the positions and mediaitems
 
                         let posTimer =
-                            Reactive.Linq.Observable.Interval (TimeSpan.FromSeconds 1)
+                            Reactive.Linq.Observable.Interval (TimeSpan.FromSeconds 1.0)
                             |> Observable.subscribe (fun _ ->
                                 if (CrossMediaManager.Current.Queue.Current.Id <> "empty") && not suppressPositionAndTrackUpdates then
                                     let currentPos = CrossMediaManager.Current.Position

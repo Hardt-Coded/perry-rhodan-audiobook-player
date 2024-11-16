@@ -5,13 +5,13 @@ open Microsoft.Extensions.DependencyInjection
 
 
 let internal sc = ServiceCollection()
-let mutable internal serviceProvider = Operators.Unchecked.defaultof<ServiceProvider>
+let mutable internal serviceProvider: ServiceProvider | null = null
 
 
 
 type DependencyService() =
     
-    static member Get<'a>()=
+    static member Get<'a>() =
         if serviceProvider = null then
             DependencyService.SetComplete()
             

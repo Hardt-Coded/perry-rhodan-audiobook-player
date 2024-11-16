@@ -61,5 +61,8 @@
         abstract member RestoreBackbuttonCallback: memoId:string -> unit
 
 
+    type ISecureStorageHelper =
+        abstract member ClearSecureStoragePreferences: unit -> unit
+
 
 

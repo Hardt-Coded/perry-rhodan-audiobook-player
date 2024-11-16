@@ -12,6 +12,7 @@ open Common
 open Dependencies
 open Domain
 open MediaManager.Library
+open PerryRhodan.AudiobookPlayer.DownloaderCommon
 open PerryRhodan.AudiobookPlayer.Services.Interfaces
 open PerryRhodan.AudiobookPlayer.ViewModels
 open ReactiveElmish
@@ -32,9 +33,10 @@ module AudioBookStore =
     module AudioBookElmish =
 
         type State = {
-            Audiobooks:AudioBookItemViewModel array
-            AudiobookGroups: string array
-            CurrentAudioBook:AudioBookItemViewModel option
+            OldShopAudiobooks:AudioBookItemViewModel array
+            OldShopAudiobookGroups: string array
+            NewShopAudiobooks:AudioBookItemViewModel array
+            NewShopAudiobookGroups: string array
             IsBusy:bool
         }
 
@@ -56,9 +58,10 @@ module AudioBookStore =
 
         let init () =
             {
-                Audiobooks = [||]
-                AudiobookGroups = [||] 
-                CurrentAudioBook = None
+                OldShopAudiobooks = [||]
+                OldShopAudiobookGroups = [||] 
+                NewShopAudiobooks = [||]
+                NewShopAudiobookGroups = [||] 
                 IsBusy = false
             }, SideEffect.LoadAudiobooks
 
@@ -73,12 +76,12 @@ module AudioBookStore =
 
             | AudiobooksLoaded audiobooks ->
                 let groups = audiobooks |> Array.map (fun i -> i.AudioBook.Group) |> Array.distinct
-                { state with Audiobooks = audiobooks; AudiobookGroups = groups }, SideEffect.None
+                { state with OldShopAudiobooks = audiobooks; OldShopAudiobookGroups = groups }, SideEffect.None
 
             | DeleteAudiobookFromDatabase audiobook ->
                 { state with
-                    Audiobooks =
-                        state.Audiobooks
+                    OldShopAudiobooks =
+                        state.OldShopAudiobooks
                         |> Array.filter (fun x -> x.AudioBook <> audiobook)
                 }, SideEffect.DeleteAudiobookFromDatabase audiobook
 
@@ -183,7 +186,7 @@ module AudioBookItem =
         | ToggleAmbientColor
 
         | UpdateDownloadProgress of current:int * total:int
-        | DownloadCompleted of WebAccess.Downloader.DownloadResult
+        | DownloadCompleted of DownloadResult
         | UpdateAudioBookPosition of position:TimeSpan
         | UpdateCurrentListenFilename of filename:string
         | UpdateCurrentAudioFileList of audioFiles:AudioBookAudioFilesInfo
@@ -394,10 +397,13 @@ module AudioBookItem =
 
 
     module SideEffects =
-
+        open FsToolkit.ErrorHandling
+        
         [<AutoOpen>]
         module Helpers =
 
+            open FsToolkit.ErrorHandling
+            
             let openLoginForm () =
                 Dispatcher.UIThread.Invoke<unit> (fun _ ->
                     let control = PerryRhodan.AudiobookPlayer.Views.LoginView()
@@ -852,6 +858,7 @@ module private Helpers =
 module private DemoData =
     let designAudioBook = {
             Id = 1
+            ShopId = None
             FullName = "Perry Rhodan 3000 - Mythos Erde"
             EpisodeNo = Some 3000
             EpisodenTitel = "Mythos Erde"

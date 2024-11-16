@@ -438,7 +438,7 @@ module PlayerPage =
                                 | _ ->
                                     let file, _ = state.AudioFileList[state.CurrentAudioFileIndex]
                                     let currentPosition = state.CurrentPosition
-                                    let rewindInSec = rewindInSec state |> TimeSpan.FromSeconds
+                                    let rewindInSec = rewindInSec state |> int64 |> TimeSpan.FromSeconds
 
                                     let newPosition =
                                         let p = currentPosition - rewindInSec
@@ -683,18 +683,18 @@ type PlayerViewModel(audiobook: AudioBookItemViewModel, startPlaying) =
     member this.SleepTimerValues =
         [|
             (None, "Aus")
-            (Some <| TimeSpan.FromMinutes 5, "5 Minuten")
-            (Some <| TimeSpan.FromMinutes 10, "10 Minuten")
-            (Some <| TimeSpan.FromMinutes 15, "15 Minuten")
-            (Some <| TimeSpan.FromMinutes 20, "20 Minuten")
-            (Some <| TimeSpan.FromMinutes 30, "30 Minuten")
-            (Some <| TimeSpan.FromMinutes 45, "45 Minuten")
-            (Some <| TimeSpan.FromMinutes 60, "60 Minuten")
-            (Some <| TimeSpan.FromMinutes 90, "90 Minuten")
-            (Some <| TimeSpan.FromMinutes 120, "120 Minuten")
-            (Some <| TimeSpan.FromMinutes 150, "150 Minuten")
-            (Some <| TimeSpan.FromMinutes 180, "180 Minuten")
-            (Some <| TimeSpan.FromMinutes 210, "210 Minuten")
+            (Some <| TimeSpan.FromMinutes 5.0, "5 Minuten")
+            (Some <| TimeSpan.FromMinutes 10.0, "10 Minuten")
+            (Some <| TimeSpan.FromMinutes 15.0, "15 Minuten")
+            (Some <| TimeSpan.FromMinutes 20.0, "20 Minuten")
+            (Some <| TimeSpan.FromMinutes 30.0, "30 Minuten")
+            (Some <| TimeSpan.FromMinutes 45.0, "45 Minuten")
+            (Some <| TimeSpan.FromMinutes 60.0, "60 Minuten")
+            (Some <| TimeSpan.FromMinutes 90.0, "90 Minuten")
+            (Some <| TimeSpan.FromMinutes 120.0, "120 Minuten")
+            (Some <| TimeSpan.FromMinutes 150.0, "150 Minuten")
+            (Some <| TimeSpan.FromMinutes 180.0, "180 Minuten")
+            (Some <| TimeSpan.FromMinutes 210.0, "210 Minuten")
 
         |]
 
@@ -769,7 +769,7 @@ type PlayerViewModel(audiobook: AudioBookItemViewModel, startPlaying) =
 
     static member DesignVM =
         let vm = new PlayerViewModel(AudioBookItemViewModel.DesignVM, false)
-        vm.SleepTimer <- Some <| TimeSpan.FromMinutes 10
+        vm.SleepTimer <- Some <| TimeSpan.FromMinutes 10.0
         vm
 
 

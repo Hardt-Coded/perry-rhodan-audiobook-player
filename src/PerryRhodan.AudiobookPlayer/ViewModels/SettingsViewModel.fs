@@ -291,6 +291,7 @@ module SideEffects =
 
 
 open SettingsPage
+open FsToolkit.ErrorHandling
 
 type SettingsViewModel() =
     inherit ReactiveElmishViewModel()
@@ -391,7 +392,8 @@ type SettingsViewModel() =
             let zip = new ICSharpCode.SharpZipLib.Zip.FastZip()
             zip.CreateZip(zipFile, stateFile.Replace("audiobooks.db",""), true, "audiobooks.db")
             Share.RequestAsync(ShareFileRequest("Einsamedien Backup", ShareFile(zipFile, "application/zip")))
-            |> Task.tmap (fun () ->
+            |> Task.ofUnit
+            |> Task.map (fun () ->
                 System.IO.File.Delete(zipFile)
             )
             |> ignore

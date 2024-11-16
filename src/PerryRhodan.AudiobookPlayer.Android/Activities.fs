@@ -15,6 +15,7 @@ open Avalonia.Vulkan
 open Dependencies
 open MediaManager
 open Microsoft.ApplicationInsights.Extensibility
+open Microsoft.Maui.ApplicationModel
 open PerryRhodan.AudiobookPlayer
 open Microsoft.Extensions.DependencyInjection
 open PerryRhodan.AudiobookPlayer.Services.AudioPlayer
@@ -25,6 +26,7 @@ open Services.DependencyServices
 open Xamarin.Android.Net
 open PerryRhodan.AudiobookPlayer.Controls
 open Android.Graphics
+open FsToolkit.ErrorHandling
 
 
 
@@ -79,6 +81,7 @@ type ServiceConnection() =
 
 
 
+
 [<Activity(
     Label = "Eins A Medien Audiobook Player",
     Theme = "@style/MyTheme.NoActionBar",
@@ -104,15 +107,15 @@ type MainActivity() as self =
         ()
 
 
-
-
-    override _.CustomizeAppBuilder(builder) =
-
+    do
         AppDomain.CurrentDomain.UnhandledException.Subscribe(fun args ->
             let ex = args.ExceptionObject :?> Exception
             Global.telemetryClient.TrackException ex
         ) |> ignore
 
+
+
+    override this.CustomizeAppBuilder(builder) =
 
         let bitmapConverter = {
             new IBitmapConverter with
@@ -122,6 +125,21 @@ type MainActivity() as self =
         }
 
         let packageInfo = self.PackageManager.GetPackageInfo(self.PackageName, PackageInfoFlags.MetaData)
+
+        let secureStorageHelper =
+            { new ISecureStorageHelper with
+                member _.ClearSecureStoragePreferences () =
+                    let packageName = AppInfo.Current.PackageName;
+                    let alias = $"{packageName}.microsoft.maui.essentials.preferences"
+                    let preferences = this.ApplicationContext.GetSharedPreferences(alias, FileCreationMode.Private)
+                    // Igitt! This is a workaround for a bug in the Xamarin.Essentials SecureStorage
+                    if preferences <> null then
+                        let pref = preferences.Edit()
+                        if pref <> null then
+                            let pref = pref.Clear()
+                            if pref <> null then
+                                pref.Apply()
+            }
 
         copyDemoDatabaseToDbFolderWhenDev packageInfo
 
@@ -149,24 +167,26 @@ type MainActivity() as self =
             .AddSingleton<IActionMenuService, ActionMenuService>()
             .AddSingleton<IBitmapConverter>(bitmapConverter)
             .AddSingleton<IPackageInformation>(packageInformation)
+            .AddSingleton<ISecureStorageHelper>(secureStorageHelper)
             |> ignore
 
         // convert function to C# Func
 
-        // let androidOptions = AndroidPlatformOptions()
-        // // Todo: do not forget Fallback
-        // let renderModes = [ AndroidRenderingMode.Vulkan ] |> System.Collections.Generic.List
-        // androidOptions.RenderingMode <- renderModes.AsReadOnly()
+        let androidOptions = AndroidPlatformOptions()
+        // Todo: do not forget Fallback
+        let renderModes = [ AndroidRenderingMode.Vulkan ] |> System.Collections.Generic.List
+        androidOptions.RenderingMode <- renderModes.AsReadOnly()
         //
-        // let vulkanOptions = VulkanOptions()
-        // vulkanOptions.VulkanInstanceCreationOptions <- VulkanInstanceCreationOptions()
+        let vulkanOptions = VulkanOptions()
+        vulkanOptions.VulkanInstanceCreationOptions <- VulkanInstanceCreationOptions()
 
         base.CustomizeAppBuilder(builder)
-            // .With(androidOptions)
-            // .With(vulkanOptions)
+
+            //
             .UseAndroid()
             .WithInterFont()
-
+            .With(vulkanOptions)
+            .With(androidOptions)
             .UseReactiveUI()
 
 
@@ -176,10 +196,7 @@ type MainActivity() as self =
 
     override this.OnCreate(savedInstanceState) =
 
-        AppDomain.CurrentDomain.UnhandledException.Subscribe(fun args ->
-            let ex = args.ExceptionObject :?> Exception
-            Global.telemetryClient.TrackException ex
-        ) |> ignore
+
 
         base.OnCreate savedInstanceState
 

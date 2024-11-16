@@ -346,9 +346,9 @@ module ShopService =
                     do!
                         checkLoginSession ()
                         |> TaskResult.bind loadAudioBooksFromCloud
-                        |> TaskResult.map (lookForOrphanedAudiobookOnDevice AudioBookStore.globalAudiobookStore.Model.Audiobooks)
+                        |> TaskResult.map (lookForOrphanedAudiobookOnDevice AudioBookStore.globalAudiobookStore.Model.OldShopAudiobooks)
                         |> TaskResult.bind processLoadedAudioBookFromDevice
-                        |> TaskResult.map (determinateNewAddedAudioBooks AudioBookStore.globalAudiobookStore.Model.Audiobooks)
+                        |> TaskResult.map (determinateNewAddedAudioBooks AudioBookStore.globalAudiobookStore.Model.OldShopAudiobooks)
                         |> TaskResult.map  checkIfCurrentAudiobookAreReallyDownloaded
                         |> TaskResult.map  removeOrphanPictures
                         |> TaskResult.bind processNewAddedAudioBooks

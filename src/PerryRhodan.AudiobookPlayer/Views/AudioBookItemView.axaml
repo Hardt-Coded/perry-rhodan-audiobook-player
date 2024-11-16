@@ -50,6 +50,7 @@
             <Border CornerRadius="15" Padding="1" ClipToBounds="True" Background="Transparent">
                 <Grid Grid.Column="0" Margin="0" Background="Transparent">
                     <asyncImageLoader:AdvancedImage Source="{Binding Thumbnail, FallbackValue={x:Static viewModel:FallbackImage.fallbackImage}}"
+                                                    x:Name="Thumbnail"
                                                     Margin="-6,5,0,0"
                                                     CornerRadius="5">
                     </asyncImageLoader:AdvancedImage>
