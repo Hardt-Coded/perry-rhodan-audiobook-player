@@ -23,12 +23,8 @@ module Helper =
     
 type GlobalCachedImageLoader =
     inherit BaseWebImageLoader
-    
-    
-
         
-    static let globalMemCache = new ConcurrentDictionary<string, Task<Bitmap>>()        
-        
+          
     new(httpClient, disposeHttpClient) = { inherit BaseWebImageLoader(httpClient, disposeHttpClient) }
     new() = { inherit BaseWebImageLoader() }
     
@@ -60,8 +56,8 @@ type AudioBookItemView () as this =
     member private this.InitializeComponent() =
         AvaloniaXamlLoader.Load(this)
         // get Grid
-        let image = this.FindControl<AdvancedImage>("Thumbnail")
-        // set ImageLoader
-        image.Loader |> Option.ofObj |> Option.iter (_.Dispose())
-        image.Loader <- globalCachedImageLoader
+        // let image = this.FindControl<AdvancedImage>("Thumbnail")
+        // // set ImageLoader
+        // image.Loader |> Option.ofObj |> Option.iter (_.Dispose())
+        // image.Loader <- globalCachedImageLoader
         

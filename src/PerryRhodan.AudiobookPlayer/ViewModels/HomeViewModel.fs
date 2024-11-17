@@ -167,14 +167,14 @@ module HomePage =
                 | NewShop -> AudioBookStore.globalAudiobookStore.Value.Model.NewShopAudiobooks
                 | OldShop -> AudioBookStore.globalAudiobookStore.Value.Model.OldShopAudiobooks
                 |> filterAudioBooks state.Filter
-                |> sortAudioBooks state.SortOrder
+                |> sortAudioBooks shop state.SortOrder
             { state with Shop = shop; AudioBooks = filteredAudiobooks }, SideEffect.None
 
         | AudioBookItemsChanged audiobookItems ->
             let filteredAudiobooks =
                 audiobookItems
                 |> filterAudioBooks state.Filter
-                |> sortAudioBooks state.SortOrder
+                |> sortAudioBooks state.Shop state.SortOrder
 
             { state with AudioBooks = filteredAudiobooks }, SideEffect.None
 
@@ -184,7 +184,7 @@ module HomePage =
                 | NewShop -> AudioBookStore.globalAudiobookStore.Value.Model.NewShopAudiobooks
                 | OldShop -> AudioBookStore.globalAudiobookStore.Value.Model.OldShopAudiobooks
                 |> filterAudioBooks filter
-                |> sortAudioBooks state.SortOrder
+                |> sortAudioBooks state.Shop state.SortOrder
             {
                 state with
                     Filter = filter
@@ -220,13 +220,21 @@ module HomePage =
             { state with IsBusy = isBusy }, SideEffect.None
 
 
-    and sortAudioBooks (sortOrder:SortOrder) (audiobooks:AudioBookItemViewModel[]) =
+    and sortAudioBooks (shop:Shop) (sortOrder:SortOrder) (audiobooks:AudioBookItemViewModel[]) =
         match sortOrder with
         | SortOrder.TitleAsc ->         audiobooks |> Array.sortBy (_.Title)
         | SortOrder.TitleDesc ->        audiobooks |> Array.sortByDescending (_.Title)
         | SortOrder.LastListendDesc ->  audiobooks |> Array.sortByDescending (_.AudioBook.State.LastTimeListend)
-        | SortOrder.IdAsc ->            audiobooks |> Array.sortBy (_.AudioBook.Id)
-        | SortOrder.IdDesc ->           audiobooks |> Array.sortByDescending (_.AudioBook.Id)
+        | SortOrder.IdAsc ->
+            match shop with
+            | NewShop -> audiobooks |> Array.sortBy (fun i -> match i.AudioBook.PublishingDate with | Some d -> d | None -> DateOnly.MinValue)
+            | OldShop -> audiobooks |> Array.sortBy (_.AudioBook.Id)
+            
+        | SortOrder.IdDesc ->
+            match shop with
+            | NewShop -> audiobooks |> Array.sortByDescending (fun i -> match i.AudioBook.PublishingDate with | Some d -> d | None -> DateOnly.MinValue)
+            | OldShop -> audiobooks |> Array.sortByDescending (_.AudioBook.Id)
+            
 
     and filterAudioBooks (filter:FilterOptions) (audiobooks:AudioBookItemViewModel[]) =
         match filter with
