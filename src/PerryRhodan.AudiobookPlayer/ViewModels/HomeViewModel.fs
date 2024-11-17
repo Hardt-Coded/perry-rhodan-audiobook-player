@@ -81,7 +81,7 @@ module private DemoData =
             AmbientColor = Some "#0000FF"
             PublishingDate = None
         }
-    
+
     let audioBooks = [|
         AudioBookItemViewModel(NewShop, designAudioBook)
         AudioBookItemViewModel(NewShop, designAudioBook2)
@@ -195,7 +195,7 @@ module HomePage =
             {
                 state with
                     SortOrder = sortOrder
-                    AudioBooks = state.AudioBooks |> sortAudioBooks sortOrder
+                    AudioBooks = state.AudioBooks |> sortAudioBooks state.Shop sortOrder
             }, SideEffect.None
 
         | SearchTextChanged searchText ->
@@ -207,7 +207,7 @@ module HomePage =
                     | NewShop -> AudioBookStore.globalAudiobookStore.Value.Model.NewShopAudiobooks
                     | OldShop -> AudioBookStore.globalAudiobookStore.Value.Model.OldShopAudiobooks
                     |> filterAudioBooks (FilterOptions.Free searchText)
-                    |> sortAudioBooks state.SortOrder
+                    |> sortAudioBooks state.Shop state.SortOrder
 
             { state with SearchText = searchText; AudioBooks = filteredAudiobooks }, SideEffect.None
 
@@ -229,12 +229,12 @@ module HomePage =
             match shop with
             | NewShop -> audiobooks |> Array.sortBy (fun i -> match i.AudioBook.PublishingDate with | Some d -> d | None -> DateOnly.MinValue)
             | OldShop -> audiobooks |> Array.sortBy (_.AudioBook.Id)
-            
+
         | SortOrder.IdDesc ->
             match shop with
             | NewShop -> audiobooks |> Array.sortByDescending (fun i -> match i.AudioBook.PublishingDate with | Some d -> d | None -> DateOnly.MinValue)
             | OldShop -> audiobooks |> Array.sortByDescending (_.AudioBook.Id)
-            
+
 
     and filterAudioBooks (filter:FilterOptions) (audiobooks:AudioBookItemViewModel[]) =
         match filter with
