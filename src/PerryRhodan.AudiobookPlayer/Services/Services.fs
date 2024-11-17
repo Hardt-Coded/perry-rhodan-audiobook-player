@@ -14,6 +14,7 @@ open Domain
 open System.Net
 open FSharp.Control
 open HtmlAgilityPack
+open Microsoft.ApplicationInsights.DataContracts
 open Microsoft.Maui.ApplicationModel
 open Newtonsoft.Json
 open System.Net.Http
@@ -25,7 +26,7 @@ open PerryRhodan.AudiobookPlayer.Services.Interfaces
 open PerryRhodan.AudiobookPlayer
 open SkiaSharp
 open Dependencies
-open PerryRhodan.AudiobookPlayer.Common
+
 
 
 type StateConnectionString = | StateConnectionString of string
@@ -103,6 +104,15 @@ module Consts =
 
 
                 let stateFileFolder = Path.Combine(currentLocalDataFolder,"states")
+                // Delete all backup files
+                try
+                    Directory.EnumerateFiles(stateFileFolder,"*backup*")
+                    |> Seq.iter (File.Delete)
+                with
+                | ex ->
+                    Global.telemetryClient.TrackTrace("error deleting backup files", SeverityLevel.Error)
+                    Global.telemetryClient.TrackException ex
+                    ()
                 let audioBooksStateDataFile = Path.Combine(stateFileFolder,"audiobooks.db")
                 let audioBookAudioFileDb = Path.Combine(stateFileFolder,"audiobookfiles.db")
                 let audioBookDownloadFolderBase = Path.Combine(currentLocalDataFolder,"audiobooks")
@@ -115,9 +125,9 @@ module Consts =
                         currentLocalDataFolder = currentLocalDataFolder
                         stateFileFolder = stateFileFolder
                         audioBooksStateDataFilePath = audioBooksStateDataFile
-                        audioBooksStateDataConnectionString = StateConnectionString $"FileName={audioBooksStateDataFile};Upgrade=true;Collation=en-US/None"
+                        audioBooksStateDataConnectionString = StateConnectionString $"FileName={audioBooksStateDataFile};Upgrade=true;Collation=en-US/None;connection=shared"
                         audioBookAudioFileInfoDbFilePath = audioBookAudioFileDb
-                        audioBookAudioFileInfoDbConnectionString = FileInfoConnectionString $"Filename={audioBookAudioFileDb};Upgrade=true;Collation=en-US/None"
+                        audioBookAudioFileInfoDbConnectionString = FileInfoConnectionString $"Filename={audioBookAudioFileDb};Upgrade=true;Collation=en-US/None;connection=shared"
                         audioBookDownloadFolderBase=audioBookDownloadFolderBase
                     |}
                 folders <- Some result
@@ -319,8 +329,8 @@ module SecureLoginStorage =
             with
             | e -> return (Error e.Message)
         }
-        
-        
+
+
     let private secNewShopCookieKey             = "perryRhodanAudioBookNewShopCookie"
     let private secNewShopStoreUsernameKey      = "perryRhodanAudioBookNewShopUsername"
     let private secNewShopStorePasswordKey      = "perryRhodanAudioBookNewShopPassword"

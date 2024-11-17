@@ -14,6 +14,9 @@ open Services.DependencyServices
 type MainViewModel(root:CompositionRoot) =
     inherit ReactiveElmishViewModel()
 
+    let app = App.getAppStore()
+
+
     interface IMainViewModel with
         member this.GotoPlayerPage audiobook startPlayer = this.GotoPlayerPage (audiobook :?> AudioBookItemViewModel) startPlayer
         member this.OpenMiniplayer audiobook startPlayer = this.OpenMiniplayer (audiobook :?> AudioBookItemViewModel) startPlayer
@@ -68,7 +71,7 @@ type MainViewModel(root:CompositionRoot) =
 
     member this.OpenCurrentPlayerPage () =
         if not app.Model.IsLoading then app.Dispatch <| OpenCurrentPlayerPage
-    
+
     member this.GotoPlayerPage audiobook startPlaying =
         if not app.Model.IsLoading then app.Dispatch <| OpenPlayerPage (audiobook, startPlaying)
 
@@ -78,16 +81,16 @@ type MainViewModel(root:CompositionRoot) =
 
     member this.GotoOptionPage() =
         if not app.Model.IsLoading then app.Dispatch <| SetView View.SettingsPage
-    
+
     member this.HomeButtonColor =
         this.BindOnChanged (app, _.View, fun e ->  SolidColorBrush(match e.View with | View.HomePage ->  Colors.WhiteSmoke | _ -> Colors.DarkGray))
 
     member this.SettingsButtonColor =
         this.BindOnChanged (app, _.View, fun e -> SolidColorBrush(match e.View with | View.SettingsPage -> Colors.WhiteSmoke | _ -> Colors.DarkGray))
-        
+
     member this.PlayerButtonColor =
         this.BindOnChanged (app, _.View, fun e -> SolidColorBrush(match e.View with | View.PlayerPage _  -> Colors.WhiteSmoke | _ -> Colors.DarkGray))
-        
+
     member this.PlayerAvailable =
         this.BindOnChanged (app, _.PlayerViewModel, _.PlayerViewModel.IsSome)
 

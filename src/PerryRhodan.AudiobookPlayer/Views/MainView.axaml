@@ -7,6 +7,7 @@
              xmlns:views="clr-namespace:PerryRhodan.AudiobookPlayer.Views"
              xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
              xmlns:mobileNumberPicker="clr-namespace:CherylUI.Controls.MobileNumberPicker;assembly=CherylUI"
+             xmlns:li="clr-namespace:LoadingIndicators.Avalonia;assembly=LoadingIndicators.Avalonia"
              xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              xmlns:vm="clr-namespace:PerryRhodan.AudiobookPlayer.ViewModels"
@@ -138,14 +139,7 @@
 
                         </Button>
                     </Grid>
-
-
-                    <Grid Grid.Row="0" Grid.RowSpan="3"
-                          IsVisible="{Binding IsLoading}"
-                          HorizontalAlignment="Center"
-                          VerticalAlignment="Center">
-                        <ProgressBar Classes="circular" IsIndeterminate="True" />
-                    </Grid>
+                    <li:LoadingIndicator Grid.RowSpan="3" IsActive="{Binding IsLoading}" Mode="Arcs" SpeedRatio="1.2" Width="100" Height="100" Foreground="{StaticResource MaterialPrimaryLightBrush}" />
                 </Grid>
 
             </Border>

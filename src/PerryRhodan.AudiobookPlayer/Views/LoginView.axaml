@@ -6,6 +6,7 @@
              xmlns:p1="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
              xmlns:vm="clr-namespace:PerryRhodan.AudiobookPlayer.ViewModels"
              xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+             xmlns:li="clr-namespace:LoadingIndicators.Avalonia;assembly=LoadingIndicators.Avalonia"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="PerryRhodan.AudiobookPlayer.Views.LoginView"
              Design.DataContext="{Binding Source={x:Static vm:LoginViewModel.DesignVM}}"
@@ -32,7 +33,7 @@
                 <Grid Height="{Binding InputPaneHeight}" />
             </StackPanel>
             <Grid IsVisible="{Binding IsLoading}">
-                <ProgressBar Classes="circular" IsIndeterminate="True" />
+                <li:LoadingIndicator IsActive="{Binding IsLoading}" Mode="Arcs" SpeedRatio="1.2" Width="100" Height="100" Foreground="{StaticResource MaterialPrimaryLightBrush}" />
             </Grid>
         </Grid>
     </controls:Card>

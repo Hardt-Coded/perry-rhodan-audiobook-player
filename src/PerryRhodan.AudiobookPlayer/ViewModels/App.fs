@@ -5,6 +5,7 @@ open Avalonia.Controls
 open CherylUI.Controls
 open Dependencies
 open Elmish
+open Microsoft.ApplicationInsights.DataContracts
 open Microsoft.Extensions.DependencyInjection
 open PerryRhodan.AudiobookPlayer.Services
 open PerryRhodan.AudiobookPlayer.ViewModel
@@ -122,7 +123,7 @@ let runSideEffect sideEffect state dispatch =
 
                     | SideEffect.InitApplication ->
                         // if the global audiobook store is busy display here a loading indicator
-                        AudioBookStore.globalAudiobookStore.Observable.Subscribe(fun s ->
+                        AudioBookStore.globalAudiobookStore.Value.Observable.Subscribe(fun s ->
                             dispatch (Msg.IsLoading s.IsBusy)
                         ) |> ignore
 
@@ -195,12 +196,16 @@ let runSideEffect sideEffect state dispatch =
 
 open Elmish.SideEffect
 
-DependencyService.ServiceCollection.AddSingleton<GlobalSettingsService>(GlobalSettingsService()) |> ignore
-DependencyService.SetComplete()
 
-let app =
+let getAppStore() =
+    DataBaseCommon.initializeDatabase ()
+    
+    // init global Audiobook Storage
+    AudioBookStore.globalAudiobookStore.Force() |> ignore
+    
     Program.mkAvaloniaProgrammWithSideEffect init update runSideEffect
-    |> Program.withErrorHandler (fun (_, ex) ->
+    |> Program.withErrorHandler (fun (msg, ex) ->
+        if msg <> "" then Global.telemetryClient.TrackTrace(msg, SeverityLevel.Error)
         Global.telemetryClient.TrackException ex
     )
     //|> Program.withConsoleTrace

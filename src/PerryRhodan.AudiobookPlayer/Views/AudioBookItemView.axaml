@@ -8,11 +8,13 @@
              xmlns:asyncImageLoader="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
              xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:viewModel="clr-namespace:PerryRhodan.AudiobookPlayer.ViewModel"
+             xmlns:loaders="clr-namespace:AsyncImageLoader.Loaders;assembly=AsyncImageLoader.Avalonia"
              x:Class="PerryRhodan.AudiobookPlayer.Views.AudioBookItemView"
              Design.DataContext="{Binding Source={x:Static viewModel:AudioBookItemViewModel.DesignVM}}"
              x:DataType="viewModel:AudioBookItemViewModel"
              Height="104" MinHeight="104" MaxHeight="104"
              Background="Black">
+    
     <UserControl.Styles>
         <Style Selector="avalonia|MaterialIcon">
             <Setter Property="Width" Value="32" />

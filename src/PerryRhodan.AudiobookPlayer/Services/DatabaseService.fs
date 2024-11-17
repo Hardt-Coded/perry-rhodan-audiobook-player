@@ -7,6 +7,7 @@ open LiteDB.FSharp
 open FsToolkit.ErrorHandling
 open Domain
 open Microsoft.ApplicationInsights.DataContracts
+open PerryRhodan.AudiobookPlayer.Services.Interfaces
 open Services
 open Services.Consts
 
@@ -42,6 +43,28 @@ module DataBaseCommon =
             | NewShopDatabaseCollection -> "audiobookfileinfosnewshop"
 
 
+    // called at the begining of the app, in order to have a single transaction
+    // to update the database, after I split the databases to old and new shop,
+    // it has a problem when starting the app.
+    type TempData = { Id:int; Name:string }
+      
+    let initializeDatabase () =
+        try
+            let folders = createCurrentFolders ()
+            let (StateConnectionString connectionString) = folders.audioBooksStateDataConnectionString
+            use db = new LiteDatabase(connectionString, mapper)
+            let audioBooksCol =
+                db.GetCollection<TempData>("onlyforinit")
+            audioBooksCol.Upsert { Id = 1; Name = "Daniel" } |> ignore
+            ()
+        with
+        | ex ->
+            Global.telemetryClient.TrackException ex
+            Global.telemetryClient.TrackTrace("Error in database initialization", SeverityLevel.Error)
+                
+        
+            
+    
     let initAppFolders () =
         let folders = createCurrentFolders ()
         if not (Directory.Exists(folders.currentLocalDataFolder)) then
@@ -226,7 +249,7 @@ module DataBaseCommon =
     }
 
     // lazy evaluation, to avoid try loading data without permission
-    let createStorageProcessor (collection:Collection) =
+    type DatabaseProcessor (collection:Collection) =
         let storageProcessor = MailboxProcessor<StorageMsg>.Start(
             fun inbox ->
                 let mutable reloadedAfterFailedInsert = false
@@ -466,12 +489,12 @@ module DataBaseCommon =
         let updateAudioBookFileInfo info =
             let msg replyChannel =
                 UpdateAudioBookFileInfo (info,replyChannel)
-            storageProcessor.PostAndAsyncReply(msg)
+            storageProcessor.PostAndAsyncReply(msg) |> Async.StartAsTask
 
         let deleteAudioBookFileInfo id =
             let msg replyChannel =
                 DeleteAudioBookFileInfo (id,replyChannel)
-            storageProcessor.PostAndAsyncReply(msg)
+            storageProcessor.PostAndAsyncReply(msg) |> Async.StartAsTask
 
 
         let removeAudiobook (audiobook:AudioBook) =
@@ -491,22 +514,26 @@ module DataBaseCommon =
             }
 
 
-        {|
-            LoadAudioBooksStateFile             = loadAudioBooksStateFile
-            LoadDownloadedAudioBooksStateFile   = loadDownloadedAudioBooksStateFile
-            InsertNewAudioBooksInStateFile      = insertNewAudioBooksInStateFile
-            UpdateAudioBookInStateFile          = updateAudioBookInStateFile
-            RemoveAudiobookFromDatabase         = removeAudiobookFromDatabase
-            DeleteAudiobookDatabase             = deleteAudiobookDatabase
-            GetAudioBookFileInfo                = getAudioBookFileInfo
-            GetAudioBookFileInfoTimeout         = getAudioBookFileInfoTimeout
-            InsertAudioBookFileInfos            = insertAudioBookFileInfos
-            UpdateAudioBookFileInfo             = updateAudioBookFileInfo
-            DeleteAudioBookFileInfo             = deleteAudioBookFileInfo
-            RemoveAudiobook                     = removeAudiobook
-        |}
-
-
+        interface IDatabaseProcessor with
+            
+            member this.DeleteAudioBookFileInfo(id)                     = deleteAudioBookFileInfo id
+            member this.DeleteAudiobookDatabase()                       = deleteAudiobookDatabase()
+            member this.GetAudioBookFileInfo(id)                        = getAudioBookFileInfo id
+            member this.GetAudioBookFileInfoTimeout timeout id          = getAudioBookFileInfoTimeout timeout id
+            member this.InsertAudioBookFileInfos(fileInfos)             = insertAudioBookFileInfos fileInfos
+            member this.InsertNewAudioBooksInStateFile(audiobooks)      = insertNewAudioBooksInStateFile audiobooks
+            member this.LoadAudioBooksStateFile()                       = loadAudioBooksStateFile()
+            member this.LoadDownloadedAudioBooksStateFile()             = loadDownloadedAudioBooksStateFile()
+            member this.RemoveAudiobook(audiobook)                      = removeAudiobook audiobook
+            member this.RemoveAudiobookFromDatabase(audiobook)          = removeAudiobookFromDatabase audiobook
+            member this.UpdateAudioBookFileInfo(fileInfo)               = updateAudioBookFileInfo fileInfo
+            member this.UpdateAudioBookInStateFile(audiobook)           = updateAudioBookInStateFile audiobook
+            
+        interface IOldShopDatabase with
+                member this.Base = this :> IDatabaseProcessor
+        interface INewShopDatabase with
+                member this.Base = this :> IDatabaseProcessor
+        
 
 
     let parseDownloadFolderForAlreadyDownloadedAudioBooks () =
@@ -573,11 +600,3 @@ module DataBaseCommon =
 
 
 
-module OldShopDatabase =
-
-    let storageProcessor = DataBaseCommon.createStorageProcessor DataBaseCommon.Collection.OldShopDatabaseCollection
-
-
-module NewShopDatabase =
-
-    let storageProcessor = DataBaseCommon.createStorageProcessor DataBaseCommon.Collection.NewShopDatabaseCollection

@@ -42,6 +42,8 @@ module AudioBookStore =
         type Msg =
             | ReloadAudiobooks
             | AudiobooksLoaded of oldAudioBooks:AudioBookItemViewModel array * newAudioBooks:AudioBookItemViewModel array
+            | OldAudiobooksLoaded of oldAudioBooks:AudioBookItemViewModel array
+            | NewAudiobooksLoaded of newAudioBooks:AudioBookItemViewModel array
             | DeleteAudiobookFromDatabase of AudioBook
             | RemoveAudiobookFromDeviceOldShop of AudioBook
             | RemoveAudiobookFromDeviceNewShop of AudioBook
@@ -76,11 +78,23 @@ module AudioBookStore =
                 state, SideEffect.None
 
             | AudiobooksLoaded (oldAudiobooks, newAudiobook) ->
-                let oldGroups = oldAudiobooks |> Array.map (fun i -> i.AudioBook.Group) |> Array.distinct
-                let newGroups = newAudiobook |> Array.map (fun i -> i.AudioBook.Group) |> Array.distinct
+                let oldGroups = oldAudiobooks |> Array.map (_.AudioBook.Group) |> Array.distinct
+                let newGroups = newAudiobook |> Array.map (_.AudioBook.Group) |> Array.distinct
                 { state with
                     OldShopAudiobooks = oldAudiobooks
                     OldShopAudiobookGroups = oldGroups
+                    NewShopAudiobooks = newAudiobook
+                    NewShopAudiobookGroups = newGroups }, SideEffect.None
+                
+            | OldAudiobooksLoaded oldAudiobooks ->
+                let oldGroups = oldAudiobooks |> Array.map (_.AudioBook.Group) |> Array.distinct
+                { state with
+                    OldShopAudiobooks = oldAudiobooks
+                    OldShopAudiobookGroups = oldGroups }, SideEffect.None
+                
+            | NewAudiobooksLoaded newAudiobook ->
+                let newGroups = newAudiobook |> Array.map (_.AudioBook.Group) |> Array.distinct
+                { state with
                     NewShopAudiobooks = newAudiobook
                     NewShopAudiobookGroups = newGroups }, SideEffect.None
 
@@ -104,6 +118,9 @@ module AudioBookStore =
         module SideEffects =
 
             let runSideEffects (sideEffect:SideEffect) (state:State) (dispatch:Msg -> unit) =
+                let oldShopDatabase = DependencyService.Get<IOldShopDatabase>()
+                let newShopDatabase = DependencyService.Get<INewShopDatabase>()
+                
                 task {
                     if sideEffect = SideEffect.None then
                         return ()
@@ -116,12 +133,12 @@ module AudioBookStore =
                                     return ()
 
                                 | SideEffect.LoadAudiobooks ->
-                                    let! oldAudioBooks = OldShopDatabase.storageProcessor.LoadAudioBooksStateFile()
+                                    let! oldAudioBooks = oldShopDatabase.Base.LoadAudioBooksStateFile()
                                     let oldAudioBookViewModels = oldAudioBooks |> Array.map (fun i -> new AudioBookItemViewModel(OldShop, i))
                                     while not (oldAudioBookViewModels |> Array.forall (_.IsInitialized)) do
                                         do! Task.Delay 100
 
-                                    let! newAudioBooks = NewShopDatabase.storageProcessor.LoadAudioBooksStateFile()
+                                    let! newAudioBooks = newShopDatabase.Base.LoadAudioBooksStateFile()
                                     let newAudioBookViewModels = newAudioBooks |> Array.map (fun i -> new AudioBookItemViewModel(NewShop, i))
                                     while not (newAudioBookViewModels |> Array.forall (_.IsInitialized)) do
                                         do! Task.Delay 100
@@ -135,7 +152,7 @@ module AudioBookStore =
                                     return ()
 
                                 | SideEffect.RemoveAudiobookFromDeviceOldShop audiobook ->
-                                    let! res =OldShopDatabase.storageProcessor.RemoveAudiobook audiobook
+                                    let! res =oldShopDatabase.Base.RemoveAudiobook audiobook
 
                                     match res with
                                     | Ok _ ->
@@ -147,7 +164,7 @@ module AudioBookStore =
                                     return()
 
                                 | SideEffect.RemoveAudiobookFromDeviceNewShop audiobook ->
-                                    let! res = NewShopDatabase.storageProcessor.RemoveAudiobook audiobook
+                                    let! res = newShopDatabase.Base.RemoveAudiobook audiobook
 
                                     match res with
                                     | Ok _ ->
@@ -164,8 +181,10 @@ module AudioBookStore =
 
 
     let globalAudiobookStore =
-        Program.mkAvaloniaProgrammWithSideEffect AudioBookElmish.init AudioBookElmish.update AudioBookElmish.SideEffects.runSideEffects
-        |> Program.mkStore
+        lazy (
+            Program.mkAvaloniaProgrammWithSideEffect AudioBookElmish.init AudioBookElmish.update AudioBookElmish.SideEffects.runSideEffects
+            |> Program.mkStore
+        )
 
 
 module AudioBookItem =
@@ -540,9 +559,9 @@ module AudioBookItem =
                     let! result =
                         match shop with
                         | OldShop ->
-                            OldShopDatabase.storageProcessor.UpdateAudioBookInStateFile audiobook
+                            DependencyService.Get<IOldShopDatabase>().Base.UpdateAudioBookInStateFile audiobook
                         | NewShop ->
-                            NewShopDatabase.storageProcessor.UpdateAudioBookInStateFile audiobook
+                            DependencyService.Get<INewShopDatabase>().Base.UpdateAudioBookInStateFile audiobook
 
                     match result with
                     | Ok _ ->
@@ -554,94 +573,11 @@ module AudioBookItem =
 
 
 
-
-            let getBitmapFromUrl (url: string) =
-                task {
-                    try
-                        use client = new HttpClient()
-                        let! imageData = client.GetByteArrayAsync(url)
-                        use stream = new MemoryStream(imageData)
-                        let bitmap = SKBitmap.Decode(stream)
-                        return if bitmap = null || bitmap.IsEmpty || bitmap.IsNull then None else Some bitmap
-                    with
-                    | ex ->
-                        Global.telemetryClient.TrackException (ex, [("url", url)] |> Map.ofList)
-                        #if DEBUG
-                        System.Diagnostics.Debug.WriteLine($"Error loading image from url: {url}")
-                        #endif
-                        return None
-                }
-
-            let getAmbientColorFromSkBitmap (bitmap:SKBitmap) =
-                let bitmap = bitmap.Resize(SkiaSharp.SKImageInfo(5,5, SKColorType.Rgb888x), SKSamplingOptions(SKFilterMode.Nearest))
-                let getHue (x,_,_) = x
-                let hues =
-                    [
-                        bitmap.GetPixel(0,1).ToHsv() |> getHue
-                        bitmap.GetPixel(0,2).ToHsv() |> getHue
-                        bitmap.GetPixel(0,3).ToHsv() |> getHue
-                        bitmap.GetPixel(0,4).ToHsv() |> getHue
-                        bitmap.GetPixel(1,4).ToHsv() |> getHue
-                        bitmap.GetPixel(2,4).ToHsv() |> getHue
-                        bitmap.GetPixel(3,4).ToHsv() |> getHue
-                        bitmap.GetPixel(4,4).ToHsv() |> getHue
-                        bitmap.GetPixel(4,3).ToHsv() |> getHue
-                        bitmap.GetPixel(4,2).ToHsv() |> getHue
-                        bitmap.GetPixel(4,1).ToHsv() |> getHue
-                        bitmap.GetPixel(4,0).ToHsv() |> getHue
-                        bitmap.GetPixel(3,0).ToHsv() |> getHue
-                        bitmap.GetPixel(2,0).ToHsv() |> getHue
-                        bitmap.GetPixel(3,3).ToHsv() |> getHue
-                    ]
-
-                let avgeHue = hues |> List.average
-                let aboveAvg = hues |> List.filter (fun x -> x > avgeHue)
-                let belowAvg = hues |> List.filter (fun x -> x < avgeHue)
-                let avgHue =
-                    if aboveAvg.Length > belowAvg.Length then
-                        aboveAvg |> List.average
-                    elif aboveAvg.Length < belowAvg.Length then
-                        belowAvg |> List.average
-                    else
-                        avgeHue
-
-                let avgHueColor = SkiaSharp.SKColor.FromHsv(avgHue, 100.0f, 50.0f)
-                avgHueColor.ToString()
-
-
-            let getAmbientColorFromPicUrl (url:string) =
-                task {
-                    try
-                        return!
-                            getBitmapFromUrl url
-                            |> Task.map (
-                                fun t -> t |> Option.map (getAmbientColorFromSkBitmap)
-                            )
-                    with
-                    | ex ->
-                        Global.telemetryClient.TrackException ex
-                        return None
-
-                }
-
-            let getAmbientColorFromPicFile (picture:string) =
-                try
-                    SkiaSharp.SKBitmap.Decode picture
-                    |> Option.ofObj
-                    |> Option.map getAmbientColorFromSkBitmap
-                with
-                | ex ->
-                    Global.telemetryClient.TrackException ex
-                    None
-
-
-
-
-
-
-
         let runSideEffects (sideEffect:SideEffect) (state:State) (dispatch:Msg -> unit) =
             let navigationService = DependencyService.Get<INavigationService>()
+            let oldShopDatabase = DependencyService.Get<IOldShopDatabase>()
+            let newShopDatabase = DependencyService.Get<INewShopDatabase>()
+            
             task {
                 try
                     if sideEffect = SideEffect.None then
@@ -658,23 +594,12 @@ module AudioBookItem =
                                     let! fileInfoList =
                                         match state.Shop with
                                         | OldShop ->
-                                            OldShopDatabase.storageProcessor.GetAudioBookFileInfo state.Audiobook.Id
+                                            oldShopDatabase.Base.GetAudioBookFileInfo state.Audiobook.Id
                                         | NewShop ->
-                                            NewShopDatabase.storageProcessor.GetAudioBookFileInfo state.Audiobook.Id
+                                            newShopDatabase.Base.GetAudioBookFileInfo state.Audiobook.Id
 
 
                                     fileInfoList |> Option.iter (fun list -> dispatch <| UpdateCurrentAudioFileList list)
-
-                                    match state.Audiobook.Picture, state.Audiobook.AmbientColor with
-                                    | Some pic, None ->
-                                        if pic.StartsWith("http") then
-                                            do! getAmbientColorFromPicUrl pic
-                                                |> Task.map (fun t -> t |> Option.iter (fun color -> dispatch <| SetAmbientColor color))
-                                        else
-                                            getAmbientColorFromPicFile pic
-                                            |> Option.iter (fun color -> dispatch <| SetAmbientColor color)
-                                    | _ ->
-                                        ()
 
                                     dispatch Initialized
                                     return ()
@@ -720,9 +645,9 @@ module AudioBookItem =
                                 | SideEffect.RemoveAudioBookFromDevice ->
                                     match state.Shop with
                                     | OldShop ->
-                                        AudioBookStore.globalAudiobookStore.Dispatch <| AudioBookStore.AudioBookElmish.RemoveAudiobookFromDeviceOldShop state.Audiobook
+                                        AudioBookStore.globalAudiobookStore.Value.Dispatch <| AudioBookStore.AudioBookElmish.RemoveAudiobookFromDeviceOldShop state.Audiobook
                                     | NewShop ->
-                                        AudioBookStore.globalAudiobookStore.Dispatch <| AudioBookStore.AudioBookElmish.RemoveAudiobookFromDeviceNewShop state.Audiobook
+                                        AudioBookStore.globalAudiobookStore.Value.Dispatch <| AudioBookStore.AudioBookElmish.RemoveAudiobookFromDeviceNewShop state.Audiobook
 
                                     do! updateDatabase state.Shop state.Audiobook
                                     DependencyService.Get<IMainViewModel>().CloseMiniplayer()
@@ -740,7 +665,7 @@ module AudioBookItem =
 
                                 | SideEffect.DeleteItemFromDb ->
                                     // update the audio file list, to trigger update of other views
-                                    AudioBookStore.globalAudiobookStore.Dispatch <| AudioBookStore.AudioBookElmish.DeleteAudiobookFromDatabase state.Audiobook
+                                    AudioBookStore.globalAudiobookStore.Value.Dispatch <| AudioBookStore.AudioBookElmish.DeleteAudiobookFromDatabase state.Audiobook
                                     return()
 
                                 | SideEffect.ShowMetaData ->
@@ -758,16 +683,8 @@ module AudioBookItem =
 
                                 | SideEffect.DownloadCompleted ->
                                     do! updateDatabase state.Shop state.Audiobook
-                                    // refresh ambient color
-                                    match state.Audiobook.Picture with
-                                    | Some picture ->
-                                        if  picture.StartsWith("http") |> not then
-                                            getAmbientColorFromPicFile picture
-                                            |> Option.iter (fun color -> dispatch <| SetAmbientColor color)
-                                    | None ->
-                                        ()
                                     // update the audio file list, to trigger update of other views
-                                    AudioBookStore.globalAudiobookStore.Dispatch <| AudioBookStore.AudioBookElmish.AudioBookChanged
+                                    AudioBookStore.globalAudiobookStore.Value.Dispatch <| AudioBookStore.AudioBookElmish.AudioBookChanged
 
                                 | SideEffect.SendPauseCommandToAudioPlayer ->
                                     do! DependencyService.Get<IAudioPlayerPause>().Pause()

@@ -17,36 +17,17 @@ type App() =
     inherit Application()
 
 
-
-
-
-
-
     override this.Initialize() =
-            AvaloniaXamlLoader.Load(this)
-            let a = 1
-            // find resource
-            let values = this.Resources.Values
-            ()
+        AvaloniaXamlLoader.Load(this)
+        ()
 
     override this.OnFrameworkInitializationCompleted() =
-        DependencyService.SetComplete()
 
-        let appRoot = AppCompositionRoot()
-        let mainViewModel = new MainViewModel(appRoot)
+        let mainViewModel = DependencyService.Get<MainViewModel>()
         let mainView = MainView()
-        let mainAccessViewService =
-            {
-                new IMainViewAccessService with
-                    member this.GetMainViewModel() = mainView.DataContext :?> IMainViewModel
-            }
+        
         mainView.DataContext <- mainViewModel
-        // extend dependencies
-        DependencyService.ServiceCollection
-            .AddSingleton<IMainViewAccessService>(mainAccessViewService)
-            .AddSingleton<IMainViewModel>(mainViewModel)
-        |> ignore
-        DependencyService.SetComplete()
+        
 
         match this.ApplicationLifetime with
         | :? IClassicDesktopStyleApplicationLifetime as desktop ->

@@ -339,8 +339,8 @@ module DownloadService =
                 
             let database =
                 match shop with
-                | OldShop -> OldShopDatabase.storageProcessor
-                | NewShop -> NewShopDatabase.storageProcessor
+                | OldShop -> DependencyService.Get<IOldShopDatabase>().Base
+                | NewShop -> DependencyService.Get<INewShopDatabase>().Base
             
             MailboxProcessor<Msg>.Start(
                 fun inbox ->
@@ -560,8 +560,8 @@ module DownloadService =
                 
             let database =
                 match shop with
-                | OldShop -> OldShopDatabase.storageProcessor
-                | NewShop -> NewShopDatabase.storageProcessor
+                | OldShop -> DependencyService.Get<IOldShopDatabase>().Base
+                | NewShop -> DependencyService.Get<INewShopDatabase>().Base
                 
             
             let updateStateDownloadInfo newState (downloadInfo:DownloadInfo) =

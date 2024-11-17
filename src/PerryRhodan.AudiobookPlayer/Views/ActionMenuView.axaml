@@ -111,9 +111,6 @@
                 <!-- TODO: Add Debug Functions -->
                 
             </StackPanel>
-            <!--<Grid IsVisible="{Binding IsLoading}">
-                <ProgressBar Classes="circular" IsIndeterminate="True" />
-            </Grid>-->
         </Grid>
     </controls:Card>
     

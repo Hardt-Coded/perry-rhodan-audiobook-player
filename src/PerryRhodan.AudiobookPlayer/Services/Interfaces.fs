@@ -65,4 +65,27 @@
         abstract member ClearSecureStoragePreferences: unit -> unit
 
 
+    type IOldShopDatabase = 
+        abstract member Base: IDatabaseProcessor
+        
+    and INewShopDatabase =
+        abstract member Base: IDatabaseProcessor
+    
+    and IDatabaseProcessor =
+        inherit IOldShopDatabase
+        inherit INewShopDatabase
+        
+        abstract member LoadAudioBooksStateFile:                unit -> Task<AudioBook[]>
+        abstract member LoadDownloadedAudioBooksStateFile:      unit -> Task<AudioBook[]>
+        abstract member InsertNewAudioBooksInStateFile:         audiobooks:AudioBook[] -> Task<Result<unit, string>>
+        abstract member UpdateAudioBookInStateFile:             audiobook:AudioBook -> Task<Result<unit, string>>
+        abstract member RemoveAudiobookFromDatabase:            audiobook:AudioBook -> Task<Result<unit, string>>
+        abstract member DeleteAudiobookDatabase:                unit -> unit
+        abstract member GetAudioBookFileInfo:                   id:int -> Task<AudioBookAudioFilesInfo option>
+        abstract member GetAudioBookFileInfoTimeout:            timeout:int -> id:int -> AudioBookAudioFilesInfo option
+        abstract member InsertAudioBookFileInfos:               fileInfos:AudioBookAudioFilesInfo[] -> Async<Result<unit, string>>
+        abstract member UpdateAudioBookFileInfo:                fileInfo:AudioBookAudioFilesInfo -> Task<Result<unit, string>>
+        abstract member DeleteAudioBookFileInfo:                id:int -> Task<Result<unit, string>>
+        abstract member RemoveAudiobook:                        audiobook:AudioBook -> Task<Result<unit, string>>
 
+    

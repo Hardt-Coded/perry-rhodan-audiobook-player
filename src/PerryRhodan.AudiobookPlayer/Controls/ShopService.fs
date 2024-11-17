@@ -2,9 +2,11 @@
 
 open System.Threading.Tasks
 open Common
+open Dependencies
 open Domain
 open FsToolkit.ErrorHandling
 open PerryRhodan.AudiobookPlayer
+open PerryRhodan.AudiobookPlayer.Services.Interfaces
 open PerryRhodan.AudiobookPlayer.ViewModel
 open Services
 
@@ -318,7 +320,7 @@ module ShopService =
 
                             onSuccess audioBooks
                             // also sync with global store
-                            //AudioBookStore.globalAudiobookStore.Dispatch <| AudioBookStore.AudioBookElmish.AudiobooksLoaded audioBooks
+                            //AudioBookStore.globalAudiobookStore.Value.Dispatch <| AudioBookStore.AudioBookElmish.AudiobooksLoaded audioBooks
                             //dispatch <| AudioBookItemsChanged audioBooks
                             // start picture download background service
                             //DependencyService.Get<IPictureDownloadService>().StartDownload()
@@ -382,10 +384,10 @@ module ShopService =
         =
         synchronizeWithCloud
             OldShop
-            (fun () -> AudioBookStore.globalAudiobookStore.Model.OldShopAudiobooks)
+            (fun () -> AudioBookStore.globalAudiobookStore.Value.Model.OldShopAudiobooks)
             OldShopWebAccessService.getAudiobooksOnline
-            OldShopDatabase.storageProcessor.InsertNewAudioBooksInStateFile
-            OldShopDatabase.storageProcessor.UpdateAudioBookInStateFile
+            (DependencyService.Get<IOldShopDatabase>().Base.InsertNewAudioBooksInStateFile)
+            (DependencyService.Get<IOldShopDatabase>().Base.UpdateAudioBookInStateFile)
             showMessage
             showErrorMessage
             (loadCookie: unit -> Task<Result<Map<string,string> option, string>>)
@@ -404,10 +406,10 @@ module ShopService =
         =
         synchronizeWithCloud
             NewShop
-            (fun () -> AudioBookStore.globalAudiobookStore.Model.NewShopAudiobooks)
+            (fun () -> AudioBookStore.globalAudiobookStore.Value.Model.NewShopAudiobooks)
             NewShopWebAccessService.getAudiobooksOnline
-            NewShopDatabase.storageProcessor.InsertNewAudioBooksInStateFile
-            NewShopDatabase.storageProcessor.UpdateAudioBookInStateFile
+            (DependencyService.Get<INewShopDatabase>().Base.InsertNewAudioBooksInStateFile)
+            (DependencyService.Get<INewShopDatabase>().Base.UpdateAudioBookInStateFile)
             showMessage
             showErrorMessage
             (loadCookie: unit -> Task<Result<Map<string,string> option, string>>)

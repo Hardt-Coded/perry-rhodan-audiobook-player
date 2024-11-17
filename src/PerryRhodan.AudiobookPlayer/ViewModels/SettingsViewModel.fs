@@ -8,7 +8,6 @@ open Microsoft.Maui.ApplicationModel
 open Microsoft.Maui.ApplicationModel.DataTransfer
 open Microsoft.Maui.Devices
 open Microsoft.Maui.Storage
-open PerryRhodan.AudiobookPlayer.Common
 open PerryRhodan.AudiobookPlayer.Services
 open PerryRhodan.AudiobookPlayer.ViewModel
 open PerryRhodan.AudiobookPlayer.Views
@@ -419,7 +418,7 @@ type SettingsViewModel() =
                 try
                     if file.FullPath.EndsWith("audiobooks.db") then
                         File.Move(file.FullPath, folder.audioBooksStateDataFilePath, true)
-                        AudioBookStore.globalAudiobookStore.Dispatch AudioBookStore.AudioBookElmish.ReloadAudiobooks
+                        AudioBookStore.globalAudiobookStore.Value.Dispatch AudioBookStore.AudioBookElmish.ReloadAudiobooks
                         do! Services.Notifications.showMessage "Erfolgreich" "Ihr Backup wurde erfolgreich importiert. Bitte App neustarten!"
                         System.Environment.Exit(0)
                     else
@@ -430,7 +429,7 @@ type SettingsViewModel() =
                             do! Services.Notifications.showErrorMessage "Fehler beim Importieren des Backups: Datei nicht gefunden."
                         else
                             File.Move(stateFile, folder.audioBooksStateDataFilePath, true)
-                            AudioBookStore.globalAudiobookStore.Dispatch AudioBookStore.AudioBookElmish.ReloadAudiobooks
+                            AudioBookStore.globalAudiobookStore.Value.Dispatch AudioBookStore.AudioBookElmish.ReloadAudiobooks
                             do! Services.Notifications.showMessage "Erfolgreich" "Ihr Backup wurde erfolgreich importiert. Bitte die App neustarten!"
                             System.Environment.Exit(0)
                 with

@@ -153,39 +153,34 @@ type MainActivity() as self =
                     packageInfo.VersionCode.ToString()
         }
 
-        // register services
-        DependencyService.ServiceCollection
-            .AddSingleton<IScreenService, ScreenService>()
-            .AddSingleton<IAndroidHttpMessageHandlerService, AndroidHttpClientHandlerService>()
-            .AddSingleton<ICloseApplication, CloseApplication>()
-            .AddSingleton<IAndroidDownloadFolder, AndroidDownloadFolder>()
-            .AddSingleton<INavigationService, NavigationService>()
-            .AddSingleton<IDownloadService, DownloadServiceImplementation.DependencyService.DownloadService>()
-            .AddSingleton<IPictureDownloadService, PictureDownloadServiceImplementation.DependencyService.PictureAndroidDownloadService>()
-            .AddSingleton<INotificationService, NotificationService.NotificationService>()
-            .AddTransient<ILoginViewModel, LoginViewModel>(fun sp -> LoginViewModel(Domain.Shop.NewShop))
-            .AddSingleton<IActionMenuService, ActionMenuService>()
-            .AddSingleton<IBitmapConverter>(bitmapConverter)
-            .AddSingleton<IPackageInformation>(packageInformation)
-            .AddSingleton<ISecureStorageHelper>(secureStorageHelper)
-            |> ignore
+        CrossMediaManager.Current.Init(this)
+
+        AppCompositionRoot.registerServices (fun serviceCollection ->
+            serviceCollection
+                .AddSingleton<IScreenService, ScreenService>()
+                .AddSingleton<IAndroidHttpMessageHandlerService, AndroidHttpClientHandlerService>()
+                .AddSingleton<ICloseApplication, CloseApplication>()
+                .AddSingleton<IAndroidDownloadFolder, AndroidDownloadFolder>()
+                .AddSingleton<IDownloadService, DownloadServiceImplementation.DependencyService.DownloadService>()
+                .AddSingleton<IPictureDownloadService, PictureDownloadServiceImplementation.DependencyService.PictureAndroidDownloadService>()
+                .AddSingleton<INotificationService, NotificationService.NotificationService>()
+                .AddSingleton<IBitmapConverter>(bitmapConverter)
+                .AddSingleton<IPackageInformation>(packageInformation)
+                .AddSingleton<ISecureStorageHelper>(secureStorageHelper)
+                |> ignore
+        )
+
 
         // convert function to C# Func
 
         let androidOptions = AndroidPlatformOptions()
-        // Todo: do not forget Fallback
-        let renderModes = [ AndroidRenderingMode.Vulkan; AndroidRenderingMode.Egl; AndroidRenderingMode.Software ] |> System.Collections.Generic.List
+        let renderModes = [ AndroidRenderingMode.Vulkan; AndroidRenderingMode.Egl ] |> System.Collections.Generic.List
         androidOptions.RenderingMode <- renderModes.AsReadOnly()
-        //
-        let vulkanOptions = VulkanOptions()
-        vulkanOptions.VulkanInstanceCreationOptions <- VulkanInstanceCreationOptions()
+
 
         base.CustomizeAppBuilder(builder)
-
-            //
             .UseAndroid()
             .WithInterFont()
-            .With(vulkanOptions)
             .With(androidOptions)
             .UseReactiveUI()
 
@@ -195,24 +190,9 @@ type MainActivity() as self =
 
 
     override this.OnCreate(savedInstanceState) =
-
-
-
         base.OnCreate savedInstanceState
 
         Global.telemetryClient.TrackEvent ("ApplicationStarted")
-
-        (*// set complete to build service provider here, to avoid that the dependencies,
-        // which are registered in app.xaml.fs are also included in the service provider
-        DependencyService.SetComplete()*)
-        CrossMediaManager.Current.Init(this)
-        let audioService = AudioPlayerService()
-        DependencyService.ServiceCollection
-            .AddSingleton<IAudioPlayer>(audioService)
-            .AddSingleton<IAudioPlayerPause>(audioService)
-        |> ignore
-
-        DependencyService.SetComplete()
 
         Microsoft.Maui.ApplicationModel.Platform.Init(this, savedInstanceState)
 

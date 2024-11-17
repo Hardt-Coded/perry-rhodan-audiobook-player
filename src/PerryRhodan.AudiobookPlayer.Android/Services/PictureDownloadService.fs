@@ -122,8 +122,8 @@
                         let notification = updateNotification "Download"
                         let audioBooks =
                             match shop with
-                            | NewShop -> AudioBookStore.globalAudiobookStore.Model.NewShopAudiobooks
-                            | OldShop -> AudioBookStore.globalAudiobookStore.Model.OldShopAudiobooks
+                            | NewShop -> AudioBookStore.globalAudiobookStore.Value.Model.NewShopAudiobooks
+                            | OldShop -> AudioBookStore.globalAudiobookStore.Value.Model.OldShopAudiobooks
                             
                         PerryRhodan.AudiobookPlayer.Services.PictureDownloadService(shop, notification, shutDownService)
                             .StartDownloadPictures(audioBooks) |> ignore

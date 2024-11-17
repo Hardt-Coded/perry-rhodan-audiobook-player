@@ -768,6 +768,8 @@ module PlayerElmish =
                          return ()
 
                     | SideEffect.SleepTimeReachedEnd ->
+                         sleepTimer |> Option.iter (_.Dispose())
+                         sleepTimer <- None
                          do! CrossMediaManager.Current.Pause()
                          dispatch <| SleepTimerMsg SleepTimerStop
                          return ()
@@ -849,10 +851,10 @@ type AudioPlayerService() =
                     state.AudioBook |> Option.iter (fun ab ->
                         ab.UpdateAudioBookPosition (state.Position)
                         ab.UpdateCurrentListenFilename (state.Filename)
-                        
+
                     )
                 | _ -> ()
-                
+
                 // update player state
                 state.AudioBook |> Option.iter (fun ab -> ab.ToggleIsPlaying (state.State = AudioPlayerState.Playing))
             )

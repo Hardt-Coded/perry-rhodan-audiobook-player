@@ -8,6 +8,7 @@
              xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
              xmlns:glassMorphism="clr-namespace:CherylUI.Controls.GlassMorphism;assembly=CherylUI"
              xmlns:valueSelector="clr-namespace:PerryRhodan.AudiobookPlayer.ValueSelector"
+             xmlns:li="clr-namespace:LoadingIndicators.Avalonia;assembly=LoadingIndicators.Avalonia"
              mc:Ignorable="d" d:DesignWidth="393" d:DesignHeight="738"
              x:Class="PerryRhodan.AudiobookPlayer.Views.HomeView"
              Background="Black"
@@ -124,29 +125,25 @@
                 </ItemsControl.ItemTemplate>
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <VirtualizingStackPanel Orientation="Vertical"  Margin="0,0,0,100"/>
+                        <VirtualizingStackPanel Orientation="Vertical" Margin="0,-100,00,0" />
                     </ItemsPanelTemplate>    
                 </ItemsControl.ItemsPanel>
+                <ItemsControl.Styles>
+                    <Style Selector="ContentPresenter:nth-child(1) views|AudioBookItemView">
+                        <Setter Property="Margin" Value="0,100,0,0" />
+                    </Style>
+                    <Style Selector="ContentPresenter:nth-last-child(1) views|AudioBookItemView">
+                        <Setter Property="Margin" Value="0,0,0,-100" />
+                    </Style>
+                </ItemsControl.Styles>
             </ItemsControl>
-            
-            <!-- <ItemsRepeater ItemsSource="{Binding AudioBooks}"> -->
-            <!--     <ItemsRepeater.ItemTemplate> -->
-            <!--         <DataTemplate> -->
-            <!--             <views:AudioBookItemView DataContext="{Binding .}" /> -->
-            <!--         </DataTemplate> -->
-            <!--     </ItemsRepeater.ItemTemplate> -->
-            <!-- </ItemsRepeater> -->
+           
         </ScrollViewer>
 
 
         <Grid Grid.Row="0" Grid.RowSpan="5" IsVisible="{Binding IsBusy}">
-            <Grid Opacity="0.5">
-                <NotificationCard Height="400" CornerRadius="20" Background="Black" Effect="blur(0)" Opacity="0.3">
-                    <Grid>
-                        <glassMorphism:CherylBackground />
-                    </Grid>
-                </NotificationCard>
-
+            <Grid Opacity="0.5" >
+                <glassMorphism:CherylBackground />
             </Grid>
             <Grid>
                 <NotificationCard Height="400" CornerRadius="20">
@@ -154,10 +151,8 @@
                         <TextBlock TextWrapping="Wrap" Text="{Binding BusyMessage}" HorizontalAlignment="Left" VerticalAlignment="Top" />
                     </Grid>
                 </NotificationCard>
-
             </Grid>
-
-            <ProgressBar Classes="circular" IsIndeterminate="True" />
+            <li:LoadingIndicator IsActive="True" Mode="Arcs" SpeedRatio="1.2" Width="100" Height="100" Foreground="{StaticResource MaterialPrimaryLightBrush}" />
         </Grid>
 
         <controls:FloatingButton Grid.Row="4"

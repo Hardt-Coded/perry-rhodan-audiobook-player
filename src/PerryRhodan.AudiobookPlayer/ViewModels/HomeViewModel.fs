@@ -41,9 +41,9 @@ module private DemoData =
     let designAudioBook2 = {
             Id = 2
             ShopId = None
-            FullName = "Perry Rhodan 3001 - Mythos Erde2"
+            FullName = "Perry Rhodan 3001 - Mythos Erde 2"
             EpisodeNo = Some 3000
-            EpisodenTitel = "Mythos Erde2"
+            EpisodenTitel = "Mythos Erde 2"
             Group = "Perry Rhodan"
             Picture = Some "avares://PerryRhodan.AudiobookPlayer/Assets/AudioBookPlaceholder_Dark.png"
             Thumbnail = Some "avares://PerryRhodan.AudiobookPlayer/Assets/AudioBookPlaceholder_Dark.png"
@@ -81,6 +81,21 @@ module private DemoData =
             AmbientColor = Some "#0000FF"
             PublishingDate = None
         }
+    
+    let audioBooks = [|
+        AudioBookItemViewModel(NewShop, designAudioBook)
+        AudioBookItemViewModel(NewShop, designAudioBook2)
+        AudioBookItemViewModel(NewShop, designAudioBook3)
+        AudioBookItemViewModel(NewShop, designAudioBook)
+        AudioBookItemViewModel(NewShop, designAudioBook2)
+        AudioBookItemViewModel(NewShop, designAudioBook3)
+        AudioBookItemViewModel(NewShop, designAudioBook)
+        AudioBookItemViewModel(NewShop, designAudioBook2)
+        AudioBookItemViewModel(NewShop, designAudioBook3)
+        AudioBookItemViewModel(NewShop, designAudioBook)
+        AudioBookItemViewModel(NewShop, designAudioBook2)
+        AudioBookItemViewModel(NewShop, designAudioBook3)
+    |]
 
 
 module HomePage =
@@ -149,12 +164,12 @@ module HomePage =
         | SwitchShop shop ->
             let filteredAudiobooks =
                 match shop with
-                | NewShop -> AudioBookStore.globalAudiobookStore.Model.NewShopAudiobooks
-                | OldShop -> AudioBookStore.globalAudiobookStore.Model.OldShopAudiobooks
+                | NewShop -> AudioBookStore.globalAudiobookStore.Value.Model.NewShopAudiobooks
+                | OldShop -> AudioBookStore.globalAudiobookStore.Value.Model.OldShopAudiobooks
                 |> filterAudioBooks state.Filter
                 |> sortAudioBooks state.SortOrder
             { state with Shop = shop; AudioBooks = filteredAudiobooks }, SideEffect.None
-        
+
         | AudioBookItemsChanged audiobookItems ->
             let filteredAudiobooks =
                 audiobookItems
@@ -166,8 +181,8 @@ module HomePage =
         | FilterChanged filter ->
             let filteredAudiobooks =
                 match state.Shop with
-                | NewShop -> AudioBookStore.globalAudiobookStore.Model.NewShopAudiobooks
-                | OldShop -> AudioBookStore.globalAudiobookStore.Model.OldShopAudiobooks
+                | NewShop -> AudioBookStore.globalAudiobookStore.Value.Model.NewShopAudiobooks
+                | OldShop -> AudioBookStore.globalAudiobookStore.Value.Model.OldShopAudiobooks
                 |> filterAudioBooks filter
                 |> sortAudioBooks state.SortOrder
             {
@@ -185,11 +200,14 @@ module HomePage =
 
         | SearchTextChanged searchText ->
             let filteredAudiobooks =
-                match state.Shop with
-                | NewShop -> AudioBookStore.globalAudiobookStore.Model.NewShopAudiobooks
-                | OldShop -> AudioBookStore.globalAudiobookStore.Model.OldShopAudiobooks
-                |> filterAudioBooks (FilterOptions.Free searchText)
-                |> sortAudioBooks state.SortOrder
+                if Avalonia.Controls.Design.IsDesignMode then
+                    DemoData.audioBooks
+                else
+                    match state.Shop with
+                    | NewShop -> AudioBookStore.globalAudiobookStore.Value.Model.NewShopAudiobooks
+                    | OldShop -> AudioBookStore.globalAudiobookStore.Value.Model.OldShopAudiobooks
+                    |> filterAudioBooks (FilterOptions.Free searchText)
+                    |> sortAudioBooks state.SortOrder
 
             { state with SearchText = searchText; AudioBooks = filteredAudiobooks }, SideEffect.None
 
@@ -257,7 +275,7 @@ type HomeViewModel(?audiobookItems) as self =
 
     do
         self.AddDisposable
-            <| AudioBookStore.globalAudiobookStore.Observable.Subscribe(fun s ->
+            <| AudioBookStore.globalAudiobookStore.Value.Observable.Subscribe(fun s ->
                 local.Dispatch (s.IsBusy |> SetBusy)
                 match local.Model.Shop with
                 | NewShop -> local.Dispatch (s.NewShopAudiobooks |> AudioBookItemsChanged)
@@ -272,10 +290,10 @@ type HomeViewModel(?audiobookItems) as self =
         //this.BindList (local, _.AudioBooks)
         this.BindOnChanged(local,_.AudioBooks, _.AudioBooks)
 
-    member this.IsNewShop 
+    member this.IsNewShop
         with get() = this.BindOnChanged(local, _.Shop, _.Shop.IsNewShop)
         and set(value) = local.Dispatch <| SwitchShop (if value then NewShop else OldShop)
-        
+
     member this.IsOldShop =
         this.BindOnChanged(local, _.Shop, _.Shop.IsOldShop)
 
@@ -295,10 +313,11 @@ type HomeViewModel(?audiobookItems) as self =
     member this.OnInitialized() =
         let currentAudioBooks =
             match local.Model.Shop with
-            | NewShop -> AudioBookStore.globalAudiobookStore.Model.NewShopAudiobooks
-            | OldShop -> AudioBookStore.globalAudiobookStore.Model.OldShopAudiobooks
-                
-        local.Dispatch (currentAudioBooks |> AudioBookItemsChanged)
+            | NewShop -> AudioBookStore.globalAudiobookStore.Value.Model.NewShopAudiobooks
+            | OldShop -> AudioBookStore.globalAudiobookStore.Value.Model.OldShopAudiobooks
+
+        if Avalonia.Controls.Design.IsDesignMode |> not then
+            local.Dispatch (currentAudioBooks |> AudioBookItemsChanged)
 
 
     member this.LoadOnlineAudiobooks() =
@@ -310,18 +329,18 @@ type HomeViewModel(?audiobookItems) as self =
                     do! Notifications.showMessage title message
                     local.Dispatch <| ClearBusyMessage
                 }
-                
+
             let showErrorMessage message =
                 task {
                     do! Notifications.showErrorMessage message
                     local.Dispatch <| ClearBusyMessage
                 }
-                
+
             let loadCookie =
                 match local.Model.Shop with
                 | NewShop -> Services.SecureLoginStorage.loadNewShopCookie
                 | OldShop -> Services.SecureLoginStorage.loadOldShopCookie
-                
+
             let appendBusyMessage msg = local.Dispatch <| AppendBusyMessage msg
             let openLogin =
                 local.Dispatch <| ClearBusyMessage
@@ -332,10 +351,10 @@ type HomeViewModel(?audiobookItems) as self =
                 local.Dispatch (audiobooks |> AudioBookItemsChanged)
                 match local.Model.Shop with
                 | OldShop ->
-                    AudioBookStore.globalAudiobookStore.Dispatch <| AudioBookStore.AudioBookElmish.AudiobooksLoaded (audiobooks, [||])
+                    AudioBookStore.globalAudiobookStore.Value.Dispatch <| AudioBookStore.AudioBookElmish.OldAudiobooksLoaded audiobooks
                 | NewShop ->
-                    AudioBookStore.globalAudiobookStore.Dispatch <| AudioBookStore.AudioBookElmish.AudiobooksLoaded ([||], audiobooks)
-                    
+                    AudioBookStore.globalAudiobookStore.Value.Dispatch <| AudioBookStore.AudioBookElmish.NewAudiobooksLoaded audiobooks
+
                 DependencyService.Get<IPictureDownloadService>().StartDownload local.Model.Shop
 
             match local.Model.Shop with
@@ -347,7 +366,7 @@ type HomeViewModel(?audiobookItems) as self =
                      appendBusyMessage
                      openLogin
                      onSuccess
-                     
+
             | NewShop ->
                 do! ShopService.synchronizeWithCloudNewShop
                      showMessage
@@ -356,7 +375,7 @@ type HomeViewModel(?audiobookItems) as self =
                      appendBusyMessage
                      openLogin
                      onSuccess
-            
+
 
             local.Dispatch (false |> SetBusy)
 
@@ -397,11 +416,11 @@ type HomeViewModel(?audiobookItems) as self =
                 FilterOptions.NotListend             , "Ungehört"       , true
                 FilterOptions.Finished               , "Beendet"        , true
 
-                
+
                 let orderedGroups =
                     match local.Model.Shop with
-                    | NewShop -> AudioBookStore.globalAudiobookStore.Model.NewShopAudiobookGroups
-                    | OldShop -> AudioBookStore.globalAudiobookStore.Model.OldShopAudiobookGroups
+                    | NewShop -> AudioBookStore.globalAudiobookStore.Value.Model.NewShopAudiobookGroups
+                    | OldShop -> AudioBookStore.globalAudiobookStore.Value.Model.OldShopAudiobookGroups
                     |> Array.sortBy id
                     |> Array.sortBy (fun g ->
                         match g with
@@ -412,10 +431,10 @@ type HomeViewModel(?audiobookItems) as self =
                         | x when x.StartsWith("Perry Rhodan") -> 10
                         | _ -> 1000
                     )
-                    
+
                 for group in orderedGroups do
-                    FilterOptions.Group group, group, false                
-                
+                    FilterOptions.Group group, group, false
+
             |]
             |> Array.map (fun (f,s, isGeneral) ->
                 FilterItem(local, f, s, (this.Filter = f), isGeneral)
@@ -427,12 +446,7 @@ type HomeViewModel(?audiobookItems) as self =
 
 
     static member DesignVM =
-        new HomeViewModel(
-            [|
-                AudioBookItemViewModel(NewShop, DemoData.designAudioBook)
-                AudioBookItemViewModel(NewShop, DemoData.designAudioBook2)
-                AudioBookItemViewModel(NewShop, DemoData.designAudioBook3)
-            |])
+        new HomeViewModel(DemoData.audioBooks)
 
 and FilterItem(local, filterOption, text, isSelected, isGeneral) =
     member this.Command () = local.Dispatch <| FilterChanged filterOption

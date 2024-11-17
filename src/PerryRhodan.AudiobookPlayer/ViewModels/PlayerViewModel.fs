@@ -330,9 +330,9 @@ module PlayerPage =
                         let! audioFileInfo =
                             match shop with
                             | OldShop ->
-                                OldShopDatabase.storageProcessor.GetAudioBookFileInfo model.Id
+                                DependencyService.Get<IOldShopDatabase>().Base.GetAudioBookFileInfo model.Id
                             | NewShop ->
-                                NewShopDatabase.storageProcessor.GetAudioBookFileInfo model.Id
+                                DependencyService.Get<INewShopDatabase>().Base.GetAudioBookFileInfo model.Id
 
                         match audioFileInfo with
                         | None ->

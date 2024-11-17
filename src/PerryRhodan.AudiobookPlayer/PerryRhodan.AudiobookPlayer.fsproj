@@ -1,11 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net9.0;net9.0-android</TargetFrameworks>
+    <TargetFrameworks>net9.0</TargetFrameworks>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <WarningsAsErrors>FS0025</WarningsAsErrors>
-    <SingleProject>true</SingleProject>
   </PropertyGroup>
 
   <ItemGroup>
@@ -86,6 +85,7 @@
     <PackageReference Include="DialogHost.Avalonia" Version="0.9.0-preview1" />
     <PackageReference Include="FsToolkit.ErrorHandling.TaskResult" Version="4.18.0" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.66" />
+    <PackageReference Include="LoadingIndicators.Avalonia" Version="11.0.11.1" />
     <PackageReference Include="Material.Avalonia" Version="3.7.4" />
     <PackageReference Include="Material.Avalonia.Dialogs" Version="3.7.4" />
     <PackageReference Include="Material.Icons.Avalonia" Version="2.1.10" />

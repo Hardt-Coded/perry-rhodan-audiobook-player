@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:PerryRhodan.AudiobookPlayer.ViewModels"
              xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+             xmlns:li="clr-namespace:LoadingIndicators.Avalonia;assembly=LoadingIndicators.Avalonia"
              mc:Ignorable="d" d:DesignWidth="393" d:DesignHeight="500"
              x:Class="PerryRhodan.AudiobookPlayer.Views.FeedbackView"
              Background="Black"
@@ -23,7 +24,7 @@
                 <Grid Height="{Binding InputPaneHeight}" />
             </StackPanel>
             <Grid IsVisible="{Binding IsBusy}">
-                <ProgressBar Classes="circular" IsIndeterminate="True" />
+                <li:LoadingIndicator IsActive="{Binding IsBusy}" Mode="Arcs" SpeedRatio="1.2" Width="100" Height="100" Foreground="{StaticResource MaterialPrimaryLightBrush}" />
             </Grid>
         </Grid>
     </controls:Card>

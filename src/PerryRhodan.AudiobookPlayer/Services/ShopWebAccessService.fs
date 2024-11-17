@@ -669,7 +669,7 @@ module NewShopWebAccessService =
 
                 //use thumbInputStream = File.OpenRead()
                 use orig = SKBitmap.Decode(imageFullName)
-                use thumb = orig.Resize(SKImageInfo(100, 100), SKSamplingOptions(SKFilterMode.Linear, SKMipmapMode.Linear))
+                use thumb = orig.Resize(SKImageInfo(280, 280), SKSamplingOptions(SKFilterMode.Linear, SKMipmapMode.Linear))
                 if isNull thumb then
                     ()
                 else
@@ -716,7 +716,9 @@ module NewShopWebAccessService =
                                 }
                                 |> Request.sendAsync
 
-                            if (resp.statusCode <> HttpStatusCode.OK) then
+                            if (resp.statusCode |> int >= 400) then
+                                let! content = resp |> Response.toTextAsync
+                                Global.telemetryClient.TrackTrace($"download statuscode {resp.statusCode}", SeverityLevel.Error, Map.ofList ["Content",content])
                                 return Error (Other $"download statuscode {resp.statusCode}")
                             else
 
