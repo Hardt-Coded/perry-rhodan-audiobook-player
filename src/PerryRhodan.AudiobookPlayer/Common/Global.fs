@@ -1,18 +1,22 @@
 ﻿module Global
 
+    open Avalonia.Controls
     open Microsoft.ApplicationInsights
     open Microsoft.ApplicationInsights.Extensibility
 
-    let appcenterAndroidId      = "***REMOVED***"
-    let supportMessageApi       = "***REMOVED***"
-    let messageEndpoint         = "https://einsamedienappmessages.z1.web.core.windows.net/messages.json"
-    let appInsightsConnection   = "***REMOVED***"
+    let appcenterAndroidId      = ""
+    let supportMessageApi       = ""
+    let messageEndpoint         = ""
+    let appInsightsConnection   = ""
     
 
 
 
     let config = TelemetryConfiguration.CreateDefault()
-    config.ConnectionString <- appInsightsConnection
+    if Design.IsDesignMode then
+        config.DisableTelemetry <- true
+    if Design.IsDesignMode |> not then
+        config.ConnectionString <- appInsightsConnection
     let telemetryClient = new TelemetryClient(config)
     
 
