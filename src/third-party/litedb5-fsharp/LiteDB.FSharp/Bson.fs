@@ -2,6 +2,7 @@ namespace LiteDB.FSharp
 
 open System
 
+open System.Reflection
 open FSharp.Reflection
 open Newtonsoft.Json
 open LiteDB
@@ -106,8 +107,8 @@ module Bson =
             else failwithf "Could not extract element type from collection of type %s"  collectionType.FullName           
         
         let getKeyFieldName (entityType: Type)= 
-          if FSharpType.IsRecord entityType 
-          then FSharpType.GetRecordFields entityType 
+          if FSharpType.IsRecord(entityType, BindingFlags.Public ||| BindingFlags.NonPublic) 
+          then FSharpType.GetRecordFields(entityType, BindingFlags.Public ||| BindingFlags.NonPublic)  
                |> Seq.tryFind (fun field -> field.Name = "Id" || field.Name = "id")
                |> function | Some field -> field.Name
                            | None -> "Id"
@@ -138,7 +139,7 @@ module Bson =
                         // if property is nested record that resulted from DbRef then
                         // also re-write the transformed _id key property back to original Id or id
                         let propType = entityType.GetProperty(y).PropertyType
-                        if FSharpType.IsRecord propType    
+                        if FSharpType.IsRecord(propType, BindingFlags.Public ||| BindingFlags.NonPublic)    
                         then rewriteKey (List.ofSeq bson.RawValue.Keys) bson propType (getKeyFieldName propType)
                         continueToNext()
 
@@ -149,7 +150,7 @@ module Bson =
 
                         let elementTypes = getCollectionElementType collectionType
                         for elementType in elementTypes do
-                            if FSharpType.IsRecord elementType then
+                            if FSharpType.IsRecord(elementType, BindingFlags.Public ||| BindingFlags.NonPublic) then
                                 let docKey = getKeyFieldName elementType
                                 for bson in bsonArray do
                                     if bson.IsDocument 

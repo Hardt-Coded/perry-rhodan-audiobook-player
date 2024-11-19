@@ -125,17 +125,9 @@
                 </ItemsControl.ItemTemplate>
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <VirtualizingStackPanel Orientation="Vertical" Margin="0,-100,00,0" />
+                        <VirtualizingStackPanel Orientation="Vertical" Margin="0,0,0,0" />
                     </ItemsPanelTemplate>    
                 </ItemsControl.ItemsPanel>
-                <ItemsControl.Styles>
-                    <Style Selector="ContentPresenter:nth-child(1) views|AudioBookItemView">
-                        <Setter Property="Margin" Value="0,100,0,0" />
-                    </Style>
-                    <Style Selector="ContentPresenter:nth-last-child(1) views|AudioBookItemView">
-                        <Setter Property="Margin" Value="0,0,0,-100" />
-                    </Style>
-                </ItemsControl.Styles>
             </ItemsControl>
            
         </ScrollViewer>

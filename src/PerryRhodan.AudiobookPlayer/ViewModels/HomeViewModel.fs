@@ -1,6 +1,7 @@
 ﻿namespace PerryRhodan.AudiobookPlayer.ViewModels
 
 open System
+open System.Collections.ObjectModel
 open Avalonia.Data.Converters
 open CherylUI.Controls
 open Common
@@ -296,7 +297,7 @@ type HomeViewModel(?audiobookItems) as self =
 
     member this.AudioBooks =
         //this.BindList (local, _.AudioBooks)
-        this.BindOnChanged(local, (fun s -> s.AudioBooks, s.Filter, s.Shop, s.SortOrder), _.AudioBooks)
+        this.BindOnChanged(local, (fun s -> s.AudioBooks, s.Filter, s.Shop, s.SortOrder), fun s -> ObservableCollection(s.AudioBooks))
 
     member this.IsNewShop
         with get() = this.BindOnChanged(local, _.Shop, _.Shop.IsNewShop)
