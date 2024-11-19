@@ -150,7 +150,7 @@ module DataBaseCommon =
             audioBooks
 
 
-    module private AudioBookFilesDataDatabase =
+    module AudioBookFilesDataDatabase =
 
         // type for backwards compatibility
         type AudioBookAudioFileDb = {

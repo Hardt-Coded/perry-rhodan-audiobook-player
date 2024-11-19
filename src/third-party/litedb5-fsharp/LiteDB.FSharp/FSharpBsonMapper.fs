@@ -1,5 +1,6 @@
 namespace LiteDB.FSharp
 
+open System.Reflection
 open LiteDB
 open System
 open System.Collections.Generic
@@ -50,7 +51,7 @@ type FSharpBsonMapper() =
         mapper
 
     override self.GetTypeCtor(mapper) =
-        if FSharpType.IsRecord mapper.ForType then
+        if FSharpType.IsRecord(mapper.ForType, BindingFlags.Public ||| BindingFlags.NonPublic) then
             CreateObject (fun doc -> FSharpBsonMapper().ToObject(mapper.ForType, doc))
         else
             base.GetTypeCtor(mapper)
