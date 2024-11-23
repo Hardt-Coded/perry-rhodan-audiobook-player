@@ -9,6 +9,7 @@
              xmlns:glassMorphism="clr-namespace:CherylUI.Controls.GlassMorphism;assembly=CherylUI"
              xmlns:valueSelector="clr-namespace:PerryRhodan.AudiobookPlayer.ValueSelector"
              xmlns:li="clr-namespace:LoadingIndicators.Avalonia;assembly=LoadingIndicators.Avalonia"
+             xmlns:controls1="clr-namespace:PerryRhodan.AudiobookPlayer.Controls"
              mc:Ignorable="d" d:DesignWidth="393" d:DesignHeight="738"
              x:Class="PerryRhodan.AudiobookPlayer.Views.HomeView"
              Background="Black"
@@ -18,7 +19,7 @@
 
     <Interaction.Behaviors>
         <EventTriggerBehavior EventName="Loaded">
-            <InvokeCommandAction Command="{Binding OnInitialized}" />
+            <InvokeCommandAction Command="{Binding OnInitialized}" PassEventArgsToCommand="True" />
         </EventTriggerBehavior>
     </Interaction.Behaviors>
     <Grid RowDefinitions="Auto,Auto,Auto,Auto,*">
@@ -84,7 +85,7 @@
             
         </Grid>
         
-        <Grid Grid.Row="2" Margin="15,0,15,0" >
+        <Grid Grid.Row="2" Margin="15,0,15,0">
             <!-- Search Bar -->
             <TextBox Watermark="Suche" 
                      
@@ -117,19 +118,29 @@
         <!-- Audio Books -->
         <ScrollViewer Grid.Row="4"
                       VerticalScrollBarVisibility="Hidden">
-            <ItemsControl ItemsSource="{Binding AudioBooks}">
-                <ItemsControl.ItemTemplate>
+            <!-- <ItemsControl ItemsSource="{Binding AudioBooks}"> -->
+            <!--     <ItemsControl.ItemTemplate> -->
+            <!--         <DataTemplate> -->
+            <!--             <views:AudioBookItemView DataContext="{Binding .}" /> -->
+            <!--         </DataTemplate> -->
+            <!--     </ItemsControl.ItemTemplate> -->
+            <!--     <ItemsControl.ItemsPanel> -->
+            <!--         <ItemsPanelTemplate> -->
+            <!--             <VirtualizingStackPanel Orientation="Vertical" Margin="0,0,0,100" /> -->
+            <!--         </ItemsPanelTemplate> -->
+            <!--     </ItemsControl.ItemsPanel> -->
+            <!-- </ItemsControl> -->
+            <controls1:VirtualPanel ItemsSource="{Binding AudioBooks}"
+                          ItemHeight="104"
+                          x:Name="AudioBookPanel"
+                          Layout="Stack"
+                          VerticalAlignment="Top">
+                <controls1:VirtualPanel.ItemTemplate>
                     <DataTemplate>
                         <views:AudioBookItemView DataContext="{Binding .}" />
                     </DataTemplate>
-                </ItemsControl.ItemTemplate>
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <VirtualizingStackPanel Orientation="Vertical" Margin="0,0,0,0" />
-                    </ItemsPanelTemplate>    
-                </ItemsControl.ItemsPanel>
-            </ItemsControl>
-           
+                </controls1:VirtualPanel.ItemTemplate>
+            </controls1:VirtualPanel>
         </ScrollViewer>
 
 

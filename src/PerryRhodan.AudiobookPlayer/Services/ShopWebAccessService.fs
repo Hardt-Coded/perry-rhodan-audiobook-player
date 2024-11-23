@@ -572,7 +572,7 @@ module NewShopWebAccessService =
                     headers [
                         "Cookie", seqCC |> Seq.map (fun (k,v) -> $"{k}={v}") |> String.concat "; "
                     ]
-                    config_transformHttpClient (useAndroidHttpClient true)
+                    config_transformHttpClient (useAndroidHttpClient false)
                 }
                 |> Request.sendTAsync
             |> handleException
@@ -583,23 +583,34 @@ module NewShopWebAccessService =
                         |> Seq.filter (fun m -> m.Key = "Location")
                         |> Seq.collect (_.Value)
                         |> Seq.tryHead
+                    Global.telemetryClient.TrackTrace(
+                        "getDownloadPage: response",
+                        SeverityLevel.Information,
+                        Map.ofList [
+                            "Location", $"{location}"
+                            "Url", requestUrl
+                            "StatusCode", resp.statusCode.ToString()
+                        ]
+                    )
                     match location, resp.statusCode with
                     // download page successfully loaded
                     | None, HttpStatusCode.OK ->
-                        return! resp |> Response.toTextAsync
+                        let! content = resp |> Response.toTextAsync
+                        return content
                     // redirect to login page
                     | Some loc , _ when loc.Contains("login") ->
                         return! Error (ComError.SessionExpired "Session expired.")
                     | _ ->
-                        let entry = new TraceTelemetry()
-                        entry.SeverityLevel <- SeverityLevel.Error
-                        entry.Message <- "Unexpected server behavior."
-                        entry.Properties.Add("StatusCode", resp.statusCode.ToString())
-                        entry.Properties.Add("Location", $"{location}")
-                        entry.Properties.Add("Url", requestUrl)
                         let! content = resp.content.ReadAsStringAsync()
-                        entry.Properties.Add("Content", content)
-                        Global.telemetryClient.Track(entry)
+                        Global.telemetryClient.TrackTrace(
+                              "Unexpected server behavior.",
+                              SeverityLevel.Error,
+                              Map.ofList [
+                                  "StatusCode", resp.statusCode.ToString()
+                                  "Location", $"{location}"
+                                  "Url", requestUrl
+                                  "Content", content
+                              ])
                         return! Error (ComError.Other "Unexpected server behavior.")
                 }
             )

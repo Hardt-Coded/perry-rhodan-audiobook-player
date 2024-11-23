@@ -298,7 +298,7 @@ let parseOldShopDownloadData htmlData =
     with
     | ex ->
         Global.telemetryClient.TrackTrace ("Error in parseOldShopDownloadData", SeverityLevel.Error)
-        Global.telemetryClient.TrackException ex
+        Global.telemetryClient.TrackException (ex, Map.ofList ["htmlData", htmlData])
         Error "Fehler beim Parsen der Downloadseite vom alten Shop" 
 
 
@@ -443,9 +443,9 @@ let parseNewShopDownloadData htmlData =
         |> Ok
     with
     | ex ->
-        Global.telemetryClient.TrackTrace ("Error in parseOldShopDownloadData", SeverityLevel.Error)
-        Global.telemetryClient.TrackException ex
-        Error "Fehler beim Parsen der Downloadseite vom alten Shop"
+        Global.telemetryClient.TrackTrace ("Error in parse new shop data", SeverityLevel.Error)
+        Global.telemetryClient.TrackException (ex, Map.ofList ["htmlData", htmlData])
+        Error "Fehler beim Parsen der Downloadseite vom neuen Shop"
 
 let filterNewAudioBooks (local:AudioBook[]) (online:AudioBook[]) =
     online

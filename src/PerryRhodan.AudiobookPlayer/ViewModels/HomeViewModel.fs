@@ -2,7 +2,9 @@
 
 open System
 open System.Collections.ObjectModel
+open Avalonia.Controls
 open Avalonia.Data.Converters
+open Avalonia.Interactivity
 open CherylUI.Controls
 open Common
 open Dependencies
@@ -223,30 +225,30 @@ module HomePage =
 
     and sortAudioBooks (shop:Shop) (sortOrder:SortOrder) (audiobooks:AudioBookItemViewModel[]) =
         match sortOrder with
-        | SortOrder.TitleAsc ->         audiobooks |> Array.sortBy (_.Title)
-        | SortOrder.TitleDesc ->        audiobooks |> Array.sortByDescending (_.Title)
-        | SortOrder.LastListendDesc ->  audiobooks |> Array.sortByDescending (_.AudioBook.State.LastTimeListend)
+        | SortOrder.TitleAsc ->         audiobooks |> Array.Parallel.sortBy (_.Title)
+        | SortOrder.TitleDesc ->        audiobooks |> Array.Parallel.sortByDescending (_.Title)
+        | SortOrder.LastListendDesc ->  audiobooks |> Array.Parallel.sortByDescending (_.AudioBook.State.LastTimeListend)
         | SortOrder.IdAsc ->
             match shop with
-            | NewShop -> audiobooks |> Array.sortBy (fun i -> match i.AudioBook.PublishingDate with | Some d -> d | None -> DateOnly.MinValue)
-            | OldShop -> audiobooks |> Array.sortBy (_.AudioBook.Id)
+            | NewShop -> audiobooks |> Array.Parallel.sortBy (fun i -> match i.AudioBook.PublishingDate with | Some d -> d | None -> DateOnly.MinValue)
+            | OldShop -> audiobooks |> Array.Parallel.sortBy (_.AudioBook.Id)
 
         | SortOrder.IdDesc ->
             match shop with
-            | NewShop -> audiobooks |> Array.sortByDescending (fun i -> match i.AudioBook.PublishingDate with | Some d -> d | None -> DateOnly.MinValue)
-            | OldShop -> audiobooks |> Array.sortByDescending (_.AudioBook.Id)
+            | NewShop -> audiobooks |> Array.Parallel.sortByDescending (fun i -> match i.AudioBook.PublishingDate with | Some d -> d | None -> DateOnly.MinValue)
+            | OldShop -> audiobooks |> Array.Parallel.sortByDescending (_.AudioBook.Id)
 
 
     and filterAudioBooks (filter:FilterOptions) (audiobooks:AudioBookItemViewModel[]) =
         match filter with
         | FilterOptions.All ->                  audiobooks
-        | FilterOptions.Downloaded ->           audiobooks |> Array.filter (_.AudioBook.State.Downloaded)
-        | FilterOptions.Unfinished ->           audiobooks |> Array.filter (fun a -> not a.AudioBook.State.Completed)
-        | FilterOptions.Finished ->             audiobooks |> Array.filter (_.AudioBook.State.Completed)
-        | FilterOptions.NotListend ->           audiobooks |> Array.filter (fun a -> a.AudioBook.State.LastTimeListend.IsNone && not a.AudioBook.State.Completed)
-        | FilterOptions.CurrentlyListening ->   audiobooks |> Array.filter (fun a -> a.AudioBook.State.LastTimeListend.IsSome && not a.AudioBook.State.Completed)
-        | FilterOptions.Group groupName ->      audiobooks |> Array.filter (fun a -> a.AudioBook.Group = groupName)
-        | FilterOptions.Free searchWord ->      audiobooks |> Array.filter (fun a -> a.Title.ToUpperInvariant().Contains (searchWord.ToUpperInvariant()))
+        | FilterOptions.Downloaded ->           audiobooks |> Array.Parallel.filter (_.AudioBook.State.Downloaded)
+        | FilterOptions.Unfinished ->           audiobooks |> Array.Parallel.filter (fun a -> not a.AudioBook.State.Completed)
+        | FilterOptions.Finished ->             audiobooks |> Array.Parallel.filter (_.AudioBook.State.Completed)
+        | FilterOptions.NotListend ->           audiobooks |> Array.Parallel.filter (fun a -> a.AudioBook.State.LastTimeListend.IsNone && not a.AudioBook.State.Completed)
+        | FilterOptions.CurrentlyListening ->   audiobooks |> Array.Parallel.filter (fun a -> a.AudioBook.State.LastTimeListend.IsSome && not a.AudioBook.State.Completed)
+        | FilterOptions.Group groupName ->      audiobooks |> Array.Parallel.filter (fun a -> a.AudioBook.Group = groupName)
+        | FilterOptions.Free searchWord ->      audiobooks |> Array.Parallel.filter (fun a -> a.Title.ToUpperInvariant().Contains (searchWord.ToUpperInvariant()))
 
 
     module SideEffects =
@@ -271,6 +273,8 @@ open ReactiveElmish.Avalonia
 type HomeViewModel(?audiobookItems) as self =
     inherit ReactiveElmishViewModel()
 
+    let mutable audioBookPanel: VirtualPanel option = None
+    
     let audiobookItems = [||] |> defaultArg audiobookItems
 
     let init () =
@@ -295,9 +299,16 @@ type HomeViewModel(?audiobookItems) as self =
     new () = new HomeViewModel([||])
 
 
+    member this.SetPanel vp = audioBookPanel <- Some vp
+    
     member this.AudioBooks =
-        //this.BindList (local, _.AudioBooks)
-        this.BindOnChanged(local, (fun s -> s.AudioBooks, s.Filter, s.Shop, s.SortOrder), fun s -> ObservableCollection(s.AudioBooks))
+        this.BindOnChanged(local, (fun s -> s.AudioBooks, s.Filter, s.Shop, s.SortOrder), fun s ->
+            audioBookPanel
+            |> Option.iter (fun i ->
+                ()
+            )    
+            s.AudioBooks
+        )
 
     member this.IsNewShop
         with get() = this.BindOnChanged(local, _.Shop, _.Shop.IsNewShop)
@@ -306,7 +317,7 @@ type HomeViewModel(?audiobookItems) as self =
     member this.IsOldShop =
         this.BindOnChanged(local, _.Shop, _.Shop.IsOldShop)
 
-    member this.IsBusy                      = this.BindOnChanged(local, _.IsBusy, _.IsBusy)
+    member this.IsBusy                    = this.BindOnChanged(local, _.IsBusy, _.IsBusy)
     member this.BusyMessage               = this.BindOnChanged(local, _.BusyMessage, _.BusyMessage)
 
     member this.SearchText
@@ -319,7 +330,12 @@ type HomeViewModel(?audiobookItems) as self =
             ) value
 
 
-    member this.OnInitialized() =
+    member this.OnInitialized(e:RoutedEventArgs) =
+        let panel = (e.Source :?> UserControl).FindControl<VirtualPanel>("AudioBookPanel")
+        match panel with
+        | null -> ()
+        | _ -> this.SetPanel panel
+        
         let currentAudioBooks =
             match local.Model.Shop with
             | NewShop -> AudioBookStore.globalAudiobookStore.Value.Model.NewShopAudiobooks

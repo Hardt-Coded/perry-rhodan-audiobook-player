@@ -174,7 +174,7 @@ type MainActivity() as self =
         // convert function to C# Func
 
         let androidOptions = AndroidPlatformOptions()
-        let renderModes = [ AndroidRenderingMode.Vulkan; AndroidRenderingMode.Egl ] |> System.Collections.Generic.List
+        let renderModes = [ AndroidRenderingMode.Egl ] |> System.Collections.Generic.List
         androidOptions.RenderingMode <- renderModes.AsReadOnly()
 
 
@@ -183,6 +183,7 @@ type MainActivity() as self =
             .WithInterFont()
             .With(androidOptions)
             .UseReactiveUI()
+            
 
 
     override this.OnResume() =
