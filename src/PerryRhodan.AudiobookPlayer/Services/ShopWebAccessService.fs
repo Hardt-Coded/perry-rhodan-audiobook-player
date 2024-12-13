@@ -748,7 +748,7 @@ module NewShopWebAccessService =
                             | x when x >= 400 ->
                                 let! content = resp |> Response.toTextAsync
                                 Global.telemetryClient.TrackTrace($"download statuscode {resp.statusCode}", SeverityLevel.Error, Map.ofList ["Content",content])
-                                return Error (Other $"download statuscode {resp.statusCode}")
+                                return Error (Other $"Fehler beim Download: Die Website meldet einen Http-Statuscode {resp.statusCode}")
                             | _ ->
 
                                 let unzipTargetFolder = Path.Combine(audioBookFolder,"audio")
@@ -841,7 +841,7 @@ module NewShopWebAccessService =
                                 return Error (Network Translations.current.NetworkTimeoutError)
                             | ex ->
                                 Global.telemetryClient.TrackException ex
-                                return Error (Other ex.Message)
+                                return Error (Other $"Fehler beim Download: {ex.Message}")
                 with
                 | exn ->
                     let ex = exn.GetBaseException()
@@ -860,5 +860,5 @@ module NewShopWebAccessService =
                         return Error (Network Translations.current.NetworkTimeoutError)
                     | ex ->
                         Global.telemetryClient.TrackException ex
-                        return Error (Other Translations.current.InternalError)
+                        return Error (Other $"Fehler beim Download: {ex.Message}")
             }
