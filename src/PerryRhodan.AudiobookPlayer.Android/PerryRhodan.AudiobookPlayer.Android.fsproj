@@ -44,7 +44,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia.Android" Version="11.2.1" />
+    <PackageReference Include="Avalonia.Android" Version="11.2.2" />
     <PackageReference Include="Xamarin.AndroidX.Core.SplashScreen" Version="1.0.1.12" />
     <PackageReference Update="Microsoft.Maui.Essentials" Version="8.0.91" />
     <PackageReference Update="Microsoft.NET.Runtime.MonoAOTCompiler.Task" Version="8.0.10" />
