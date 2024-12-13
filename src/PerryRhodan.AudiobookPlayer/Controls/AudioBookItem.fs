@@ -520,11 +520,13 @@ module AudioBookItem =
                                 match error with
                                 | ComError.SessionExpired _ ->
                                     downloadService.ShutDownService ()
+                                    do! Notifications.showErrorMessage "Login-Session abgelaufen. Bitte neu anmelden." |> Async.AwaitTask
                                     openLoginForm shop
                                     dispatch <| RemoveDownloadFromQueue
                                     downloadService.RemoveInfoListener listenerName
 
                                 | ComError.Other msg ->
+                                    dispatch <| RemoveDownloadFromQueue
                                     do! Notifications.showErrorMessage msg |> Async.AwaitTask
                                     Global.telemetryClient.TrackTrace (msg, SeverityLevel.Error)
                                     downloadService.RemoveInfoListener listenerName
@@ -535,6 +537,7 @@ module AudioBookItem =
                                     do! Notifications.showErrorMessage msg |> Async.AwaitTask
                                     ()
                                 | ComError.Exception e ->
+                                    dispatch <| RemoveDownloadFromQueue
                                     let ex = e.GetBaseException()
                                     let msg = ex.Message + "|" + ex.StackTrace
                                     Global.telemetryClient.TrackException ex

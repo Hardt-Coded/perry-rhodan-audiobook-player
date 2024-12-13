@@ -56,7 +56,6 @@ module PlayerElmish =
         TimeUntilSleep: TimeSpan option
         PlaybackSpeed: decimal
         IsBusy: bool
-        SleepTimerState: SleepTimerState option
         // RecendlyMoved: RecendlyMoved
 
     } with
@@ -77,7 +76,6 @@ module PlayerElmish =
             TimeUntilSleep = None
             PlaybackSpeed = 1.0m
             IsBusy = false
-            SleepTimerState = None
             // RecendlyMoved = No
         }
 
@@ -95,7 +93,6 @@ module PlayerElmish =
     type Msg =
         | StateControlMsg of StateControlMsg
         | PlayerControlMsg of PlayerControlMsg
-        | SleepTimerMsg of SleepTimerMsg
         | RunSideEffect of SideEffect
 
 
@@ -122,13 +119,6 @@ module PlayerElmish =
         | UpdateAudioPlayerState of state: AudioPlayerState
         | UpdateCurrentMediaItem of mediaItem: IMediaItem
 
-    and SleepTimerMsg =
-        | SleepTimerTick
-        | SleepTimerStop
-        | SleepTimerStart of TimeSpan
-
-
-
 
 
     and [<RequireQualifiedAccess>]
@@ -149,11 +139,7 @@ module PlayerElmish =
         | StopPlayingAndFinishAudioBook
 
         | GotUpdateInfoDataFromOutside
-
-        | StartSleepTimer
-        | StopSleepTimer
-        | SleepTimeReachedEnd
-
+      
         | QuitAudioPlayer
     // side effects are the same as the message itself, so we can use the same type
 
@@ -510,28 +496,6 @@ module PlayerElmish =
 
 
 
-        | SleepTimerMsg SleepTimerTick ->
-            state.SleepTimerState
-            |> Option.map (fun sleepTimerState ->
-                if sleepTimerState.SleepTimerCurrentTime <= TimeSpan.Zero then
-                    state, SideEffect.SleepTimeReachedEnd
-                else
-                    { state with SleepTimerState = Some { sleepTimerState with SleepTimerCurrentTime = sleepTimerState.SleepTimerCurrentTime - TimeSpan.FromSeconds 1.0 } }, SideEffect.None
-            )
-            |> Option.defaultValue (state, SideEffect.None)
-
-        | SleepTimerMsg SleepTimerStop ->
-            { state with SleepTimerState = None }, SideEffect.StopSleepTimer
-
-        | SleepTimerMsg (SleepTimerStart time) ->
-            { state
-              with SleepTimerState = {
-                SleepTimerStartValue = time
-                SleepTimerCurrentTime = time
-                } |> Some
-            }, SideEffect.StartSleepTimer
-
-
 
     module SideEffects =
 
@@ -567,14 +531,6 @@ module PlayerElmish =
                 task {
                     match sideEffect with
                     | SideEffect.None ->
-                        return ()
-
-                    | SideEffect.StartSleepTimer ->
-                        sleepTimer |> Option.iter (_.Dispose())
-                        sleepTimer <- Some <| new Timer(
-                            fun _ ->
-                                dispatch <| SleepTimerMsg SleepTimerTick |> ignore
-                            , null, TimeSpan.FromSeconds 1.0, TimeSpan.FromSeconds 1.0)
                         return ()
 
                     | SideEffect.InitMediaPlayer ->
@@ -762,18 +718,6 @@ module PlayerElmish =
                                  false
                          | None -> ()
 
-
-                    | SideEffect.StopSleepTimer ->
-                         sleepTimer |> Option.iter (_.Dispose())
-                         return ()
-
-                    | SideEffect.SleepTimeReachedEnd ->
-                         sleepTimer |> Option.iter (_.Dispose())
-                         sleepTimer <- None
-                         do! CrossMediaManager.Current.Pause()
-                         dispatch <| SleepTimerMsg SleepTimerStop
-                         return ()
-
                 }
 
 
@@ -797,7 +741,6 @@ type IAudioPlayer =
     abstract member Previous: unit -> Task<unit>
     abstract member JumpForward: unit -> Task<unit>
     abstract member JumpBackwards: unit -> Task<unit>
-    abstract member StartSleepTimer: spleepTime: TimeSpan option -> Task<unit>
     abstract member AudioPlayerInformation: PlayerElmish.AudioPlayerInfo
     // observable
     abstract member AudioPlayerInfoChanged: IObservable<PlayerElmish.AudioPlayerInfo>
@@ -953,17 +896,7 @@ type AudioPlayerService() =
                 if not store.Model.IsBusy then
                     store.Dispatch <| PlayerControlMsg (SetPlaybackSpeed speed)
             }
-
-        member this.StartSleepTimer sleepTime =
-            task {
-                if not store.Model.IsBusy then
-                    match sleepTime with
-                    | None ->
-                        store.Dispatch <| SleepTimerMsg SleepTimerStop
-                    | Some sleepTime ->
-                        store.Dispatch <| SleepTimerMsg (SleepTimerStart sleepTime)
-            }
-
+        
 
         member this.AudioPlayerInformation with get() = store.Model
         member this.AudioPlayerInfoChanged = store.Observable

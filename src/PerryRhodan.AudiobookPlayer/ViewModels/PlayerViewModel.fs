@@ -8,6 +8,7 @@ open Avalonia.Controls
 open Avalonia.Controls.Primitives
 open Dependencies
 open Domain
+open FSharpx.Control
 open Microsoft.Extensions.DependencyInjection
 open PerryRhodan.AudiobookPlayer.Services
 open PerryRhodan.AudiobookPlayer.Services.AudioPlayer
@@ -15,6 +16,9 @@ open PerryRhodan.AudiobookPlayer.Services.AudioPlayer.PlayerElmish
 open PerryRhodan.AudiobookPlayer.Services.Interfaces
 open PerryRhodan.AudiobookPlayer.ViewModel
 open ReactiveElmish
+
+
+
 
 module PlayerPage =
 
@@ -43,7 +47,10 @@ module PlayerPage =
 
 
     let disposables = new System.Collections.Generic.List<IDisposable>()
-
+    
+    let sleepTimerEvent = Event<TimeSpan option>()
+    
+    
     type Msg =
         | PlayerControlMsg of PlayerControlMsg
         | ButtonActionMsg of ButtonActionMsg
@@ -56,6 +63,7 @@ module PlayerPage =
         | SetTrackPosition of TimeSpan
         | SetDragging of bool
         | UpdateScreenInformation of info: PlayerElmish.State
+        | UpdateTimeUntilSleep of TimeSpan option
 
         | SetBusy of bool
 
@@ -247,12 +255,6 @@ module PlayerPage =
             // always update the time until sleeps and audioplayer state
             let state = {
                 state with
-                    TimeUntilSleeps =
-                        info.SleepTimerState
-                        |> Option.map (_.SleepTimerCurrentTime)
-                    SelectedSleepTime =
-                        // reset selected sleep time if the sleep timer has stopped
-                        info.SleepTimerState |> Option.bind (fun _ -> state.SelectedSleepTime)
                     CurrentState = info.State
 
             }
@@ -270,8 +272,8 @@ module PlayerPage =
                         IsLoading = info.IsBusy
                 },
                 SideEffect.None
-            //else
-            //    state, SideEffect.None
+        | UpdateTimeUntilSleep t ->
+            { state with TimeUntilSleeps = t }, SideEffect.None
 
 
 
@@ -397,6 +399,19 @@ module PlayerPage =
                             | SideEffect.None -> return ()
 
                             | SideEffect.InitAudioPlayer ->
+                                
+                                disposables |> Seq.iter _.Dispose()
+                                
+                                disposables.Add
+                                    <| audioPlayer.AudioPlayerInfoChanged.Subscribe(fun info ->
+                                        dispatch <| UpdateScreenInformation info
+                                    )
+                                    
+                                disposables.Add
+                                    <| sleepTimerEvent.Publish.Subscribe(fun time ->
+                                        dispatch <| UpdateTimeUntilSleep time
+                                    )
+                                
                                 // check if the global audio player is active and already an audiobook is loaded
                                 match audioPlayer.AudioPlayerInformation.AudioBook with
                                 // when the user tapped on the already active audiobook
@@ -488,12 +503,7 @@ module PlayerPage =
                                 do! audioPlayer.Stop false
                                 do! audioPlayer.Init state.AudioBook fileList
 
-                                disposables |> Seq.iter (_.Dispose())
-                                disposables.Add
-                                    <| audioPlayer.AudioPlayerInfoChanged.Subscribe(fun info ->
-                                        //if info.State = AudioPlayerState.Playing then
-                                            dispatch <| UpdateScreenInformation info
-                                    )
+                                
 
                                 // update the screen information
                                 dispatch <| UpdateScreenInformation audioPlayer.AudioPlayerInformation
@@ -508,7 +518,10 @@ module PlayerPage =
                                 return ()
 
                             | SideEffect.StartSleepTimer sleepTime ->
-                                do! audioPlayer.StartSleepTimer sleepTime
+                                
+                                    
+                                let sleepTimerService = DependencyService.Get<ISleepTimerService>()
+                                sleepTimerService.StartSleepTimer sleepTime
                                 return ()
 
                             | SideEffect.SetPlaybackSpeed speed ->

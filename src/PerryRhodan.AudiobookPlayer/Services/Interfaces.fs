@@ -41,6 +41,9 @@
         
     type IPictureDownloadService =
         abstract member StartDownload: Shop -> unit
+        
+    type ISleepTimerService =
+        abstract member StartSleepTimer: TimeSpan option -> unit
 
     type IAndroidHttpMessageHandlerService =
         abstract member GetHttpMesageHandler: unit -> HttpMessageHandler

@@ -163,6 +163,7 @@ type MainActivity() as self =
                 .AddSingleton<IAndroidDownloadFolder, AndroidDownloadFolder>()
                 .AddSingleton<IDownloadService, DownloadServiceImplementation.DependencyService.DownloadService>()
                 .AddSingleton<IPictureDownloadService, PictureDownloadServiceImplementation.DependencyService.PictureAndroidDownloadService>()
+                .AddSingleton<ISleepTimerService, SleepTimerServiceImplementation.DependencyService.SleepTimerService>()
                 .AddSingleton<INotificationService, NotificationService.NotificationService>()
                 .AddSingleton<IBitmapConverter>(bitmapConverter)
                 .AddSingleton<IPackageInformation>(packageInformation)
