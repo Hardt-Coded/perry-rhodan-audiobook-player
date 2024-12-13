@@ -409,21 +409,18 @@ module OldShopWebAccessService =
                                     |> Request.sendAsync
 
                                 if (resp.statusCode <> HttpStatusCode.OK) then
+                                    Global.telemetryClient.TrackTrace($"download statuscode {resp.statusCode}", SeverityLevel.Error)
                                     return Error (Other $"download statuscode {resp.statusCode}")
                                 else
 
                                     let unzipTargetFolder = Path.Combine(audioBookFolder,"audio")
 
-
-
                                     if not (Directory.Exists(unzipTargetFolder)) then
                                         Directory.CreateDirectory(unzipTargetFolder) |> ignore
-
 
                                     let downloadingFlagFile = Path.Combine(unzipTargetFolder,"downloading")
                                     // create flag file, to determinate download was maybe interrupted!
                                     File.WriteAllText(downloadingFlagFile,"downloading")
-
 
                                     let fileSize =
                                         (resp.content.Headers
@@ -489,23 +486,39 @@ module OldShopWebAccessService =
                                     }
 
                             with
-                            | :? WebException | :? SocketException ->
+                            | :? WebException as ex ->
+                                Global.telemetryClient.TrackTrace($"Network error.", SeverityLevel.Error)
+                                Global.telemetryClient.TrackException ex
+                                return Error (Network Translations.current.NetworkError)
+                            | :? SocketException as ex ->
+                                Global.telemetryClient.TrackTrace($"Network error.", SeverityLevel.Error)
+                                Global.telemetryClient.TrackException ex
                                 return Error (Network Translations.current.NetworkError)
                             | :? TimeoutException ->
+                                Global.telemetryClient.TrackTrace($"Timeout error.", SeverityLevel.Error)
                                 return Error (Network Translations.current.NetworkTimeoutError)
-                            | _ ->
+                            | ex ->
+                                Global.telemetryClient.TrackException ex
                                 return Error (Other Translations.current.InternalError)
                 with
                 | exn ->
                     let ex = exn.GetBaseException()
                     Global.telemetryClient.TrackException ex
                     match ex with
-                    | :? WebException | :? SocketException ->
+                    | :? WebException as ex ->
+                        Global.telemetryClient.TrackTrace($"Network error.", SeverityLevel.Error)
+                        Global.telemetryClient.TrackException ex
+                        return Error (Network Translations.current.NetworkError)
+                    | :? SocketException as ex ->
+                        Global.telemetryClient.TrackTrace($"Network error.", SeverityLevel.Error)
+                        Global.telemetryClient.TrackException ex
                         return Error (Network Translations.current.NetworkError)
                     | :? TimeoutException ->
+                        Global.telemetryClient.TrackTrace($"Timeout error.", SeverityLevel.Error)
                         return Error (Network Translations.current.NetworkTimeoutError)
-                    | _ ->
-                        return Error (Other Translations.current.InternalError)
+                    | ex ->
+                        Global.telemetryClient.TrackException ex
+                        return Error (Other ex.Message)
             }
 
 
@@ -727,11 +740,16 @@ module NewShopWebAccessService =
                                 }
                                 |> Request.sendAsync
 
-                            if (resp.statusCode |> int >= 400) then
+                            match (resp.statusCode |> int) with
+                            | 403 ->
+                                let! content = resp |> Response.toTextAsync
+                                Global.telemetryClient.TrackTrace($"download statuscode {resp.statusCode}", SeverityLevel.Error, Map.ofList ["Content",content])
+                                return Error (SessionExpired "Login-Session abgelaufen!")
+                            | x when x >= 400 ->
                                 let! content = resp |> Response.toTextAsync
                                 Global.telemetryClient.TrackTrace($"download statuscode {resp.statusCode}", SeverityLevel.Error, Map.ofList ["Content",content])
                                 return Error (Other $"download statuscode {resp.statusCode}")
-                            else
+                            | _ ->
 
                                 let unzipTargetFolder = Path.Combine(audioBookFolder,"audio")
 
@@ -810,21 +828,37 @@ module NewShopWebAccessService =
                                 }
 
                         with
-                        | :? WebException | :? SocketException ->
-                            return Error (Network Translations.current.NetworkError)
-                        | :? TimeoutException ->
-                            return Error (Network Translations.current.NetworkTimeoutError)
-                        | _ ->
-                            return Error (Other Translations.current.InternalError)
+                            | :? WebException as ex ->
+                                Global.telemetryClient.TrackTrace($"Network error.", SeverityLevel.Error)
+                                Global.telemetryClient.TrackException ex
+                                return Error (Network Translations.current.NetworkError)
+                            | :? SocketException as ex ->
+                                Global.telemetryClient.TrackTrace($"Network error.", SeverityLevel.Error)
+                                Global.telemetryClient.TrackException ex
+                                return Error (Network Translations.current.NetworkError)
+                            | :? TimeoutException ->
+                                Global.telemetryClient.TrackTrace($"Timeout error.", SeverityLevel.Error)
+                                return Error (Network Translations.current.NetworkTimeoutError)
+                            | ex ->
+                                Global.telemetryClient.TrackException ex
+                                return Error (Other ex.Message)
                 with
                 | exn ->
                     let ex = exn.GetBaseException()
                     Global.telemetryClient.TrackException ex
                     match ex with
-                    | :? WebException | :? SocketException ->
+                    | :? WebException as ex ->
+                        Global.telemetryClient.TrackTrace($"Network error.", SeverityLevel.Error)
+                        Global.telemetryClient.TrackException ex
+                        return Error (Network Translations.current.NetworkError)
+                    | :? SocketException as ex ->
+                        Global.telemetryClient.TrackTrace($"Network error.", SeverityLevel.Error)
+                        Global.telemetryClient.TrackException ex
                         return Error (Network Translations.current.NetworkError)
                     | :? TimeoutException ->
+                        Global.telemetryClient.TrackTrace($"Timeout error.", SeverityLevel.Error)
                         return Error (Network Translations.current.NetworkTimeoutError)
-                    | _ ->
+                    | ex ->
+                        Global.telemetryClient.TrackException ex
                         return Error (Other Translations.current.InternalError)
             }

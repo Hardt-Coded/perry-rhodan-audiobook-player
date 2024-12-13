@@ -5,6 +5,7 @@ open CherylUI.Controls
 open Dependencies
 open Domain
 open Global
+open Microsoft.ApplicationInsights.DataContracts
 open PerryRhodan.AudiobookPlayer
 open PerryRhodan.AudiobookPlayer.Services.Interfaces
 open ReactiveElmish.Avalonia
@@ -133,24 +134,28 @@ module LoginPage =
                                     | Ok cc ->
                                         match cc with
                                         | None ->
-                                            Notifications.showToasterMessage "Login fehlgeschlagen"
+                                            do! Notifications.showErrorMessage "Login fehlgeschlagen"
                                             dispatch LoginFailed
                                         | Some c ->
                                             dispatch <| LoginSucceeded c
                                     | Error e ->
                                         match e with
                                         | SessionExpired e ->
+                                            Global.telemetryClient.TrackTrace(e, SeverityLevel.Error, Map.empty)
                                             do! Notifications.showErrorMessage e
                                             ()
                                         | Other e ->
+                                            Global.telemetryClient.TrackTrace(e, SeverityLevel.Error, Map.empty)
                                             do! Notifications.showErrorMessage e
                                             ()
                                         | Exception e ->
                                             let ex = e.GetBaseException()
                                             let msg = ex.Message + "|" + ex.StackTrace
+                                            Global.telemetryClient.TrackException(ex, Map.empty)
                                             do! Notifications.showErrorMessage msg
                                             ()
                                         | Network msg ->
+                                            Global.telemetryClient.TrackTrace(msg, SeverityLevel.Error, Map.empty)
                                             do! Notifications.showErrorMessage msg
                                             ()
 

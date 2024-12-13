@@ -5,6 +5,7 @@ open Common
 open Dependencies
 open Domain
 open FsToolkit.ErrorHandling
+open Microsoft.ApplicationInsights.DataContracts
 open PerryRhodan.AudiobookPlayer
 open PerryRhodan.AudiobookPlayer.Services.Interfaces
 open PerryRhodan.AudiobookPlayer.ViewModel
@@ -334,20 +335,26 @@ module ShopService =
                             | WebError comError ->
                                 match comError with
                                 | SessionExpired _ ->
+                                    Global.telemetryClient.TrackEvent("SessionExpired")
+                                    do! showErrorMessage "Login ist abgelaufen, bitte neu einloggen!"
                                     openLogin ()
 
                                 | Other e ->
+                                    Global.telemetryClient.TrackTrace(e, SeverityLevel.Error)
                                     do! showErrorMessage e
 
                                 | Exception e ->
                                     let ex = e.GetBaseException()
                                     let msg = ex.Message + "|" + ex.StackTrace
+                                    Global.telemetryClient.TrackTrace(msg, SeverityLevel.Error)
                                     do! showErrorMessage msg
 
                                 | Network msg ->
+                                    Global.telemetryClient.TrackTrace(msg, SeverityLevel.Error)
                                     do! showErrorMessage msg
 
                             | StorageError msg ->
+                                Global.telemetryClient.TrackTrace(msg, SeverityLevel.Error)
                                 do! showErrorMessage msg
                     }
 

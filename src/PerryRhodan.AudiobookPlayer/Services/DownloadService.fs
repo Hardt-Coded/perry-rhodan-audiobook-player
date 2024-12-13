@@ -599,6 +599,7 @@ module DownloadService =
 
                     match res with
                     | Error error ->
+                        Global.telemetryClient.TrackEvent($"Error while downloading audiobook: {error}")
                         inbox.Post <| DownloadError error
                     | Ok result ->
 
@@ -619,6 +620,7 @@ module DownloadService =
                         }
                         match saveResult with
                         | Error msg ->
+                            Global.telemetryClient.TrackEvent($"Error while saving audiobook state: {msg}")
                             inbox.Post <| DownloadError (ComError.Other msg)
                         | Ok _ ->
                             inbox.Post <| FinishedDownload (newInfo,result)
