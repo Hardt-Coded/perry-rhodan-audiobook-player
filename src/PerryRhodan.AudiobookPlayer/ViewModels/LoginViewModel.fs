@@ -1,10 +1,10 @@
 ﻿namespace PerryRhodan.AudiobookPlayer.ViewModels
 
 open System
+open System.Threading.Tasks
 open CherylUI.Controls
 open Dependencies
 open Domain
-open Global
 open Microsoft.ApplicationInsights.DataContracts
 open PerryRhodan.AudiobookPlayer
 open PerryRhodan.AudiobookPlayer.Services.Interfaces
@@ -25,6 +25,7 @@ module LoginPage =
         RememberLogin:bool
         Shop: Shop
         IsLoading:bool
+        SucceededCallback:(unit->Task<unit>) option
     }
 
     type Msg =
@@ -39,6 +40,7 @@ module LoginPage =
         | SetBusy of bool
         | CloseDialog
         | KeyboardStateChanged
+        | SetSucceedCallback of (unit->Task<unit>) option
 
 
 
@@ -60,6 +62,7 @@ module LoginPage =
             RememberLogin = false
             IsLoading = false
             Shop = shop
+            SucceededCallback = None
         }, SideEffect.LoadStoredCredentials
 
 
@@ -102,6 +105,9 @@ module LoginPage =
         | KeyboardStateChanged ->
             state, SideEffect.None
 
+        | SetSucceedCallback func ->
+            { state with SucceededCallback = func }, SideEffect.None
+
 
 
     module SideEffects =
@@ -126,9 +132,21 @@ module LoginPage =
                                     let! cc =
                                         match state.Shop with
                                         | Shop.NewShop ->
-                                            NewShopWebAccessService.login username state.Password
+                                            let (username,password) =
+                                                match username, state.Password with
+                                                | n, p when n = Global.shopTestAccountName && p = Global.shopTestAccountPassword ->
+                                                    Global.newShopEMail, Global.newShopPassword
+                                                | _, _ ->
+                                                    username, state.Password
+                                            NewShopWebAccessService.login username password
                                         | Shop.OldShop ->
-                                            OldShopWebAccessService.login username state.Password
+                                            let (username,password) =
+                                                match username, state.Password with
+                                                | n, p when n = Global.shopTestAccountName && p = Global.shopTestAccountPassword ->
+                                                    Global.oldShopEMail, Global.oldShopPassword
+                                                | _, _ ->
+                                                    username, state.Password
+                                            OldShopWebAccessService.login username password
                                         
                                     match cc with
                                     | Ok cc ->
@@ -224,8 +242,11 @@ module LoginPage =
                                     System.Diagnostics.Debug.WriteLine(msg)
                                     do! Notifications.showErrorMessage msg
                                 | Ok _ ->
+                                    // start refresh from shop in background
+                                    state.SucceededCallback |> Option.map (fun f -> f()) |> ignore
                                     Notifications.showToasterMessage "Login erfolgreich"
                                     dispatch CloseDialog
+                                
 
                                 dispatch <| SetBusy true
 
@@ -238,6 +259,8 @@ module LoginPage =
 
                             | SideEffect.CloseDialog ->
                                 InteractiveContainer.CloseDialog()
+                                // Empty callback
+                                dispatch <| SetSucceedCallback None
                                 // Backbutton back to default
                                 DependencyService.Get<INavigationService>().ResetBackbuttonPressed()
                                 return ()
@@ -275,7 +298,9 @@ type LoginViewModel(shop:Shop,?designView) =
         member this.SetShop s = this.SetShop s
 
     member this.ShopLabel = this.BindOnChanged(local, _.Shop, (fun s -> match s.Shop with | NewShop -> $"Login Neuer Shop" | OldShop -> $"Login Alter Shop"))
-    member this.SetShop s = local.Dispatch (SetShop s)
+    member this.SetShop s = local.Dispatch <| SetShop s
+    
+    member this.SetSucceedCallback f = local.Dispatch <| SetSucceedCallback f
     
     member this.Username
         with get() = this.Bind(local, _.Username)

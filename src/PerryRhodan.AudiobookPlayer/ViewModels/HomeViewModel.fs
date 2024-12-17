@@ -367,6 +367,7 @@ type HomeViewModel(?audiobookItems) as self =
                 | OldShop -> Services.SecureLoginStorage.loadOldShopCookie
 
             let appendBusyMessage msg = local.Dispatch <| AppendBusyMessage msg
+            
             let openLogin =
                 local.Dispatch <| ClearBusyMessage
                 this.OpenLogin
@@ -409,6 +410,7 @@ type HomeViewModel(?audiobookItems) as self =
     member this.OpenLogin () =
         let control = PerryRhodan.AudiobookPlayer.Views.LoginView()
         let vm = new LoginViewModel(local.Model.Shop)
+        vm.SetSucceedCallback (Some this.LoadOnlineAudiobooks)
         control.DataContext <- vm
         InteractiveContainer.ShowDialog (control, true)
 
