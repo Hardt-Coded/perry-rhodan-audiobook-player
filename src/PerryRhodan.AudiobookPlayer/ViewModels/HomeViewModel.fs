@@ -403,6 +403,9 @@ type HomeViewModel(?audiobookItems) as self =
                      onSuccess
 
 
+            local.Dispatch <| FilterChanged FilterOptions.All
+            local.Dispatch <| SortOrderChanged SortOrder.IdDesc
+            
             local.Dispatch (false |> SetBusy)
 
         }
